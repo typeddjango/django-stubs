@@ -11,8 +11,6 @@ django.contrib.admin.tests.AdminSeleniumTestCase.trigger_resize
 django.contrib.admin.tests.CSPMiddleware
 django.contrib.admin.widgets.DateTimeWidgetContextMixin
 django.contrib.auth.admin.UserAdmin.lookup_allowed
-django.contrib.auth.checks.check_models_permissions
-django.contrib.auth.checks.check_user_model
 django.contrib.auth.templatetags
 django.contrib.auth.templatetags.auth
 django.contrib.contenttypes.fields.GenericForeignKey.ct_field_attname
@@ -61,10 +59,6 @@ django.contrib.postgres.search.psql_escape
 django.contrib.postgres.search.quote_lexeme
 django.contrib.postgres.search.spec_chars_re
 django.contrib.postgres.utils.CheckPostgresInstalledMixin
-django.contrib.staticfiles.checks.check_finders
-django.contrib.staticfiles.checks.check_storages
-django.core.checks.model_checks.check_all_models
-django.core.checks.model_checks.check_lazy_references
 django.core.checks.security.base.E026
 django.core.checks.security.base.check_csp_settings
 django.core.mail.EmailMessage.message
