@@ -65,12 +65,10 @@ def test_find_classes_inheriting_from_generic() -> None:
             if module_name.startswith("django.tasks") and django.VERSION < (6, 0):
                 continue
             django_module = importlib.import_module(module_name)
-            all_generic_classes.update(
-                {
-                    cls: [subcls.__name__ for subcls in getattr(django_module, cls).mro()[1:-1]]
-                    for cls in generic_visitor.generic_classes
-                }
-            )
+            for cls in generic_visitor.generic_classes:
+                if cls in {"AsyncPage", "AsyncPaginator", "BasePaginator"} and django.VERSION < (6, 0):
+                    continue
+                all_generic_classes[cls] = [subcls.__name__ for subcls in getattr(django_module, cls).mro()[1:-1]]
 
     print(f"Processed {len(pyi_files)} .pyi files.")
     print(f"Found {len(all_generic_classes)} unique classes inheriting from Generic in stubs")

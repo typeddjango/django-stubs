@@ -70,9 +70,6 @@ django.core.checks.security.base.check_csp_settings
 django.core.mail.EmailMessage.message
 django.core.mail.backends.smtp.EmailBackend.prep_address
 django.core.mail.message.EmailMessage.message
-django.core.paginator.AsyncPage
-django.core.paginator.AsyncPaginator
-django.core.paginator.BasePaginator
 django.db.backends.base.creation.BaseDatabaseCreation.create_test_db
 django.db.backends.base.operations.BaseDatabaseOperations.compile_json_path
 django.db.backends.base.operations.BaseDatabaseOperations.fetch_returned_insert_columns
