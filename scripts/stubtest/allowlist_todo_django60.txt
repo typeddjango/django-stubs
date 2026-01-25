@@ -135,11 +135,6 @@ django.forms.models.BaseModelForm.validate_constraints
 django.forms.renderers.Jinja2DivFormRenderer
 django.tasks.checks
 django.tasks.default_task_backend
-django.template.base.PartialTemplate
-django.template.defaulttags.PartialDefNode
-django.template.defaulttags.PartialNode
-django.template.defaulttags.partial_func
-django.template.defaulttags.partialdef_func
 django.test.runner.QueryFormatter
 django.test.selenium.SeleniumTestCase.get_browser_logs
 django.test.testcases._AssertTemplateUsedContext.rendered_template_names
