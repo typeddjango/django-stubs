@@ -140,10 +140,6 @@ django.test.selenium.SeleniumTestCase.get_browser_logs
 django.test.testcases._AssertTemplateUsedContext.rendered_template_names
 django.utils.copy
 django.utils.datastructures.DeferredSubDict
-django.utils.deprecation.RemovedInDjango60Warning
-django.utils.deprecation.RemovedInDjango70Warning
-django.utils.deprecation.deprecate_posargs
-django.utils.deprecation.django_file_prefixes
 django.utils.http.MAX_HEADER_LENGTH
 django.utils.http.parse_header_parameters
 django.utils.inspect.is_module_level_function
