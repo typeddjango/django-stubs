@@ -89,9 +89,6 @@ django.db.migrations.executor.MigrationExecutor.record_migration
 django.db.migrations.loader.MigrationLoader.all_replaced_applied
 django.db.migrations.loader.MigrationLoader.replace_migration
 django.db.migrations.operations.base.Operation.__replace__
-django.db.migrations.serializer.DeconstructableSerializer
-django.db.migrations.serializer.DeconstructibleSerializer
-django.db.migrations.serializer.ZoneInfoSerializer
 django.db.models.BaseConstraint.__init__
 django.db.models.BaseConstraint.check
 django.db.models.CheckConstraint.__init__
