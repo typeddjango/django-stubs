@@ -462,7 +462,6 @@ django.db.migrations.questioner.NonInteractiveMigrationQuestioner.log_lack_of_mi
 django.db.migrations.recorder.MigrationRecorder.Migration.get_next_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.get_previous_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.id
-django.db.migrations.serializer.ChoicesSerializer
 django.db.migrations.utils.FieldReference
 django.db.migrations.utils.field_is_referenced
 django.db.migrations.utils.field_references
