@@ -149,10 +149,4 @@ django.utils.deprecation.RemovedInDjango60Warning
 django.utils.deprecation.RemovedInDjango70Warning
 django.utils.deprecation.deprecate_posargs
 django.utils.deprecation.django_file_prefixes
-django.utils.http.MAX_HEADER_LENGTH
-django.utils.http.parse_header_parameters
-django.utils.inspect.is_module_level_function
 django.utils.itercompat
-django.utils.json
-django.utils.log.log_message
-django.utils.text.acompress_sequence

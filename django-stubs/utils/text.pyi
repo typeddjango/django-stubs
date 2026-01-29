@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import AsyncIterator, Callable, Iterable, Iterator
 from html.parser import HTMLParser
 from io import BytesIO
 from re import Pattern
@@ -51,6 +51,9 @@ class StreamingBuffer(BytesIO):
     def read(self) -> bytes: ...  # type: ignore[override]
 
 def compress_sequence(sequence: Iterable[bytes], *, max_random_bytes: int | None = None) -> Iterator[bytes]: ...
+async def acompress_sequence(
+    sequence: Iterable[bytes], *, max_random_bytes: int | None = None
+) -> AsyncIterator[bytes]: ...
 
 smart_split_re: Pattern[str]
 

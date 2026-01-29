@@ -42,6 +42,13 @@ class ServerFormatter(logging.Formatter):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def uses_server_time(self) -> bool: ...
 
+def log_message(
+    logger: Logger,
+    level: int | str,
+    message: str,
+    args: Any,
+    kwargs: Any = None,
+) -> None: ...
 def log_response(
     message: str,
     *args: Any,
