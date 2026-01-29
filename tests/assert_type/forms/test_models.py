@@ -7,7 +7,7 @@ from django.db import models
 
 
 class MyModel(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)  # pyright: ignore[reportUnknownVariableType]
 
 
 def callback_optional(db_field: models.Field[Any, Any], **kwargs: Any) -> forms.Field | None:
@@ -18,5 +18,5 @@ def callback_required(db_field: models.Field[Any, Any], **kwargs: Any) -> forms.
     return forms.CharField()
 
 
-forms.fields_for_model(MyModel, formfield_callback=callback_optional)
-forms.fields_for_model(MyModel, formfield_callback=callback_required)
+forms.fields_for_model(MyModel, formfield_callback=callback_optional)  # pyright: ignore[reportUnknownMemberType]
+forms.fields_for_model(MyModel, formfield_callback=callback_required)  # pyright: ignore[reportUnknownMemberType]
