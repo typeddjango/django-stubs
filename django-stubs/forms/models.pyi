@@ -26,7 +26,7 @@ _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 _Labels: TypeAlias = dict[str, str]
 _HelpTexts: TypeAlias = dict[str, str]
 _ErrorMessages: TypeAlias = dict[str, dict[str, str]]
-_FormFieldCallback: TypeAlias = Callable[[models.Field], Field]
+_FormFieldCallback: TypeAlias = Callable[[models.Field], Field | None]
 
 _M = TypeVar("_M", bound=Model)
 _ParentM = TypeVar("_ParentM", bound=Model)
