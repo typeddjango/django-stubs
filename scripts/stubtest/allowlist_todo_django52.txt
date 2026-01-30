@@ -33,7 +33,6 @@ django.contrib.gis.management
 django.contrib.gis.management.commands
 django.contrib.gis.management.commands.inspectdb
 django.contrib.gis.management.commands.ogrinspect
-django.contrib.sessions.backends.base.SessionBase.pop
 django.core.handlers.wsgi.LimitedStream.read
 django.core.handlers.wsgi.LimitedStream.readline
 django.db.backends.base.features.BaseDatabaseFeatures.rounds_to_even
