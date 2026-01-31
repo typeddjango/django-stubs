@@ -16,3 +16,4 @@ class EmailBackend(BaseEmailBackend):
     ssl_certfile: StrOrBytesPath | None
     connection: smtplib.SMTP_SSL | smtplib.SMTP | None
     _lock: threading.RLock
+    def prep_address(self, address: str, force_ascii: bool = True) -> str: ...

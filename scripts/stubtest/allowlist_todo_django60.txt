@@ -59,9 +59,6 @@ django.contrib.postgres.search.psql_escape
 django.contrib.postgres.search.quote_lexeme
 django.contrib.postgres.search.spec_chars_re
 django.contrib.postgres.utils.CheckPostgresInstalledMixin
-django.core.mail.EmailMessage.message
-django.core.mail.backends.smtp.EmailBackend.prep_address
-django.core.mail.message.EmailMessage.message
 django.db.backends.base.creation.BaseDatabaseCreation.create_test_db
 django.db.backends.base.operations.BaseDatabaseOperations.compile_json_path
 django.db.backends.base.operations.BaseDatabaseOperations.fetch_returned_insert_columns
