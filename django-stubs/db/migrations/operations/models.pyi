@@ -141,10 +141,17 @@ class RenameIndex(IndexOperation):
     def new_name_lower(self) -> str: ...
 
 class AddConstraint(IndexOperation):
+    model_name: str
+    constraint: BaseConstraint
     def __init__(self, model_name: str, constraint: BaseConstraint) -> None: ...
 
 class RemoveConstraint(IndexOperation):
+    model_name: str
+    name: str
     def __init__(self, model_name: str, name: str) -> None: ...
 
 class AlterConstraint(IndexOperation):
+    model_name: str
+    name: str
+    constraint: BaseConstraint
     def __init__(self, model_name: str, name: str, constraint: BaseConstraint) -> None: ...
