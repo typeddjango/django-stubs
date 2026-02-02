@@ -11,6 +11,8 @@ from django.test.testcases import SimpleTestCase
 from django.test.utils import TimeKeeperProtocol
 from django.utils.datastructures import OrderedSet
 
+class QueryFormatter(logging.Formatter): ...
+
 class DebugSQLTextTestResult(TextTestResult):
     buffer: bool
     descriptions: bool
