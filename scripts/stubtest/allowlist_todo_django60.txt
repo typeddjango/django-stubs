@@ -9,9 +9,6 @@ django.contrib.admin.sites.AdminSite.password_change_form
 django.contrib.admin.tests.AdminSeleniumTestCase.trigger_resize
 django.contrib.admin.tests.CSPMiddleware
 django.contrib.admin.widgets.DateTimeWidgetContextMixin
-django.contrib.contenttypes.fields.GenericForeignKey.ct_field_attname
-django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_queryset
-django.contrib.contenttypes.management.get_contenttypes_and_models
 django.contrib.gis.admin.AdminSite.password_change_form
 django.contrib.gis.admin.ModelAdmin.log_deletion
 django.contrib.gis.db.models.BaseConstraint.__init__
