@@ -128,8 +128,6 @@ django.test.selenium.SeleniumTestCase.get_browser_logs
 django.test.testcases._AssertTemplateUsedContext.rendered_template_names
 django.utils.copy
 django.utils.datastructures.DeferredSubDict
-django.utils.http.MAX_HEADER_LENGTH
-django.utils.http.parse_header_parameters
 django.utils.inspect.is_module_level_function
 django.utils.itercompat
 django.utils.json
