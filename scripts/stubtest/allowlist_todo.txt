@@ -112,7 +112,6 @@ django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_fk_field
 django.contrib.contenttypes.admin.GenericInlineModelAdmin.template
 django.contrib.contenttypes.fields.GenericRelation.get_extra_restriction
 django.contrib.contenttypes.forms.generic_inlineformset_factory
-django.contrib.contenttypes.management.inject_rename_contenttypes_operations
 django.contrib.contenttypes.models.ContentType.app_label
 django.contrib.contenttypes.models.ContentType.app_labeled_name
 django.contrib.contenttypes.models.ContentType.id
