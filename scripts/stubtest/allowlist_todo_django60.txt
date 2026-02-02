@@ -30,7 +30,6 @@ django.contrib.gis.db.models.__all__
 django.contrib.gis.db.models.functions.GeometryType
 django.contrib.gis.db.models.functions.Rotate
 django.contrib.gis.forms.BaseGeometryWidget.base_layer
-django.contrib.gis.forms.BaseModelForm.validate_constraints
 django.contrib.gis.forms.OSMWidget.base_layer
 django.contrib.gis.forms.OpenLayersWidget.base_layer
 django.contrib.gis.forms.widgets.BaseGeometryWidget.base_layer
