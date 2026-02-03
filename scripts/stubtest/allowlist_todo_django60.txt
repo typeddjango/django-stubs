@@ -72,10 +72,6 @@ django.db.backends.oracle.utils.InsertVar
 django.db.backends.postgresql.operations.DatabaseOperations.fetch_returned_insert_rows
 django.db.backends.sqlite3.operations.DatabaseOperations.fetch_returned_insert_rows
 django.db.backends.sqlite3.operations.DatabaseOperations.format_json_path_numeric_index
-django.db.migrations.executor.MigrationExecutor.record_migration
-django.db.migrations.loader.MigrationLoader.all_replaced_applied
-django.db.migrations.loader.MigrationLoader.replace_migration
-django.db.migrations.operations.base.Operation.__replace__
 django.db.models.BaseConstraint.__init__
 django.db.models.BaseConstraint.check
 django.db.models.CheckConstraint.__init__
