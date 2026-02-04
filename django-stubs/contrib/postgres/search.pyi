@@ -1,3 +1,4 @@
+import re
 from typing import Any, ClassVar, TypeAlias
 
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -5,16 +6,30 @@ from django.db.models import Expression, Field, FloatField, TextField
 from django.db.models.expressions import Combinable, CombinedExpression, Func, Value
 from django.db.models.lookups import Lookup
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from psycopg.adapt import Dumper
 from typing_extensions import Self
 
+from .utils import CheckPostgresInstalledMixin
+
 _Expression: TypeAlias = str | Combinable | SearchQueryCombinable
+
+class UTF8Dumper(Dumper):
+    def dump(self, obj: object) -> bytes: ...
+
+def quote_lexeme(value: str) -> str: ...
+
+spec_chars_re: re.Pattern[str]
+multiple_spaces_re: re.Pattern[str]
+
+def normalize_spaces(val: str) -> str | None: ...
+def psql_escape(query: str) -> str | None: ...
 
 class SearchVectorExact(Lookup):
     def process_rhs(self, qn: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
     def as_sql(self, qn: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
-class SearchVectorField(Field): ...
-class SearchQueryField(Field): ...
+class SearchVectorField(CheckPostgresInstalledMixin, Field): ...
+class SearchQueryField(CheckPostgresInstalledMixin, Field): ...
 
 class SearchConfig(Expression):
     config: _Expression | None
@@ -143,7 +158,15 @@ class TrigramStrictWordDistance(TrigramWordBase): ...
 class TrigramWordSimilarity(TrigramWordBase): ...
 class TrigramStrictWordSimilarity(TrigramWordBase): ...
 
-class Lexeme(Value):
+class LexemeCombinable:
+    BITAND: str
+    BITOR: str
+    def __or__(self, other: LexemeCombinable) -> CombinedLexeme: ...
+    def __ror__(self, other: LexemeCombinable) -> CombinedLexeme: ...
+    def __and__(self, other: LexemeCombinable) -> CombinedLexeme: ...
+    def __rand__(self, other: LexemeCombinable) -> CombinedLexeme: ...
+
+class Lexeme(LexemeCombinable, Value):  # type: ignore[misc]
     def __init__(
         self,
         value: Any,
@@ -153,5 +176,7 @@ class Lexeme(Value):
         prefix: bool = False,
         weight: Any | None = None,
     ) -> None: ...
+    def __invert__(self) -> Self: ...  # type: ignore[override]
 
-class CombinedLexeme(CombinedExpression): ...
+class CombinedLexeme(LexemeCombinable, CombinedExpression):  # type: ignore[misc]
+    def __invert__(self) -> Self: ...  # type: ignore[override]
