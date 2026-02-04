@@ -679,6 +679,8 @@
         import django.views.i18n
         import django.views.static
     mypy_config: |
+        [mypy-psycopg.*]
+        ignore_errors = true
         [mypy-redis.*]
         ignore_errors = true
         [mypy-yaml.*]
