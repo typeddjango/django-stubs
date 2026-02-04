@@ -35,10 +35,19 @@ class Library:
     def simple_tag(
         self, func: None = None, takes_context: bool | None = None, name: str | None = None
     ) -> Callable[[_C], _C]: ...
+    @overload
     def inclusion_tag(
         self,
         filename: Template | str,
-        func: Callable | None = None,
+        func: _C,
+        takes_context: bool | None = None,
+        name: str | None = None,
+    ) -> _C: ...
+    @overload
+    def inclusion_tag(
+        self,
+        filename: Template | str,
+        func: None = None,
         takes_context: bool | None = None,
         name: str | None = None,
     ) -> Callable[[_C], _C]: ...
