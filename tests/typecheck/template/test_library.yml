@@ -135,3 +135,27 @@
             return ', '.join(results)
 
         reveal_type(format_results) # N: Revealed type is "def (results: builtins.list[builtins.str]) -> builtins.str"
+
+-   case: register_inclusion_tag_takes_context
+    main: |
+        from typing_extensions import reveal_type
+        from typing import Any
+        from django import template
+        register = template.Library()
+
+        @register.inclusion_tag('results.html', takes_context=True)
+        def format_results(context: dict[str, Any], results: list[str]) -> str:
+            return ', '.join(results)
+
+        reveal_type(format_results) # N: Revealed type is "def (context: builtins.dict[builtins.str, Any], results: builtins.list[builtins.str]) -> builtins.str"
+
+-   case: register_inclusion_tag_via_call
+    main: |
+        from typing_extensions import reveal_type
+        from django import template
+        register = template.Library()
+
+        def format_results(results: list[str]) -> str:
+            return ', '.join(results)
+
+        reveal_type(register.inclusion_tag('results.html', format_results)) # N: Revealed type is "def (results: builtins.list[builtins.str]) -> builtins.str"
