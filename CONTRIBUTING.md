@@ -33,6 +33,34 @@ As a first step you will need to fork this repository and clone your fork locall
 In order to be able to continuously sync your fork with the origin repository's master branch, you will need to set up an upstream master.
 To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
+### System Dependencies
+
+The test suite requires some system libraries to be installed:
+
+**MySQL/MariaDB client libraries** (required for `mysqlclient` to build):
+
+- Ubuntu/Debian: `sudo apt-get install libmysqlclient-dev pkg-config`
+- Fedora/RHEL: `sudo dnf install mysql-devel pkgconf-pkg-config`
+- macOS (Homebrew): `brew install mariadb pkg-config`
+
+**GDAL and GEOS** (optional, only needed for `django.contrib.gis` tests):
+
+- Ubuntu/Debian: `sudo apt-get install binutils libproj-dev gdal-bin`
+- Fedora/RHEL: `sudo dnf install gdal gdal-devel geos geos-devel`
+- macOS (Homebrew): `brew install gdal` — see note below
+
+> **macOS Note:** Homebrew installs libraries to `/opt/homebrew` (Apple Silicon) or `/usr/local` (Intel),
+> which are not in the default library search path. The 2 GIS tests may fail unless you create symlinks:
+>
+> ```bash
+> sudo mkdir -p /usr/local/lib
+> sudo ln -s /opt/homebrew/opt/gdal/lib/libgdal.dylib /usr/local/lib/libgdal.dylib
+> sudo ln -s /opt/homebrew/opt/geos/lib/libgeos_c.dylib /usr/local/lib/libgeos_c.dylib
+> ```
+>
+> If you're not working on GIS-related stubs, you can skip GDAL/GEOS installation entirely —
+> the 2 failing tests won't affect other contributions.
+
 ### Dependency Setup
 
 We use [uv](https://github.com/astral-sh/uv) to manage our dev dependencies.
@@ -45,7 +73,9 @@ uv sync
 source .venv/bin/activate
 ```
 
-Finally, install the pre-commit hooks:
+Finally, install the pre-commit hooks. Pre-commit must be installed separately
+(see [installation options](https://pre-commit.com/#install)), or you can use `uvx pre-commit` to
+run it without installation:
 
 ```bash
 pre-commit install
@@ -66,7 +96,7 @@ You can also run pre-commit per file or for a specific path, simply replace "--a
 To execute the unit tests, simply run:
 
 ```bash
-pytest -n auto
+uv run pytest -n auto
 ```
 
 If you get some unexpected results or want to be sure that tests run is not affected by previous one, remove `mypy` cache:
