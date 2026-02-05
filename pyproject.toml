@@ -54,6 +54,7 @@ tests = [
   "django==5.2.11; python_version < '3.12'",
   "django==6.0.2; python_version >= '3.12'",
   "mysqlclient==2.2.7",
+  "psycopg[binary]==3.3.2",
   "psycopg2-binary==2.9.11",
   "jinja2==3.1.6",
   "pyyaml==6.0.3",

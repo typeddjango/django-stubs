@@ -409,8 +409,6 @@ django.db.backends.oracle.features.DatabaseFeatures.supports_frame_exclusion
 django.db.backends.postgresql.base.DatabaseWrapper.Database
 django.db.backends.postgresql.base.DatabaseWrapper.ops
 django.db.backends.postgresql.base.DatabaseWrapper.tzinfo_factory
-django.db.backends.postgresql.base.INETARRAY
-django.db.backends.postgresql.base.INETARRAY_OID
 django.db.backends.postgresql.features.DatabaseFeatures.django_test_expected_failures
 django.db.backends.postgresql.features.DatabaseFeatures.introspected_field_types
 django.db.backends.postgresql.features.DatabaseFeatures.prohibits_null_characters_in_text_exception
