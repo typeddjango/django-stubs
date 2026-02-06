@@ -39,8 +39,8 @@ class Model(metaclass=ModelBase):
     # Our mypy plugin aligns with this behaviour and will remove the 2 attributes below
     # and re-add them to correct concrete subclasses of 'Model'
     DoesNotExist: Final[type[ObjectDoesNotExist]]
-    MultipleObjectsReturned: Final[type[BaseMultipleObjectsReturned]]
     NotUpdated: Final[type[ObjectNotUpdated]]
+    MultipleObjectsReturned: Final[type[BaseMultipleObjectsReturned]]
     # This 'objects' attribute will be deleted, via the plugin, in favor of managing it
     # to only exist on subclasses it exists on during runtime.
     objects: ClassVar[Manager[Self]]

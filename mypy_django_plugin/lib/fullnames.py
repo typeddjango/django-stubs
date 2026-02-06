@@ -61,6 +61,7 @@ TYPED_MODEL_META_FULLNAME = "django_stubs_ext.db.models.TypedModelMeta"
 STR_PROMISE_FULLNAME = "django.utils.functional._StrPromise"
 
 OBJECT_DOES_NOT_EXIST = "django.core.exceptions.ObjectDoesNotExist"
+OBJECT_NOT_UPDATED = "django.core.exceptions.ObjectNotUpdated"
 MULTIPLE_OBJECTS_RETURNED = "django.core.exceptions.MultipleObjectsReturned"
 
 DJANGO_ABSTRACT_MODELS = frozenset(
