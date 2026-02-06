@@ -21,6 +21,9 @@ django.contrib.sites.migrations.*
 # default_storage is actually an instance of DefaultStorage, but it proxies through to a Storage
 django.core.files.storage.default_storage
 
+# default_task_backend is actually an instance of ConnectionProxy, but it proxies through to a BaseTaskBackend
+django.tasks.default_task_backend
+
 # '<Model>_RelatedManager' entries are plugin generated and these subclasses only exist
 # _locally/dynamically_ runtime -- Created via
 # 'django.db.models.fields.related_descriptors.create_reverse_many_to_one_manager'

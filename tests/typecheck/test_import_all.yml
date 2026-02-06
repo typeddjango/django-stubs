@@ -565,6 +565,15 @@
         import django.middleware.locale
         import django.middleware.security
         import django.shortcuts
+        import django.tasks
+        import django.tasks.backends
+        import django.tasks.backends.base
+        import django.tasks.backends.dummy
+        import django.tasks.backends.immediate
+        import django.tasks.base
+        import django.tasks.checks
+        import django.tasks.exceptions
+        import django.tasks.signals
         import django.template
         import django.template.backends
         import django.template.backends.base

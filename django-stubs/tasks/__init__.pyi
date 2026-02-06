@@ -1,5 +1,3 @@
-from typing import Any, type_check_only
-
 from django.utils.connection import BaseConnectionHandler
 
 from .backends.base import BaseTaskBackend
@@ -26,10 +24,5 @@ __all__ = [
 class TaskBackendHandler(BaseConnectionHandler[BaseTaskBackend]): ...
 
 task_backends: TaskBackendHandler
-
-@type_check_only
-class _default_task_backend(BaseTaskBackend):
-    def enqueue(self, task: Task, args: list[Any], kwargs: dict[str, Any]) -> TaskResult: ...
-
-# Actually ConnectionProxy, but quacks exactly like _default_task_backend, it's not worth distinguishing the two.
-default_task_backend: _default_task_backend
+# Actually ConnectionProxy, but quacks exactly like BaseTaskBackend, it's not worth distinguishing the two.
+default_task_backend: BaseTaskBackend
