@@ -105,6 +105,7 @@ _need_generic: list[MPGeneric[Any]] = [
 if VERSION >= (6, 0):
     from django.core.paginator import AsyncPage, AsyncPaginator, BasePaginator
     from django.tasks import Task, TaskContext, TaskResult
+    from django.utils.datastructures import DeferredSubDict
 
     _need_generic.extend(
         [
@@ -114,6 +115,7 @@ if VERSION >= (6, 0):
             MPGeneric(BasePaginator),
             MPGeneric(AsyncPaginator),
             MPGeneric(AsyncPage),
+            MPGeneric(DeferredSubDict),
         ]
     )
 

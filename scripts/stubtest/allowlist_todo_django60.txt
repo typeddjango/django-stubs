@@ -115,10 +115,3 @@ django.db.models.sql.compiler.SQLUpdateCompiler.returning_fields
 django.db.models.sql.compiler.SQLUpdateCompiler.returning_params
 django.tasks.checks
 django.tasks.default_task_backend
-django.utils.copy
-django.utils.datastructures.DeferredSubDict
-django.utils.inspect.is_module_level_function
-django.utils.itercompat
-django.utils.json
-django.utils.log.log_message
-django.utils.text.acompress_sequence

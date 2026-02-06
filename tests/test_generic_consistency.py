@@ -6,7 +6,6 @@ from typing import Any, final
 from unittest import mock
 
 import django
-
 from django_stubs_ext.patch import MPGeneric
 
 # The root directory of the django-stubs package
@@ -66,7 +65,8 @@ def test_find_classes_inheriting_from_generic() -> None:
                 continue
             django_module = importlib.import_module(module_name)
             for cls in generic_visitor.generic_classes:
-                if cls in {"AsyncPage", "AsyncPaginator", "BasePaginator"} and django.VERSION < (6, 0):
+                _skip_classes = {"AsyncPage", "AsyncPaginator", "BasePaginator", "DeferredSubDict"}
+                if cls in _skip_classes and django.VERSION < (6, 0):
                     continue
                 all_generic_classes[cls] = [subcls.__name__ for subcls in getattr(django_module, cls).mro()[1:-1]]
 

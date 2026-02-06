@@ -620,6 +620,7 @@
         import django.utils.cache
         import django.utils.choices
         import django.utils.connection
+        import django.utils.copy
         import django.utils.crypto
         import django.utils.datastructures
         import django.utils.dateformat
@@ -638,7 +639,7 @@
         import django.utils.http
         import django.utils.inspect
         import django.utils.ipv6
-        import django.utils.itercompat
+        import django.utils.json
         import django.utils.log
         import django.utils.lorem_ipsum
         import django.utils.module_loading
