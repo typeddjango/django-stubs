@@ -113,5 +113,3 @@ django.db.models.query.Prefetch.get_current_queryset
 django.db.models.sql.compiler.SQLUpdateCompiler.execute_returning_sql
 django.db.models.sql.compiler.SQLUpdateCompiler.returning_fields
 django.db.models.sql.compiler.SQLUpdateCompiler.returning_params
-django.tasks.checks
-django.tasks.default_task_backend
