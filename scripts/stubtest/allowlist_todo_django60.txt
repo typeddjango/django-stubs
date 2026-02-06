@@ -1,6 +1,3 @@
-django.conf.FORMS_URLFIELD_ASSUME_HTTPS_DEPRECATED_MSG
-django.conf.global_settings.FORMS_URLFIELD_ASSUME_HTTPS
-django.conf.global_settings.URLIZE_ASSUME_HTTPS
 django.contrib.admin.AdminSite.password_change_form
 django.contrib.admin.ModelAdmin.log_deletion
 django.contrib.admin.models.LogEntryManager.log_action

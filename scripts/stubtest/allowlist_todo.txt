@@ -2,7 +2,6 @@
 # Unsorted: there are real problems and things we can really ignore.
 
 django.__main__
-django.conf.global_settings.gettext_noop
 django.contrib.admin.FieldListFilter.title
 django.contrib.admin.filters.FieldListFilter.title
 django.contrib.admin.helpers.AdminForm.fields

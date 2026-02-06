@@ -1,14 +1,15 @@
 from collections.abc import Collection, Mapping, Sequence
 from re import Pattern
-
-# This is defined here as a do-nothing function because we can't import
-# django.utils.translation -- that module depends on the settings.
 from typing import Any, Literal, Protocol, TypeAlias, TypedDict, type_check_only
 
 from django.utils.functional import _StrOrPromise
 from typing_extensions import NotRequired
 
 from django_stubs_ext.settings import TemplatesSetting
+
+# This is defined here as a do-nothing function because we can't import
+# django.utils.translation -- that module depends on the settings.
+def gettext_noop(s: str) -> str: ...
 
 # Note: the tuple element format for ADMINS or MANAGERS is deprecated. Use a
 # list of strings instead.
@@ -131,11 +132,6 @@ TEMPLATES: list[TemplatesSetting]
 
 # Default form rendering class.
 FORM_RENDERER: str
-
-# RemovedInDjango60Warning: It's a transitional setting helpful in early
-# adoption of "https" as the new default value of forms.URLField.assume_scheme.
-# Set to True to assume "https" during the Django 5.x release cycle.
-FORMS_URLFIELD_ASSUME_HTTPS: bool
 
 # Default email address to use for various automated correspondence from
 # the site managers.
@@ -549,6 +545,11 @@ SECURE_SSL_REDIRECT: bool
 ##################
 SECURE_CSP: Mapping[str, Collection[str] | str]
 SECURE_CSP_REPORT_ONLY: Mapping[str, Collection[str] | str]
+
+# RemovedInDjango70Warning: A transitional setting helpful in early adoption of
+# HTTPS as the default protocol in urlize and urlizetrunc when no protocol is
+# provided. Set to True to assume HTTPS during the Django 6.x release cycle.
+URLIZE_ASSUME_HTTPS: bool
 
 #########
 # TASKS #
