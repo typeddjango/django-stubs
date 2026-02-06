@@ -35,31 +35,27 @@ To do so follow this [official github guide](https://docs.github.com/en/free-pro
 
 ### System Dependencies
 
-The test suite requires some system libraries to be installed:
+The test suite requires some system libraries that Django itself treats as optional.
+This project depends on `mysqlclient`, which needs MySQL/MariaDB C client libraries to build.
+Install them for your platform following the
+[mysqlclient install guide](https://github.com/PyMySQL/mysqlclient#install).
+For Debian/Ubuntu, the [django-docker-box packages list](https://github.com/django/django-docker-box/blob/main/packages.txt)
+is also a useful reference.
 
-**MySQL/MariaDB client libraries** (required for `mysqlclient` to build):
+**GDAL and GEOS** are needed to pass all tests (2 GIS-related tests require them).
+See the Django documentation on
+[installing geospatial libraries](https://docs.djangoproject.com/en/stable/ref/contrib/gis/install/geolibs/).
+If you're not working on GIS-related stubs, you can skip GDAL/GEOS —
+the 2 failing tests won't affect other contributions.
 
-- Ubuntu/Debian: `sudo apt-get install libmysqlclient-dev pkg-config`
-- Fedora/RHEL: `sudo dnf install mysql-devel pkgconf-pkg-config`
-- macOS (Homebrew): `brew install mariadb pkg-config`
-
-**GDAL and GEOS** (optional, only needed for `django.contrib.gis` tests):
-
-- Ubuntu/Debian: `sudo apt-get install binutils libproj-dev gdal-bin`
-- Fedora/RHEL: `sudo dnf install gdal gdal-devel geos geos-devel`
-- macOS (Homebrew): `brew install gdal` — see note below
-
-> **macOS Note:** Homebrew installs libraries to `/opt/homebrew` (Apple Silicon) or `/usr/local` (Intel),
-> which are not in the default library search path. The 2 GIS tests may fail unless you create symlinks:
+> **macOS Note:** Homebrew installs GDAL/GEOS to `/opt/homebrew` (Apple Silicon) or `/usr/local` (Intel),
+> which are not in the default library search path. The GIS tests may fail unless you create symlinks:
 >
 > ```bash
 > sudo mkdir -p /usr/local/lib
 > sudo ln -s /opt/homebrew/opt/gdal/lib/libgdal.dylib /usr/local/lib/libgdal.dylib
 > sudo ln -s /opt/homebrew/opt/geos/lib/libgeos_c.dylib /usr/local/lib/libgeos_c.dylib
 > ```
->
-> If you're not working on GIS-related stubs, you can skip GDAL/GEOS installation entirely —
-> the 2 failing tests won't affect other contributions.
 
 ### Dependency Setup
 
