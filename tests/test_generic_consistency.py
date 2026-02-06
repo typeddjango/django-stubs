@@ -6,6 +6,7 @@ from typing import Any, final
 from unittest import mock
 
 import django
+
 from django_stubs_ext.patch import MPGeneric
 
 # The root directory of the django-stubs package
