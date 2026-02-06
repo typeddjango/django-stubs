@@ -42,9 +42,19 @@ class ServerFormatter(logging.Formatter):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def uses_server_time(self) -> bool: ...
 
+def log_message(
+    logger: Logger,
+    message: str,
+    *args: object,
+    level: str | None = None,
+    status_code: int | None = None,
+    request: HttpRequest | None = None,
+    exception: BaseException | None = None,
+    **extra: object,
+) -> None: ...
 def log_response(
     message: str,
-    *args: Any,
+    *args: object,
     response: HttpResponse | None = None,
     request: HttpRequest | None = None,
     logger: Logger = ...,

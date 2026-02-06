@@ -50,6 +50,7 @@ class Template:
     engine: Engine
     source: str
     nodelist: NodeList
+    extra_data: dict[str, Any]
     def __init__(
         self,
         template_string: Template | str,
@@ -114,6 +115,7 @@ class Parser:
     command_stack: list[tuple[str, Token]]
     libraries: dict[str, Library]
     origin: Origin | None
+    extra_data: dict[str, Any]
     def __init__(
         self,
         tokens: list[Token] | str,
