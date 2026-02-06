@@ -1015,6 +1015,16 @@ class MetaclassAdjustments(ModelClassInitializer):
             if attr is not None and isinstance(attr.node, Var) and not attr.plugin_generated:
                 del ctx.cls.info.names[attr_name]
 
+        # When resolve_manager_on_typevars is disabled (default), also remove the
+        # 'objects' property from the ModelBase metaclass so that type[T].objects
+        # does not resolve via the metaclass fallback. When the option is enabled,
+        # we leave the metaclass property intact so that type[T].objects resolves
+        # to Manager[T] for TypeVars bounded by Model subclasses.
+        if not plugin_config.resolve_manager_on_typevars:
+            metaclass_type = ctx.cls.info.metaclass_type
+            if metaclass_type is not None and "objects" in metaclass_type.type.names:
+                del metaclass_type.type.names["objects"]
+
     def get_exception_bases(self, name: str) -> list[Instance]:
         bases = []
         for model_base in self.model_classdef.info.direct_base_classes():

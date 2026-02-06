@@ -136,6 +136,16 @@ The supported settings are:
   [See here why](https://github.com/typeddjango/django-stubs?tab=readme-ov-file#how-to-use-typemodel-annotation-with-objects-attribute)
   this is dangerous to do by default.
 
+- `resolve_manager_on_typevars`, a boolean, default `false`.
+
+  Set to `true` to allow `.objects` to resolve on `type[T]` where `T` is a
+  `TypeVar` bounded by a Django `Model` subclass. This is useful for generic
+  model utilities, factory patterns, and plugin architectures where the concrete
+  model type isn't known at the call site but is guaranteed to be a `Model`
+  subclass. Without this setting, only `._default_manager` and `._base_manager`
+  are available on `type[T]`; with it, `.objects` resolves to `Manager[T]` as
+  well.
+
 
 ## FAQ
 
@@ -385,6 +395,12 @@ to skip removing `.objects`, `.DoesNotExist`, and `.MultipleObjectsReturned`
 attributes from `model.Model` if you are using our mypy plugin.
 
 Use this setting on your own risk, because it can hide valid errors.
+
+Alternatively, if you need `.objects` to work on `type[T]` where `T` is a
+`TypeVar` bounded by a `Model` subclass (e.g. generic model utilities or factory
+patterns), you can set `resolve_manager_on_typevars = true`. This keeps strict
+checking on direct `models.Model` access while enabling `.objects` on type
+variables bounded by model subclasses.
 
 ### How to type a custom `models.Field`?
 

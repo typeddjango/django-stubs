@@ -17,6 +17,7 @@ TEMPLATE = """
 django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
 strict_model_abstract_attrs = bool (default: true)
+resolve_manager_on_typevars = bool (default: false)
 ...
 (django-stubs) mypy: error: {}
 """
@@ -28,6 +29,7 @@ TEMPLATE_TOML = """
 django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
 strict_model_abstract_attrs = bool (default: true)
+resolve_manager_on_typevars = bool (default: false)
 ...
 (django-stubs) mypy: error: {}
 """
@@ -78,6 +80,15 @@ def write_to_file(file_contents: str, suffix: str | None = None) -> Generator[st
             ],
             "invalid 'strict_model_abstract_attrs': the setting must be a boolean",
             id="invalid-strict_model_abstract_attrs",
+        ),
+        pytest.param(
+            [
+                "[mypy.plugins.django-stubs]",
+                "django_settings_module = some.module",
+                "resolve_manager_on_typevars = bad",
+            ],
+            "invalid 'resolve_manager_on_typevars': the setting must be a boolean",
+            id="invalid-resolve_manager_on_typevars",
         ),
     ],
 )
@@ -160,6 +171,15 @@ def test_handles_filename(capsys: Any, filename: str) -> None:
             """,
             "invalid 'strict_model_abstract_attrs': the setting must be a boolean",
             id="invalid strict_model_abstract_attrs type",
+        ),
+        pytest.param(
+            """
+            [tool.django-stubs]
+            django_settings_module = "some.module"
+            resolve_manager_on_typevars = "a"
+            """,
+            "invalid 'resolve_manager_on_typevars': the setting must be a boolean",
+            id="invalid resolve_manager_on_typevars type",
         ),
     ],
 )

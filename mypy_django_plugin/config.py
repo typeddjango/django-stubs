@@ -21,6 +21,7 @@ INI_USAGE = """
 django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
 strict_model_abstract_attrs = bool (default: true)
+resolve_manager_on_typevars = bool (default: false)
 ...
 """
 TOML_USAGE = """
@@ -30,6 +31,7 @@ TOML_USAGE = """
 django_settings_module = str (default: `os.getenv("DJANGO_SETTINGS_MODULE")`)
 strict_settings = bool (default: true)
 strict_model_abstract_attrs = bool (default: true)
+resolve_manager_on_typevars = bool (default: false)
 ...
 """
 INVALID_FILE = "mypy config file is not specified or found"
@@ -60,7 +62,12 @@ def exit_with_error(msg: str, is_toml: bool = False) -> NoReturn:
 
 
 class DjangoPluginConfig:
-    __slots__ = ("django_settings_module", "strict_model_abstract_attrs", "strict_settings")
+    __slots__ = (
+        "django_settings_module",
+        "resolve_manager_on_typevars",
+        "strict_model_abstract_attrs",
+        "strict_settings",
+    )
 
     django_settings_module: str
     strict_settings: bool
@@ -106,6 +113,9 @@ class DjangoPluginConfig:
         self.strict_model_abstract_attrs = config.get("strict_model_abstract_attrs", True)
         if not isinstance(self.strict_model_abstract_attrs, bool):
             toml_exit(INVALID_BOOL_SETTING.format(key="strict_model_abstract_attrs"))
+        self.resolve_manager_on_typevars = config.get("resolve_manager_on_typevars", False)
+        if not isinstance(self.resolve_manager_on_typevars, bool):
+            toml_exit(INVALID_BOOL_SETTING.format(key="resolve_manager_on_typevars"))
 
     def parse_ini_file(self, filepath: Path) -> None:
         parser = configparser.ConfigParser()
@@ -139,11 +149,17 @@ class DjangoPluginConfig:
         except ValueError:
             exit_with_error(INVALID_BOOL_SETTING.format(key="strict_model_abstract_attrs"))
 
+        try:
+            self.resolve_manager_on_typevars = parser.getboolean(section, "resolve_manager_on_typevars", fallback=False)
+        except ValueError:
+            exit_with_error(INVALID_BOOL_SETTING.format(key="resolve_manager_on_typevars"))
+
     def to_json(self, extra_data: dict[str, Any]) -> dict[str, Any]:
         """We use this method to reset mypy cache via `report_config_data` hook."""
         return {
             "django_settings_module": self.django_settings_module,
             "strict_settings": self.strict_settings,
             "strict_model_abstract_attrs": self.strict_model_abstract_attrs,
+            "resolve_manager_on_typevars": self.resolve_manager_on_typevars,
             **dict(sorted(extra_data.items())),
         }

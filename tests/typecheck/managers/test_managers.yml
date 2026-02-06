@@ -838,3 +838,122 @@
                 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
                 class UserProfile(AbstractBaseUser, PermissionsMixin):
                     pass
+
+-   case: test_objects_on_typevar_bounded_model_with_config
+    mypy_config: |
+        [mypy.plugins.django-stubs]
+        django_settings_module = mysettings
+        resolve_manager_on_typevars = true
+    main: |
+        from typing import TypeVar
+        from typing_extensions import reveal_type
+        from myapp.models import MyBaseModel, MyConcreteModel, Base
+        from django.db import models
+
+        # Generic class pattern: type[T] as class attribute
+        base_instance = Base(MyConcreteModel)
+        reveal_type(base_instance.model_cls.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyConcreteModel]"
+        reveal_type(base_instance.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyConcreteModel]"
+
+        # Concrete model access still works
+        reveal_type(MyConcreteModel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyConcreteModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Generic, TypeVar
+                from typing_extensions import reveal_type
+                from django.db import models
+
+                class MyBaseModel(models.Model):
+                    class Meta:
+                        abstract = True
+
+                class MyConcreteModel(MyBaseModel):
+                    pass
+
+                _T = TypeVar('_T', bound=models.Model)
+                class Base(Generic[_T]):
+                    def __init__(self, model_cls: type[_T]) -> None:
+                        self.model_cls = model_cls
+                        reveal_type(self.model_cls.objects)  # N: Revealed type is "django.db.models.manager.Manager[_T`1]"
+
+                class ChildBase(Base[MyConcreteModel]):
+                    def method(self) -> None:
+                        reveal_type(self.model_cls.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyConcreteModel]"
+
+-   case: test_objects_on_typevar_bounded_model_default_config
+    main: |
+        from typing import Generic, TypeVar
+        from django.db import models
+
+        _T = TypeVar('_T', bound=models.Model)
+        class Base(Generic[_T]):
+            def __init__(self, model_cls: type[_T]) -> None:
+                self.model_cls = model_cls
+                self.model_cls.objects  # E: "type[_T]" has no attribute "objects"  [attr-defined]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    pass
+
+-   case: test_default_manager_on_typevar_still_works_regardless_of_config
+    main: |
+        from typing import Generic, TypeVar
+        from typing_extensions import reveal_type
+        from myapp.models import Base, MyModel
+        from django.db import models
+
+        # _default_manager always works because it is on the ModelBase metaclass
+        base_instance = Base(MyModel)
+        reveal_type(base_instance.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
+        reveal_type(base_instance.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Generic, TypeVar
+                from typing_extensions import reveal_type
+                from django.db import models
+
+                _T = TypeVar('_T', bound=models.Model)
+                class Base(Generic[_T]):
+                    def __init__(self, model_cls: type[_T]) -> None:
+                        self.model_cls = model_cls
+                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T`1]"
+                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T`1]"
+
+                class MyModel(models.Model):
+                    pass
+
+-   case: test_custom_manager_concrete_model_not_regressed_with_typevar_config
+    mypy_config: |
+        [mypy.plugins.django-stubs]
+        django_settings_module = mysettings
+        resolve_manager_on_typevars = true
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.CustomManager[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.CustomManager[myapp.models.MyModel]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class CustomManager(models.Manager):
+                    pass
+                class MyModel(models.Model):
+                    objects = CustomManager()

@@ -31,6 +31,11 @@ class ModelBase(type):
     def _default_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
     @property
     def _base_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
+    # This metaclass property is the fallback for 'objects' when accessed on type[T]
+    # where T is a TypeVar bounded by a Model subclass. It is removed by the plugin
+    # unless resolve_manager_on_typevars is enabled.
+    @property
+    def objects(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc,unused-ignore]
 
 class Model(metaclass=ModelBase):
     # Note: these two metaclass generated attributes don't really exist on the 'Model'
