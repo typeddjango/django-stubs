@@ -1,13 +1,3 @@
-django.contrib.admin.AdminSite.password_change_form
-django.contrib.admin.ModelAdmin.log_deletion
-django.contrib.admin.models.LogEntryManager.log_action
-django.contrib.admin.options.ModelAdmin.log_deletion
-django.contrib.admin.sites.AdminSite.password_change_form
-django.contrib.admin.tests.AdminSeleniumTestCase.trigger_resize
-django.contrib.admin.tests.CSPMiddleware
-django.contrib.admin.widgets.DateTimeWidgetContextMixin
-django.contrib.gis.admin.AdminSite.password_change_form
-django.contrib.gis.admin.ModelAdmin.log_deletion
 django.contrib.gis.db.backends.postgis.base.BaseBinaryDumper
 django.contrib.gis.db.backends.postgis.base.BaseTextDumper
 django.contrib.gis.db.backends.postgis.base.DatabaseWrapper.register_geometry_adapters

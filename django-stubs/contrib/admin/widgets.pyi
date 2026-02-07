@@ -6,7 +6,7 @@ from django.contrib.admin.sites import AdminSite
 from django.core.files.base import File
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel
 from django.forms.models import ModelChoiceIterator
-from django.forms.widgets import ChoiceWidget, _OptAttrs
+from django.forms.widgets import ChoiceWidget, Media, _OptAttrs
 from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
 
@@ -21,14 +21,26 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         choices: _Choices = ...,
     ) -> None: ...
 
-class BaseAdminDateWidget(forms.DateInput):
+    class Media:
+        js: list[str]
+
+class DateTimeWidgetContextMixin:
+    def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
+
+class BaseAdminDateWidget(DateTimeWidgetContextMixin, forms.DateInput):
     def __init__(self, attrs: _OptAttrs | None = ..., format: str | None = ...) -> None: ...
+
+    class Media:
+        js: list[str]
 
 class AdminDateWidget(BaseAdminDateWidget):
     template_name: str
 
-class BaseAdminTimeWidget(forms.TimeInput):
+class BaseAdminTimeWidget(DateTimeWidgetContextMixin, forms.TimeInput):
     def __init__(self, attrs: _OptAttrs | None = ..., format: str | None = ...) -> None: ...
+
+    class Media:
+        js: list[str]
 
 class AdminTimeWidget(BaseAdminTimeWidget):
     template_name: str
@@ -150,6 +162,8 @@ class AutocompleteMixin:
         choices: Any = ...,
         using: str | None = ...,
     ) -> None: ...
+    @property
+    def media(self) -> Media: ...
     def get_url(self) -> str: ...
     def build_attrs(self, base_attrs: _OptAttrs, extra_attrs: _OptAttrs | None = ...) -> dict[str, Any]: ...
     # typo in source: `attr` instead of `attrs`
