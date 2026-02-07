@@ -215,8 +215,14 @@ class AddAnnotateUtilities(ModelClassInitializer):
 
     def run(self) -> None:
         annotations = self.lookup_typeinfo_or_incomplete_defn_error("django_stubs_ext.Annotations")
-        object_does_not_exist = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.OBJECT_DOES_NOT_EXIST)
-        multiple_objects_returned = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.MULTIPLE_OBJECTS_RETURNED)
+        exception_bases = {
+            model_exc_name: self.lookup_typeinfo_or_incomplete_defn_error(base_exc_name)
+            for model_exc_name, base_exc_name in [
+                ("DoesNotExist", fullnames.OBJECT_DOES_NOT_EXIST),
+                ("NotUpdated", fullnames.OBJECT_NOT_UPDATED),
+                ("MultipleObjectsReturned", fullnames.MULTIPLE_OBJECTS_RETURNED),
+            ]
+        }
         annotated_model_name = self.model_classdef.info.name + "@AnnotatedWith"
         annotated_model = self.lookup_typeinfo(self.model_classdef.info.module_name + "." + annotated_model_name)
         if annotated_model is None:
@@ -235,12 +241,12 @@ class AddAnnotateUtilities(ModelClassInitializer):
                 # explicit ABCMeta if not all abstract attributes are implemented i.e.
                 # class is kept abstract. So we add the attributes to get mypy off our
                 # back
-                helpers.add_new_sym_for_info(
-                    annotated_model, "DoesNotExist", TypeType(Instance(object_does_not_exist, []))
-                )
-                helpers.add_new_sym_for_info(
-                    annotated_model, "MultipleObjectsReturned", TypeType(Instance(multiple_objects_returned, []))
-                )
+                for model_exc_name, base_exc_type in exception_bases.items():
+                    helpers.add_new_sym_for_info(
+                        annotated_model,
+                        model_exc_name,
+                        TypeType(Instance(base_exc_type, [])),
+                    )
 
 
 class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
@@ -1010,7 +1016,7 @@ class MetaclassAdjustments(ModelClassInitializer):
         if ctx.cls.fullname != fullnames.MODEL_CLASS_FULLNAME:
             return
 
-        for attr_name in ["DoesNotExist", "MultipleObjectsReturned", "objects"]:
+        for attr_name in ["DoesNotExist", "NotUpdated", "MultipleObjectsReturned", "objects"]:
             attr = ctx.cls.info.names.get(attr_name)
             if attr is not None and isinstance(attr.node, Var) and not attr.plugin_generated:
                 del ctx.cls.info.names[attr_name]
@@ -1035,48 +1041,35 @@ class MetaclassAdjustments(ModelClassInitializer):
 
     def add_exception_classes(self) -> None:
         """
-        Adds exception classes 'DoesNotExist' and 'MultipleObjectsReturned' to a model
-        type, aligned with how the model metaclass does it runtime.
+        Adds exception classes `DoesNotExist`, `NotUpdated`,  and `MultipleObjectsReturned` to a
+        model type, aligned with how the model metaclass does it runtime.
 
         If the model is abstract, exceptions will be added as abstract attributes.
         """
-        if "DoesNotExist" not in self.model_classdef.info.names:
-            object_does_not_exist = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.OBJECT_DOES_NOT_EXIST)
-            does_not_exist: Var | TypeInfo
-            if self.is_model_abstract:
-                does_not_exist = self.create_new_var("DoesNotExist", TypeType(Instance(object_does_not_exist, [])))
-                does_not_exist.is_abstract_var = True
-            else:
-                does_not_exist = helpers.create_type_info(
-                    "DoesNotExist",
-                    self.model_classdef.info.fullname,
-                    self.get_exception_bases("DoesNotExist") or [Instance(object_does_not_exist, [])],
-                )
-            self.model_classdef.info.names[does_not_exist.name] = SymbolTableNode(
-                MDEF, does_not_exist, plugin_generated=True
-            )
+        for model_exc_name, base_exc_name in [
+            ("DoesNotExist", fullnames.OBJECT_DOES_NOT_EXIST),
+            ("NotUpdated", fullnames.OBJECT_NOT_UPDATED),
+            ("MultipleObjectsReturned", fullnames.MULTIPLE_OBJECTS_RETURNED),
+        ]:
+            if model_exc_name in self.model_classdef.info.names:
+                continue
 
-        if "MultipleObjectsReturned" not in self.model_classdef.info.names:
-            django_multiple_objects_returned = self.lookup_typeinfo_or_incomplete_defn_error(
-                fullnames.MULTIPLE_OBJECTS_RETURNED
-            )
-            multiple_objects_returned: Var | TypeInfo
+            base_exc_type = self.lookup_typeinfo_or_incomplete_defn_error(base_exc_name)
+            base_exc_inst = Instance(base_exc_type, [])
+            model_exc_type: Var | TypeInfo
+
             if self.is_model_abstract:
-                multiple_objects_returned = self.create_new_var(
-                    "MultipleObjectsReturned", TypeType(Instance(django_multiple_objects_returned, []))
-                )
-                multiple_objects_returned.is_abstract_var = True
+                model_exc_type = self.create_new_var(model_exc_name, TypeType(base_exc_inst))
+                model_exc_type.is_abstract_var = True
             else:
-                multiple_objects_returned = helpers.create_type_info(
-                    "MultipleObjectsReturned",
+                model_exc_type = helpers.create_type_info(
+                    model_exc_name,
                     self.model_classdef.info.fullname,
-                    (
-                        self.get_exception_bases("MultipleObjectsReturned")
-                        or [Instance(django_multiple_objects_returned, [])]
-                    ),
+                    self.get_exception_bases(model_exc_name) or [base_exc_inst],
                 )
-            self.model_classdef.info.names[multiple_objects_returned.name] = SymbolTableNode(
-                MDEF, multiple_objects_returned, plugin_generated=True
+
+            self.model_classdef.info.names[model_exc_type.name] = SymbolTableNode(
+                MDEF, model_exc_type, plugin_generated=True
             )
 
     def run(self) -> None:

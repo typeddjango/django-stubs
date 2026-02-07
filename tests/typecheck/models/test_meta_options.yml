@@ -171,7 +171,7 @@
         AbstractModel._default_manager.create()
 
         # Errors:
-        AbstractModel()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attributes "DoesNotExist" and "MultipleObjectsReturned"  [abstract]
+        AbstractModel()  # E: Cannot instantiate abstract class "AbstractModel" with abstract attributes "DoesNotExist", "MultipleObjectsReturned" and "NotUpdated"  [abstract]
         AbstractModel.objects.create()  # E: "type[AbstractModel]" has no attribute "objects"  [attr-defined]
     installed_apps:
         - myapp

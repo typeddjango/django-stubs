@@ -5,12 +5,18 @@
         from django.db import models
 
         models.Model.DoesNotExist  # E: "type[Model]" has no attribute "DoesNotExist"  [attr-defined]
+        models.Model.NotUpdated  # E: "type[Model]" has no attribute "NotUpdated"  [attr-defined]
         models.Model.MultipleObjectsReturned  # E: "type[Model]" has no attribute "MultipleObjectsReturned"  [attr-defined]
 
         reveal_type(Abstract1.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         reveal_type(Abstract2.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         reveal_type(Concrete1.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.DoesNotExist"
         reveal_type(Concrete2.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.DoesNotExist"
+
+        reveal_type(Abstract1.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
+        reveal_type(Abstract2.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
+        reveal_type(Concrete1.NotUpdated)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.NotUpdated"
+        reveal_type(Concrete2.NotUpdated)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.NotUpdated"
 
         reveal_type(Abstract1.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
         reveal_type(Abstract2.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
@@ -19,6 +25,9 @@
 
         reveal_type(super(Concrete1, Concrete1()).DoesNotExist())  # N: Revealed type is "django.core.exceptions.ObjectDoesNotExist"
         reveal_type(super(Concrete2, Concrete2()).DoesNotExist())  # N: Revealed type is "myapp.models.Concrete1.DoesNotExist"
+
+        reveal_type(super(Concrete1, Concrete1()).NotUpdated())  # N: Revealed type is "django.core.exceptions.ObjectNotUpdated"
+        reveal_type(super(Concrete2, Concrete2()).NotUpdated())  # N: Revealed type is "myapp.models.Concrete1.NotUpdated"
 
         a: type[Concrete1.DoesNotExist]
         a = Concrete1.DoesNotExist
@@ -35,20 +44,35 @@
         c = Concrete2.DoesNotExist  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete2.DoesNotExist]", variable has type "type[myapp.models.Concrete3.DoesNotExist]")  [assignment]
         c = Concrete3.DoesNotExist
 
-        d: type[Concrete1.MultipleObjectsReturned]
-        d = Concrete1.MultipleObjectsReturned
-        d = Concrete2.MultipleObjectsReturned
-        d = Concrete3.MultipleObjectsReturned
+        d: type[Concrete1.NotUpdated]
+        d = Concrete1.NotUpdated
+        d = Concrete2.NotUpdated
+        d = Concrete3.NotUpdated
 
-        e: type[Concrete2.MultipleObjectsReturned]
-        e = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete2.MultipleObjectsReturned]")  [assignment]
-        e = Concrete2.MultipleObjectsReturned
-        e = Concrete3.MultipleObjectsReturned
+        e: type[Concrete2.NotUpdated]
+        e = Concrete1.NotUpdated  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.NotUpdated]", variable has type "type[myapp.models.Concrete2.NotUpdated]")  [assignment]
+        e = Concrete2.NotUpdated
+        e = Concrete3.NotUpdated
 
-        f: type[Concrete3.MultipleObjectsReturned]
-        f = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
-        f = Concrete2.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete2.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
-        f = Concrete3.MultipleObjectsReturned
+        f: type[Concrete3.NotUpdated]
+        f = Concrete1.NotUpdated  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.NotUpdated]", variable has type "type[myapp.models.Concrete3.NotUpdated]")  [assignment]
+        f = Concrete2.NotUpdated  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete2.NotUpdated]", variable has type "type[myapp.models.Concrete3.NotUpdated]")  [assignment]
+        f = Concrete3.NotUpdated
+
+        g: type[Concrete1.MultipleObjectsReturned]
+        g = Concrete1.MultipleObjectsReturned
+        g = Concrete2.MultipleObjectsReturned
+        g = Concrete3.MultipleObjectsReturned
+
+        h: type[Concrete2.MultipleObjectsReturned]
+        h = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete2.MultipleObjectsReturned]")  [assignment]
+        h = Concrete2.MultipleObjectsReturned
+        h = Concrete3.MultipleObjectsReturned
+
+        i: type[Concrete3.MultipleObjectsReturned]
+        i = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
+        i = Concrete2.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete2.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
+        i = Concrete3.MultipleObjectsReturned
     installed_apps:
         - myapp
     files:
@@ -85,6 +109,7 @@
         from django.db import models
 
         reveal_type(models.Model.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
+        reveal_type(models.Model.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
         reveal_type(models.Model.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
         reveal_type(models.Model.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.db.models.base.Model]"
 
@@ -93,6 +118,11 @@
         reveal_type(Concrete1.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.DoesNotExist"
         reveal_type(Concrete2.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.DoesNotExist"
 
+        reveal_type(Abstract1.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
+        reveal_type(Abstract2.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
+        reveal_type(Concrete1.NotUpdated)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.NotUpdated"
+        reveal_type(Concrete2.NotUpdated)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.NotUpdated"
+
         reveal_type(Abstract1.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
         reveal_type(Abstract2.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
         reveal_type(Concrete1.MultipleObjectsReturned)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.MultipleObjectsReturned"
@@ -100,6 +130,9 @@
 
         reveal_type(super(Concrete1, Concrete1()).DoesNotExist())  # N: Revealed type is "django.core.exceptions.ObjectDoesNotExist"
         reveal_type(super(Concrete2, Concrete2()).DoesNotExist())  # N: Revealed type is "myapp.models.Concrete1.DoesNotExist"
+
+        reveal_type(super(Concrete1, Concrete1()).NotUpdated())  # N: Revealed type is "django.core.exceptions.ObjectNotUpdated"
+        reveal_type(super(Concrete2, Concrete2()).NotUpdated())  # N: Revealed type is "myapp.models.Concrete1.NotUpdated"
 
         a: type[Concrete1.DoesNotExist]
         a = Concrete1.DoesNotExist
@@ -116,20 +149,35 @@
         c = Concrete2.DoesNotExist  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete2.DoesNotExist]", variable has type "type[myapp.models.Concrete3.DoesNotExist]")  [assignment]
         c = Concrete3.DoesNotExist
 
-        d: type[Concrete1.MultipleObjectsReturned]
-        d = Concrete1.MultipleObjectsReturned
-        d = Concrete2.MultipleObjectsReturned
-        d = Concrete3.MultipleObjectsReturned
+        d: type[Concrete1.NotUpdated]
+        d = Concrete1.NotUpdated
+        d = Concrete2.NotUpdated
+        d = Concrete3.NotUpdated
 
-        e: type[Concrete2.MultipleObjectsReturned]
-        e = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete2.MultipleObjectsReturned]")  [assignment]
-        e = Concrete2.MultipleObjectsReturned
-        e = Concrete3.MultipleObjectsReturned
+        e: type[Concrete2.NotUpdated]
+        e = Concrete1.NotUpdated  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.NotUpdated]", variable has type "type[myapp.models.Concrete2.NotUpdated]")  [assignment]
+        e = Concrete2.NotUpdated
+        e = Concrete3.NotUpdated
 
-        f: type[Concrete3.MultipleObjectsReturned]
-        f = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
-        f = Concrete2.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete2.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
-        f = Concrete3.MultipleObjectsReturned
+        f: type[Concrete3.NotUpdated]
+        f = Concrete1.NotUpdated  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.NotUpdated]", variable has type "type[myapp.models.Concrete3.NotUpdated]")  [assignment]
+        f = Concrete2.NotUpdated  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete2.NotUpdated]", variable has type "type[myapp.models.Concrete3.NotUpdated]")  [assignment]
+        f = Concrete3.NotUpdated
+
+        g: type[Concrete1.MultipleObjectsReturned]
+        g = Concrete1.MultipleObjectsReturned
+        g = Concrete2.MultipleObjectsReturned
+        g = Concrete3.MultipleObjectsReturned
+
+        h: type[Concrete2.MultipleObjectsReturned]
+        h = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete2.MultipleObjectsReturned]")  [assignment]
+        h = Concrete2.MultipleObjectsReturned
+        h = Concrete3.MultipleObjectsReturned
+
+        i: type[Concrete3.MultipleObjectsReturned]
+        i = Concrete1.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete1.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
+        i = Concrete2.MultipleObjectsReturned  # E: Incompatible types in assignment (expression has type "type[myapp.models.Concrete2.MultipleObjectsReturned]", variable has type "type[myapp.models.Concrete3.MultipleObjectsReturned]")  [assignment]
+        i = Concrete3.MultipleObjectsReturned
     installed_apps:
         - myapp
     files:
