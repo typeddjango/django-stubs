@@ -1,8 +1,5 @@
-from typing import Any
-
-from django.db.models import CheckConstraint, F, UniqueConstraint
+from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.db.models.functions import Lower
-from django.db.models.lookups import LessThan
 
 UniqueConstraint(Lower("name").desc(), "category", name="unique_lower_name_category")
 UniqueConstraint(fields=["name"], name="unique_name")
@@ -13,7 +10,4 @@ UniqueConstraint(  # type: ignore[call-overload]  # pyrefly: ignore[no-matching-
     name="unique_mess",
 )
 
-CheckConstraint(  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # pyrefly: ignore[deprecated]
-    name="less_than_constraint",
-    check=LessThan[Any](F("months"), 1),
-)
+CheckConstraint(name="positive_price", condition=Q(price__gt=0))

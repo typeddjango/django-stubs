@@ -128,8 +128,6 @@ django.contrib.gis.db.models.Aggregate.as_sql
 django.contrib.gis.db.models.Aggregate.default_alias
 django.contrib.gis.db.models.Aggregate.name
 django.contrib.gis.db.models.AutoField.rel_db_type
-django.contrib.gis.db.models.BaseConstraint.contains_expressions
-django.contrib.gis.db.models.BaseConstraint.validate
 django.contrib.gis.db.models.BigAutoField.rel_db_type
 django.contrib.gis.db.models.BigIntegerField.formfield
 django.contrib.gis.db.models.BinaryField.get_placeholder
@@ -139,7 +137,6 @@ django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.CharField.cast_db_type
 django.contrib.gis.db.models.CharField.description
 django.contrib.gis.db.models.CharField.formfield
-django.contrib.gis.db.models.CheckConstraint.validate
 django.contrib.gis.db.models.Count.__init__
 django.contrib.gis.db.models.DateField.formfield
 django.contrib.gis.db.models.DateTimeField.formfield
@@ -249,8 +246,6 @@ django.contrib.gis.db.models.TextField.formfield
 django.contrib.gis.db.models.TimeField.formfield
 django.contrib.gis.db.models.URLField.formfield
 django.contrib.gis.db.models.UUIDField.formfield
-django.contrib.gis.db.models.UniqueConstraint.contains_expressions
-django.contrib.gis.db.models.UniqueConstraint.validate
 django.contrib.gis.db.models.Value.empty_result_set_value
 django.contrib.gis.db.models.Value.for_save
 django.contrib.gis.db.models.Variance.__init__
@@ -448,8 +443,6 @@ django.db.models.Aggregate.as_sql
 django.db.models.Aggregate.default_alias
 django.db.models.Aggregate.name
 django.db.models.AutoField.rel_db_type
-django.db.models.BaseConstraint.contains_expressions
-django.db.models.BaseConstraint.validate
 django.db.models.BigAutoField.rel_db_type
 django.db.models.BigIntegerField.formfield
 django.db.models.BinaryField.get_placeholder
@@ -459,7 +452,6 @@ django.db.models.Case.allowed_default
 django.db.models.CharField.cast_db_type
 django.db.models.CharField.description
 django.db.models.CharField.formfield
-django.db.models.CheckConstraint.validate
 django.db.models.Count.__init__
 django.db.models.DateField.formfield
 django.db.models.DateTimeField.formfield
@@ -567,8 +559,6 @@ django.db.models.TextField.formfield
 django.db.models.TimeField.formfield
 django.db.models.URLField.formfield
 django.db.models.UUIDField.formfield
-django.db.models.UniqueConstraint.contains_expressions
-django.db.models.UniqueConstraint.validate
 django.db.models.Value.empty_result_set_value
 django.db.models.Value.for_save
 django.db.models.Variance.__init__
@@ -590,11 +580,6 @@ django.db.models.base.make_foreign_order_accessors
 django.db.models.base.method_get_order
 django.db.models.base.method_set_order
 django.db.models.base.subclass_exception
-django.db.models.constraints.BaseConstraint.contains_expressions
-django.db.models.constraints.BaseConstraint.validate
-django.db.models.constraints.CheckConstraint.validate
-django.db.models.constraints.UniqueConstraint.contains_expressions
-django.db.models.constraints.UniqueConstraint.validate
 django.db.models.expressions.BaseExpression.empty_result_set_value
 django.db.models.expressions.BaseExpression.prefix_references
 django.db.models.expressions.BaseExpression.replace_expressions
