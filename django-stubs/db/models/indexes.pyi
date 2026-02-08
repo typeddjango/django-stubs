@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
+from django.core.checks import CheckMessage
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
@@ -40,6 +41,7 @@ class Index:
     def deconstruct(self) -> tuple[str, Sequence[Any], dict[str, Any]]: ...
     def clone(self) -> Index: ...
     def set_name_with_model(self, model: type[Model]) -> None: ...
+    def check(self, model: type[Model], connection: BaseDatabaseWrapper) -> list[CheckMessage]: ...
 
 class IndexExpression(Func):
     template: str
