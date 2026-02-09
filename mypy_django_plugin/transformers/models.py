@@ -427,7 +427,7 @@ class AddManagers(ModelClassInitializer):
                 manager_fullname = f"{self.model_classdef.fullname}.{manager_name}"
                 self.api.fail(
                     f'Could not resolve manager type for "{manager_fullname}"',
-                    manager_expr if manager_expr else self.ctx.cls,
+                    manager_expr or self.ctx.cls,
                     code=MANAGER_MISSING,
                 )
 
