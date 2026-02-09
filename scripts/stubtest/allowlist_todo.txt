@@ -277,7 +277,6 @@ django.contrib.gis.forms.RadioSelect.id_for_label
 django.contrib.gis.forms.formset_factory
 django.contrib.gis.forms.inlineformset_factory
 django.contrib.gis.forms.modelformset_factory
-django.contrib.gis.gdal.OGRGeometry.geojson
 django.contrib.gis.gdal.SpatialReference.pretty_wkt
 django.contrib.gis.gdal.SpatialReference.xml
 django.contrib.gis.gdal.envelope.OGREnvelope.MaxX
@@ -285,12 +284,10 @@ django.contrib.gis.gdal.envelope.OGREnvelope.MaxY
 django.contrib.gis.gdal.envelope.OGREnvelope.MinX
 django.contrib.gis.gdal.envelope.OGREnvelope.MinY
 django.contrib.gis.gdal.geometries.LineString.coords
-django.contrib.gis.gdal.geometries.OGRGeometry.geojson
 django.contrib.gis.gdal.geometries.Polygon.exterior_ring
 django.contrib.gis.gdal.srs.SpatialReference.pretty_wkt
 django.contrib.gis.gdal.srs.SpatialReference.xml
 django.contrib.gis.geos.Point.tuple
-django.contrib.gis.geos.geometry.GEOSGeometryBase.geojson
 django.contrib.gis.geos.geometry.GEOSGeometryBase.make_valid
 django.contrib.gis.geos.geometry.GEOSGeometryBase.normalize
 django.contrib.gis.geos.libgeos.error_h

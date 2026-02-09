@@ -3,7 +3,7 @@ from typing import Any, ClassVar
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.sql.conversion import AreaField, DistanceField
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.models import BinaryField, BooleanField, FloatField, Func, IntegerField, TextField
+from django.db.models import BinaryField, BooleanField, CharField, FloatField, Func, IntegerField, TextField
 from django.db.models import Transform as StandardTransform
 from django.db.models.expressions import BaseExpression
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
@@ -128,6 +128,11 @@ class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
     arity: int
     geom_param_pos: Any
 
+class GeometryType(GeoFuncMixin, StandardTransform):
+    lookup_name: str
+    output_field: ClassVar[CharField]
+    def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
+
 class IsEmpty(GeoFuncMixin, StandardTransform):
     lookup_name: str
     output_field: ClassVar[BooleanField]
@@ -176,6 +181,9 @@ class PointOnSurface(OracleToleranceMixin, GeomOutputGeoFunc):
 
 class Reverse(GeoFunc):
     arity: int
+
+class Rotate(GeomOutputGeoFunc):
+    def __init__(self, expression: Any, angle: Any, origin: Any | None = ..., **extra: Any) -> None: ...
 
 class Scale(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):
     def __init__(self, expression: Any, x: Any, y: Any, z: float = ..., **extra: Any) -> None: ...

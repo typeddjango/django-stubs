@@ -6,6 +6,7 @@ from django.forms.widgets import Widget
 logger: Logger
 
 class BaseGeometryWidget(Widget):
+    base_layer: str | None
     geom_type: str
     map_srid: int
     map_width: int
@@ -20,6 +21,7 @@ class BaseGeometryWidget(Widget):
     def get_context(self, name: Any, value: Any, attrs: Any) -> Any: ...
 
 class OpenLayersWidget(BaseGeometryWidget):
+    base_layer: str
     template_name: str
     map_srid: int
 
@@ -31,6 +33,7 @@ class OpenLayersWidget(BaseGeometryWidget):
     def deserialize(self, value: Any) -> Any: ...
 
 class OSMWidget(OpenLayersWidget):
+    base_layer: str
     template_name: str
     default_lon: int
     default_lat: int
