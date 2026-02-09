@@ -175,6 +175,7 @@ class TimeInput(DateTimeBaseInput):
     template_name: str
 
 def boolean_check(v: Any) -> bool: ...
+
 @type_check_only
 class _CheckCallable(Protocol):
     def __call__(self, value: Any, /) -> bool: ...
