@@ -46,6 +46,11 @@ class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc]
     def label(self) -> _StrOrPromise: ...
     @enum_property
     def value(self) -> Any: ...
+    
+    # --- YOUR ADDITION STARTS HERE ---
+    @property
+    def choices(self) -> list[tuple[Any, _StrOrPromise]]: ...
+    # --- YOUR ADDITION ENDS HERE ---
 
 # fake, to keep simulate class properties
 @type_check_only
