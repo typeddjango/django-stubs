@@ -25,4 +25,4 @@
         def get_violation_error_message(self) -> int:
             return 10
   out: |
-    main:5: error: Return type "int" of "get_violation_error_message" incompatible with return type "str" in supertype "django.db.models.constraints.BaseConstraint"  [override]
+    main:5: error: Return type "int" of "get_violation_error_message" incompatible with return type "str | _StrPromise | dict[str, Any]" in supertype "django.db.models.constraints.BaseConstraint"  [override]
