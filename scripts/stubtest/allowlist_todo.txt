@@ -2,11 +2,6 @@
 # Unsorted: there are real problems and things we can really ignore.
 
 django.__main__
-django.contrib.admin.helpers.AdminForm.fields
-django.contrib.admin.helpers.AdminForm.is_bound
-django.contrib.admin.helpers.AdminReadonlyField.get_admin_url
-django.contrib.admin.helpers.InlineAdminFormSet.is_bound
-django.contrib.admin.helpers.InlineAdminFormSet.total_form_count
 django.contrib.admin.models.LogEntry.action_flag
 django.contrib.admin.models.LogEntry.action_time
 django.contrib.admin.models.LogEntry.change_message
@@ -20,16 +15,10 @@ django.contrib.admin.models.LogEntry.object_id
 django.contrib.admin.models.LogEntry.object_repr
 django.contrib.admin.models.LogEntry.user
 django.contrib.admin.models.LogEntry.user_id
-django.contrib.admin.options.BaseModelAdmin.media
-django.contrib.admin.options.InlineModelAdmin.model
-django.contrib.admin.options.InlineModelAdmin.template
 django.contrib.admin.site
 django.contrib.admin.sites.site
 django.contrib.admin.tests.AdminSeleniumTestCase
 django.contrib.admin.tests.AdminSeleniumTestCase.assertCountSeleniumElements
-django.contrib.admin.views.autocomplete.AutocompleteJsonView.admin_site
-django.contrib.admin.views.autocomplete.AutocompleteJsonView.process_request
-django.contrib.admin.views.autocomplete.AutocompleteJsonView.serialize_result
 django.contrib.auth.admin.GroupAdmin.formfield_for_manytomany
 django.contrib.auth.admin.UserAdmin.fieldsets
 django.contrib.auth.admin.UserAdmin.get_form
