@@ -76,13 +76,13 @@ class HttpRequest:
     def get_full_path(self, force_append_slash: bool = ...) -> str: ...
     def get_full_path_info(self, force_append_slash: bool = ...) -> str: ...
     def get_signed_cookie(
-    self,
-    key: str,
-    default: Any = ...,
-    salt: str = ...,
-    max_age: int | datetime.timedelta | None = ...,
-    fallback: Any = ...,
-) -> str | None: ...
+        self,
+        key: str,
+        default: Any = ...,
+        salt: str = ...,
+        max_age: int | datetime.timedelta | None = ...,
+        fallback: Any = ...,
+    ) -> str | None: ...
     def build_absolute_uri(self, location: str | None = ...) -> str: ...
     @property
     def scheme(self) -> str | None: ...
