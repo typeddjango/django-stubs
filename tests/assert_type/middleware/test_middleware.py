@@ -1,4 +1,5 @@
 from django.contrib.redirects.middleware import RedirectFallbackMiddleware
+from django.http.request import HttpRequest
 from django.http.response import (
     FileResponse,
     HttpResponse,
@@ -40,3 +41,8 @@ class CustomRedirectFallbackMiddleware2(RedirectFallbackMiddleware):
 class BrokenCustomRedirectFallbackMiddleware(RedirectFallbackMiddleware):
     response_redirect_class = HttpResponse  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
     response_gone_class = 12  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
+
+
+class ResponseGoneFallbackMiddleware(RedirectFallbackMiddleware):
+    def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
+        return self.response_gone_class()
