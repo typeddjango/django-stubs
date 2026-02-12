@@ -57,6 +57,9 @@ django.utils.datastructures.ImmutableList.remove
 django.utils.datastructures.ImmutableList.sort
 django.utils.datastructures.ImmutableList.reverse
 
+# Runtime default is the cached_property descriptor itself
+django.contrib.auth.password_validation.CommonPasswordValidator.__init__
+
 # Promise is lazy, see notes in .pyi
 django.utils.functional.Promise.__init__
 django.utils.functional.Promise.__add__
