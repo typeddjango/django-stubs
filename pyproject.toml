@@ -95,7 +95,7 @@ module-name = ["django-stubs", "mypy_django_plugin"]
 module-root = ""
 
 [tool.codespell]
-ignore-words-list = "aadd,acount,nam,asend"
+ignore-words-list = "aadd,acount,asend,indentity,nam"
 
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude

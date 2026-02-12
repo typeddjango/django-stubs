@@ -11,6 +11,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_sequence: str
     sql_set_sequence_max: str
     sql_set_sequence_owner: str
+    sql_alter_sequence_type: str
     sql_create_index: str
     sql_create_index_concurrently: str
     sql_delete_index: str
@@ -18,6 +19,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_column_inline_fk: str
     sql_delete_fk: str
     sql_delete_procedure: str
+    sql_add_identity: str
+    sql_drop_indentity: str  # typo in source: `indentity` instead of `identity`
     def quote_value(self, value: Any) -> str: ...
     def add_index(self, model: type[Model], index: Index, concurrently: bool = False) -> None: ...
     def remove_index(self, model: type[Model], index: Index, concurrently: bool = False) -> None: ...
