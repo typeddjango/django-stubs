@@ -52,8 +52,6 @@ django.db.backends.oracle.features.DatabaseFeatures.supports_primitives_in_json_
 django.db.backends.oracle.features.DatabaseFeatures.supports_tuple_lookups
 django.db.backends.oracle.features.DatabaseFeatures.test_collations
 django.db.backends.oracle.introspection.TableInfo
-django.db.backends.oracle.utils.BulkInsertMapper.NCLOB
-django.db.backends.oracle.utils.dsn
 django.db.backends.postgresql.base.DatabaseWrapper.close_pool
 django.db.backends.postgresql.base.DatabaseWrapper.pool
 django.db.backends.postgresql.compiler

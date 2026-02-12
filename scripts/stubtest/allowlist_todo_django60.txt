@@ -25,8 +25,6 @@ django.db.backends.oracle.operations.DatabaseOperations.fetch_returned_rows
 django.db.backends.oracle.operations.DatabaseOperations.field_cast_sql
 django.db.backends.oracle.operations.DatabaseOperations.return_insert_columns
 django.db.backends.oracle.operations.DatabaseOperations.returning_columns
-django.db.backends.oracle.utils.BoundVar
-django.db.backends.oracle.utils.InsertVar
 django.db.backends.postgresql.base.CursorDebugWrapper.copy
 django.db.backends.postgresql.base.CursorDebugWrapper.copy_expert
 django.db.backends.postgresql.base.CursorDebugWrapper.copy_to
