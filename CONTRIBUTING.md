@@ -81,10 +81,10 @@ Run `./scripts/stubtest.sh` to test that stubs and sources are in-line.
 
 We have some special files to allow errors:
 
-1. `scripts/stubtest/allowlist.txt` - Permanent exclusions, e.g. internal utilities, plugin-handled items, type system limitations.
-2. `scripts/stubtest/allowlist_todo.txt` - General backlog of stub errors to fix or move to permanent allowlist.
-3. `scripts/stubtest/allowlist_todo_django52.txt` - Django 5.2-specific API changes requiring stub updates.
-4. `scripts/stubtest/allowlist_todo_django60.txt` - Django 6.0-specific API changes requiring stub updates.
+1. [`scripts/stubtest/allowlist.txt`](scripts/stubtest/allowlist.txt) - Permanent exclusions, e.g. internal utilities, plugin-handled items, type system limitations.
+2. [`scripts/stubtest/allowlist_todo.txt`](scripts/stubtest/allowlist_todo.txt) - General backlog of stub errors to fix or move to permanent allowlist.
+3. [`scripts/stubtest/allowlist_todo_django52.txt`](scripts/stubtest/allowlist_todo_django52.txt) - Django 5.2-specific API changes requiring stub updates.
+4. [`scripts/stubtest/allowlist_todo_django60.txt`](scripts/stubtest/allowlist_todo_django60.txt) - Django 6.0-specific API changes requiring stub updates.
 
 You might also want to disable `incremental` mode while working on `stubtest` changes.
 This mode leads to several known problems (stubs do not show up or have strange errors).
