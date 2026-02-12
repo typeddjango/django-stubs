@@ -334,20 +334,7 @@ django.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.db.backends.oracle.features.DatabaseFeatures.introspected_field_types
 django.db.backends.oracle.features.DatabaseFeatures.supports_collation_on_charfield
 django.db.backends.oracle.features.DatabaseFeatures.supports_frame_exclusion
-django.db.backends.postgresql.base.DatabaseWrapper.Database
 django.db.backends.postgresql.base.DatabaseWrapper.ops
-django.db.backends.postgresql.base.DatabaseWrapper.tzinfo_factory
-django.db.backends.postgresql.features.DatabaseFeatures.django_test_expected_failures
-django.db.backends.postgresql.features.DatabaseFeatures.introspected_field_types
-django.db.backends.postgresql.features.DatabaseFeatures.prohibits_null_characters_in_text_exception
-django.db.backends.postgresql.features.DatabaseFeatures.uses_server_side_binding
-django.db.backends.postgresql.introspection.DatabaseIntrospection.index_default_access_method
-django.db.backends.postgresql.introspection.FieldInfo
-django.db.backends.postgresql.introspection.TableInfo
-django.db.backends.postgresql.operations.get_json_dumps
-django.db.backends.postgresql.schema.DatabaseSchemaEditor.sql_add_identity
-django.db.backends.postgresql.schema.DatabaseSchemaEditor.sql_alter_sequence_type
-django.db.backends.postgresql.schema.DatabaseSchemaEditor.sql_drop_indentity
 django.db.backends.sqlite3.base.DatabaseWrapper.Database
 django.db.backends.sqlite3.base.DatabaseWrapper.ops
 django.db.backends.sqlite3.base.DatabaseWrapper.pattern_esc
@@ -873,4 +860,3 @@ django.urls.resolvers.LocaleRegexDescriptor.__get__
 django.db.models.expressions.rhs
 django.db.models.expressions.result
 django.db.models.expressions.lhs
-django.db.backends.postgresql.base.Cursor

@@ -462,10 +462,12 @@
         import django.db.backends.postgresql
         import django.db.backends.postgresql.base
         import django.db.backends.postgresql.client
+        import django.db.backends.postgresql.compiler
         import django.db.backends.postgresql.creation
         import django.db.backends.postgresql.features
         import django.db.backends.postgresql.introspection
         import django.db.backends.postgresql.operations
+        import django.db.backends.postgresql.psycopg_any
         import django.db.backends.postgresql.schema
         import django.db.backends.signals
         import django.db.backends.sqlite3
