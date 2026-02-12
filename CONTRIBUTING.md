@@ -77,7 +77,7 @@ rm -r .mypy_cache
 
 ### Testing stubs with `stubtest`
 
-Run `./scripts/stubtest.sh` to test that stubs and sources are in-line.
+Run [`./scripts/stubtest.sh`](scripts/stubtest.sh) to test that stubs and sources are in-line.
 
 We have some special files to allow errors:
 
