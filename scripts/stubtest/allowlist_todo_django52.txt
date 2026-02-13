@@ -33,10 +33,6 @@ django.contrib.gis.management.commands.ogrinspect
 django.db.backends.base.features.BaseDatabaseFeatures.rounds_to_even
 django.db.backends.base.features.BaseDatabaseFeatures.supports_tuple_lookups
 django.db.backends.base.schema.BaseDatabaseSchemaEditor.sql_pk_constraint
-django.db.backends.mysql.compiler.SQLCompiler.__init__
-django.db.backends.mysql.compiler.SQLCompiler.get_default_columns
-django.db.backends.mysql.compiler.SQLCompiler.get_qualify_sql
-django.db.backends.mysql.compiler.SQLCompiler.get_related_selections
 django.db.backends.mysql.features.DatabaseFeatures.allows_group_by_selected_pks
 django.db.backends.mysql.features.DatabaseFeatures.has_native_uuid_field
 django.db.backends.mysql.features.DatabaseFeatures.supports_expression_defaults

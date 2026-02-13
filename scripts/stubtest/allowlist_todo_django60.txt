@@ -9,9 +9,6 @@ django.contrib.gis.db.models.ForeignObjectRel.get_joining_columns
 django.contrib.gis.db.models.GeneratedField.referenced_fields
 django.contrib.gis.db.models.Model._do_update
 django.contrib.gis.db.models.Prefetch.get_current_queryset
-django.db.backends.postgresql.compiler.SQLUpdateCompiler.execute_returning_sql
-django.db.backends.postgresql.compiler.SQLUpdateCompiler.returning_fields
-django.db.backends.postgresql.compiler.SQLUpdateCompiler.returning_params
 django.db.models.ForeignObjectRel.get_joining_columns
 django.db.models.GeneratedField.referenced_fields
 django.db.models.Model._do_update
@@ -30,6 +27,3 @@ django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor.get_prefe
 django.db.models.fields.related_descriptors.ReverseOneToOneDescriptor.get_prefetch_queryset
 django.db.models.fields.reverse_related.ForeignObjectRel.get_joining_columns
 django.db.models.query.Prefetch.get_current_queryset
-django.db.models.sql.compiler.SQLUpdateCompiler.execute_returning_sql
-django.db.models.sql.compiler.SQLUpdateCompiler.returning_fields
-django.db.models.sql.compiler.SQLUpdateCompiler.returning_params

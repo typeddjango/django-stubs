@@ -31,7 +31,9 @@ class SQLCompiler:
     annotation_col_map: Any
     klass_info: Any
     ordering_parts: Any
-    def __init__(self, query: Query, connection: BaseDatabaseWrapper, using: str | None) -> None: ...
+    def __init__(
+        self, query: Query, connection: BaseDatabaseWrapper, using: str | None, elide_empty: bool = True
+    ) -> None: ...
     col_count: int | None
     def setup_query(self, with_col_aliases: bool = False) -> None: ...
     has_extra_select: Any
@@ -65,9 +67,14 @@ class SQLCompiler:
     def quote_name_unless_alias(self, name: str) -> str: ...
     def compile(self, node: BaseExpression) -> _AsSqlType: ...
     def get_combinator_sql(self, combinator: str, all: bool) -> tuple[list[str], list[int] | list[str]]: ...
+    def get_qualify_sql(self) -> tuple[list[str], list[Any]]: ...
     def as_sql(self, with_limits: bool = True, with_col_aliases: bool = False) -> _AsSqlType: ...
     def get_default_columns(
-        self, start_alias: str | None = None, opts: Any | None = None, from_parent: type[Model] | None = None
+        self,
+        select_mask: dict[str, Any],
+        start_alias: str | None = None,
+        opts: Any | None = None,
+        from_parent: type[Model] | None = None,
     ) -> list[Expression]: ...
     def get_distinct(self) -> tuple[list[Any], list[Any]]: ...
     def find_ordering_name(
@@ -82,6 +89,7 @@ class SQLCompiler:
     def get_related_selections(
         self,
         select: list[tuple[Expression, str | None]],
+        select_mask: dict[str, Any],
         opts: Any | None = None,
         root_alias: str | None = None,
         cur_depth: int = 1,
@@ -93,6 +101,10 @@ class SQLCompiler:
     def apply_converters(
         self, rows: Iterable[Iterable[Any]], converters: dict[int, tuple[list[Callable], Expression]]
     ) -> Iterator[list[None | date | datetime | float | Decimal | UUID | bytes | str]]: ...
+    def has_composite_fields(self, expressions: Iterable[Expression]) -> bool: ...
+    def composite_fields_to_tuples(
+        self, rows: Iterable[Any], expressions: Iterable[Expression]
+    ) -> Iterator[list[tuple[Any, ...]]]: ...
     def results_iter(
         self,
         results: Iterable[list[Sequence[Any]]] | None = None,
@@ -121,10 +133,6 @@ class SQLCompiler:
         self, result_type: Literal["multi"] = "multi", chunked_fetch: bool = False, chunk_size: int = 100
     ) -> Iterable[list[Sequence[Any]]] | None: ...
     def explain_query(self) -> Iterator[str]: ...
-    def composite_fields_to_tuples(
-        self, rows: Iterable[Any], expressions: Iterable[Expression]
-    ) -> Iterator[list[tuple[Any, ...]]]: ...
-    def has_composite_fields(self, expressions: Iterable[Expression]) -> bool: ...
 
 class SQLInsertCompiler(SQLCompiler):
     query: InsertQuery
@@ -154,8 +162,11 @@ class SQLDeleteCompiler(SQLCompiler):
 
 class SQLUpdateCompiler(SQLCompiler):
     query: UpdateQuery
+    returning_fields: Sequence[Any] | None
+    returning_params: Sequence[Any]
     def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
     def execute_sql(self, result_type: Literal["cursor", "no results"]) -> int: ...  # type: ignore[override]
+    def execute_returning_sql(self, returning_fields: Sequence[Any] | None) -> list[Sequence[Any]]: ...
     def pre_sql_setup(self) -> None: ...  # type: ignore[override]
 
 class SQLAggregateCompiler(SQLCompiler):
