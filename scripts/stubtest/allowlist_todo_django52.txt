@@ -52,9 +52,6 @@ django.db.backends.oracle.features.DatabaseFeatures.supports_primitives_in_json_
 django.db.backends.oracle.features.DatabaseFeatures.supports_tuple_lookups
 django.db.backends.oracle.features.DatabaseFeatures.test_collations
 django.db.backends.oracle.introspection.TableInfo
-django.db.backends.sqlite3.base.DatabaseWrapper.transaction_modes
-django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_column_comment
-django.db.backends.sqlite3.schema.DatabaseSchemaEditor.sql_alter_table_comment
 django.db.migrations.autodetector.OperationDependency
 django.db.models.Count.allows_composite_expressions
 django.db.models.Field.has_db_default

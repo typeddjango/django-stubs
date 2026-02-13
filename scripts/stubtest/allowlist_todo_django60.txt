@@ -28,8 +28,6 @@ django.db.backends.oracle.operations.DatabaseOperations.returning_columns
 django.db.backends.postgresql.compiler.SQLUpdateCompiler.execute_returning_sql
 django.db.backends.postgresql.compiler.SQLUpdateCompiler.returning_fields
 django.db.backends.postgresql.compiler.SQLUpdateCompiler.returning_params
-django.db.backends.sqlite3.operations.DatabaseOperations.fetch_returned_insert_rows
-django.db.backends.sqlite3.operations.DatabaseOperations.format_json_path_numeric_index
 django.db.models.ForeignObjectRel.get_joining_columns
 django.db.models.GeneratedField.referenced_fields
 django.db.models.Model._do_update
