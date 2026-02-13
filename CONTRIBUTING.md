@@ -77,13 +77,14 @@ rm -r .mypy_cache
 
 ### Testing stubs with `stubtest`
 
-Run `./scripts/stubtest.sh` to test that stubs and sources are in-line.
+Run [`./scripts/stubtest.sh`](scripts/stubtest.sh) to test that stubs and sources are in-line.
 
 We have some special files to allow errors:
 
-1. `scripts/stubtest/allowlist.txt` where we store things that we really don't care about: hacks, django internal utility modules, things that are handled by our plugin, things that are not representable by type system, etc
-2. `scripts/stubtest/allowlist_todo.txt` where we store all errors there are right now. Basically, this is a TODO list: we need to work through this list and fix things (or move entries to real `allowlist.txt`). In the end, ideally we can remove this file.
-3. `scripts/stubtest/allowlist_todo_django52.txt` where we store new errors from the Django 5.0 to 5.2 upgrade. This is an extra TODO list.
+1. [`scripts/stubtest/allowlist.txt`](scripts/stubtest/allowlist.txt) - Permanent exclusions, e.g. internal utilities, plugin-handled items, type system limitations.
+2. [`scripts/stubtest/allowlist_todo.txt`](scripts/stubtest/allowlist_todo.txt) - General backlog of stub errors to fix or move to permanent allowlist.
+3. [`scripts/stubtest/allowlist_todo_django52.txt`](scripts/stubtest/allowlist_todo_django52.txt) - Django 5.2-specific API changes requiring stub updates.
+4. [`scripts/stubtest/allowlist_todo_django60.txt`](scripts/stubtest/allowlist_todo_django60.txt) - Django 6.0-specific API changes requiring stub updates.
 
 You might also want to disable `incremental` mode while working on `stubtest` changes.
 This mode leads to several known problems (stubs do not show up or have strange errors).
