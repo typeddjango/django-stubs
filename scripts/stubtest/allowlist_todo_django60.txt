@@ -9,11 +9,6 @@ django.contrib.gis.db.models.ForeignObjectRel.get_joining_columns
 django.contrib.gis.db.models.GeneratedField.referenced_fields
 django.contrib.gis.db.models.Model._do_update
 django.contrib.gis.db.models.Prefetch.get_current_queryset
-django.db.backends.mysql.operations.DatabaseOperations.fetch_returned_insert_rows
-django.db.backends.mysql.operations.DatabaseOperations.return_insert_columns
-django.db.backends.oracle.operations.DatabaseOperations.fetch_returned_insert_columns
-django.db.backends.oracle.operations.DatabaseOperations.field_cast_sql
-django.db.backends.oracle.operations.DatabaseOperations.return_insert_columns
 django.db.backends.postgresql.compiler.SQLUpdateCompiler.execute_returning_sql
 django.db.backends.postgresql.compiler.SQLUpdateCompiler.returning_fields
 django.db.backends.postgresql.compiler.SQLUpdateCompiler.returning_params
