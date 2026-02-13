@@ -51,7 +51,6 @@ django.db.backends.oracle.features.DatabaseFeatures.supports_comparing_boolean_e
 django.db.backends.oracle.features.DatabaseFeatures.supports_primitives_in_json_field
 django.db.backends.oracle.features.DatabaseFeatures.supports_tuple_lookups
 django.db.backends.oracle.features.DatabaseFeatures.test_collations
-django.db.backends.oracle.introspection.TableInfo
 django.db.migrations.autodetector.OperationDependency
 django.db.models.Count.allows_composite_expressions
 django.db.models.Field.has_db_default

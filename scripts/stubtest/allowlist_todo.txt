@@ -322,12 +322,6 @@ django.db.backends.mysql.features.DatabaseFeatures.supports_select_difference
 django.db.backends.mysql.features.DatabaseFeatures.supports_select_intersection
 django.db.backends.mysql.features.DatabaseFeatures.supports_table_check_constraints
 django.db.backends.mysql.features.DatabaseFeatures.test_collations
-django.db.backends.mysql.introspection.DatabaseIntrospection.get_storage_engine
-django.db.backends.mysql.introspection.InfoLine.__match_args__
-django.db.backends.mysql.introspection.InfoLine.__new__
-django.db.backends.mysql.introspection.InfoLine._fields
-django.db.backends.mysql.introspection.InfoLine.comment
-django.db.backends.mysql.introspection.TableInfo
 django.db.backends.mysql.schema.DatabaseSchemaEditor.sql_alter_column_comment
 django.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.db.backends.oracle.features.DatabaseFeatures.introspected_field_types
