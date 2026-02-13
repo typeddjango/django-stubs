@@ -1,15 +1,13 @@
-from typing import Any, TypeVar
+from typing import Any
 
 from django.contrib import admin
-from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.auth.models import Group, _UserType
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 
-_AbstractUserT = TypeVar("_AbstractUserT", bound=AbstractUser)
-
 class GroupAdmin(admin.ModelAdmin[Group]): ...
 
-class UserAdmin(admin.ModelAdmin[_AbstractUserT]):
+class UserAdmin(admin.ModelAdmin[_UserType]):
     change_user_password_template: Any
     add_fieldsets: Any
     add_form: Any
