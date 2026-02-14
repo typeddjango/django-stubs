@@ -9,5 +9,3 @@ django.contrib.gis.db.models.Model._do_update
 django.db.models.Model._do_update
 django.db.models.base.Model._do_update
 django.db.models.expressions.OrderByList.from_param
-django.db.models.fields.json.HasKeyLookup.compile_json_path_final_key
-django.db.models.fields.json.HasKeyOrArrayIndex.compile_json_path_final_key
