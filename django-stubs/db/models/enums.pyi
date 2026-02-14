@@ -4,7 +4,6 @@ from typing import Any, Literal, TypeVar, overload, type_check_only
 
 from _typeshed import ConvertibleToInt
 from django.utils.functional import _StrOrPromise
-from typing_extensions import deprecated
 
 if sys.version_info >= (3, 11):
     from enum import EnumType, IntEnum, StrEnum
@@ -34,9 +33,6 @@ class ChoicesType(EnumType):
     def values(self) -> list[Any]: ...
     if sys.version_info < (3, 12):
         def __contains__(self, member: Any) -> bool: ...
-
-@deprecated("ChoicesMeta is deprecated in favor of ChoicesType and will be removed in Django 6.0.")
-class ChoicesMeta(ChoicesType): ...
 
 class Choices(enum.Enum, metaclass=ChoicesType):  # type: ignore[misc]
     _label_: _StrOrPromise
