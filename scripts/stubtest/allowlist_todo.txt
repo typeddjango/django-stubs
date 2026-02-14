@@ -725,10 +725,6 @@ django.db.models.query_utils.logger
 django.db.models.query_utils.select_related_descend
 django.db.models.sql.AggregateQuery.__init__
 django.db.models.sql.InsertQuery.__init__
-django.db.models.sql.compiler.SQLCompiler.__init__
-django.db.models.sql.compiler.SQLCompiler.get_default_columns
-django.db.models.sql.compiler.SQLCompiler.get_qualify_sql
-django.db.models.sql.compiler.SQLCompiler.get_related_selections
 django.db.models.sql.datastructures.BaseTable.identity
 django.db.models.sql.datastructures.Join.identity
 django.db.models.sql.subqueries.AggregateQuery.__init__
