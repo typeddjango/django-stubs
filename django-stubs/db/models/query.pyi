@@ -8,7 +8,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import Combinable, OrderBy
 from django.db.models.sql.query import Query, RawQuery
 from django.utils.functional import cached_property
-from typing_extensions import Self, TypeVar, deprecated
+from typing_extensions import Self, TypeVar
 
 _T = TypeVar("_T", covariant=True)
 _Model = TypeVar("_Model", bound=Model, covariant=True)
@@ -279,10 +279,6 @@ class Prefetch(Generic[_LookupT, _PrefetchedQuerySetT, _ToAttrT]):
     def add_prefix(self, prefix: str) -> None: ...
     def get_current_prefetch_to(self, level: int) -> str: ...
     def get_current_to_attr(self, level: int) -> tuple[str, str]: ...
-    @deprecated(
-        "get_current_queryset() is deprecated and will be removed in Django 6.0. Use get_current_querysets() instead."
-    )
-    def get_current_queryset(self, level: int) -> _PrefetchedQuerySetT | None: ...
     def get_current_querysets(self, level: int) -> list[_PrefetchedQuerySetT] | None: ...
 
 def prefetch_related_objects(model_instances: Sequence[_Model], *related_lookups: str | Prefetch) -> None: ...

@@ -8,7 +8,6 @@ from django.db.models.lookups import Lookup, StartsWith, Transform
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
-from typing_extensions import deprecated
 
 from .mixins import FieldCacheMixin
 
@@ -77,10 +76,6 @@ class ForeignObjectRel(FieldCacheMixin):
         limit_choices_to: _LimitChoicesTo | None = None,
         ordering: Sequence[str] = (),
     ) -> _ChoicesList: ...
-    @deprecated(
-        "get_joining_columns() is deprecated and will be removed in Django 6.0. Use get_joining_fields() instead."
-    )
-    def get_joining_columns(self) -> tuple: ...
     def get_joining_fields(self) -> tuple[tuple[Field, Field], ...]: ...
     def get_extra_restriction(
         self, where_class: type[WhereNode], alias: str, related_alias: str
