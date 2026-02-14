@@ -32,3 +32,26 @@
           def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseBase:
               return super().dispatch(request, *args, **kwargs)
           reveal_type(dispatch)  # N: Revealed type is "def (self: main.TestView, request: django.http.request.HttpRequest, *args: Any, **kwargs: Any) -> django.http.response.HttpResponseBase"
+-   case: decorator_from_middleware_with_args_returns_factory
+    main: |
+      from django.http.response import HttpResponseBase
+      from django.utils.decorators import decorator_from_middleware_with_args
+      from django.middleware.cache import CacheMiddleware
+
+      factory = decorator_from_middleware_with_args(CacheMiddleware)
+      decorator = factory(cache_timeout=300)
+
+      @decorator
+      def my_view() -> HttpResponseBase:
+          return HttpResponseBase()
+-   case: decorator_from_middleware_in_return_type
+    main: |
+      from typing import Callable, ParamSpec
+      from django.http.response import HttpResponseBase
+      from django.utils.decorators import decorator_from_middleware
+      from django.middleware.cache import CacheMiddleware
+
+      P = ParamSpec("P")
+
+      def custom_decorator() -> Callable[[Callable[P, HttpResponseBase]], Callable[P, HttpResponseBase]]:
+          return decorator_from_middleware(CacheMiddleware)
