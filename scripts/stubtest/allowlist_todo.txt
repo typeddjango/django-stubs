@@ -25,10 +25,6 @@ django.contrib.auth.admin.UserAdmin.get_form
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
 django.contrib.auth.decorators.login_required
-django.contrib.auth.hashers.Argon2PasswordHasher.params
-django.contrib.auth.hashers.ScryptPasswordHasher
-django.contrib.auth.hashers.must_update_salt
-django.contrib.auth.hashers.reset_hashers
 django.contrib.auth.models.AbstractBaseUser.last_login
 django.contrib.auth.models.AbstractBaseUser.password
 django.contrib.auth.models.AbstractUser.date_joined
