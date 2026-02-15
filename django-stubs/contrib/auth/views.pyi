@@ -1,6 +1,6 @@
 from typing import Any, TypeVar
 
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import _User, _UserModel
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
@@ -20,11 +20,11 @@ class RedirectURLMixin:
     def get_default_redirect_url(self) -> str: ...
 
 class LoginView(RedirectURLMixin, FormView[_AuthForm]):
+    form_class: type[AuthenticationForm]  # type: ignore[assignment]
     authentication_form: Any
     redirect_field_name: Any
     redirect_authenticated_user: bool
     extra_context: Any
-    def get_redirect_url(self) -> str: ...
 
 class LogoutView(RedirectURLMixin, TemplateView):
     next_page: str | None
@@ -45,6 +45,7 @@ class PasswordContextMixin:
 class PasswordResetView(PasswordContextMixin, FormView):
     email_template_name: str
     extra_email_context: Any
+    form_class: type[PasswordResetForm]
     from_email: Any
     html_email_template_name: Any
     subject_template_name: str
@@ -57,6 +58,7 @@ class PasswordResetDoneView(PasswordContextMixin, TemplateView):
     title: Any
 
 class PasswordResetConfirmView(PasswordContextMixin, FormView):
+    form_class: type[SetPasswordForm]
     post_reset_login: bool
     post_reset_login_backend: Any
     reset_url_token: str
@@ -70,6 +72,7 @@ class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
     title: Any
 
 class PasswordChangeView(PasswordContextMixin, FormView):
+    form_class: type[PasswordChangeForm]
     title: Any
 
 class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
