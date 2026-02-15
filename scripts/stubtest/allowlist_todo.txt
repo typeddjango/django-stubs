@@ -74,10 +74,6 @@ django.contrib.auth.models.User.last_name
 django.contrib.auth.models.User.password
 django.contrib.auth.models.User.user_permissions
 django.contrib.auth.models.User.username
-django.contrib.auth.views.LoginView.form_class
-django.contrib.auth.views.PasswordChangeView.form_class
-django.contrib.auth.views.PasswordResetConfirmView.form_class
-django.contrib.auth.views.PasswordResetView.form_class
 django.contrib.contenttypes.fields.GenericRelation.get_extra_restriction
 django.contrib.contenttypes.forms.generic_inlineformset_factory
 django.contrib.contenttypes.models.ContentType.app_label
