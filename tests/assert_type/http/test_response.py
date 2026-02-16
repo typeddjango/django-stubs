@@ -7,6 +7,7 @@ from typing_extensions import assert_type
 # ============
 
 response = HttpResponse()
+# We can assign any objects, but get bytes back:
 response.content = "abc"
 assert_type(response.content, bytes)
 
@@ -15,15 +16,15 @@ assert_type(response.content, bytes)
 
 streaming_response = StreamingHttpResponse()
 
-# We can assign `Iterator`s ...
-streaming_response.streaming_content = iter([1, 2])
+# We can assign any `Iterable`s ...
+streaming_response.streaming_content = [1, 2]
 
 
-async def async_iterator() -> AsyncIterator[int]:
+async def async_iterable() -> AsyncIterable[int]:
     yield 1
 
 
-streaming_response.streaming_content = async_iterator()
+streaming_response.streaming_content = async_iterable()
 
-# ... but only get `Iterable` back:
-assert_type(streaming_response.streaming_content, Iterable[object] | AsyncIterable[object])
+# ... but get `Iterator` back:
+assert_type(streaming_response.streaming_content, Iterator[object] | AsyncIterator[object])
