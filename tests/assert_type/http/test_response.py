@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterable, AsyncIterator
+from collections.abc import AsyncIterable, AsyncIterator, Iterable
 
 from django.http.response import HttpResponse, StreamingHttpResponse
 from typing_extensions import assert_type
@@ -18,10 +18,11 @@ streaming_response = StreamingHttpResponse()
 
 # We can assign any `Iterable`s ...
 streaming_response.streaming_content = [1, 2]
+streaming_response.streaming_content = iter(['a', 'b'])
 
 
-async def async_iterable() -> AsyncIterable[int]:
-    yield 1
+def async_iterable() -> AsyncIterable[int]:
+    raise NotImplementedError
 
 
 streaming_response.streaming_content = async_iterable()
