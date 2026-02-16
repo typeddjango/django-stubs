@@ -28,4 +28,4 @@ def async_iterable() -> AsyncIterable[int]:
 streaming_response.streaming_content = async_iterable()
 
 # ... but get `Iterator` back:
-assert_type(streaming_response.streaming_content, Iterator[object] | AsyncIterator[object])
+assert_type(streaming_response.streaming_content, Iterator[bytes] | AsyncIterator[bytes])
