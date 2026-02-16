@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterable, AsyncIterator, Iterable
+from collections.abc import AsyncIterable, AsyncIterator
 
 from django.http.response import HttpResponse, StreamingHttpResponse
 from typing_extensions import assert_type
