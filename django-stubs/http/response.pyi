@@ -92,7 +92,7 @@ class HttpResponseBase:
     def getvalue(self) -> bytes: ...
 
 class HttpResponse(HttpResponseBase, Iterable[bytes]):
-    content = _PropertyDescriptor[object, bytes]()
+    content: _PropertyDescriptor[object, bytes]
     csrf_cookie_set: bool
     sameorigin: bool
     test_server_port: str
@@ -108,9 +108,9 @@ class HttpResponse(HttpResponseBase, Iterable[bytes]):
 
 class StreamingHttpResponse(HttpResponseBase, Iterable[bytes], AsyncIterable[bytes]):
     is_async: bool
-    streaming_content = _PropertyDescriptor[
+    streaming_content: _PropertyDescriptor[
         Iterable[object] | AsyncIterable[object], Iterator[bytes] | AsyncIterator[bytes]
-    ]()
+    ]
     def __init__(
         self, streaming_content: Iterable[object] | AsyncIterable[object] = ..., *args: Any, **kwargs: Any
     ) -> None: ...
