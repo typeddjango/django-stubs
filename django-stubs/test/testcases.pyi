@@ -1,6 +1,6 @@
 import threading
 import unittest
-from collections.abc import Callable, Collection, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Any, overload
@@ -169,7 +169,7 @@ class TransactionTestCase(SimpleTestCase):
     def assertQuerySetEqual(
         self,
         qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
-        values: Collection[Any],
+        values: Iterable[Any],
         transform: Callable[[Model], Any] | type[str] | None = ...,
         ordered: bool = ...,
         msg: str | None = ...,
