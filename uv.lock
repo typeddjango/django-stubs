@@ -325,7 +325,7 @@ dev = [
     { name = "pyrefly", specifier = "==0.52.0" },
     { name = "pyright", specifier = "==1.1.408" },
     { name = "pytest", specifier = "==9.0.2" },
-    { name = "pytest-mypy-plugins", specifier = "==3.2.0" },
+    { name = "pytest-mypy-plugins", specifier = "==3.3.0" },
     { name = "pytest-shard", specifier = "==0.1.2" },
     { name = "pytest-xdist", specifier = "==3.8.0" },
     { name = "pyyaml", specifier = "==6.0.3" },
@@ -341,7 +341,7 @@ tests = [
     { name = "psycopg", extras = ["binary"], specifier = "==3.3.2" },
     { name = "psycopg2-binary", specifier = "==2.9.11" },
     { name = "pytest", specifier = "==9.0.2" },
-    { name = "pytest-mypy-plugins", specifier = "==3.2.0" },
+    { name = "pytest-mypy-plugins", specifier = "==3.3.0" },
     { name = "pytest-shard", specifier = "==0.1.2" },
     { name = "pytest-xdist", specifier = "==3.8.0" },
     { name = "pyyaml", specifier = "==6.0.3" },
@@ -942,7 +942,7 @@ wheels = [
 
 [[package]]
 name = "pytest-mypy-plugins"
-version = "3.2.0"
+version = "3.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "decorator" },
@@ -955,9 +955,9 @@ dependencies = [
     { name = "regex" },
     { name = "tomlkit" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8e/a0/3ec3d82da6c109efb48c70ffc666badb226e987a1f6c1076f1fddb7ca1a3/pytest_mypy_plugins-3.2.0.tar.gz", hash = "sha256:68bd95400c8f128327acd9a16c737dbec18b20fced3184ad97f391b07d4662f4", size = 27292, upload-time = "2024-12-21T20:11:36.467Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bd/5d/d10e83a0dfb5fe8eb7468c77d566ec8511abc4cc505cf69dbdab0447cb7f/pytest_mypy_plugins-3.3.0.tar.gz", hash = "sha256:4faa42c567fc25951f065c42607f61f5c36ded0265f4d77a4d16cda76002054a", size = 28907, upload-time = "2026-02-16T17:24:56Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/de/84/6c9af99c416e52286fbf6df91a2ae19ef4da5d6f2dab626f8ff1a61280b5/pytest_mypy_plugins-3.2.0-py3-none-any.whl", hash = "sha256:46e24e8d9eaeabcddd0a5dc5fb089c021903d5952e0c9d8af79383db99b9ffae", size = 20627, upload-time = "2024-12-21T20:11:33.723Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/49/a5f212e829e2b05b31aad9e96b89e70cd73c7a604f74df34825eac5fd227/pytest_mypy_plugins-3.3.0-py3-none-any.whl", hash = "sha256:7b93f338609eace9405986be69fb52344dfb3ccbb96f3fc5ac3cbd257a34c5fc", size = 20798, upload-time = "2026-02-16T17:24:54.693Z" },
 ]
 
 [[package]]
