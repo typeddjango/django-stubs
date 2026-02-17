@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import Any, ClassVar, Literal, NoReturn, TypeAlias, TypeVar
+from typing import Any, ClassVar, Literal, TypeAlias, TypeVar
 
 from django.contrib.auth.base_user import AbstractBaseUser as AbstractBaseUser
 from django.contrib.auth.base_user import BaseUserManager as BaseUserManager
@@ -10,7 +10,7 @@ from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self
+from typing_extensions import Never, Self
 
 # This is our "placeholder" type the mypy plugin refines to configured 'AUTH_USER_MODEL'
 # wherever it is used as a type. The most recognised example of this is (probably)
@@ -123,7 +123,7 @@ class AnonymousUser:
     is_staff: Literal[False]
     is_active: Literal[False]
     is_superuser: Literal[False]
-    def __int__(self) -> NoReturn: ...
+    def __int__(self) -> Never: ...
     def save(self) -> None: ...
     def delete(self) -> None: ...
     def set_password(self, raw_password: str) -> None: ...
