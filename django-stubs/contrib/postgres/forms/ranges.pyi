@@ -2,7 +2,8 @@ from typing import Any, ClassVar
 
 from django import forms
 from django.db.models.fields import _ErrorMessagesDict
-from django.forms.widgets import MultiWidget, _OptAttrs
+from django.forms.fields import _WidgetTypeOrInstance
+from django.forms.widgets import MultiWidget, TextInput, _OptAttrs
 from psycopg2.extras import Range  # type: ignore [import-untyped]
 
 class RangeWidget(MultiWidget):
@@ -17,6 +18,7 @@ class BaseRangeField(forms.MultiValueField):
     base_field: type[forms.Field]
     range_type: type[Range]
     hidden_widget: type[forms.Widget]
+    widget: _WidgetTypeOrInstance[TextInput, RangeWidget]  # type: ignore[assignment]
     def __init__(self, **kwargs: Any) -> None: ...
     def prepare_value(self, value: Any) -> Any: ...
     def compress(self, values: tuple[Any | None, Any | None]) -> Range | None: ...

@@ -3,7 +3,7 @@ from typing import Any, ClassVar
 
 from django import forms
 from django.db.models.fields import _ErrorMessagesDict
-from django.forms.fields import _ClassLevelWidgetT
+from django.forms.fields import _WidgetTypeOrInstance
 from django.forms.utils import _DataT, _FilesT
 from django.forms.widgets import _OptAttrs
 
@@ -33,7 +33,6 @@ class SimpleArrayField(forms.CharField):
 
 class SplitArrayWidget(forms.Widget):
     template_name: str
-    widget: _ClassLevelWidgetT
     size: int
     def __init__(self, widget: forms.Widget | type[forms.Widget], size: int, **kwargs: Any) -> None: ...
     @property
@@ -46,6 +45,7 @@ class SplitArrayWidget(forms.Widget):
     def needs_multipart_form(self) -> bool: ...  # type: ignore[override]
 
 class SplitArrayField(forms.Field):
+    widget: _WidgetTypeOrInstance[forms.TextInput, SplitArrayWidget]  # type: ignore[assignment]
     default_error_messages: ClassVar[_ErrorMessagesDict]
     base_field: forms.Field
     size: int
