@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
-from typing import Any, ClassVar, Protocol, TypeAlias, type_check_only
+from typing import Any, Callable, ClassVar, Protocol, TypeAlias, type_check_only
 from uuid import UUID
 
 from django.core.files import File
