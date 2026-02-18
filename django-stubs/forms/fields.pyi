@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import Collection, Iterator, Sequence
+from collections.abc import Callable, Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
 from typing import Any, ClassVar, Protocol, TypeAlias, type_check_only
@@ -96,16 +96,16 @@ class CharField(Field):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class IntegerField(Field):
-    max_value: int | None
-    min_value: int | None
-    step_size: int | None
+    max_value: int | Callable[[], int] | None
+    min_value: int | Callable[[], int] | None
+    step_size: int | Callable[[], int] | None
     re_decimal: Any
     def __init__(
         self,
         *,
-        max_value: int | None = None,
-        min_value: int | None = None,
-        step_size: int | None = None,
+        max_value: int | Callable[[], int] | None = None,
+        min_value: int | Callable[[], int] | None = None,
+        step_size: int | Callable[[], int] | None = None,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
