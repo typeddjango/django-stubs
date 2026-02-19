@@ -491,7 +491,6 @@
         import django.db.migrations.operations.fields
         import django.db.migrations.operations.models
         import django.db.migrations.operations.special
-        import django.db.migrations.operations.utils
         import django.db.migrations.optimizer
         import django.db.migrations.questioner
         import django.db.migrations.recorder
