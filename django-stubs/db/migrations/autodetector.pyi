@@ -20,11 +20,11 @@ class OperationDependency(tuple[str, str, str | None, OperationDependency.Type])
         ALTER_FOO_TOGETHER = 4
         REMOVE_INDEX_OR_CONSTRAINT = 5
 
-    def __new__(_cls, app_label: str, model_name: str, field_name: str | None, type: Type) -> Self: ...
     app_label: str
     model_name: str
     field_name: str | None
     type: Type
+    def __new__(_cls, app_label: str, model_name: str, field_name: str | None, type: Type) -> Self: ...
     @cached_property
     def model_name_lower(self) -> str: ...
     @cached_property
