@@ -474,9 +474,7 @@ class DjangoContext:
                         # Resolve the lookup class (e.g. "isnull" -> IsNull)
                         lookup_cls = Field().get_lookup(annotation_lookup_parts[-1])
                         if lookup_cls is not None:
-                            lookup_info = helpers.lookup_class_typeinfo(
-                                helpers.get_typechecker_api(ctx), lookup_cls
-                            )
+                            lookup_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), lookup_cls)
                             if lookup_info is not None:
                                 for lookup_base in helpers.iter_bases(lookup_info):
                                     if lookup_base.args and isinstance(
