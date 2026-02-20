@@ -468,8 +468,27 @@ class DjangoContext:
             if helpers.is_annotated_model(model_instance.type) and model_instance.extra_attrs:
                 # If the field comes from .annotate(), we assume Any for it
                 # and allow chaining any lookups.
-                lookup_base_field, *_ = lookup.split("__")
+                lookup_base_field, *annotation_lookup_parts = lookup.split("__")
                 if lookup_base_field in model_instance.extra_attrs.attrs:
+                    if annotation_lookup_parts:
+                        # Resolve the lookup class (e.g. "isnull" -> IsNull)
+                        lookup_cls = Field().get_lookup(annotation_lookup_parts[-1])
+                        if lookup_cls is not None:
+                            lookup_info = helpers.lookup_class_typeinfo(
+                                helpers.get_typechecker_api(ctx), lookup_cls
+                            )
+                            if lookup_info is not None:
+                                for lookup_base in helpers.iter_bases(lookup_info):
+                                    if lookup_base.args and isinstance(
+                                        (lookup_type := get_proper_type(lookup_base.args[0])),
+                                        Instance,
+                                    ):
+                                        # If the lookup type is Field, it means the expected type
+                                        # depends on the actual field type, which we don't have
+                                        # for annotations. Fall back to the annotation type.
+                                        if lookup_type.type.fullname != fullnames.FIELD_FULLNAME:
+                                            return lookup_type
+                                        break
                     return model_instance.extra_attrs.attrs[lookup_base_field]
 
             msg = exc.args[0]
