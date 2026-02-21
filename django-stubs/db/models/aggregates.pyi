@@ -9,6 +9,7 @@ from django.db.models.query import _OrderByFieldName
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
 class Aggregate(Func):
+    name: str | None
     filter_template: str
     filter: Any
     allow_distinct: bool

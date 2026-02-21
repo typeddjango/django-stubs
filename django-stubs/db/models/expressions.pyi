@@ -2,8 +2,9 @@ import datetime
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from decimal import Decimal
 from enum import Enum
-from typing import Any, ClassVar, Generic, Literal, NoReturn, TypeAlias, TypeVar
+from typing import Any, ClassVar, Generic, Literal, TypeAlias, TypeVar
 
+from django.core.exceptions import FieldError
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Q, fields
 from django.db.models.fields import Field
@@ -13,10 +14,12 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
 from django.db.models.sql.query import Query
 from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import cached_property
-from typing_extensions import Self
+from typing_extensions import Never, Self
 
 class SQLiteNumericMixin:
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
+
+class OutputFieldIsNoneError(FieldError): ...
 
 _Numeric: TypeAlias = float | Decimal
 
@@ -59,11 +62,14 @@ class Combinable:
     def __invert__(self) -> NegatedExpression[Combinable]: ...
 
 class BaseExpression:
+    empty_result_set_value: Any
     is_summary: bool
     filterable: bool
     window_compatible: bool
     allowed_default: bool
     constraint_validation_compatible: bool
+    set_returning: bool
+    allows_composite_expressions: bool
     def __init__(self, output_field: Field | None = None) -> None: ...
     def get_db_converters(self, connection: BaseDatabaseWrapper) -> list[Callable]: ...
     def get_source_expressions(self) -> list[Any]: ...
@@ -96,23 +102,14 @@ class BaseExpression:
     def get_lookup(self, lookup: str) -> type[Lookup] | None: ...
     def get_transform(self, name: str) -> type[Transform] | None: ...
     def relabeled_clone(self, change_map: Mapping[str, str]) -> Self: ...
+    def replace_expressions(self, replacements: Mapping[Self, Any]) -> Self: ...
     def get_refs(self) -> set[str]: ...
     def copy(self) -> Self: ...
+    def prefix_references(self, prefix: str) -> Self: ...
     def get_group_by_cols(self) -> list[BaseExpression]: ...
     def get_source_fields(self) -> list[Field | None]: ...
-    def asc(
-        self,
-        *,
-        descending: bool = ...,
-        nulls_first: bool | None = ...,
-        nulls_last: bool | None = ...,
-    ) -> OrderBy: ...
-    def desc(
-        self,
-        *,
-        nulls_first: bool | None = ...,
-        nulls_last: bool | None = ...,
-    ) -> OrderBy: ...
+    def asc(self, **kwargs: Any) -> OrderBy: ...
+    def desc(self, **kwargs: Any) -> OrderBy: ...
     def reverse_ordering(self) -> BaseExpression: ...
     def flatten(self) -> Iterator[BaseExpression]: ...
     def select_format(self, compiler: SQLCompiler, sql: str, params: _ParamsT) -> _AsSqlType: ...
@@ -136,11 +133,10 @@ class TemporalSubtraction(CombinedExpression):
     def __init__(self, lhs: Combinable, rhs: Combinable) -> None: ...
 
 class F(_Deconstructible, Combinable):
-    name: str
     allowed_default: ClassVar[bool]
     def __init__(self, name: str) -> None: ...
     def __getitem__(self, subscript: int | slice) -> Sliced: ...
-    def __contains__(self, other: Any) -> NoReturn: ...
+    def __contains__(self, other: Any) -> Never: ...
     def resolve_expression(
         self,
         query: Any | None = None,
@@ -150,19 +146,8 @@ class F(_Deconstructible, Combinable):
         for_save: bool = False,
     ) -> Expression: ...
     def replace_expressions(self, replacements: Mapping[F, Any]) -> F: ...
-    def asc(
-        self,
-        *,
-        descending: bool = ...,
-        nulls_first: bool | None = ...,
-        nulls_last: bool | None = ...,
-    ) -> OrderBy: ...
-    def desc(
-        self,
-        *,
-        nulls_first: bool | None = ...,
-        nulls_last: bool | None = ...,
-    ) -> OrderBy: ...
+    def asc(self, **kwargs: Any) -> OrderBy: ...
+    def desc(self, **kwargs: Any) -> OrderBy: ...
     def copy(self) -> Self: ...
 
 class Sliced(F):
@@ -179,6 +164,9 @@ class Sliced(F):
 class ResolvedOuterRef(F):
     contains_aggregate: ClassVar[bool]
     contains_over_clause: ClassVar[bool]
+    def as_sql(self, *args: Any, **kwargs: Any) -> _AsSqlType: ...
+    def relabeled_clone(self, relabels: Mapping[str, str]) -> Self: ...
+    def get_group_by_cols(self) -> list[BaseExpression]: ...
 
 class OuterRef(F):
     contains_aggregate: ClassVar[bool]
@@ -188,7 +176,6 @@ class OuterRef(F):
 
 class Func(SQLiteNumericMixin, Expression):
     function: str | None = None
-    name: str
     template: str
     arg_joiner: str
     arity: int | None
@@ -207,7 +194,10 @@ class Func(SQLiteNumericMixin, Expression):
 
 class Value(Expression):
     value: Any
+    for_save: bool
     def __init__(self, value: Any, output_field: Field | None = None) -> None: ...
+    @property
+    def empty_result_set_value(self) -> Any: ...
 
 class RawSQL(Expression):
     params: list[Any]
@@ -225,16 +215,34 @@ class Col(Expression):
     contains_column_references: Literal[True]
     possibly_multivalued: Literal[False]
     def __init__(self, alias: str, target: Field, output_field: Field | None = None) -> None: ...
+    def relabeled_clone(self, relabels: Mapping[str, str]) -> Self: ...
+
+class ColPairs(Expression):
+    alias: str
+    targets: Sequence[Field]
+    sources: Sequence[Field]
+    def __init__(
+        self, alias: str, targets: Sequence[Field], sources: Sequence[Field], output_field: Field | None
+    ) -> None: ...
+    def __len__(self) -> int: ...
+    def __iter__(self) -> Iterator[Col]: ...
+    def get_cols(self) -> list[Col]: ...
+    def relabeled_clone(self, relabels: Mapping[str, str]) -> Self: ...
 
 class Ref(Expression):
     def __init__(self, refs: str, source: Expression) -> None: ...
+    def relabeled_clone(self, relabels: Mapping[str, str]) -> Self: ...
 
 class ExpressionList(Func):
     def __init__(
         self, *expressions: BaseExpression | Combinable, output_field: Field | None = None, **extra: Any
     ) -> None: ...
 
-class OrderByList(Func): ...
+class OrderByList(ExpressionList):
+    @classmethod
+    def from_param(
+        cls, context: str, param: str | BaseExpression | Sequence[str | BaseExpression] | None
+    ) -> Self | None: ...
 
 _E = TypeVar("_E", bound=Q | Combinable)
 
@@ -251,6 +259,9 @@ class When(Expression):
     condition: Any
     result: Any
     def __init__(self, condition: Any | None = None, then: Any | None = None, **lookups: Any) -> None: ...
+    def as_sql(
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, template: str | None = None, **extra_context: Any
+    ) -> _AsSqlType: ...
 
 class Case(Expression):
     template: str
@@ -261,6 +272,14 @@ class Case(Expression):
     def __init__(
         self, *cases: Any, default: Any | None = None, output_field: Field | None = None, **extra: Any
     ) -> None: ...
+    def as_sql(
+        self,
+        compiler: SQLCompiler,
+        connection: BaseDatabaseWrapper,
+        template: str | None = None,
+        case_joiner: str | None = None,
+        **extra_context: Any,
+    ) -> _AsSqlType: ...
 
 class Subquery(BaseExpression, Combinable):
     template: str
@@ -268,6 +287,12 @@ class Subquery(BaseExpression, Combinable):
     query: Query
     extra: dict[Any, Any]
     def __init__(self, queryset: Query | QuerySet, output_field: Field | None = None, **extra: Any) -> None: ...
+    @property
+    def external_aliases(self) -> set[str]: ...
+    def get_external_cols(self) -> list[Col]: ...
+    def as_sql(
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, template: str | None = None, **extra_context: Any
+    ) -> _AsSqlType: ...
 
 class Exists(Subquery):
     output_field: ClassVar[fields.BooleanField]
@@ -279,6 +304,7 @@ class OrderBy(Expression):
     nulls_last: bool
     descending: bool
     expression: Expression | F | Subquery
+    allows_composite_expressions: bool
     def __init__(
         self,
         expression: Expression | F | Subquery,
@@ -286,6 +312,10 @@ class OrderBy(Expression):
         nulls_first: bool | None = None,
         nulls_last: bool | None = None,
     ) -> None: ...
+    def as_sql(
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, template: str | None = None, **extra_context: Any
+    ) -> _AsSqlType: ...
+    def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
     def asc(self) -> None: ...  # type: ignore[override]
     def desc(self) -> None: ...  # type: ignore[override]
 
@@ -303,6 +333,12 @@ class Window(SQLiteNumericMixin, Expression):
         frame: WindowFrame | None = None,
         output_field: Field | None = None,
     ) -> None: ...
+    def as_sql(
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, template: str | None = None
+    ) -> _AsSqlType: ...
+    def as_sqlite(  # type: ignore[override]
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper
+    ) -> _AsSqlType: ...
 
 class WindowFrameExclusion(Enum):
     CURRENT_ROW = "CURRENT ROW"
@@ -312,17 +348,19 @@ class WindowFrameExclusion(Enum):
 
 class WindowFrame(Expression):
     template: str
-    frame_type: str
     def __init__(
         self,
         start: int | None = None,
         end: int | None = None,
         exclusion: WindowFrameExclusion | None = None,
     ) -> None: ...
+    def get_exclusion(self) -> str: ...
     def window_frame_start_end(
         self, connection: BaseDatabaseWrapper, start: int | None, end: int | None
     ) -> tuple[int, int]: ...
-    def get_exclusion(self) -> str: ...
 
-class RowRange(WindowFrame): ...
-class ValueRange(WindowFrame): ...
+class RowRange(WindowFrame):
+    frame_type: str
+
+class ValueRange(WindowFrame):
+    frame_type: str
