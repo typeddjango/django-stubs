@@ -286,7 +286,9 @@ class Subquery(BaseExpression, Combinable):
     subquery: bool
     query: Query
     extra: dict[Any, Any]
-    def __init__(self, queryset: Query | QuerySet, output_field: Field | None = None, **extra: Any) -> None: ...
+    def __init__(
+        self, queryset: Query | QuerySet | Subquery, output_field: Field | None = None, **extra: Any
+    ) -> None: ...
     @property
     def external_aliases(self) -> set[str]: ...
     def get_external_cols(self) -> list[Col]: ...
@@ -296,7 +298,7 @@ class Subquery(BaseExpression, Combinable):
 
 class Exists(Subquery):
     output_field: ClassVar[fields.BooleanField]
-    def __init__(self, queryset: Query | QuerySet, **kwargs: Any) -> None: ...
+    def __init__(self, queryset: Query | QuerySet | Subquery, **kwargs: Any) -> None: ...
 
 class OrderBy(Expression):
     template: str
