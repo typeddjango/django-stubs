@@ -1,7 +1,11 @@
 from ctypes import Structure
 from typing import Any
 
-class OGREnvelope(Structure): ...
+class OGREnvelope(Structure):
+    MinX: float
+    MaxX: float
+    MinY: float
+    MaxY: float
 
 class Envelope:
     def __init__(self, *args: Any) -> None: ...
