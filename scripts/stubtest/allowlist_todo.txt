@@ -186,7 +186,6 @@ django.contrib.gis.db.models.ManyToManyField.path_infos
 django.contrib.gis.db.models.ManyToManyField.reverse_path_infos
 django.contrib.gis.db.models.ManyToManyRel.identity
 django.contrib.gis.db.models.ManyToOneRel.identity
-django.contrib.gis.db.models.Model.add_to_class
 django.contrib.gis.db.models.OneToOneField.__get__
 django.contrib.gis.db.models.OneToOneField.formfield
 django.contrib.gis.db.models.OneToOneField.forward_related_accessor_class
@@ -400,7 +399,6 @@ django.db.models.ManyToManyField.path_infos
 django.db.models.ManyToManyField.reverse_path_infos
 django.db.models.ManyToManyRel.identity
 django.db.models.ManyToOneRel.identity
-django.db.models.Model.add_to_class
 django.db.models.OneToOneField.__get__
 django.db.models.OneToOneField.formfield
 django.db.models.OneToOneField.forward_related_accessor_class
@@ -427,14 +425,6 @@ django.db.models.aggregates.Aggregate.default_alias
 django.db.models.aggregates.Count.__init__
 django.db.models.aggregates.StdDev.__init__
 django.db.models.aggregates.Variance.__init__
-django.db.models.base.Model.add_to_class
-django.db.models.base.ModelBase.__new__
-django.db.models.base.ModelBase.add_to_class
-django.db.models.base.ModelStateFieldsCacheDescriptor.__get__
-django.db.models.base.make_foreign_order_accessors
-django.db.models.base.method_get_order
-django.db.models.base.method_set_order
-django.db.models.base.subclass_exception
 django.db.models.expressions.Case.allowed_default
 django.db.models.expressions.CombinedExpression.allowed_default
 django.db.models.expressions.ExpressionWrapper.allowed_default

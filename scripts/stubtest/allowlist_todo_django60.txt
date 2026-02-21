@@ -5,6 +5,3 @@ django.contrib.gis.db.backends.postgis.base.GeographyType
 django.contrib.gis.db.backends.postgis.base.GeometryType
 django.contrib.gis.db.backends.postgis.base.RasterType
 django.contrib.gis.db.backends.postgis.base.postgis_adapters
-django.contrib.gis.db.models.Model._do_update
-django.db.models.Model._do_update
-django.db.models.base.Model._do_update
