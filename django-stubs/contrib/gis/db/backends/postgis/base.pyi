@@ -1,6 +1,12 @@
 from typing import Any
 
 from django.db.backends.postgresql.base import DatabaseWrapper as Psycopg2DatabaseWrapper
+from psycopg.adapt import Dumper
+from psycopg.pq import Format
+
+class BaseBinaryDumper(Dumper):
+    format: Format
+    def dump(self, obj: Any) -> bytes: ...
 
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
     SchemaEditorClass: Any
