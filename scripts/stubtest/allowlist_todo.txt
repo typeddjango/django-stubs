@@ -231,12 +231,6 @@ django.contrib.gis.forms.RadioSelect.id_for_label
 django.contrib.gis.forms.formset_factory
 django.contrib.gis.forms.inlineformset_factory
 django.contrib.gis.forms.modelformset_factory
-django.contrib.gis.gdal.SpatialReference.pretty_wkt
-django.contrib.gis.gdal.SpatialReference.xml
-django.contrib.gis.gdal.geometries.LineString.coords
-django.contrib.gis.gdal.geometries.Polygon.exterior_ring
-django.contrib.gis.gdal.srs.SpatialReference.pretty_wkt
-django.contrib.gis.gdal.srs.SpatialReference.xml
 django.contrib.postgres.fields.ArrayField.formfield
 django.contrib.postgres.fields.HStoreField.formfield
 django.contrib.postgres.fields.RangeField.formfield
