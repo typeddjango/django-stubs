@@ -1,3 +1,4 @@
+django.contrib.gis.db.backends.postgis.base.BaseTextDumper
 django.contrib.gis.db.backends.postgis.base.GeographyType
 django.contrib.gis.db.backends.postgis.base.GeometryType
 django.contrib.gis.db.backends.postgis.base.RasterType
