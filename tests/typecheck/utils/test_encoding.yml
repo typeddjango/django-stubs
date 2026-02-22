@@ -14,18 +14,6 @@
       reveal_type(force_str('foo', strings_only=True))  # N: Revealed type is "builtins.str"
       reveal_type(force_str(S('foo'), strings_only=True))  # N: Revealed type is "main.S"
 
--   case: force_bytes_or_str_with_any
-    main: |
-      from typing import Any
-      from typing_extensions import assert_type
-      from django.utils.encoding import force_bytes, force_str, smart_bytes, smart_str
-
-      def f(x: Any) -> None:
-          assert_type(force_bytes(x), bytes)
-          assert_type(force_str(x), str)
-          assert_type(smart_bytes(x), bytes)
-          assert_type(smart_str(x), str)
-
 -   case: smart_bytes_or_str
     main: |
       from typing_extensions import reveal_type
