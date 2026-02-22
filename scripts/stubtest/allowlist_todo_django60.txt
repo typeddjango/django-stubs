@@ -1,10 +1,16 @@
+<<<<<<< HEAD
 django.contrib.gis.db.backends.postgis.base.BaseBinaryDumper
+=======
+>>>>>>> df91dbc2 (Remove BaseBinaryDumper from allowlist)
 django.contrib.gis.db.backends.postgis.base.BaseTextDumper
 django.contrib.gis.db.backends.postgis.base.DatabaseWrapper.register_geometry_adapters
 django.contrib.gis.db.backends.postgis.base.GeographyType
 django.contrib.gis.db.backends.postgis.base.GeometryType
 django.contrib.gis.db.backends.postgis.base.RasterType
 django.contrib.gis.db.backends.postgis.base.postgis_adapters
+<<<<<<< HEAD
 django.contrib.gis.db.models.Model._do_update
 django.db.models.Model._do_update
 django.db.models.base.Model._do_update
+=======
+>>>>>>> df91dbc2 (Remove BaseBinaryDumper from allowlist)
