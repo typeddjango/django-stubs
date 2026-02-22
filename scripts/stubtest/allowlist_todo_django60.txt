@@ -1,4 +1,4 @@
-django.contrib.gis.db.backends.postgis.base.BaseTextDumper
+django.contrib.gis.db.backends.postgis.base.BaseBinaryDumper
 django.contrib.gis.db.backends.postgis.base.DatabaseWrapper.register_geometry_adapters
 django.contrib.gis.db.backends.postgis.base.GeographyType
 django.contrib.gis.db.backends.postgis.base.GeometryType
