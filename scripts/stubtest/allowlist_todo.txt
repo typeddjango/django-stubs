@@ -80,9 +80,6 @@ django.contrib.flatpages.models.FlatPage.sites
 django.contrib.flatpages.models.FlatPage.template_name
 django.contrib.flatpages.models.FlatPage.title
 django.contrib.flatpages.models.FlatPage.url
-django.contrib.gis.admin.GISModelAdmin.gis_widget
-django.contrib.gis.admin.options.GISModelAdmin.gis_widget
-django.contrib.gis.admin.options.GeoModelAdminMixin
 django.contrib.gis.admin.site
 django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
