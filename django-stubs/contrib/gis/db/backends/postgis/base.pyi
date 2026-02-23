@@ -1,6 +1,7 @@
 from typing import Any
 
 from django.db.backends.postgresql.base import DatabaseWrapper as Psycopg2DatabaseWrapper
+from psycopg import BaseConnection
 from psycopg.adapt import Dumper
 from psycopg.pq import Format
 
@@ -15,3 +16,4 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
     introspection: Any
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def prepare_database(self) -> None: ...
+    def register_geometry_adapters(self, pg_connection: BaseConnection[bytes], clear_caches: bool = False) -> None: ...
