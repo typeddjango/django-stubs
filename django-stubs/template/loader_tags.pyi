@@ -1,7 +1,7 @@
 import collections
 from typing import Any
 
-from django.template.base import FilterExpression, NodeList, Origin, Parser, Token
+from django.template.base import FilterExpression, NodeList, Parser, Token
 from django.template.context import Context
 from django.utils.safestring import SafeString
 
@@ -22,16 +22,12 @@ class BlockNode(Node):
     context: Context
     name: str
     nodelist: NodeList
-    origin: Origin
     parent: Node | None
-    token: Token
     def __init__(self, name: str, nodelist: NodeList, parent: Node | None = None) -> None: ...
     def render(self, context: Context) -> SafeString: ...
     def super(self) -> SafeString: ...
 
 class ExtendsNode(Node):
-    origin: Origin
-    token: Token
     must_be_first: bool
     context_key: str
     nodelist: NodeList
@@ -46,8 +42,6 @@ class ExtendsNode(Node):
     def render(self, context: Context) -> Any: ...
 
 class IncludeNode(Node):
-    origin: Origin
-    token: Token
     context_key: str
     template: FilterExpression
     extra_context: dict[str, FilterExpression]
