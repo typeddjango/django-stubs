@@ -8,6 +8,9 @@ class BaseBinaryDumper(Dumper):
     format: Format
     def dump(self, obj: Any) -> bytes: ...
 
+class BaseTextDumper(Dumper):
+    def dump(self, obj: Any) -> bytes: ...
+
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
     SchemaEditorClass: Any
     features: Any
