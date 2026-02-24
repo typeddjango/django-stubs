@@ -33,8 +33,8 @@ class TokenType(Enum):
 
 class VariableDoesNotExist(Exception):
     msg: str
-    params: tuple[dict[str, str] | str]
-    def __init__(self, msg: str, params: tuple[dict[str, str] | str] = ...) -> None: ...
+    params: tuple[Any, ...]
+    def __init__(self, msg: str, params: tuple[Any, ...] = ...) -> None: ...
 
 class Origin:
     name: str
@@ -110,8 +110,8 @@ class DebugLexer(Lexer):
 
 class Parser:
     tokens: list[Token] | str
-    tags: dict[str, Callable]
-    filters: dict[str, Callable]
+    tags: dict[str, Callable[..., Any]]
+    filters: dict[str, Callable[..., Any]]
     command_stack: list[tuple[str, Token]]
     libraries: dict[str, Library]
     origin: Origin | None
@@ -134,7 +134,7 @@ class Parser:
     def delete_first_token(self) -> None: ...
     def add_library(self, lib: Library) -> None: ...
     def compile_filter(self, token: str) -> FilterExpression: ...
-    def find_filter(self, filter_name: str) -> Callable: ...
+    def find_filter(self, filter_name: str) -> Callable[..., Any]: ...
 
 constant_string: str
 filter_raw_string: str
@@ -144,10 +144,11 @@ class FilterExpression:
     token: str
     filters: list[Any]
     var: Any
+    is_var: bool
     def __init__(self, token: str, parser: Parser) -> None: ...
     def resolve(self, context: Context, ignore_failures: bool = False) -> Any: ...
     @staticmethod
-    def args_check(name: str, func: Callable, provided: list[tuple[bool, Any]]) -> bool: ...
+    def args_check(name: str, func: Callable[..., Any], provided: list[tuple[bool, Any]]) -> bool: ...
 
 class Variable:
     var: dict[Any, Any] | str
