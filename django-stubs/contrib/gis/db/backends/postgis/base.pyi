@@ -12,6 +12,8 @@ class BaseBinaryDumper(Dumper):
 class BaseTextDumper(Dumper):
     def dump(self, obj: Any) -> bytes: ...
 
+class RsterType: ...
+
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
     SchemaEditorClass: Any
     features: Any
