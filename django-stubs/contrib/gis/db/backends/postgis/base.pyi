@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Any
 
 from django.db.backends.postgresql.base import DatabaseWrapper as Psycopg2DatabaseWrapper
@@ -23,4 +24,15 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
 
 class GeometryType: ...
 class GeographyType: ...
-class GeographyType: ...
+class RasterType: ...
+class PostGISTextDumper(BaseTextDumper): ...
+
+class PostGISBinaryDumper(BaseBinaryDumper):
+    format: Format
+
+@lru_cache
+def postgis_adapters(
+    geo_oid: int,
+    geog_oid: int,
+    raster_oid: int,
+) -> tuple[type[PostGISTextDumper], type[PostGISBinaryDumper]]: ...
