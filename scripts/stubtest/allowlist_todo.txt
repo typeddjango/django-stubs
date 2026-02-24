@@ -7,7 +7,6 @@ django.contrib.admin.models.LogEntry.get_action_flag_display
 django.contrib.admin.models.LogEntry.get_next_by_action_time
 django.contrib.admin.models.LogEntry.get_previous_by_action_time
 django.contrib.admin.models.LogEntry.id
-django.contrib.admin.models.LogEntry.object_id
 django.contrib.admin.models.LogEntry.user_id
 django.contrib.admin.site
 django.contrib.admin.sites.site
