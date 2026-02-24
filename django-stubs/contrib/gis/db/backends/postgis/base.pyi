@@ -5,14 +5,14 @@ from psycopg import BaseConnection
 from psycopg.adapt import Dumper
 from psycopg.pq import Format
 
+class RasterType: ...
+
 class BaseBinaryDumper(Dumper):
     format: Format
     def dump(self, obj: Any) -> bytes: ...
 
 class BaseTextDumper(Dumper):
     def dump(self, obj: Any) -> bytes: ...
-
-class RsterType: ...
 
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
     SchemaEditorClass: Any
