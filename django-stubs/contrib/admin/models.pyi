@@ -1,7 +1,10 @@
 from collections.abc import Iterable
-from typing import Any, ClassVar, Literal, overload
+from datetime import datetime
+from typing import Any, Literal, overload
 from uuid import UUID
 
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.base import Model
 
@@ -33,14 +36,14 @@ class LogEntryManager(models.Manager[LogEntry]):
     ) -> list[LogEntry]: ...
 
 class LogEntry(models.Model):
-    action_time: models.DateTimeField
-    user: models.ForeignKey
-    content_type: models.ForeignKey
-    object_id: models.TextField
-    object_repr: models.CharField
-    action_flag: models.PositiveSmallIntegerField
-    change_message: models.TextField
-    objects: ClassVar[LogEntryManager]
+    action_time: models.DateTimeField[datetime, datetime]
+    user: models.ForeignKey[User, User]
+    content_type: models.ForeignKey[ContentType, ContentType]
+    object_id: models.TextField[str, str]
+    object_repr: models.CharField[str, str]
+    action_flag: models.PositiveSmallIntegerField[int, int]
+    change_message: models.TextField[str, str]
+    objects: LogEntryManager  # type: ignore[assignment]
     def is_addition(self) -> bool: ...
     def is_change(self) -> bool: ...
     def is_deletion(self) -> bool: ...
