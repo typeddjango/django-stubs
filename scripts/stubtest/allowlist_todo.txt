@@ -2,18 +2,12 @@
 # Unsorted: there are real problems and things we can really ignore.
 
 django.__main__
-django.contrib.admin.models.LogEntry.action_flag
-django.contrib.admin.models.LogEntry.action_time
-django.contrib.admin.models.LogEntry.change_message
-django.contrib.admin.models.LogEntry.content_type
 django.contrib.admin.models.LogEntry.content_type_id
 django.contrib.admin.models.LogEntry.get_action_flag_display
 django.contrib.admin.models.LogEntry.get_next_by_action_time
 django.contrib.admin.models.LogEntry.get_previous_by_action_time
 django.contrib.admin.models.LogEntry.id
 django.contrib.admin.models.LogEntry.object_id
-django.contrib.admin.models.LogEntry.object_repr
-django.contrib.admin.models.LogEntry.user
 django.contrib.admin.models.LogEntry.user_id
 django.contrib.admin.site
 django.contrib.admin.sites.site
