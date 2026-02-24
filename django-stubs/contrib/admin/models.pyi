@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
+from django.db.models.query_utils import DeferredAttribute
 
 ADDITION: int
 CHANGE: int
@@ -36,13 +38,16 @@ class LogEntryManager(models.Manager[LogEntry]):
     ) -> list[LogEntry]: ...
 
 class LogEntry(models.Model):
-    action_time: models.DateTimeField[datetime, datetime]
-    user: models.ForeignKey[User, User]
-    content_type: models.ForeignKey[ContentType, ContentType]
-    object_id: models.TextField[str, str]
-    object_repr: models.CharField[str, str]
-    action_flag: models.PositiveSmallIntegerField[int, int]
-    change_message: models.TextField[str, str]
+    action_time: DeferredAttribute | models.DateTimeField[datetime, datetime]
+    user: ForwardManyToOneDescriptor[models.ForeignKey[User, User]] | models.ForeignKey[User, User]
+    content_type: (
+        ForwardManyToOneDescriptor[models.ForeignKey[ContentType, ContentType]]
+        | models.ForeignKey[ContentType, ContentType]
+    )
+    object_id: DeferredAttribute | models.TextField[str, str]
+    object_repr: DeferredAttribute | models.CharField[str, str]
+    action_flag: DeferredAttribute | models.PositiveSmallIntegerField[int, int]
+    change_message: DeferredAttribute | models.TextField[str, str]
     objects: LogEntryManager  # type: ignore[assignment]
     def is_addition(self) -> bool: ...
     def is_change(self) -> bool: ...
