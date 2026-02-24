@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Literal, overload
+from typing import Any, ClassVar, Literal, overload
 from uuid import UUID
 
 from django.contrib.auth.models import User
@@ -48,7 +48,7 @@ class LogEntry(models.Model):
     object_repr: DeferredAttribute | models.CharField[str, str]
     action_flag: DeferredAttribute | models.PositiveSmallIntegerField[int, int]
     change_message: DeferredAttribute | models.TextField[str, str]
-    objects: LogEntryManager  # type: ignore[assignment]
+    objects: ClassVar[LogEntryManager]
     def is_addition(self) -> bool: ...
     def is_change(self) -> bool: ...
     def is_deletion(self) -> bool: ...
