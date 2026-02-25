@@ -459,34 +459,60 @@ class DjangoContext:
             raise LookupsAreUnsupported()
         return self._resolve_field_from_parts(field_parts, model_cls)
 
+    def _resolve_lookup_type_from_lookup_class(
+        self, ctx: MethodContext, lookup_cls: type, field: Union["Field[Any, Any]", ForeignObjectRel] | None = None
+    ) -> MypyType | None:
+        """Resolve the expected type for a lookup class.
+
+        Args:
+            ctx: The method context
+            lookup_cls: The Django lookup class (e.g., IsNull, Contains)
+            field: Optional field for resolving Field-dependent types
+
+        Returns:
+            The resolved type, or None if it couldn't be determined
+        """
+        lookup_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), lookup_cls)
+        if lookup_info is None:
+            return None
+
+        for lookup_base in helpers.iter_bases(lookup_info):
+            if lookup_base.args and isinstance((lookup_type := get_proper_type(lookup_base.args[0])), Instance):
+                # if it's Field, consider lookup_type a __get__ of current field
+                if lookup_type.type.fullname == fullnames.FIELD_FULLNAME:
+                    if field is None:
+                        # No field available (e.g., annotation), can't resolve further
+                        return None
+                    field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
+                    if field_info is None:
+                        return None
+                    return get_proper_type(
+                        helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=field.null)
+                    )
+                return lookup_type
+
+        return None
+
     def resolve_lookup_expected_type(
         self, ctx: MethodContext, model_cls: type[Model], lookup: str, model_instance: Instance
     ) -> MypyType:
         try:
+            # solve_lookup_type uses Django's Query.solve_lookup_type(), which raises
+            # FieldError for annotated fields since they don't exist on the actual model.
             solved_lookup = self.solve_lookup_type(model_cls, lookup)
         except FieldError as exc:
+            # We handle annotation lookups here using _resolve_lookup_type_from_lookup_class,
+            # which is the same helper used for regular field lookups below.
             if helpers.is_annotated_model(model_instance.type) and model_instance.extra_attrs:
-                # If the field comes from .annotate(), we assume Any for it
-                # and allow chaining any lookups.
                 lookup_base_field, *annotation_lookup_parts = lookup.split("__")
                 if lookup_base_field in model_instance.extra_attrs.attrs:
                     if annotation_lookup_parts:
-                        # Resolve the lookup class (e.g. "isnull" -> IsNull)
                         lookup_cls = Field().get_lookup(annotation_lookup_parts[-1])
                         if lookup_cls is not None:
-                            lookup_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), lookup_cls)
-                            if lookup_info is not None:
-                                for lookup_base in helpers.iter_bases(lookup_info):
-                                    if lookup_base.args and isinstance(
-                                        (lookup_type := get_proper_type(lookup_base.args[0])),
-                                        Instance,
-                                    ):
-                                        # If the lookup type is Field, it means the expected type
-                                        # depends on the actual field type, which we don't have
-                                        # for annotations. Fall back to the annotation type.
-                                        if lookup_type.type.fullname != fullnames.FIELD_FULLNAME:
-                                            return lookup_type
-                                        break
+                            lookup_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls)
+                            if lookup_type is not None:
+                                return lookup_type
+                    # No lookup suffix or Field-dependent lookup: fall back to annotation type
                     return model_instance.extra_attrs.attrs[lookup_base_field]
 
             msg = exc.args[0]
@@ -514,23 +540,9 @@ class DjangoContext:
         if lookup_cls is None or isinstance(lookup_cls, Exact):
             return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
 
-        assert lookup_cls is not None
-
-        lookup_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), lookup_cls)
-        if lookup_info is None:
-            return AnyType(TypeOfAny.explicit)
-
-        for lookup_base in helpers.iter_bases(lookup_info):
-            if lookup_base.args and isinstance((lookup_type := get_proper_type(lookup_base.args[0])), Instance):
-                # if it's Field, consider lookup_type a __get__ of current field
-                if lookup_type.type.fullname == fullnames.FIELD_FULLNAME:
-                    field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
-                    if field_info is None:
-                        return AnyType(TypeOfAny.explicit)
-                    lookup_type = get_proper_type(
-                        helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=field.null)
-                    )
-                return lookup_type
+        resolved_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls, field)
+        if resolved_type is not None:
+            return resolved_type
 
         return AnyType(TypeOfAny.explicit)
 
