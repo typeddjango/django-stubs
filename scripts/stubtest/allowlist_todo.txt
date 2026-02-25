@@ -18,7 +18,6 @@ django.contrib.admin.models.LogEntry.user_id
 django.contrib.admin.site
 django.contrib.admin.sites.site
 django.contrib.admin.tests.AdminSeleniumTestCase
-django.contrib.admin.tests.AdminSeleniumTestCase.assertCountSeleniumElements
 django.contrib.auth.admin.UserAdmin.fieldsets
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
