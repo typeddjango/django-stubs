@@ -1,15 +1,17 @@
 import logging
 from argparse import ArgumentParser
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from contextlib import AbstractContextManager
 from io import StringIO
-from typing import Any, Literal
+from typing import Any, Literal, TypeVar
 from unittest import TestCase, TestLoader, TestSuite, TextTestResult, TextTestRunner
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test.testcases import SimpleTestCase
 from django.test.utils import TimeKeeperProtocol
 from django.utils.datastructures import OrderedSet
+
+_T = TypeVar("_T", bound=Callable[[str], str])
 
 class QueryFormatter(logging.Formatter): ...
 
@@ -91,6 +93,18 @@ class ParallelTestSuite(TestSuite):
     ) -> None: ...
     def run(self, result: Any) -> Any: ...  # type: ignore[override]
     def handle_event(self, result: Any, tests: list[TestSuite], event: Sequence[Any]) -> None: ...
+
+class Shuffler:
+    hash_algorithm: str
+    seed: int | str
+    seed_source: str
+    def __init__(self, seed: int | str) -> None: ...
+    @classmethod
+    def _hash_text(cls, text: str) -> str: ...
+    @property
+    def seed_display(self) -> str: ...
+    def _hash_item(self, item: str, key: Callable[[_T], _T]) -> str: ...
+    def shuffle(self, items: list[str], key: Callable[[_T], _T]) -> list[str]: ...
 
 class DiscoverRunner:
     test_suite: type[TestSuite]
