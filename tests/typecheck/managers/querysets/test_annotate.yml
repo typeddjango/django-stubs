@@ -498,7 +498,7 @@
 
 # Regression test for https://github.com/typeddjango/django-stubs/issues/3098
 # __isnull lookup on annotated fields should expect bool, not the annotation type
-- case: test_isnull_lookup_on_annotated_field_expects_bool
+- case: test_annotated_field_lookup_type_checking_ok
   main: |
     from uuid import UUID
     from typing_extensions import TypedDict
@@ -513,8 +513,35 @@
 
     def filter_annotated(qs: QuerySet[AnnotatedModel]) -> QuerySet[AnnotatedModel]:
         # __isnull lookup should accept bool, not UUID
-        # Currently this incorrectly reports: Incompatible type for lookup 'scan_id__isnull': (got "bool", expected "UUID | None")
         return qs.filter(scan_id__isnull=True)
+
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100)
+
+# Test that lookups on annotated fields check argument types
+- case: test_annotated_field_lookup_type_checking_error
+  main: |
+    from typing_extensions import TypedDict
+    from django.db.models import QuerySet
+    from django_stubs_ext import WithAnnotations
+    from myapp.models import MyModel
+
+    class MyAnnotations(TypedDict):
+        total: int
+
+    AnnotatedModel = WithAnnotations[MyModel, MyAnnotations]
+
+    def filter_annotated(qs: QuerySet[AnnotatedModel]) -> QuerySet[AnnotatedModel]:
+        # Invalid: str argument for __gt lookup should error
+        qs.filter(total__gt=10)
+        return qs.filter(total__gt="not a number")  # E: Incompatible type for lookup 'total__gt': (got "str", expected "int")  [misc]
 
   installed_apps:
     - myapp
