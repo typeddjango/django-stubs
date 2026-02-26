@@ -5,6 +5,8 @@ from django.contrib import admin
 from django.contrib.admin.options import _DisplayT
 from django.contrib.admin.utils import flatten, flatten_fieldsets
 from django.db import models
+from django.db.models import F
+from django.db.models.functions import Upper
 from typing_extensions import assert_type
 
 
@@ -80,3 +82,15 @@ assert_type(flatten_fieldsets(person_fieldset_list_admin.fieldsets), list[str])
 assert_type(flatten_fieldsets(person_fieldset_list_admin.get_fieldsets(request)), list[str])
 assert_type(flatten_fieldsets(person_fieldset_tuple_admin.fieldsets), list[str])
 assert_type(flatten_fieldsets(person_fieldset_tuple_admin.get_fieldsets(request)), list[str])
+
+
+class PersonOrderingAdmin(admin.ModelAdmin[Person]):
+    ordering = [Upper("first_name")]
+
+
+class PersonMixedOrderingAdmin(admin.ModelAdmin[Person]):
+    ordering = ["-last_name", Upper("first_name")]
+
+
+class PersonFExpressionAdmin(admin.ModelAdmin[Person]):
+    ordering = [F("birthday").desc(nulls_last=True)]

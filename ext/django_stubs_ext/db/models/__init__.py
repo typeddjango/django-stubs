@@ -4,7 +4,8 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import ClassVar
 
-    from django.db.models import BaseConstraint, Index, OrderBy
+    from django.db.models import BaseConstraint, Index
+    from django.db.models.expressions import Combinable
     from django.utils.datastructures import _ListOrTuple
 
     from django_stubs_ext import StrOrPromise
@@ -28,7 +29,7 @@ if TYPE_CHECKING:
         get_latest_by: ClassVar[str | Sequence[str]]
         managed: ClassVar[bool]  # default: True
         order_with_respect_to: ClassVar[str]
-        ordering: ClassVar[Sequence[str | OrderBy]]
+        ordering: ClassVar[Sequence[str | Combinable]]
         permissions: ClassVar[_ListOrTuple[tuple[str, StrOrPromise]]]
         default_permissions: ClassVar[Sequence[str]]  # default: ("add", "change", "delete", "view")
         proxy: ClassVar[bool]  # default: False

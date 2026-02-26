@@ -12,6 +12,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
 from django.db.models.expressions import Col, Combinable, Expression, Func
 from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.query import _OrderByFieldName
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
 from django.forms import Widget
@@ -222,7 +223,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         include_blank: bool = True,
         blank_choice: _ChoicesList = ...,
         limit_choices_to: _LimitChoicesTo | None = None,
-        ordering: Sequence[str] = (),
+        ordering: Sequence[_OrderByFieldName] = (),
     ) -> BlankChoiceIterator | _ChoicesList: ...
     @property
     def flatchoices(self) -> list[_Choice]: ...

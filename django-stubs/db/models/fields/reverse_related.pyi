@@ -5,6 +5,7 @@ from django.db.models.base import Model
 from django.db.models.fields import AutoField, Field, _AllLimitChoicesTo, _ChoicesList, _LimitChoicesTo
 from django.db.models.fields.related import ForeignKey, ForeignObject, ManyToManyField, OneToOneField
 from django.db.models.lookups import Lookup, StartsWith, Transform
+from django.db.models.query import _OrderByFieldName
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
@@ -74,7 +75,7 @@ class ForeignObjectRel(FieldCacheMixin):
         include_blank: bool = True,
         blank_choice: _ChoicesList = ...,
         limit_choices_to: _LimitChoicesTo | None = None,
-        ordering: Sequence[str] = (),
+        ordering: Sequence[_OrderByFieldName] = (),
     ) -> _ChoicesList: ...
     def get_joining_fields(self) -> tuple[tuple[Field, Field], ...]: ...
     def get_extra_restriction(
