@@ -88,6 +88,8 @@ django.core.validators.slug_unicode_re
 django.core.validators.URLValidator.regex
 django.core.management.commands.makemessages.plural_forms_re
 django.core.management.commands.runserver.naiveip_re
+django.db.models.functions.Collate.collation_re
+django.db.models.functions.comparison.Collate.collation_re
 django.http.request.host_validation_re
 django.middleware.csrf.invalid_token_chars_re
 django.template.base.filter_re
