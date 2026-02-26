@@ -462,12 +462,12 @@ class DjangoContext:
     def _resolve_lookup_type_from_lookup_class(
         self, ctx: MethodContext, lookup_cls: type, field: Union["Field[Any, Any]", ForeignObjectRel] | None = None
     ) -> MypyType | None:
-        """Resolve the expected type for a lookup class.
+        """Resolve the expected type for a lookup class (used both for regular fields and annotated fields)
 
         Args:
-            ctx: The method context
+            ctx
             lookup_cls: The Django lookup class (e.g., IsNull, Contains)
-            field: Optional field for resolving Field-dependent types
+            field: Optional field for resolving Field-dependent types (None for annotated fields)
 
         Returns:
             The resolved type, or None if it couldn't be determined
@@ -493,27 +493,47 @@ class DjangoContext:
 
         return None
 
+    def _resolve_annotated_field_lookup(
+        self, ctx: MethodContext, lookup: str, model_instance: Instance
+    ) -> MypyType | None:
+        """Resolve the expected type for a lookup on an annotated field.
+
+        Args:
+            ctx
+            lookup: The full lookup string (e.g., 'total__gte' or 'total').
+            model_instance: The model instance containing extra_attrs from annotations.
+
+        Returns:
+            The resolved mypy type for the lookup, or None if the base field
+            is not found in the model's annotations.
+        """
+        if not helpers.is_annotated_model(model_instance.type) or not model_instance.extra_attrs:
+            return None
+
+        lookup_base_field, *annotation_lookup_parts = lookup.split("__")
+        if lookup_base_field in model_instance.extra_attrs.attrs:
+            if annotation_lookup_parts:
+                lookup_cls = Field().get_lookup(annotation_lookup_parts[-1])
+                if lookup_cls is not None:
+                    lookup_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls)
+                    if lookup_type is not None:
+                        return lookup_type
+            # No lookup suffix or Field-dependent lookup: fall back to annotation type
+            return model_instance.extra_attrs.attrs[lookup_base_field]
+        return None
+
     def resolve_lookup_expected_type(
         self, ctx: MethodContext, model_cls: type[Model], lookup: str, model_instance: Instance
     ) -> MypyType:
         try:
             # solve_lookup_type uses Django's Query.solve_lookup_type(), which raises
-            # FieldError for annotated fields since they don't exist on the actual model.
+            # FieldError for annotated fields since they don't exist on the actual model...
             solved_lookup = self.solve_lookup_type(model_cls, lookup)
         except FieldError as exc:
-            # We handle annotation lookups here using _resolve_lookup_type_from_lookup_class,
-            # which is the same helper used for regular field lookups below.
-            if helpers.is_annotated_model(model_instance.type) and model_instance.extra_attrs:
-                lookup_base_field, *annotation_lookup_parts = lookup.split("__")
-                if lookup_base_field in model_instance.extra_attrs.attrs:
-                    if annotation_lookup_parts:
-                        lookup_cls = Field().get_lookup(annotation_lookup_parts[-1])
-                        if lookup_cls is not None:
-                            lookup_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls)
-                            if lookup_type is not None:
-                                return lookup_type
-                    # No lookup suffix or Field-dependent lookup: fall back to annotation type
-                    return model_instance.extra_attrs.attrs[lookup_base_field]
+            # ...so we handle annotation lookups here
+            annotation_lookup = self._resolve_annotated_field_lookup(ctx, lookup, model_instance)
+            if annotation_lookup is not None:
+                return annotation_lookup
 
             msg = exc.args[0]
             if model_instance.extra_attrs:
