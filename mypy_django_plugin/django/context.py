@@ -511,16 +511,19 @@ class DjangoContext:
             return None
 
         lookup_base_field, *annotation_lookup_parts = lookup.split("__")
-        if lookup_base_field in model_instance.extra_attrs.attrs:
-            if annotation_lookup_parts:
-                lookup_cls = Field().get_lookup(annotation_lookup_parts[-1])
-                if lookup_cls is not None:
-                    lookup_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls)
-                    if lookup_type is not None:
-                        return lookup_type
-            # No lookup suffix or Field-dependent lookup: fall back to annotation type
-            return model_instance.extra_attrs.attrs[lookup_base_field]
-        return None
+
+        if not lookup_base_field in model_instance.extra_attrs.attrs:
+            return None
+
+        if annotation_lookup_parts:
+            lookup_cls = Field().get_lookup(annotation_lookup_parts[-1])
+            if lookup_cls is not None:
+                lookup_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls)
+                if lookup_type is not None:
+                    return lookup_type
+
+        # No lookup suffix or Field-dependent lookup: fall back to annotation type
+        return model_instance.extra_attrs.attrs[lookup_base_field]
 
     def resolve_lookup_expected_type(
         self, ctx: MethodContext, model_cls: type[Model], lookup: str, model_instance: Instance
