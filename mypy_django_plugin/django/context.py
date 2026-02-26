@@ -512,7 +512,7 @@ class DjangoContext:
 
         lookup_base_field, *annotation_lookup_parts = lookup.split("__")
 
-        if not lookup_base_field in model_instance.extra_attrs.attrs:
+        if lookup_base_field not in model_instance.extra_attrs.attrs:
             return None
 
         if annotation_lookup_parts:
