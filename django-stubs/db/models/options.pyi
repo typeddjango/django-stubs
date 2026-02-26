@@ -11,6 +11,7 @@ from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import ManyToManyField, OneToOneField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.manager import Manager
+from django.db.models.query import _OrderByFieldName
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, _ListOrTuple
 from django.utils.functional import _StrOrPromise, cached_property
@@ -51,7 +52,7 @@ class Options(Generic[_M]):
     verbose_name_plural: _StrOrPromise | None
     db_table: str
     db_table_comment: str
-    ordering: Sequence[str] | None
+    ordering: Sequence[_OrderByFieldName] | None
     indexes: _ListOrTuple[Any]
     unique_together: Sequence[tuple[str, ...]]  # Are always normalized
     index_together: Sequence[tuple[str, ...]]  # Are always normalized
