@@ -4,7 +4,6 @@
 django.contrib.gis.db.backends.mysql.schema.MySQLGISSchemaEditor.__init__
 django.contrib.gis.db.backends.oracle.operations.OracleOperations.convert_extent
 django.contrib.gis.db.backends.oracle.operations.OracleOperations.from_text
-django.contrib.gis.db.models.Field.has_db_default
 django.contrib.gis.db.models.ForeignKey.cast_db_type
 django.contrib.gis.db.models.Q.identity
 django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
@@ -22,9 +21,7 @@ django.db.backends.oracle.features.DatabaseFeatures.supports_comparing_boolean_e
 django.db.backends.oracle.features.DatabaseFeatures.supports_primitives_in_json_field
 django.db.backends.oracle.features.DatabaseFeatures.supports_tuple_lookups
 django.db.backends.oracle.features.DatabaseFeatures.test_collations
-django.db.models.Field.has_db_default
 django.db.models.ForeignKey.cast_db_type
 django.db.models.Q.identity
-django.db.models.fields.Field.has_db_default
 django.db.models.fields.related.ForeignKey.cast_db_type
 django.db.models.fields.tuple_lookups
