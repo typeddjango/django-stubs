@@ -1,6 +1,6 @@
 import logging
 from argparse import ArgumentParser
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from contextlib import AbstractContextManager
 from io import StringIO
 from typing import Any, Literal, TypeVar
@@ -11,7 +11,7 @@ from django.test.testcases import SimpleTestCase
 from django.test.utils import TimeKeeperProtocol
 from django.utils.datastructures import OrderedSet
 
-_ST = TypeVar("_ST", bound=Callable[[str], str])
+_ST = TypeVar("_ST")
 
 class QueryFormatter(logging.Formatter): ...
 
@@ -98,13 +98,13 @@ class Shuffler:
     hash_algorithm: str
     seed: int | str
     seed_source: str
-    def __init__(self, seed: int | str) -> None: ...
+    def __init__(self, seed: int | str | None = ...) -> None: ...
     @classmethod
     def _hash_text(cls, text: str) -> str: ...
     @property
     def seed_display(self) -> str: ...
-    def _hash_item(self, item: str, key: Callable[[_ST], _ST]) -> str: ...
-    def shuffle(self, items: list[str], key: Callable[[_ST], _ST]) -> list[str]: ...
+    def _hash_item(self, item: _ST, key: Callable[[_ST], str]) -> str: ...
+    def shuffle(self, items: Iterable[_ST], key: Callable[[_ST], str]) -> list[_ST]: ...
 
 class DiscoverRunner:
     test_suite: type[TestSuite]
