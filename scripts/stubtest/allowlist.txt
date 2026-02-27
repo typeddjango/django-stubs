@@ -274,7 +274,12 @@ django.test.selenium.SeleniumTestCase.__init_subclass__
 # mypy does not understand __getitem__ unpacking python/mypy#2220
 django.urls.ResolverMatch.__iter__
 django.urls.resolvers.ResolverMatch.__iter__
-
-# Loop leak variables - values depend on dict iteration order, not public API
-django.template.smartif.key
-django.template.smartif.op
+ع
+# Ignored because these classes are dynamically generated at runtime.
+# Stubtest reports them as missing when running `./scripts/stubtest.sh`
+# Previously noted for `PostGISBinaryDumper` and PostGISTextDumper:
+# "This is ignored because the error is raised by stubtest when running `./scripts/stubtest.sh.`
+#  At runtime the `PostGISBinaryDumper` and` PostGISTextDumper` classes are not present,
+#  so stubtest reports them as missing."
+django.contrib.gis.db.backends.postgis.base.PostGISBinaryDumper
+django.contrib.gis.db.backends.postgis.base.PostGISTextDumper
