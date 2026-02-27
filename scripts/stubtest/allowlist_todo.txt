@@ -80,7 +80,6 @@ django.contrib.flatpages.models.FlatPage.template_name
 django.contrib.flatpages.models.FlatPage.title
 django.contrib.flatpages.models.FlatPage.url
 django.contrib.gis.admin.site
-django.contrib.gis.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent
 django.contrib.gis.db.backends.postgis.operations.PostGISOperations.convert_extent3d
 django.contrib.gis.db.backends.postgis.schema.PostGISSchemaEditor.rast_index_template
@@ -247,10 +246,6 @@ django.contrib.staticfiles.storage.staticfiles_storage
 django.core.cache.cache
 django.db.backends.ddl_references.Expressions
 django.db.backends.mysql.base.DatabaseWrapper.ops
-django.db.backends.oracle.features.DatabaseFeatures.django_test_skips
-django.db.backends.oracle.features.DatabaseFeatures.introspected_field_types
-django.db.backends.oracle.features.DatabaseFeatures.supports_collation_on_charfield
-django.db.backends.oracle.features.DatabaseFeatures.supports_frame_exclusion
 django.db.backends.postgresql.base.DatabaseWrapper.ops
 django.db.backends.sqlite3.base.DatabaseWrapper.ops
 django.db.backends.utils.debug_transaction
