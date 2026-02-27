@@ -10,10 +10,19 @@ _F = TypeVar("_F", bound=Callable[..., Any])
 
 class SeleniumTestCaseBase:
     browsers: Any
+    selenium_hub: str | None = None
+    external_host: str | None = None
     browser: Any
+    headless: bool = False
+    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> type: ...
     @classmethod
     def import_webdriver(cls, browser: Any) -> type[Any]: ...  # Type[WebDriver]
+    @classmethod
+    def import_options(cls, browser: Any) -> type[Any]: ...  # Type[WebDriver]
+    @classmethod
+    def great_capability(cls, browser: Any) -> dict[str, Any]: ...
     def create_webdriver(self) -> Any: ...  # WebDriver
+    def create_options(self) -> Any: ...
 
 class ChangeWindowSize:
     def __init__(self, width: int, height: int, selenium: Any) -> None: ...
@@ -27,6 +36,7 @@ class ChangeWindowSize:
 
 class SeleniumTestCase(LiveServerTestCase):
     implicit_wait: int
+    external_host: str | None = None
     screenshots: bool = False
     selenium: Any
     def desktop_size(self) -> AbstractContextManager[None]: ...
