@@ -612,15 +612,7 @@ django.forms.widgets.Input.input_type
 django.forms.widgets.Media.__html__
 django.forms.widgets.RadioSelect.id_for_label
 django.test.selenium.SeleniumTestCase
-django.test.selenium.SeleniumTestCase.external_host
 django.test.selenium.SeleniumTestCase.tags
-django.test.selenium.SeleniumTestCaseBase.__new__
-django.test.selenium.SeleniumTestCaseBase.create_options
-django.test.selenium.SeleniumTestCaseBase.external_host
-django.test.selenium.SeleniumTestCaseBase.get_capability
-django.test.selenium.SeleniumTestCaseBase.headless
-django.test.selenium.SeleniumTestCaseBase.import_options
-django.test.selenium.SeleniumTestCaseBase.selenium_hub
 django.test.testcases.LiveServerThread.__init__
 django.test.testcases.LiveServerThread.server_class
 django.test.testcases._AssertTemplateUsedContext.__init__
