@@ -23,4 +23,3 @@ django.db.backends.oracle.features.DatabaseFeatures.test_collations
 django.db.models.ForeignKey.cast_db_type
 django.db.models.Q.identity
 django.db.models.fields.related.ForeignKey.cast_db_type
-django.db.models.fields.tuple_lookups
