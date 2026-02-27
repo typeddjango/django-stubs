@@ -88,8 +88,6 @@ django.core.validators.slug_unicode_re
 django.core.validators.URLValidator.regex
 django.core.management.commands.makemessages.plural_forms_re
 django.core.management.commands.runserver.naiveip_re
-django.db.models.functions.Collate.collation_re
-django.db.models.functions.comparison.Collate.collation_re
 django.http.request.host_validation_re
 django.middleware.csrf.invalid_token_chars_re
 django.template.base.filter_re
@@ -278,3 +276,12 @@ django.urls.resolvers.ResolverMatch.__iter__
 # Loop leak variables - values depend on dict iteration order, not public API
 django.template.smartif.key
 django.template.smartif.op
+
+# Ignored because these classes are dynamically generated at runtime.
+# Stubtest reports them as missing when running `./scripts/stubtest.sh`
+# Previously noted for `PostGISBinaryDumper` and PostGISTextDumper:
+# "This is ignored because the error is raised by stubtest when running `./scripts/stubtest.sh.`
+#  At runtime the `PostGISBinaryDumper` and` PostGISTextDumper` classes are not present,
+#  so stubtest reports them as missing."
+django.contrib.gis.db.backends.postgis.base.PostGISBinaryDumper
+django.contrib.gis.db.backends.postgis.base.PostGISTextDumper
