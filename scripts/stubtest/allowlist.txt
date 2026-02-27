@@ -70,6 +70,11 @@ django.utils.functional.Promise.__mod__
 # `classonlymethod` is an alias for `@classmethod` which is disjoint:
 django.utils.decorators.classonlymethod
 
+# At runtime these return functools.partial via class_or_instance_method descriptor
+django.db.models.query_utils.RegisterLookupMixin.get_lookups
+django.db.models.query_utils.RegisterLookupMixin.register_lookup
+django.db.models.query_utils.RegisterLookupMixin._unregister_lookup
+
 # Lazy regex
 django.contrib.admin.utils.UNQUOTE_RE
 django.contrib.gis.geometry.hex_regex
