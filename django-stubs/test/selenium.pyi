@@ -9,6 +9,7 @@ from typing_extensions import Self
 _F = TypeVar("_F", bound=Callable[..., Any])
 
 _WebDriver: TypeAlias = Any
+_Options: TypeAlias = Any
 
 class SeleniumTestCaseBase:
     browsers: Any
