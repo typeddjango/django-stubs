@@ -68,4 +68,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def bare_select_suffix(self) -> str: ...  # type: ignore[override]
     @cached_property
-    def supports_tuple_lookups(self) -> bool: ...
+    def supports_tuple_lookups(self) -> bool: ...  # type: ignore[override]

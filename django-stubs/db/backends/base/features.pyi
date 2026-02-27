@@ -145,6 +145,7 @@ class BaseDatabaseFeatures:
     supports_unlimited_charfield: bool
     supports_tuple_comparison_against_subquery: bool
     rounds_to_even: bool
+    supports_tuple_lookups: bool
     test_collations: dict[str, str | None]
     test_now_utc_template: str | None
     insert_test_table_with_defaults: str | None
