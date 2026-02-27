@@ -14,7 +14,7 @@ class SeleniumTestCaseBase:
     external_host: str | None = None
     browser: Any
     headless: bool = False
-    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> type: ...
+    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> Self: ...
     @classmethod
     def import_webdriver(cls, browser: Any) -> type[Any]: ...  # Type[WebDriver]
     @classmethod
