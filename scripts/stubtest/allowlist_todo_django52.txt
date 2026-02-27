@@ -11,9 +11,6 @@ django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
 django.db.backends.base.features.BaseDatabaseFeatures.rounds_to_even
 django.db.backends.base.features.BaseDatabaseFeatures.supports_tuple_lookups
 django.db.backends.base.schema.BaseDatabaseSchemaEditor.sql_pk_constraint
-django.db.backends.mysql.features.DatabaseFeatures.allows_group_by_selected_pks
-django.db.backends.mysql.features.DatabaseFeatures.has_native_uuid_field
-django.db.backends.mysql.features.DatabaseFeatures.supports_expression_defaults
 django.db.backends.oracle.base.DatabaseWrapper.close_pool
 django.db.backends.oracle.base.DatabaseWrapper.is_pool
 django.db.backends.oracle.base.DatabaseWrapper.ops
