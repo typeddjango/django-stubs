@@ -274,7 +274,8 @@ django.test.selenium.SeleniumTestCase.__init_subclass__
 # mypy does not understand __getitem__ unpacking python/mypy#2220
 django.urls.ResolverMatch.__iter__
 django.urls.resolvers.ResolverMatch.__iter__
-ع
+
+
 # Ignored because these classes are dynamically generated at runtime.
 # Stubtest reports them as missing when running `./scripts/stubtest.sh`
 # Previously noted for `PostGISBinaryDumper` and PostGISTextDumper:
