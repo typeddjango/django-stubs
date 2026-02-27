@@ -284,3 +284,23 @@ django.urls.resolvers.ResolverMatch.__iter__
 #  so stubtest reports them as missing."
 django.contrib.gis.db.backends.postgis.base.PostGISBinaryDumper
 django.contrib.gis.db.backends.postgis.base.PostGISTextDumper
+
+
+
+# Dynamically generated in runtime; ignore in stubtest
+# smartif runtime-only members
+django.template.smartif.key
+django.template.smartif.opg
+
+
+
+
+
+# Dynamic/runtime-only members for stubtest
+django.contrib.gis.db.models.IntegerChoices
+django.contrib.gis.db.models.TextChoices
+django.tasks.base.TextChoices
+django.template.smartif.key
+django.template.smartif.op
+django.utils.inspect.lock
+django.utils.inspect.safe_signature_from_callable
