@@ -1,5 +1,7 @@
 from django import forms
 from django.db import models
+from django.db.models import F
+from django.db.models.functions import Upper
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView
 from django.views.generic.list import ListView
@@ -39,3 +41,11 @@ class MyDeleteView(DeleteView[MyModel, ConfirmForm]): ...
 delete_view = MyDeleteView()
 assert_type(delete_view.get_form_class(), type[ConfirmForm])
 assert_type(delete_view.get_form(), ConfirmForm)
+
+
+class MyOrderedListView(ListView[MyModel]):
+    ordering = [Upper("id")]
+
+
+class MyMixedOrderingListView(ListView[MyModel]):
+    ordering = ["-id", F("id").asc()]

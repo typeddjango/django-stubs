@@ -14,7 +14,7 @@ from django.db.models.base import Model
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey, ManyToManyField, RelatedField
 from django.db.models.options import Options
-from django.db.models.query import QuerySet
+from django.db.models.query import QuerySet, _OrderByFieldName
 from django.forms.fields import Field as FormField
 from django.forms.fields import TypedChoiceField
 from django.forms.formsets import BaseFormSet
@@ -97,7 +97,7 @@ class BaseModelAdmin(Generic[_ModelT], metaclass=MediaDefiningClass):
     prepopulated_fields: ClassVar[dict[str, Sequence[str]]]
     formfield_overrides: ClassVar[Mapping[type[Field], Mapping[str, Any]]]
     readonly_fields: ClassVar[_ListOrTuple[str]]
-    ordering: ClassVar[_ListOrTuple[str] | None]
+    ordering: ClassVar[_ListOrTuple[_OrderByFieldName] | None]
     sortable_by: ClassVar[_ListOrTuple[str] | None]
     show_full_result_count: ClassVar[bool]
     checks_class: ClassVar[Any]
@@ -124,7 +124,7 @@ class BaseModelAdmin(Generic[_ModelT], metaclass=MediaDefiningClass):
     def get_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> _FieldGroups: ...
     def get_fieldsets(self, request: HttpRequest, obj: _ModelT | None = ...) -> _FieldsetSpec: ...
     def get_inlines(self, request: HttpRequest, obj: _ModelT | None) -> _ListOrTuple[type[InlineModelAdmin]]: ...
-    def get_ordering(self, request: HttpRequest) -> _ListOrTuple[str]: ...
+    def get_ordering(self, request: HttpRequest) -> _ListOrTuple[_OrderByFieldName]: ...
     def get_readonly_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> _ListOrTuple[str]: ...
     def get_prepopulated_fields(self, request: HttpRequest, obj: _ModelT | None = ...) -> dict[str, Sequence[str]]: ...
     def get_queryset(self, request: HttpRequest) -> QuerySet[_ModelT]: ...
