@@ -219,10 +219,6 @@ django.contrib.postgres.fields.RangeField.formfield
 django.contrib.postgres.fields.array.ArrayField.formfield
 django.contrib.postgres.fields.hstore.HStoreField.formfield
 django.contrib.postgres.fields.ranges.RangeField.formfield
-django.contrib.redirects.models.Redirect.id
-django.contrib.redirects.models.Redirect.new_path
-django.contrib.redirects.models.Redirect.old_path
-django.contrib.redirects.models.Redirect.site
 django.contrib.redirects.models.Redirect.site_id
 django.contrib.sessions.backends.signed_cookies.SessionStore.exists
 django.contrib.sessions.base_session.AbstractBaseSession.expire_date
