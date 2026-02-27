@@ -9,9 +9,6 @@ logger: Logger
 
 class MySQLGISSchemaEditor(DatabaseSchemaEditor):
     sql_add_spatial_index: str
-    sql_drop_spatial_index: str
-    geometry_sql: Any
-    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def skip_default(self, field: Field) -> bool: ...
     def column_sql(
         self, model: type[Model], field: Field, include_default: bool = ...
