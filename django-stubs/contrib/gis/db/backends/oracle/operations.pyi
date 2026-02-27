@@ -26,11 +26,13 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     Adapter: Any
     extent: str
     unionagg: str
+    from_text: str  # type: ignore[assignment]
     function_names: Any
     select: str
     gis_operators: Any
     unsupported_functions: Any
     def geo_quote_name(self, name: Any) -> Any: ...
+    def convert_extent(self, clob: Any) -> tuple[float, float, float, float] | None: ...  # type: ignore[override]
     def geo_db_type(self, f: Any) -> Any: ...
     def get_distance(self, f: Any, value: Any, lookup_type: Any) -> Any: ...
     def get_geom_placeholder(self, f: Any, value: Any, compiler: Any) -> Any: ...
