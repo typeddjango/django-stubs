@@ -90,3 +90,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_expression_indexes(self) -> bool: ...  # type: ignore[override]
     @cached_property
     def supports_any_value(self) -> bool: ...  # type: ignore[override]
+    @cached_property
+    def supports_expression_defaults(self) -> bool: ...  # type: ignore[override]
+    @cached_property
+    def has_native_uuid_field(self) -> bool: ...  # type: ignore[override]
+    @cached_property
+    def allows_group_by_selected_pks(self) -> bool: ...  # type: ignore[override]
