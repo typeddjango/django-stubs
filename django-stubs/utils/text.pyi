@@ -1,11 +1,11 @@
-from collections.abc import AsyncIterable, AsyncIterator, Callable, Iterable, Iterator
+from collections.abc import AsyncIterable, AsyncIterator, Iterable, Iterator
 from html.parser import HTMLParser
 from io import BytesIO
 from re import Pattern
-from typing import ClassVar, TypeVar, overload
+from typing import Any, ClassVar, TypeVar, overload
 
 from django.db.models.base import Model
-from django.utils.functional import SimpleLazyObject, _StrOrPromise, cached_property
+from django.utils.functional import SimpleLazyObject, _StrOrPromise, _StrPromise, cached_property
 
 _StrOrPromiseT = TypeVar("_StrOrPromiseT", bound=_StrOrPromise)
 _StrOrPromiseOrNoneT = TypeVar("_StrOrPromiseOrNoneT", bound=_StrOrPromise | None)
@@ -61,5 +61,4 @@ def smart_split(text: str) -> Iterator[str]: ...
 def unescape_string_literal(s: _StrOrPromiseT) -> _StrOrPromiseT: ...
 def slugify(value: _StrOrPromiseT, allow_unicode: bool = False) -> _StrOrPromiseT: ...
 def camel_case_to_spaces(value: str) -> str: ...
-
-format_lazy: Callable[..., _StrOrPromise]
+def format_lazy(format_string: _StrOrPromise, *args: Any, **kwargs: Any) -> _StrPromise: ...
