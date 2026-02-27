@@ -19,6 +19,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_pk: str
     sql_delete_pk: str
     sql_create_index: str
+    sql_alter_column_comment: None  # type: ignore[assignment]
     @property
     def sql_delete_check(self) -> str: ...  # type: ignore[override]
     @property

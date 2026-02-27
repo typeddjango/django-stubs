@@ -247,14 +247,6 @@ django.contrib.staticfiles.storage.staticfiles_storage
 django.core.cache.cache
 django.db.backends.ddl_references.Expressions
 django.db.backends.mysql.base.DatabaseWrapper.ops
-django.db.backends.mysql.features.DatabaseFeatures.can_return_rows_from_bulk_insert
-django.db.backends.mysql.features.DatabaseFeatures.django_test_skips
-django.db.backends.mysql.features.DatabaseFeatures.minimum_database_version
-django.db.backends.mysql.features.DatabaseFeatures.supports_select_difference
-django.db.backends.mysql.features.DatabaseFeatures.supports_select_intersection
-django.db.backends.mysql.features.DatabaseFeatures.supports_table_check_constraints
-django.db.backends.mysql.features.DatabaseFeatures.test_collations
-django.db.backends.mysql.schema.DatabaseSchemaEditor.sql_alter_column_comment
 django.db.backends.oracle.features.DatabaseFeatures.django_test_skips
 django.db.backends.oracle.features.DatabaseFeatures.introspected_field_types
 django.db.backends.oracle.features.DatabaseFeatures.supports_collation_on_charfield
