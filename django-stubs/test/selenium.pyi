@@ -1,12 +1,14 @@
 from collections.abc import Callable, Sequence
 from contextlib import AbstractContextManager
 from types import TracebackType
-from typing import Any, TypeVar
+from typing import Any, TypeAlias, TypeVar
 
 from django.test import LiveServerTestCase
 from typing_extensions import Self
 
 _F = TypeVar("_F", bound=Callable[..., Any])
+
+_WebDriver: TypeAlias = Any
 
 class SeleniumTestCaseBase:
     browsers: Any
@@ -16,12 +18,12 @@ class SeleniumTestCaseBase:
     headless: bool = False
     def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> Self: ...
     @classmethod
-    def import_webdriver(cls, browser: Any) -> type[Any]: ...  # Type[WebDriver]
+    def import_webdriver(cls, browser: Any) -> type[_WebDriver]: ...
     @classmethod
-    def import_options(cls, browser: Any) -> type[Any]: ...  # Type[WebDriver]
+    def import_options(cls, browser: Any) -> type[_WebDriver]: ...
     @classmethod
     def get_capability(cls, browser: Any) -> dict[str, Any]: ...
-    def create_webdriver(self) -> Any: ...  # WebDriver
+    def create_webdriver(self) -> Any: ...
     def create_options(self) -> Any: ...
 
 class ChangeWindowSize:
