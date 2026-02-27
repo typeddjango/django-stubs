@@ -51,6 +51,7 @@ class BaseDatabaseSchemaEditor(AbstractContextManager[Any]):
     sql_delete_index: str
     sql_create_pk: str
     sql_delete_pk: str
+    sql_pk_constraint: str
     sql_delete_procedure: str
     sql_alter_table_comment: str
     sql_alter_column_comment: str
