@@ -30,4 +30,3 @@ django.db.models.ForeignKey.cast_db_type
 django.db.models.Q.identity
 django.db.models.fields.Field.has_db_default
 django.db.models.fields.related.ForeignKey.cast_db_type
-django.db.models.fields.tuple_lookups
