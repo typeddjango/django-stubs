@@ -32,7 +32,7 @@ class PostGISBinaryDumper(BaseBinaryDumper):
 
 @lru_cache
 def postgis_adapters(
-    geo_oid: int,
-    geog_oid: int,
-    raster_oid: int,
+    geo_oid: int | None,
+    geog_oid: int | None,
+    raster_oid: int | None,
 ) -> tuple[type[PostGISTextDumper], type[PostGISBinaryDumper]]: ...
