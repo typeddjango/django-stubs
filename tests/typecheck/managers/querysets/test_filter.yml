@@ -164,14 +164,21 @@
 
 -   case: related_model_reverse_foreign_key_lookup
     main: |
-        from myapp.models import Blog, Publisher
+        from myapp.models import Blog, Publisher, Category
         blog = Blog()
         publisher = Publisher()
+
+        # With related_name
         Publisher.objects.filter(blogs=Blog())
         Publisher.objects.filter(blogs__id=1)
-
         Publisher.objects.filter(blogs=publisher)  # E: Incompatible type for lookup 'blogs': (got "Publisher", expected "Blog | int | None")  [misc]
         Publisher.objects.filter(blogs__id=publisher)  # E: Incompatible type for lookup 'blogs__id': (got "Publisher", expected "str | int")  [misc]
+
+        # Without related_name
+        Category.objects.filter(blog=Blog())
+        Category.objects.filter(blog__id=1)
+        Category.objects.filter(blog=publisher)  # E: Incompatible type for lookup 'blog': (got "Publisher", expected "Blog | int | None")  [misc]
+        Category.objects.filter(blog__id=publisher)  # E: Incompatible type for lookup 'blog__id': (got "Publisher", expected "str | int")  [misc]
     installed_apps:
         - myapp
     files:
@@ -181,8 +188,11 @@
                 from django.db import models
                 class Publisher(models.Model):
                     pass
+                class Category(models.Model):
+                    pass
                 class Blog(models.Model):
                     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, related_name='blogs')
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
 
 -   case: many_to_many_lookups
