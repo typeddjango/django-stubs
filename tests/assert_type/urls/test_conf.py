@@ -1,4 +1,5 @@
 from django.conf.urls.i18n import urlpatterns as i18n_urlpatterns
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.contrib.flatpages import urls as flatpages_urls
@@ -45,3 +46,13 @@ assert_type(path("i18n/", include((i18n_urlpatterns, "i18n"))), URLResolver)
 assert_type(path("admindocs/", include("django.contrib.admindocs.urls")), URLResolver)
 assert_type(path("admindocs/", include(("django.contrib.admindocs.urls", "i18n"))), URLResolver)
 assert_type(path("", include(staticfiles_urlpatterns(prefix="static/"))), URLResolver)
+
+# Test 'static'
+assert_type(static("/media/"), list[URLPattern])
+assert_type(static("/media/", document_root="/tmp/media"), list[URLPattern])
+
+
+def custom_serve(request: object, path: str) -> HttpResponse: ...
+
+
+assert_type(static("/media/", view=custom_serve), list[URLPattern])
