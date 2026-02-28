@@ -14,7 +14,7 @@ BILATERAL: Literal["bilateral"]
 class PostGISOperator(SpatialOperator):
     geography: Any
     raster: bool | Literal["bilateral"]
-    def __init__(self, geography: bool = ..., raster: bool | Literal["bilateral"] = ..., **kwargs: Any) -> None: ...
+    def __init__(self, geography: bool = False, raster: bool | Literal["bilateral"] = False, **kwargs: Any) -> None: ...
     def check_raster(self, lookup: Any, template_params: Any) -> Any: ...
     def check_geography(
         self,
@@ -31,7 +31,6 @@ class ST_Polygon(Func):
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     name: str
     postgis: bool
-    geography: bool
     geom_func_prefix: str
     Adapter: Any
     collect: Any
@@ -45,10 +44,12 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     unsupported_functions: Any
     select: str
     select_extent: Any
-    @property
+    @cached_property
     def function_names(self) -> Any: ...
-    @property
+    @cached_property
     def spatial_version(self) -> Any: ...
+    def convert_extent(self, box: Any) -> tuple[float, float, float, float] | None: ...  # type: ignore[override]
+    def convert_extent3d(self, box3d: Any) -> tuple[float, float, float, float, float, float] | None: ...  # type: ignore[override]
     def geo_db_type(self, f: Any) -> Any: ...
     def get_distance(self, f: Any, dist_val: Any, lookup_type: Any) -> Any: ...
     def get_geom_placeholder(self, f: Any, value: Any, compiler: Any) -> Any: ...

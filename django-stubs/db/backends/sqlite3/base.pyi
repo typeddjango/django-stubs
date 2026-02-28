@@ -25,6 +25,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     features: DatabaseFeatures
     introspection: DatabaseIntrospection
     ops: DatabaseOperations
+    operators: dict[str, str]
 
     pattern_esc: str
     pattern_ops: dict[str, str]
