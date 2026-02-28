@@ -36,7 +36,7 @@ class _AssertTemplateUsedContext:
     template_name: str
     rendered_templates: list[Template]
     context: ContextList
-    def __init__(self, test_case: Any, template_name: Any) -> None: ...
+    def __init__(self, test_case: Any, template_name: Any, msg_prefix: str = "", count: int | None = None) -> None: ...
     def on_template_render(self, sender: Any, signal: Any, template: Any, context: Any, **kwargs: Any) -> None: ...
     @property
     def rendered_template_names(self) -> list[str]: ...
@@ -46,7 +46,7 @@ class _AssertTemplateUsedContext:
         self,
         exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
-        exc_tb: TracebackType | None,
+        traceback: TracebackType | None,
     ) -> None: ...
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext): ...
@@ -66,47 +66,47 @@ class SimpleTestCase(unittest.TestCase):
     databases: set[str] | str
     @classmethod
     def ensure_connection_patch_method(cls) -> None: ...
-    def __call__(self, result: unittest.TestResult | None = ...) -> None: ...
+    def __call__(self, result: unittest.TestResult | None = None) -> None: ...
     def settings(self, **kwargs: Any) -> Any: ...
     def modify_settings(self, **kwargs: Any) -> Any: ...
     def assertRedirects(
         self,
         response: HttpResponseBase,
         expected_url: str,
-        status_code: int = ...,
-        target_status_code: int = ...,
-        msg_prefix: str = ...,
-        fetch_redirect_response: bool = ...,
+        status_code: int = 302,
+        target_status_code: int = 200,
+        msg_prefix: str = "",
+        fetch_redirect_response: bool = True,
     ) -> None: ...
     def assertURLEqual(
         self,
         url1: _StrOrPromise,
         url2: _StrOrPromise,
-        msg_prefix: str = ...,
+        msg_prefix: str = "",
     ) -> None: ...
     def assertContains(
         self,
         response: HttpResponseBase,
         text: bytes | int | _StrOrPromise,
-        count: int | None = ...,
-        status_code: int = ...,
-        msg_prefix: str = ...,
-        html: bool = ...,
+        count: int | None = None,
+        status_code: int = 200,
+        msg_prefix: str = "",
+        html: bool = False,
     ) -> None: ...
     def assertNotContains(
         self,
         response: HttpResponseBase,
         text: bytes | int | _StrOrPromise,
-        status_code: int = ...,
-        msg_prefix: str = ...,
-        html: bool = ...,
+        status_code: int = 200,
+        msg_prefix: str = "",
+        html: bool = False,
     ) -> None: ...
     def assertFormError(
         self,
         form: BaseForm,
         field: str | None,
         errors: list[str] | str,
-        msg_prefix: str = ...,
+        msg_prefix: str = "",
     ) -> None: ...
     def assertFormSetError(
         self,
@@ -114,17 +114,17 @@ class SimpleTestCase(unittest.TestCase):
         form_index: int | None,
         field: str | None,
         errors: list[str] | str,
-        msg_prefix: str = ...,
+        msg_prefix: str = "",
     ) -> None: ...
     def assertTemplateUsed(
         self,
-        response: HttpResponseBase | str | None = ...,
-        template_name: str | None = ...,
-        msg_prefix: str = ...,
-        count: int | None = ...,
+        response: HttpResponseBase | str | None = None,
+        template_name: str | None = None,
+        msg_prefix: str = "",
+        count: int | None = None,
     ) -> _AssertTemplateUsedContext | None: ...
     def assertTemplateNotUsed(
-        self, response: HttpResponseBase | str | None = ..., template_name: str | None = ..., msg_prefix: str = ...
+        self, response: HttpResponseBase | str | None = None, template_name: str | None = None, msg_prefix: str = ""
     ) -> _AssertTemplateNotUsedContext | None: ...
     def assertRaisesMessage(
         self, expected_exception: type[Exception], expected_message: str, *args: Any, **kwargs: Any
@@ -137,42 +137,41 @@ class SimpleTestCase(unittest.TestCase):
         fieldclass: type[EmailField],
         valid: dict[str, str],
         invalid: dict[str, list[str]],
-        field_args: Iterable[Any] | None = ...,
-        field_kwargs: Mapping[str, Any] | None = ...,
-        empty_value: str = ...,
+        field_args: Iterable[Any] | None = None,
+        field_kwargs: Mapping[str, Any] | None = None,
+        empty_value: str = "",
     ) -> Any: ...
-    def assertHTMLEqual(self, html1: str, html2: str, msg: str | None = ...) -> None: ...
-    def assertHTMLNotEqual(self, html1: str, html2: str, msg: str | None = ...) -> None: ...
-    def assertInHTML(self, needle: str, haystack: str, count: int | None = ..., msg_prefix: str = ...) -> None: ...
-    def assertNotInHTML(self, needle: str, haystack: str, msg_prefix: str = ...) -> None: ...
+    def assertHTMLEqual(self, html1: str, html2: str, msg: str | None = None) -> None: ...
+    def assertHTMLNotEqual(self, html1: str, html2: str, msg: str | None = None) -> None: ...
+    def assertInHTML(self, needle: str, haystack: str, count: int | None = None, msg_prefix: str = "") -> None: ...
+    def assertNotInHTML(self, needle: str, haystack: str, msg_prefix: str = "") -> None: ...
     def assertJSONEqual(
         self,
         raw: str | bytes | bytearray,
         expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
-        msg: str | None = ...,
+        msg: str | None = None,
     ) -> None: ...
     def assertJSONNotEqual(
         self,
         raw: str | bytes | bytearray,
         expected_data: dict[str, Any] | list[Any] | str | int | float | bool | None,
-        msg: str | None = ...,
+        msg: str | None = None,
     ) -> None: ...
-    def assertXMLEqual(self, xml1: str, xml2: str, msg: str | None = ...) -> None: ...
-    def assertXMLNotEqual(self, xml1: str, xml2: str, msg: str | None = ...) -> None: ...
+    def assertXMLEqual(self, xml1: str, xml2: str, msg: str | None = None) -> None: ...
+    def assertXMLNotEqual(self, xml1: str, xml2: str, msg: str | None = None) -> None: ...
 
 class TransactionTestCase(SimpleTestCase):
     reset_sequences: bool
     available_apps: Any
     fixtures: Any
-    multi_db: bool
     serialized_rollback: bool
     def assertQuerySetEqual(
         self,
         qs: Iterator[Any] | list[Model] | QuerySet | RawQuerySet,
         values: Iterable[Any],
-        transform: Callable[[Model], Any] | type[str] | None = ...,
-        ordered: bool = ...,
-        msg: str | None = ...,
+        transform: Callable[[Model], Any] | type[str] | None = None,
+        ordered: bool = True,
+        msg: str | None = None,
     ) -> None: ...
     @overload
     def assertNumQueries(self, num: int, func: None = None, *, using: str = ...) -> _AssertNumQueriesContext: ...
@@ -186,18 +185,19 @@ class TestCase(TransactionTestCase):
     def setUpTestData(cls) -> None: ...
     @classmethod
     def captureOnCommitCallbacks(
-        cls, *, using: str = ..., execute: bool = ...
+        cls, *, using: str = "default", execute: bool = False
     ) -> AbstractContextManager[list[Callable[[], Any]]]: ...
 
 class CheckCondition:
-    conditions: Sequence[tuple[Callable, str]]
-    def __init__(self, *conditions: tuple[Callable, str]) -> None: ...
-    def add_condition(self, condition: Callable, reason: str) -> CheckCondition: ...
+    conditions: Sequence[tuple[Callable[..., Any], str]]
+    def __init__(self, *conditions: tuple[Callable[..., Any], str]) -> None: ...
+    def add_condition(self, condition: Callable[..., Any], reason: str) -> CheckCondition: ...
     def __get__(self, instance: None, cls: type[TransactionTestCase] | None = ...) -> bool: ...
 
-def skipIfDBFeature(*features: Any) -> Callable: ...
-def skipUnlessDBFeature(*features: Any) -> Callable: ...
-def skipUnlessAnyDBFeature(*features: Any) -> Callable: ...
+def connections_support_transactions(aliases: Iterable[str] | None = None) -> bool: ...
+def skipIfDBFeature(*features: Any) -> Callable[..., Any]: ...
+def skipUnlessDBFeature(*features: Any) -> Callable[..., Any]: ...
+def skipUnlessAnyDBFeature(*features: Any) -> Callable[..., Any]: ...
 
 class QuietWSGIRequestHandler(WSGIRequestHandler): ...
 
@@ -222,13 +222,14 @@ class LiveServerThread(threading.Thread):
     is_ready: threading.Event
     error: ImproperlyConfigured | None
     static_handler: type[WSGIHandler]
-    connections_override: dict[str, BaseDatabaseWrapper]
+    connections_override: dict[str, BaseDatabaseWrapper] | None
+    server_class: type[ThreadedWSGIServer]
     def __init__(
         self,
         host: str,
         static_handler: type[WSGIHandler],
-        connections_override: dict[str, BaseDatabaseWrapper] = ...,
-        port: int = ...,
+        connections_override: dict[str, BaseDatabaseWrapper] | None = None,
+        port: int = 0,
     ) -> None: ...
     httpd: ThreadedWSGIServer
     def terminate(self) -> None: ...
@@ -248,7 +249,5 @@ class SerializeMixin:
     lockfile: Any
     @classmethod
     def setUpClass(cls) -> None: ...
-
-def connections_support_transactions(aliases: Iterable[str] | None = ...) -> bool: ...
 
 __all__ = ("SimpleTestCase", "TestCase", "TransactionTestCase", "skipIfDBFeature", "skipUnlessDBFeature")
