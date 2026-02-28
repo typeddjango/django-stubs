@@ -511,9 +511,6 @@ django.forms.widgets.Media.__html__
 django.forms.widgets.RadioSelect.id_for_label
 django.test.selenium.SeleniumTestCase
 django.test.selenium.SeleniumTestCase.tags
-django.test.testcases.LiveServerThread.__init__
-django.test.testcases.LiveServerThread.server_class
-django.test.testcases._AssertTemplateUsedContext.__init__
 django.urls.conf.path
 django.urls.conf.re_path
 django.urls.path
