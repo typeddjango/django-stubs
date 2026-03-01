@@ -771,7 +771,7 @@ def validate_select_related(ctx: MethodContext, django_context: DjangoContext) -
 
 
 def _validate_bulk_update_field(
-    ctx: MethodContext, model_cls: type[Model], field_name: str, method: Literal["bulk_update", "abulk_update"]
+    ctx: MethodContext, model_cls: type[Model], field_name: str, method: str, *, fields_param: str | None = None
 ) -> bool:
     opts = model_cls._meta
     try:
@@ -789,7 +789,8 @@ def _validate_bulk_update_field(
         all_pk_fields.update(getattr(parent._meta, "pk_fields", [parent._meta.pk]))
 
     if field in all_pk_fields:
-        ctx.api.fail(f'"{method}()" cannot be used with primary key fields. Got "{field_name}"', ctx.context)
+        suffix = f" in {fields_param}" if fields_param else ""
+        ctx.api.fail(f'"{method}()" cannot be used with primary key fields{suffix}. Got "{field_name}"', ctx.context)
         return False
 
     return True
@@ -821,5 +822,61 @@ def validate_bulk_update(
         field_name = helpers.resolve_string_attribute_value(field_arg, django_context)
         if field_name is not None:
             _validate_bulk_update_field(ctx, django_model.cls, field_name, method)
+
+    return ctx.default_return_type
+
+
+def _validate_bulk_create_unique_field(
+    ctx: MethodContext, model_cls: type[Model], field_name: str, method: str
+) -> bool:
+    opts = model_cls._meta
+    resolved_name = opts.pk.name if field_name == "pk" else field_name
+    try:
+        field = opts.get_field(resolved_name)
+    except FieldDoesNotExist as e:
+        ctx.api.fail(str(e), ctx.context)
+        return False
+
+    if not field.concrete or field.many_to_many:
+        ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
+        return False
+
+    return True
+
+
+def validate_bulk_create(
+    ctx: MethodContext, django_context: DjangoContext, method: Literal["bulk_create", "abulk_create"]
+) -> MypyType:
+    """
+    Type check the `update_fields` and `unique_fields` arguments passed to `QuerySet.bulk_create(...)`.
+
+    Extracted and adapted from `django.db.models.query.QuerySet._check_bulk_create_options`
+    """
+    if not (
+        isinstance(ctx.type, Instance)
+        and (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is not None
+    ):
+        return ctx.default_return_type
+
+    if (
+        len(ctx.args) > 4
+        and ctx.args[4]
+        and isinstance((update_fields_expr := ctx.args[4][0]), (ListExpr, TupleExpr, SetExpr))
+    ):
+        for field_arg in update_fields_expr.items:
+            field_name = helpers.resolve_string_attribute_value(field_arg, django_context)
+            if field_name is not None:
+                # Same validation as bulk_update applies here
+                _validate_bulk_update_field(ctx, django_model.cls, field_name, method, fields_param="update_fields")
+
+    if (
+        len(ctx.args) > 5
+        and ctx.args[5]
+        and isinstance((unique_fields_expr := ctx.args[5][0]), (ListExpr, TupleExpr, SetExpr))
+    ):
+        for field_arg in unique_fields_expr.items:
+            field_name = helpers.resolve_string_attribute_value(field_arg, django_context)
+            if field_name is not None:
+                _validate_bulk_create_unique_field(ctx, django_model.cls, field_name, method)
 
     return ctx.default_return_type

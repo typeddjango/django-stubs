@@ -176,6 +176,12 @@ class NewSemanalDjangoPlugin(Plugin):
             "abulk_update": partial(
                 querysets.validate_bulk_update, django_context=self.django_context, method="abulk_update"
             ),
+            "bulk_create": partial(
+                querysets.validate_bulk_create, django_context=self.django_context, method="bulk_create"
+            ),
+            "abulk_create": partial(
+                querysets.validate_bulk_create, django_context=self.django_context, method="abulk_create"
+            ),
         }
 
     def get_method_hook(self, fullname: str) -> Callable[[MethodContext], MypyType] | None:
