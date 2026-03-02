@@ -38,7 +38,8 @@
 -   case: str_promise_proxy
     main:  |
       from typing_extensions import reveal_type
-      from django.utils.functional import Promise, lazystr, _StrPromise
+      from django.utils.functional import Promise, lazystr
+      from django_stubs_ext import StrOrPromise
 
       s = lazystr("asd")
 
@@ -49,13 +50,13 @@
       reveal_type(s.swapcase)        # N: Revealed type is "def () -> builtins.str"
       reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> tuple[builtins.str]"
       s.nonsense                     # E: "_StrPromise" has no attribute "nonsense"  [attr-defined]
-      f: _StrPromise | str
+      f: StrOrPromise
       reveal_type(f.format("asd"))   # N: Revealed type is "builtins.str"
       reveal_type(f + "asd")         # N: Revealed type is "builtins.str"
-      reveal_type("asd" + f)         # N: Revealed type is "Any | builtins.str"
+      reveal_type("asd" + f)         # N: Revealed type is "builtins.str"
 
       reveal_type(s + "bar")         # N: Revealed type is "builtins.str"
-      reveal_type("foo" + s)         # N: Revealed type is "Any"
+      reveal_type("foo" + s)         # N: Revealed type is "builtins.str"
       reveal_type(s % "asd")         # N: Revealed type is "builtins.str"
 
       def foo(content: str) -> None:
