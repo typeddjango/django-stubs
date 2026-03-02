@@ -653,6 +653,12 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         if to_attr and check_valid_attr_value(
             ctx, django_context, qs_model, to_attr, new_attr_names=set(new_attrs.keys())
         ):
+            # When traversing multiple relations (e.g. "groups__user_set"), the to_attr is set
+            # on the last item of the chain (e.g. Group), not on the root model (e.g. User).
+            # We can't annotate an intermediate model from here, so skip adding the annotation
+            # to the root model to avoid incorrectly attributing to_attr to it.
+            if lookup and "__" in lookup:
+                continue
             new_attrs[to_attr] = api.named_generic_type(
                 "builtins.list",
                 [elem_model if elem_model is not None else AnyType(TypeOfAny.special_form)],
