@@ -120,9 +120,6 @@ django.contrib.gis.db.models.Field.get_pk_value_on_save
 django.contrib.gis.db.models.Field.rel_db_type
 django.contrib.gis.db.models.Field.unique
 django.contrib.gis.db.models.FileField.__get__
-django.contrib.gis.db.models.FileField.attr_class
-django.contrib.gis.db.models.FileField.descriptor_class
-django.contrib.gis.db.models.FileField.formfield
 django.contrib.gis.db.models.FilePathField.formfield
 django.contrib.gis.db.models.FloatField.formfield
 django.contrib.gis.db.models.ForeignKey.__class_getitem__
@@ -153,9 +150,6 @@ django.contrib.gis.db.models.ForeignObjectRel.path_infos
 django.contrib.gis.db.models.Func.allowed_default
 django.contrib.gis.db.models.GenericIPAddressField.formfield
 django.contrib.gis.db.models.ImageField.__get__
-django.contrib.gis.db.models.ImageField.attr_class
-django.contrib.gis.db.models.ImageField.descriptor_class
-django.contrib.gis.db.models.ImageField.formfield
 django.contrib.gis.db.models.IntegerField.formfield
 django.contrib.gis.db.models.JSONField.formfield
 django.contrib.gis.db.models.JSONField.get_transform
@@ -280,9 +274,6 @@ django.db.models.Field.get_pk_value_on_save
 django.db.models.Field.rel_db_type
 django.db.models.Field.unique
 django.db.models.FileField.__get__
-django.db.models.FileField.attr_class
-django.db.models.FileField.descriptor_class
-django.db.models.FileField.formfield
 django.db.models.FilePathField.formfield
 django.db.models.FloatField.formfield
 django.db.models.ForeignKey.__class_getitem__
@@ -313,9 +304,6 @@ django.db.models.ForeignObjectRel.path_infos
 django.db.models.Func.allowed_default
 django.db.models.GenericIPAddressField.formfield
 django.db.models.ImageField.__get__
-django.db.models.ImageField.attr_class
-django.db.models.ImageField.descriptor_class
-django.db.models.ImageField.formfield
 django.db.models.IntegerField.formfield
 django.db.models.JSONField.formfield
 django.db.models.JSONField.get_transform
@@ -410,13 +398,7 @@ django.db.models.fields.TimeField.formfield
 django.db.models.fields.URLField.formfield
 django.db.models.fields.UUIDField.formfield
 django.db.models.fields.files.FileField.__get__
-django.db.models.fields.files.FileField.attr_class
-django.db.models.fields.files.FileField.descriptor_class
-django.db.models.fields.files.FileField.formfield
 django.db.models.fields.files.ImageField.__get__
-django.db.models.fields.files.ImageField.attr_class
-django.db.models.fields.files.ImageField.descriptor_class
-django.db.models.fields.files.ImageField.formfield
 django.db.models.fields.json.CaseInsensitiveMixin.process_lhs
 django.db.models.fields.json.JSONField.formfield
 django.db.models.fields.json.JSONField.get_transform
