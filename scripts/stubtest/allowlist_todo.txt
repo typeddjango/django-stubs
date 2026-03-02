@@ -220,10 +220,7 @@ django.contrib.sessions.models.Session.get_next_by_expire_date
 django.contrib.sessions.models.Session.get_previous_by_expire_date
 django.contrib.sessions.models.Session.session_data
 django.contrib.sessions.models.Session.session_key
-django.contrib.sites.models.Site.domain
 django.contrib.sites.models.Site.flatpage_set
-django.contrib.sites.models.Site.id
-django.contrib.sites.models.Site.name
 django.contrib.staticfiles.finders.BaseStorageFinder.storage
 django.contrib.staticfiles.finders.DefaultStorageFinder.storage
 django.contrib.staticfiles.storage.staticfiles_storage
