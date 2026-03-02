@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models.base import Model
@@ -22,6 +22,9 @@ from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupport
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.helpers import DjangoModel
 from mypy_django_plugin.transformers.models import get_annotated_type
+
+if TYPE_CHECKING:
+    from django.db.models.options import _AnyField
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
@@ -694,6 +697,70 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     return default_return_type.copy_modified(args=[annotated_model, row_type])
 
 
+def _try_get_field(
+    ctx: MethodContext, model_cls: type[Model], field_name: str, *, resolve_pk: bool = False
+) -> "_AnyField | None":
+    opts = model_cls._meta
+    resolved_name = opts.pk.name if resolve_pk and field_name == "pk" else field_name
+    try:
+        return opts.get_field(resolved_name)
+    except FieldDoesNotExist as e:
+        ctx.api.fail(str(e), ctx.context)
+        return None
+
+
+def _check_field_concrete(ctx: MethodContext, field: "_AnyField", field_name: str, method: str) -> bool:
+    if not field.concrete or field.many_to_many:
+        ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
+        return False
+    return True
+
+
+def _check_field_not_pk(
+    ctx: MethodContext,
+    model_cls: type[Model],
+    field: "_AnyField",
+    field_name: str,
+    method: str,
+    *,
+    attr_name: str | None = None,
+) -> bool:
+    opts = model_cls._meta
+    all_pk_fields = set(getattr(opts, "pk_fields", [opts.pk]))
+    for parent in getattr(opts, "all_parents", opts.get_parent_list()):
+        all_pk_fields.update(getattr(parent._meta, "pk_fields", [parent._meta.pk]))
+    if field in all_pk_fields:
+        suffix = f" in {attr_name}" if attr_name else ""
+        ctx.api.fail(f'"{method}()" cannot be used with primary key fields{suffix}. Got "{field_name}"', ctx.context)
+        return False
+    return True
+
+
+def _extract_field_names_from_collection(
+    ctx: MethodContext, django_context: DjangoContext, arg_index: int
+) -> list[str] | None:
+    if not (
+        len(ctx.args) > arg_index
+        and ctx.args[arg_index]
+        and isinstance((collection_expr := ctx.args[arg_index][0]), (ListExpr, TupleExpr, SetExpr))
+    ):
+        return None
+
+    return [
+        field_name
+        for field_arg in collection_expr.items
+        if (field_name := helpers.resolve_string_attribute_value(field_arg, django_context)) is not None
+    ]
+
+
+def _extract_field_names_from_varargs(ctx: MethodContext) -> list[str]:
+    return [
+        lookup_value
+        for lookup_type in (ctx.arg_types[0] if ctx.arg_types and ctx.arg_types[0] else [])
+        if (lookup_value := helpers.get_literal_str_type(get_proper_type(lookup_type))) is not None
+    ]
+
+
 def _get_select_related_field_choices(model_cls: type[Model]) -> set[str]:
     """
     Get valid field choices for select_related lookups.
@@ -754,46 +821,23 @@ def validate_select_related(ctx: MethodContext, django_context: DjangoContext) -
 
     Extracted and adapted from `django.db.models.sql.compiler.SQLCompiler.get_related_selections`
     """
-    if not (
-        isinstance(ctx.type, Instance)
-        and (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is not None
-        and ctx.arg_types
-        and ctx.arg_types[0]
-    ):
+    if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
         return ctx.default_return_type
 
-    for lookup_type in ctx.arg_types[0]:
-        lookup_value = helpers.get_literal_str_type(get_proper_type(lookup_type))
-        if lookup_value is not None:
-            _validate_select_related_lookup(ctx, django_context, django_model.cls, lookup_value)
+    for lookup_value in _extract_field_names_from_varargs(ctx):
+        _validate_select_related_lookup(ctx, django_context, django_model.cls, lookup_value)
 
     return ctx.default_return_type
 
 
 def _validate_bulk_update_field(
-    ctx: MethodContext, model_cls: type[Model], field_name: str, method: str, *, fields_param: str | None = None
+    ctx: MethodContext, model_cls: type[Model], field_name: str, method: str, *, attr_name: str | None = None
 ) -> bool:
-    opts = model_cls._meta
-    try:
-        field = opts.get_field(field_name)
-    except FieldDoesNotExist as e:
-        ctx.api.fail(str(e), ctx.context)
-        return False
-
-    if not field.concrete or field.many_to_many:
-        ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
-        return False
-
-    all_pk_fields = set(getattr(opts, "pk_fields", [opts.pk]))
-    for parent in getattr(opts, "all_parents", opts.get_parent_list()):
-        all_pk_fields.update(getattr(parent._meta, "pk_fields", [parent._meta.pk]))
-
-    if field in all_pk_fields:
-        suffix = f" in {fields_param}" if fields_param else ""
-        ctx.api.fail(f'"{method}()" cannot be used with primary key fields{suffix}. Got "{field_name}"', ctx.context)
-        return False
-
-    return True
+    return (
+        (field := _try_get_field(ctx, model_cls, field_name)) is not None
+        and _check_field_concrete(ctx, field, field_name, method)
+        and _check_field_not_pk(ctx, model_cls, field, field_name, method, attr_name=attr_name)
+    )
 
 
 def validate_bulk_update(
@@ -805,23 +849,20 @@ def validate_bulk_update(
     Extracted and adapted from `django.db.models.query.QuerySet.bulk_update`
     Mirrors tests from `django/tests/queries/test_bulk_update.py`
     """
-    if not (
-        isinstance(ctx.type, Instance)
-        and (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is not None
-        and len(ctx.args) >= 2
-        and ctx.args[1]
-        and isinstance((fields_args := ctx.args[1][0]), (ListExpr, TupleExpr, SetExpr))
-    ):
+    if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None or (
+        field_names := _extract_field_names_from_collection(ctx, django_context, arg_index=1)
+    ) is None:
         return ctx.default_return_type
 
-    if len(fields_args.items) == 0:
-        ctx.api.fail(f'Field names must be given to "{method}()"', ctx.context)
+    if not field_names:
+        # Only error if the collection literal itself is empty (not when items are unresolvable).
+        collection_expr = ctx.args[1][0]
+        if isinstance(collection_expr, (ListExpr, TupleExpr, SetExpr)) and not collection_expr.items:
+            ctx.api.fail(f'Field names must be given to "{method}()"', ctx.context)
         return ctx.default_return_type
 
-    for field_arg in fields_args.items:
-        field_name = helpers.resolve_string_attribute_value(field_arg, django_context)
-        if field_name is not None:
-            _validate_bulk_update_field(ctx, django_model.cls, field_name, method)
+    for field_name in field_names:
+        _validate_bulk_update_field(ctx, django_model.cls, field_name, method)
 
     return ctx.default_return_type
 
@@ -829,19 +870,9 @@ def validate_bulk_update(
 def _validate_bulk_create_unique_field(
     ctx: MethodContext, model_cls: type[Model], field_name: str, method: str
 ) -> bool:
-    opts = model_cls._meta
-    resolved_name = opts.pk.name if field_name == "pk" else field_name
-    try:
-        field = opts.get_field(resolved_name)
-    except FieldDoesNotExist as e:
-        ctx.api.fail(str(e), ctx.context)
-        return False
-
-    if not field.concrete or field.many_to_many:
-        ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
-        return False
-
-    return True
+    return (field := _try_get_field(ctx, model_cls, field_name, resolve_pk=True)) is not None and _check_field_concrete(
+        ctx, field, field_name, method
+    )
 
 
 def validate_bulk_create(
@@ -852,31 +883,17 @@ def validate_bulk_create(
 
     Extracted and adapted from `django.db.models.query.QuerySet._check_bulk_create_options`
     """
-    if not (
-        isinstance(ctx.type, Instance)
-        and (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is not None
-    ):
+    if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
         return ctx.default_return_type
 
-    if (
-        len(ctx.args) > 4
-        and ctx.args[4]
-        and isinstance((update_fields_expr := ctx.args[4][0]), (ListExpr, TupleExpr, SetExpr))
-    ):
-        for field_arg in update_fields_expr.items:
-            field_name = helpers.resolve_string_attribute_value(field_arg, django_context)
-            if field_name is not None:
-                # Same validation as bulk_update applies here
-                _validate_bulk_update_field(ctx, django_model.cls, field_name, method, fields_param="update_fields")
+    update_field_names = _extract_field_names_from_collection(ctx, django_context, arg_index=4)
+    if update_field_names is not None:
+        for field_name in update_field_names:
+            _validate_bulk_update_field(ctx, django_model.cls, field_name, method, attr_name="update_fields")
 
-    if (
-        len(ctx.args) > 5
-        and ctx.args[5]
-        and isinstance((unique_fields_expr := ctx.args[5][0]), (ListExpr, TupleExpr, SetExpr))
-    ):
-        for field_arg in unique_fields_expr.items:
-            field_name = helpers.resolve_string_attribute_value(field_arg, django_context)
-            if field_name is not None:
-                _validate_bulk_create_unique_field(ctx, django_model.cls, field_name, method)
+    unique_field_names = _extract_field_names_from_collection(ctx, django_context, arg_index=5)
+    if unique_field_names is not None:
+        for field_name in unique_field_names:
+            _validate_bulk_create_unique_field(ctx, django_model.cls, field_name, method)
 
     return ctx.default_return_type
