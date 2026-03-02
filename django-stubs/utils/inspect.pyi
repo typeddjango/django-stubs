@@ -1,10 +1,17 @@
+import functools
+import sys
+import threading
 from collections.abc import Callable
 from contextlib import AbstractContextManager
-from inspect import _ParameterKind
+from inspect import Signature, _ParameterKind
 from types import FunctionType
 from typing import Any, TypeGuard
 
 ARG_KINDS: frozenset[_ParameterKind]
+
+if sys.version_info >= (3, 14):
+    lock: threading.Lock
+    safe_signature_from_callable: functools.partial[Signature]
 
 def get_func_args(func: Callable[..., Any]) -> list[str]: ...
 def get_func_full_args(func: Callable[..., Any]) -> list[tuple[str, str] | tuple[str]]: ...
