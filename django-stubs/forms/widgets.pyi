@@ -45,6 +45,7 @@ class Media:
     @staticmethod
     def merge(*lists: Iterable[Any]) -> list[Any]: ...
     def __add__(self, other: Media) -> Media: ...
+    def __html__(self) -> SafeString: ...
 
 class MediaDefiningClass(type):
     def __new__(
@@ -81,7 +82,7 @@ class Widget(metaclass=MediaDefiningClass):
     def use_required_attribute(self, initial: Any) -> bool: ...
 
 class Input(Widget):
-    input_type: str
+    input_type: str | None
     template_name: str
 
 class TextInput(Input):
@@ -120,7 +121,6 @@ class PasswordInput(Input):
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
 
 class HiddenInput(Input):
-    choices: _Choices
     input_type: str
     template_name: str
 
@@ -201,7 +201,6 @@ class ChoiceWidget(Widget):
     def optgroups(
         self, name: str, value: list[str], attrs: _OptAttrs | None = None
     ) -> list[tuple[str | None, list[dict[str, Any]], int | None]]: ...
-    def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     def create_option(
         self,
         name: str,
@@ -212,6 +211,7 @@ class ChoiceWidget(Widget):
         subindex: int | None = None,
         attrs: _OptAttrs | None = None,
     ) -> dict[str, Any]: ...
+    def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     def id_for_label(self, id_: str, index: str = "0") -> str: ...
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
     def format_value(self, value: Any) -> list[str]: ...  # type: ignore[override]
@@ -237,19 +237,17 @@ class SelectMultiple(Select):
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
 
 class RadioSelect(ChoiceWidget):
-    can_add_related: bool
     input_type: str
     template_name: str
     option_template_name: str
+    def id_for_label(self, id_: str, index: str | None = None) -> str: ...
 
-class CheckboxSelectMultiple(ChoiceWidget):
-    can_add_related: bool
+class CheckboxSelectMultiple(RadioSelect):
     input_type: str
     template_name: str
     option_template_name: str
     def use_required_attribute(self, initial: Any) -> bool: ...
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
-    def id_for_label(self, id_: str, index: str | None = None) -> str: ...
 
 class MultiWidget(Widget):
     template_name: str

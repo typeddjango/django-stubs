@@ -8,6 +8,7 @@ from django.db.models.base import Model
 from django.db.models.fields import _AllLimitChoicesTo, _LimitChoicesTo
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
+from django.db.models.utils import AltersData
 from django.forms.fields import ChoiceField, Field, _ClassLevelWidgetT
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet
@@ -17,6 +18,7 @@ from django.forms.widgets import Widget
 from django.utils.choices import BaseChoiceIterator, CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
+from typing_extensions import Self
 
 ALL_FIELDS: Literal["__all__"]
 
@@ -67,7 +69,7 @@ class ModelFormOptions(Generic[_M]):
 
 class ModelFormMetaclass(DeclarativeFieldsMetaclass): ...
 
-class BaseModelForm(BaseForm, Generic[_M]):
+class BaseModelForm(BaseForm, AltersData, Generic[_M]):
     instance: _M
     _meta: ModelFormOptions[_M]
     def __init__(
@@ -109,7 +111,7 @@ def modelform_factory(
 
 _ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
 
-class BaseModelFormSet(BaseFormSet[_ModelFormT], Generic[_M, _ModelFormT]):
+class BaseModelFormSet(BaseFormSet[_ModelFormT], AltersData, Generic[_M, _ModelFormT]):
     model: type[_M]
     edit_only: bool
     unique_fields: Collection[str]
@@ -194,6 +196,14 @@ class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT], Generic[_M, _ParentM,
     def add_fields(self, form: _ModelFormT, index: int | None) -> None: ...
     def get_unique_error_message(self, unique_check: Sequence[str]) -> str: ...
 
+@overload
+def _get_foreign_key(
+    parent_model: type[Model], model: type[Model], fk_name: str | None = None, can_fail: Literal[False] = ...
+) -> ForeignKey: ...
+@overload
+def _get_foreign_key(
+    parent_model: type[Model], model: type[Model], fk_name: str | None = None, can_fail: Literal[True] = ...
+) -> ForeignKey | None: ...
 def inlineformset_factory(
     parent_model: type[_ParentM],
     model: type[_M],
@@ -282,6 +292,7 @@ class ModelChoiceField(ChoiceField, Generic[_M]):
     ) -> None: ...
     def validate_no_null_characters(self, value: Any) -> None: ...
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
+    def __deepcopy__(self, memo: dict[int, Any]) -> Self: ...
     def label_from_instance(self, obj: _M) -> str: ...
     choices: _PropertyDescriptor[
         _ChoicesInput | _ChoicesCallable | CallableChoiceIterator,
@@ -307,14 +318,6 @@ class ModelMultipleChoiceField(ModelChoiceField[_M]):
     def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...  # type: ignore[override]
 
 def modelform_defines_fields(form_class: type[ModelForm]) -> bool: ...
-@overload
-def _get_foreign_key(
-    parent_model: type[Model], model: type[Model], fk_name: str | None = None, can_fail: Literal[True] = True
-) -> ForeignKey | None: ...
-@overload
-def _get_foreign_key(
-    parent_model: type[Model], model: type[Model], fk_name: str | None = None, can_fail: Literal[False] = False
-) -> ForeignKey: ...
 
 __all__ = (
     "ALL_FIELDS",
