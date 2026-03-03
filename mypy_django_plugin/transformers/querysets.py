@@ -930,3 +930,27 @@ def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> Mypy
         _validate_order_by_lookup(ctx, django_model.cls, parts)
 
     return ctx.default_return_type
+
+
+def _validate_defer_only_fields(
+    ctx: MethodContext, model_cls: type[Model], field_names: list[str], *, is_defer: bool
+) -> None:
+    query = Query(model_cls)
+    query.add_deferred_loading(field_names) if is_defer else query.add_immediate_loading(field_names)
+
+    try:
+        query.get_select_mask()
+    except (FieldDoesNotExist, FieldError) as exc:
+        method = "defer" if is_defer else "only"
+        ctx.api.fail(f'Invalid field in "{method}()": {exc.args[0]}', ctx.context)
+
+
+def validate_defer_only(ctx: MethodContext, django_context: DjangoContext, *, is_defer: bool) -> MypyType:
+    if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None or not (
+        field_names := _extract_field_names_from_varargs(ctx)
+    ):
+        return ctx.default_return_type
+
+    _validate_defer_only_fields(ctx, django_model.cls, field_names, is_defer=is_defer)
+
+    return ctx.default_return_type

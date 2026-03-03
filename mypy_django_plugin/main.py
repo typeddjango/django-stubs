@@ -187,6 +187,8 @@ class NewSemanalDjangoPlugin(Plugin):
             "aearliest": partial(querysets.validate_order_by, django_context=self.django_context),
             "latest": partial(querysets.validate_order_by, django_context=self.django_context),
             "alatest": partial(querysets.validate_order_by, django_context=self.django_context),
+            "defer": partial(querysets.validate_defer_only, django_context=self.django_context, is_defer=True),
+            "only": partial(querysets.validate_defer_only, django_context=self.django_context, is_defer=False),
         }
 
     def get_method_hook(self, fullname: str) -> Callable[[MethodContext], MypyType] | None:
