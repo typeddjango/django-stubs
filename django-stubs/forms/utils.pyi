@@ -62,7 +62,6 @@ class ErrorList(UserList[ValidationError | _StrOrPromise], RenderableErrorMixin)
     template_name_ul: str
     error_class: str
     renderer: BaseRenderer
-    field_name: str | None
     def __init__(
         self,
         initlist: ErrorList | Sequence[str | Exception] | None = None,

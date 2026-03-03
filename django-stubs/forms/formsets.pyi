@@ -22,7 +22,6 @@ _F = TypeVar("_F", bound=BaseForm)
 
 class ManagementForm(Form):
     cleaned_data: dict[str, int | None]
-    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     def clean(self) -> dict[str, int | None]: ...
 
 class BaseFormSet(Sized, RenderableFormMixin, Generic[_F]):
@@ -62,8 +61,6 @@ class BaseFormSet(Sized, RenderableFormMixin, Generic[_F]):
         error_class: type[ErrorList] = ...,
         form_kwargs: dict[str, Any] | None = None,
         error_messages: Mapping[str, str] | None = None,
-        form_renderer: BaseRenderer = ...,
-        renderer: BaseRenderer = ...,
     ) -> None: ...
     def __iter__(self) -> Iterator[_F]: ...
     def __getitem__(self, index: int) -> _F: ...
@@ -122,6 +119,7 @@ def formset_factory(
     validate_min: bool = False,
     absolute_max: int | None = None,
     can_delete_extra: bool = True,
+    renderer: BaseRenderer | None = None,
 ) -> type[BaseFormSet[_F]]: ...
 def all_valid(formsets: Sequence[BaseFormSet[_F]]) -> bool: ...
 
