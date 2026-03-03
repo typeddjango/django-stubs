@@ -343,3 +343,29 @@
 
                 class Book(models.Model):
                     author = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+-   case: prefetch_related_traversing_multiple_relations
+    main: |
+        from typing_extensions import reveal_type
+        from django.db.models import Prefetch, F
+        from django.contrib.auth.models import User, Group
+
+        # When prefetching a relation that is traversing multiple relations
+        # The `to_attr` arg is set on the last item of the chain, not the initial one.
+        # We should NOT annotate the root model (User) with the to_attr.
+        user = (
+            User.objects
+            .prefetch_related(Prefetch("groups__user_set", User.objects.all(), to_attr="users"))
+            .get()
+        )
+        reveal_type(user) # N: Revealed type is "django.contrib.auth.models.User"
+        reveal_type(user.groups) # N: Revealed type is "django.contrib.auth.models.Group_ManyRelatedManager[django.contrib.auth.models.User_groups]"
+        last_group = user.groups.get()
+        reveal_type(last_group) # N: Revealed type is "django.contrib.auth.models.Group"
+
+        # Ideally we would like the type to be inferred as list[User] here
+        last_group.users # E: "Group" has no attribute "users"; maybe "user_set"?  [attr-defined]
+
+    installed_apps:
+        - django.contrib.auth
+        - django.contrib.contenttypes
