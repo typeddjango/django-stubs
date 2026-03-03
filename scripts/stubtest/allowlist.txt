@@ -41,22 +41,6 @@ django.contrib.auth.models.User_ManyRelatedManager
 django.utils.archive.BaseArchive.list
 django.utils.archive.BaseArchive.extract
 
-# ImmutableList always raise when calling these,
-# later they can be added with `-> NoReturn` overrides.
-django.utils.datastructures.ImmutableList.__delitem__
-django.utils.datastructures.ImmutableList.__delslice__
-django.utils.datastructures.ImmutableList.__iadd__
-django.utils.datastructures.ImmutableList.__imul__
-django.utils.datastructures.ImmutableList.__setitem__
-django.utils.datastructures.ImmutableList.__setslice__
-django.utils.datastructures.ImmutableList.append
-django.utils.datastructures.ImmutableList.extend
-django.utils.datastructures.ImmutableList.insert
-django.utils.datastructures.ImmutableList.pop
-django.utils.datastructures.ImmutableList.remove
-django.utils.datastructures.ImmutableList.sort
-django.utils.datastructures.ImmutableList.reverse
-
 # Runtime default is the cached_property descriptor itself
 django.contrib.auth.password_validation.CommonPasswordValidator.__init__
 
