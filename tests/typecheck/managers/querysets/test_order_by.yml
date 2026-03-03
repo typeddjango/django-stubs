@@ -43,6 +43,20 @@
 
         # FK id field
         Article.objects.order_by("author_id")
+
+        # Clear ordering with no arguments
+        Article.objects.order_by()
+
+        # Chained order_by calls (second overrides first)
+        Article.objects.order_by("title").order_by("-author__name")
+
+        # Reverse FK traversal (Author -> Article)
+        Author.objects.order_by("article__title")
+        Author.objects.order_by("-article__title")
+
+        # values() / values_list() then order_by
+        Article.objects.values("title").order_by("title")
+        Article.objects.values_list("title", flat=True).order_by("title")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -57,7 +71,7 @@
                     title = models.CharField(max_length=200)
                     content = models.TextField()
                     published = models.BooleanField(default=False)
-                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="article")
 
 
 -   case: order_by_invalid_fields
@@ -80,6 +94,14 @@
         field: Literal["nonexistent"] = "nonexistent"
         Article.objects.order_by(field)  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
 
+        # Literal typed descending invalid
+        field2: Literal["-nonexistent"] = "-nonexistent"
+        Article.objects.order_by(field2)  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
+
+        # Literal typed invalid FK traversal
+        field3: Literal["author__nonexistent"] = "author__nonexistent"
+        Article.objects.order_by(field3)  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: article, email, id, name  [misc]
+
         # earliest / latest with invalid fields
         Article.objects.earliest("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
         Article.objects.latest("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
@@ -88,6 +110,15 @@
         async def test_async() -> None:
             await Article.objects.aearliest("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
             await Article.objects.alatest("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
+
+        # Lookup suffix on a valid field — __exact is a lookup, not a traversal
+        Article.objects.order_by("title__exact")  # E: Cannot resolve keyword 'exact' into field. Join on 'title' not permitted.  [misc]
+
+        # Invalid field at depth > 2
+        Article.objects.order_by("author__name__nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Join on 'name' not permitted.  [misc]
+
+        # values() then order_by with invalid field
+        Article.objects.values("title").order_by("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -102,4 +133,4 @@
                     title = models.CharField(max_length=200)
                     content = models.TextField()
                     published = models.BooleanField(default=False)
-                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="article")
