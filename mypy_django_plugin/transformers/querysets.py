@@ -11,6 +11,7 @@ from django.db.models.fields.related_descriptors import (
     ReverseOneToOneDescriptor,
 )
 from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.sql.query import Query
 from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
 from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, ListExpr, SetExpr, TupleExpr
@@ -901,5 +902,30 @@ def validate_bulk_create(
     if unique_field_names is not None:
         for field_name in unique_field_names:
             _validate_bulk_create_unique_field(ctx, django_model.cls, field_name, method)
+
+    return ctx.default_return_type
+
+
+def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str]) -> None:
+    if len(parts) == 1 and parts[0] == "?":
+        return
+
+    try:
+        Query(model_cls).names_to_path(parts, model_cls._meta, fail_on_missing=True)
+    except FieldError as exc:
+        ctx.api.fail(exc.args[0], ctx.context)
+
+
+def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
+        return ctx.default_return_type
+
+    for lookup_value in _extract_field_names_from_varargs(ctx):
+        parts = lookup_value.removeprefix("-").split("__")
+
+        if django_model.typ.extra_attrs and parts[0] in django_model.typ.extra_attrs.attrs:
+            # Skip validation for annotated fields
+            continue
+        _validate_order_by_lookup(ctx, django_model.cls, parts)
 
     return ctx.default_return_type

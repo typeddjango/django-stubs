@@ -182,6 +182,11 @@ class NewSemanalDjangoPlugin(Plugin):
             "abulk_create": partial(
                 querysets.validate_bulk_create, django_context=self.django_context, method="abulk_create"
             ),
+            "order_by": partial(querysets.validate_order_by, django_context=self.django_context),
+            "earliest": partial(querysets.validate_order_by, django_context=self.django_context),
+            "aearliest": partial(querysets.validate_order_by, django_context=self.django_context),
+            "latest": partial(querysets.validate_order_by, django_context=self.django_context),
+            "alatest": partial(querysets.validate_order_by, django_context=self.django_context),
         }
 
     def get_method_hook(self, fullname: str) -> Callable[[MethodContext], MypyType] | None:
