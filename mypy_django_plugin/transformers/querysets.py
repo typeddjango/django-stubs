@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Literal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models.base import Model
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.related_descriptors import (
     ForwardManyToOneDescriptor,
@@ -526,7 +527,7 @@ def check_valid_prefetch_related_lookup(
     """Check if a lookup string resolve to something that can be prefetched"""
     current_model_cls = django_model.cls
     contenttypes_installed = django_context.apps_registry.is_installed("django.contrib.contenttypes")
-    for through_attr in lookup.split("__"):
+    for through_attr in lookup.split(LOOKUP_SEP):
         rel_obj_descriptor = getattr(current_model_cls, through_attr, None)
         if rel_obj_descriptor is None:
             ctx.api.fail(
@@ -797,7 +798,7 @@ def _validate_select_related_lookup(
         )
         return False
 
-    lookup_parts = lookup.split("__")
+    lookup_parts = lookup.split(LOOKUP_SEP)
     observed_model = model_cls
     for i, part in enumerate(lookup_parts):
         valid_choices = _get_select_related_field_choices(observed_model)
@@ -921,7 +922,7 @@ def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> Mypy
         return ctx.default_return_type
 
     for lookup_value in _extract_field_names_from_varargs(ctx):
-        parts = lookup_value.removeprefix("-").split("__")
+        parts = lookup_value.removeprefix("-").split(LOOKUP_SEP)
 
         if django_model.typ.extra_attrs and parts[0] in django_model.typ.extra_attrs.attrs:
             # Skip validation for annotated fields
