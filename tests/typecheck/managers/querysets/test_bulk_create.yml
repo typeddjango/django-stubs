@@ -114,7 +114,7 @@
         Article.objects.bulk_create(articles, update_fields=["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]
 
         # Cannot update primary key fields in update_fields
-        Article.objects.bulk_create(articles, update_fields=["id"])  # E: "bulk_create()" cannot be used with primary key fields in update_fields. Got "id"  [misc]
+        Article.objects.bulk_create(articles, update_fields=["id"])  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
 
         # ManyToMany is not a concrete updatable field
         Article.objects.bulk_create(articles, update_fields={"tags"})  # E: "bulk_create()" can only be used with concrete fields. Got "tags"  [misc]
@@ -128,7 +128,7 @@
 
         # Mixed valid and invalid fields in update_fields
         Article.objects.bulk_create(articles, update_fields={"title", "nonexistent"})  # E: Article has no field named 'nonexistent'  [misc]
-        Article.objects.bulk_create(articles, update_fields=("id", "title"))  # E: "bulk_create()" cannot be used with primary key fields in update_fields. Got "id"  [misc]
+        Article.objects.bulk_create(articles, update_fields=("id", "title"))  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
 
         # Mixed valid and invalid fields in unique_fields
         Article.objects.bulk_create(articles, unique_fields={"title", "nonexistent"})  # E: Article has no field named 'nonexistent'  [misc]
@@ -151,16 +151,16 @@
         Article.objects.bulk_create(articles, unique_fields=[invalid_field])  # E: Article has no field named 'nonexistent'  [misc]
 
         pk_field: Literal["id"] = "id"
-        Article.objects.bulk_create(articles, update_fields=[pk_field])  # E: "bulk_create()" cannot be used with primary key fields in update_fields. Got "id"  [misc]
+        Article.objects.bulk_create(articles, update_fields=[pk_field])  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
 
         # Test with different models
         authors = [Author(name="Test")]
-        Author.objects.bulk_create(authors, update_fields=["id"])  # E: "bulk_create()" cannot be used with primary key fields in update_fields. Got "id"  [misc]
+        Author.objects.bulk_create(authors, update_fields=["id"])  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
         Author.objects.bulk_create(authors, update_fields=["invalid"])  # E: Author has no field named 'invalid'  [misc]
         Author.objects.bulk_create(authors, unique_fields=["invalid"])  # E: Author has no field named 'invalid'  [misc]
 
         categories = [Category(name="Test")]
-        Category.objects.bulk_create(categories, update_fields=["id"])  # E: "bulk_create()" cannot be used with primary key fields in update_fields. Got "id"  [misc]
+        Category.objects.bulk_create(categories, update_fields=["id"])  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
         Category.objects.bulk_create(categories, update_fields=["invalid"])  # E: Category has no field named 'invalid'  [misc]
         Category.objects.bulk_create(categories, unique_fields=["invalid"])  # E: Category has no field named 'invalid'  [misc]
 
@@ -172,7 +172,7 @@
             await Article.objects.abulk_create(articles, update_fields=["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]
 
             # Cannot update primary key fields in update_fields
-            await Article.objects.abulk_create(articles, update_fields=["id"])  # E: "abulk_create()" cannot be used with primary key fields in update_fields. Got "id"  [misc]
+            await Article.objects.abulk_create(articles, update_fields=["id"])  # E: "abulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
 
             # Invalid field names in unique_fields
             await Article.objects.abulk_create(articles, unique_fields=["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]

@@ -730,8 +730,8 @@ def _check_field_not_pk(
     for parent in getattr(opts, "all_parents", opts.get_parent_list()):
         all_pk_fields.update(getattr(parent._meta, "pk_fields", [parent._meta.pk]))
     if field in all_pk_fields:
-        suffix = f" in {attr_name}" if attr_name else ""
-        ctx.api.fail(f'"{method}()" cannot be used with primary key fields{suffix}. Got "{field_name}"', ctx.context)
+        param_str = f' in "{attr_name}="' if attr_name else ""
+        ctx.api.fail(f'"{method}()" does not support primary key fields{param_str}. Got "{field_name}"', ctx.context)
         return False
     return True
 
