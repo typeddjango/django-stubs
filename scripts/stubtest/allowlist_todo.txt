@@ -17,7 +17,6 @@ django.contrib.admin.models.LogEntry.user
 django.contrib.admin.models.LogEntry.user_id
 django.contrib.admin.site
 django.contrib.admin.sites.site
-django.contrib.admin.tests.AdminSeleniumTestCase
 django.contrib.auth.admin.UserAdmin.fieldsets
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
@@ -445,8 +444,6 @@ django.forms.models.BaseModelFormSet.model
 django.forms.models.inlineformset_factory
 django.forms.models.modelformset_factory
 django.forms.widgets.ChoiceWidget.template_name
-django.test.selenium.SeleniumTestCase
-django.test.selenium.SeleniumTestCase.tags
 django.urls.conf.path
 django.urls.conf.re_path
 django.urls.path
