@@ -37,7 +37,7 @@ except ImportError:
 if TYPE_CHECKING:
     from django.apps.registry import Apps
     from django.conf import LazySettings
-    from django.contrib.contenttypes.fields import GenericForeignKey
+    from django.db.models.options import _AnyField
 
 
 @contextmanager
@@ -394,7 +394,7 @@ class DjangoContext:
         self, field_parts: Iterable[str], model_cls: type[Model]
     ) -> tuple[Union["Field[Any, Any]", ForeignObjectRel], type[Model]]:
         currently_observed_model = model_cls
-        field: Field[Any, Any] | ForeignObjectRel | GenericForeignKey | None = None
+        field: _AnyField | None = None
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)

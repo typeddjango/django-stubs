@@ -1,0 +1,206 @@
+-   case: bulk_create_valid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author, Category
+        from typing import Literal
+
+        # Valid update_fields
+        articles = [Article(title="Test")]
+        Article.objects.bulk_create(articles, update_fields=["title"])
+        Article.objects.bulk_create(articles, update_fields=["content"])
+        Article.objects.bulk_create(articles, update_fields=["published"])
+
+        # Valid update_fields with multiple fields
+        Article.objects.bulk_create(articles, update_fields=("title", "content"))
+        Article.objects.bulk_create(articles, update_fields={"title", "content", "published"})
+
+        # Valid update_fields with foreign key field
+        Article.objects.bulk_create(articles, update_fields=["author"])
+        Article.objects.bulk_create(articles, update_fields=["author_id"])
+        Article.objects.bulk_create(articles, update_fields=["category"])
+        Article.objects.bulk_create(articles, update_fields=["category_id"])
+
+        # Valid unique_fields
+        Article.objects.bulk_create(articles, unique_fields=["id"])
+        Article.objects.bulk_create(articles, unique_fields=["title"])
+        Article.objects.bulk_create(articles, unique_fields=["author"])
+        Article.objects.bulk_create(articles, unique_fields=["author_id"])
+
+        # Valid unique_fields with 'pk' alias
+        Article.objects.bulk_create(articles, unique_fields=["pk"])
+        Article.objects.bulk_create(articles, unique_fields=("pk", "title"))
+
+        # Valid combination of update_fields and unique_fields
+        Article.objects.bulk_create(
+            articles,
+            update_fields=["title", "content"],
+            unique_fields=["id"]
+        )
+        Article.objects.bulk_create(
+            articles,
+            update_fields=["content"],
+            unique_fields=["pk", "title"]
+        )
+
+        # Valid on different models
+        authors = [Author(name="Test")]
+        Author.objects.bulk_create(authors, update_fields=["name"])
+        Author.objects.bulk_create(authors, unique_fields=["id"])
+
+        categories = [Category(name="Test")]
+        Category.objects.bulk_create(categories, update_fields=["name"])
+        Category.objects.bulk_create(categories, unique_fields=["pk"])
+
+        # Variables with Literal types
+        update_field: Literal["title"] = "title"
+        unique_field: Literal["id"] = "id"
+        Article.objects.bulk_create(articles, update_fields=[update_field], unique_fields=[unique_field])
+
+        # Dynamic lists (no validation, passes through)
+        def get_fields() -> list[str]:
+            return ["title"]
+
+        Article.objects.bulk_create(articles, update_fields=get_fields(), unique_fields=get_fields())
+
+        # Async version
+        async def test_async_bulk_create() -> None:
+            articles = [Article(title="Test")]
+            await Article.objects.abulk_create(articles, update_fields=["title"])
+            await Article.objects.abulk_create(articles, unique_fields=["pk"])
+            await Article.objects.abulk_create(
+                articles,
+                update_fields=["content"],
+                unique_fields=["id"]
+            )
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+
+                class Category(models.Model):
+                    name = models.CharField(max_length=100)
+                    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=100)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField('myapp.Tag')
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)
+
+
+
+-   case: bulk_create_invalid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author, Category
+        from typing import Literal
+
+        articles = [Article(title="Test")]
+
+        # Invalid field names in update_fields
+        Article.objects.bulk_create(articles, update_fields=["nonexistent"])  # E: Article has no field named 'nonexistent'  [misc]
+        Article.objects.bulk_create(articles, update_fields=["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]
+
+        # Cannot update primary key fields in update_fields
+        Article.objects.bulk_create(articles, update_fields=["id"])  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
+
+        # ManyToMany is not a concrete updatable field
+        Article.objects.bulk_create(articles, update_fields={"tags"})  # E: "bulk_create()" can only be used with concrete fields. Got "tags"  [misc]
+
+        # Invalid field names in unique_fields
+        Article.objects.bulk_create(articles, unique_fields=["nonexistent"])  # E: Article has no field named 'nonexistent'  [misc]
+        Article.objects.bulk_create(articles, unique_fields=["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]
+
+        # ManyToMany is not allowed in unique_fields either
+        Article.objects.bulk_create(articles, unique_fields={"tags"})  # E: "bulk_create()" can only be used with concrete fields. Got "tags"  [misc]
+
+        # Mixed valid and invalid fields in update_fields
+        Article.objects.bulk_create(articles, update_fields={"title", "nonexistent"})  # E: Article has no field named 'nonexistent'  [misc]
+        Article.objects.bulk_create(articles, update_fields=("id", "title"))  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
+
+        # Mixed valid and invalid fields in unique_fields
+        Article.objects.bulk_create(articles, unique_fields={"title", "nonexistent"})  # E: Article has no field named 'nonexistent'  [misc]
+
+        # Whitespace-only field names
+        Article.objects.bulk_create(articles, update_fields=[""])  # E: Article has no field named ''  [misc]
+        Article.objects.bulk_create(articles, unique_fields=["   "])  # E: Article has no field named '   '  [misc]
+
+        # Nested field lookups are not supported
+        Article.objects.bulk_create(articles, update_fields=["author__name"])  # E: Article has no field named 'author__name'  [misc]
+        Article.objects.bulk_create(articles, unique_fields=["category__parent__name"])  # E: Article has no field named 'category__parent__name'  [misc]
+
+        # Multiple invalid fields
+        Article.objects.bulk_create(articles, update_fields=["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
+        Article.objects.bulk_create(articles, unique_fields=["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
+
+        # Literal type variables are validated
+        invalid_field: Literal["nonexistent"] = "nonexistent"
+        Article.objects.bulk_create(articles, update_fields=[invalid_field])  # E: Article has no field named 'nonexistent'  [misc]
+        Article.objects.bulk_create(articles, unique_fields=[invalid_field])  # E: Article has no field named 'nonexistent'  [misc]
+
+        pk_field: Literal["id"] = "id"
+        Article.objects.bulk_create(articles, update_fields=[pk_field])  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
+
+        # Test with different models
+        authors = [Author(name="Test")]
+        Author.objects.bulk_create(authors, update_fields=["id"])  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
+        Author.objects.bulk_create(authors, update_fields=["invalid"])  # E: Author has no field named 'invalid'  [misc]
+        Author.objects.bulk_create(authors, unique_fields=["invalid"])  # E: Author has no field named 'invalid'  [misc]
+
+        categories = [Category(name="Test")]
+        Category.objects.bulk_create(categories, update_fields=["id"])  # E: "bulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
+        Category.objects.bulk_create(categories, update_fields=["invalid"])  # E: Category has no field named 'invalid'  [misc]
+        Category.objects.bulk_create(categories, unique_fields=["invalid"])  # E: Category has no field named 'invalid'  [misc]
+
+        # Async version
+        async def test_async_bulk_create_invalid() -> None:
+            articles = [Article(title="Test")]
+
+            # Invalid field names in update_fields
+            await Article.objects.abulk_create(articles, update_fields=["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]
+
+            # Cannot update primary key fields in update_fields
+            await Article.objects.abulk_create(articles, update_fields=["id"])  # E: "abulk_create()" does not support primary key fields in "update_fields=". Got "id"  [misc]
+
+            # Invalid field names in unique_fields
+            await Article.objects.abulk_create(articles, unique_fields=["invalid_field"])  # E: Article has no field named 'invalid_field'  [misc]
+
+            # ManyToMany is not allowed
+            await Article.objects.abulk_create(articles, update_fields={"tags"})  # E: "abulk_create()" can only be used with concrete fields. Got "tags"  [misc]
+            await Article.objects.abulk_create(articles, unique_fields={"tags"})  # E: "abulk_create()" can only be used with concrete fields. Got "tags"  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+
+                class Category(models.Model):
+                    name = models.CharField(max_length=100)
+                    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=100)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField('myapp.Tag')
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)
