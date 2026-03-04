@@ -449,3 +449,8 @@ django.forms.widgets.ChoiceWidget.template_name
 django.db.models.expressions.rhs
 django.db.models.expressions.result
 django.db.models.expressions.lhs
+
+# Django 6.0.3 security fix new APIs:
+django.utils._os.makedirs
+django.utils._os.safe_makedirs
+django.utils.inspect.signature
