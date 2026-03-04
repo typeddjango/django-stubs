@@ -444,11 +444,6 @@ django.forms.models.BaseModelFormSet.model
 django.forms.models.inlineformset_factory
 django.forms.models.modelformset_factory
 django.forms.widgets.ChoiceWidget.template_name
-django.urls.conf.path
-django.urls.conf.re_path
-django.urls.path
-django.urls.re_path
-django.urls.resolvers.LocaleRegexDescriptor.__get__
 
 # mypy 1.9.0 new issues:
 django.db.models.expressions.rhs

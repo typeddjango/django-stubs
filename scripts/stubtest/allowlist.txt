@@ -24,6 +24,12 @@ django.core.files.storage.default_storage
 # default_task_backend is actually an instance of ConnectionProxy, but it proxies through to a BaseTaskBackend
 django.tasks.default_task_backend
 
+# path/re_path are actually functools.partial objects at runtime, but stubs type them as functions
+django.urls.conf.path
+django.urls.conf.re_path
+django.urls.path
+django.urls.re_path
+
 # '<Model>_RelatedManager' entries are plugin generated and these subclasses only exist
 # _locally/dynamically_ runtime -- Created via
 # 'django.db.models.fields.related_descriptors.create_reverse_many_to_one_manager'
