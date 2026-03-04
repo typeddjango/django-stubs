@@ -206,7 +206,7 @@ class DjangoContext:
 
         model_info = helpers.lookup_class_typeinfo(api, model_cls)
         for field in model_cls._meta.get_fields():
-            if isinstance(field, Field):
+            if isinstance(field, Field) and hasattr(field, 'attname'):
                 field_name = field.attname
                 # Can not determine target_field for recursive relationship when model is abstract
                 if field.related_model == "self" and model_cls._meta.abstract:
