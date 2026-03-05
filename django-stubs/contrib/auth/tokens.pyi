@@ -1,5 +1,4 @@
 from datetime import date, datetime
-from typing import Any
 
 from django.contrib.auth.models import _User
 
@@ -15,4 +14,4 @@ class PasswordResetTokenGenerator:
     def _num_seconds(self, dt: datetime | date) -> int: ...
     def _now(self) -> datetime: ...
 
-default_token_generator: Any
+default_token_generator: PasswordResetTokenGenerator
