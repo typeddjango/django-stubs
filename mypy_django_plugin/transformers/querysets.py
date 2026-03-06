@@ -662,7 +662,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
             # on the last item of the chain (e.g. Group), not on the root model (e.g. User).
             # We can't annotate an intermediate model from here, so skip adding the annotation
             # to the root model to avoid incorrectly attributing to_attr to it.
-            if lookup and "__" in lookup:
+            if lookup and LOOKUP_SEP in lookup:
                 continue
             new_attrs[to_attr] = api.named_generic_type(
                 "builtins.list",
