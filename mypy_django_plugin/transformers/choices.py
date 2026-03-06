@@ -1,5 +1,6 @@
 from enum import Enum, auto
 
+from django.db.models.constants import LOOKUP_SEP
 from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo, Var
 from mypy.plugin import AttributeContext
 from mypy.typeanal import make_optional_type
@@ -34,7 +35,7 @@ def _get_enum_members(info: TypeInfo) -> list[str]:
         if (
             isinstance(sym.node, Var)
             and name not in ("_ignore_", "_order_", "__order__")
-            and not name.startswith("__")
+            and not name.startswith(LOOKUP_SEP)
             and sym.node.has_explicit_value
         )
     ]
