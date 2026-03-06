@@ -1,0 +1,74 @@
+-   case: update_valid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author
+
+        # Simple field
+        Article.objects.update(title="new title")
+
+        # Multiple fields
+        Article.objects.update(title="new title", published=True)
+
+        # FK id field (concrete)
+        Article.objects.update(author_id=1)
+
+        # Chained with filter
+        Article.objects.filter(published=False).update(published=True)
+
+        # Async variant
+        async def test_async() -> None:
+            await Article.objects.aupdate(title="new title")
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField(Tag)
+
+
+-   case: update_invalid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author
+
+        # Non-existent field
+        Article.objects.update(nonexistent=1)  # E: Article has no field named 'nonexistent'  [misc]
+
+        # M2M field (not concrete)
+        Article.objects.update(tags=1)  # E: "update()" can only be used with concrete fields. Got "tags"  [misc]
+
+        # Async variant with invalid field
+        async def test_async() -> None:
+            await Article.objects.aupdate(nonexistent=1)  # E: Article has no field named 'nonexistent'  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField(Tag)

@@ -189,6 +189,11 @@ class NewSemanalDjangoPlugin(Plugin):
             "alatest": partial(querysets.validate_order_by, django_context=self.django_context),
             "defer": partial(querysets.validate_defer_only, django_context=self.django_context, is_defer=True),
             "only": partial(querysets.validate_defer_only, django_context=self.django_context, is_defer=False),
+            "distinct": partial(querysets.validate_distinct, django_context=self.django_context),
+            "update": partial(querysets.validate_update, django_context=self.django_context),
+            "aupdate": partial(querysets.validate_update, django_context=self.django_context),
+            "in_bulk": partial(querysets.validate_in_bulk, django_context=self.django_context),
+            "ain_bulk": partial(querysets.validate_in_bulk, django_context=self.django_context),
         }
 
     def get_method_hook(self, fullname: str) -> Callable[[MethodContext], MypyType] | None:
