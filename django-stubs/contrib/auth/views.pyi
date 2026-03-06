@@ -26,7 +26,7 @@ class LoginView(RedirectURLMixin, FormView[_AuthForm]):
     redirect_authenticated_user: bool
     extra_context: Any
 
-class LogoutView(RedirectURLMixin, TemplateView):
+class LogoutView(RedirectURLMixin, TemplateView[HttpResponse]):
     next_page: str | None
     redirect_field_name: str
     extra_context: Any
