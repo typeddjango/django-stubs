@@ -75,6 +75,8 @@ class _WKBReader(IOBase):
 
 def default_trim_value() -> bool: ...
 
+DEFAULT_TRIM_VALUE: Any
+
 class WKTWriter(IOBase):
     ptr_type: Any
     destructor: Any
