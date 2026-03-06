@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Mapping
-from typing import Any, Generic, NoReturn, TypeVar, overload, type_check_only
+from typing import Any, Generic, TypeVar, overload, type_check_only
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.base import Model
@@ -10,7 +10,7 @@ from django.db.models.manager import BaseManager, Manager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.functional import cached_property
-from typing_extensions import Self
+from typing_extensions import Never, Self
 
 _M = TypeVar("_M", bound=Model)
 _F = TypeVar("_F", bound=Field)
@@ -20,6 +20,7 @@ _To = TypeVar("_To", bound=Model)
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):
     field: RelatedField
+    def __set__(self, instance: Model, value: Any) -> None: ...
 
 class ForwardManyToOneDescriptor(Generic[_F]):
     field: _F
@@ -86,18 +87,19 @@ class ReverseManyToOneDescriptor(Generic[_To]):
     def __get__(self, instance: None, cls: Any | None = None) -> Self: ...
     @overload
     def __get__(self, instance: Model, cls: Any | None = None) -> RelatedManager[_To]: ...
-    def __set__(self, instance: Any, value: Any) -> NoReturn: ...
+    def __set__(self, instance: Any, value: Any) -> Never: ...
 
 # Fake class, Django defines 'RelatedManager' inside a function body
 @type_check_only
 class RelatedManager(Manager[_To], Generic[_To]):
     related_val: tuple[int, ...]
+    def __call__(self, *, manager: str) -> RelatedManager[_To]: ...
     def add(self, *objs: _To | int, bulk: bool = ...) -> None: ...
     async def aadd(self, *objs: _To | int, bulk: bool = ...) -> None: ...
     def remove(self, *objs: _To | int, bulk: bool = ...) -> None: ...
     async def aremove(self, *objs: _To | int, bulk: bool = ...) -> None: ...
-    def clear(self, *, clear: bool = ...) -> None: ...
-    async def aclear(self, *, clear: bool = ...) -> None: ...
+    def clear(self, *, bulk: bool = ...) -> None: ...
+    async def aclear(self, *, bulk: bool = ...) -> None: ...
     def set(
         self,
         objs: QuerySet[_To] | Iterable[_To | int],
@@ -112,7 +114,6 @@ class RelatedManager(Manager[_To], Generic[_To]):
         bulk: bool = ...,
         clear: bool = ...,
     ) -> None: ...
-    def __call__(self, *, manager: str) -> RelatedManager[_To]: ...
 
 def create_reverse_many_to_one_manager(
     superclass: type[BaseManager[_M]], rel: ManyToOneRel
@@ -148,6 +149,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_To, _Through]):
 class ManyRelatedManager(Manager[_To], Generic[_To, _Through]):
     related_val: tuple[int, ...]
     through: type[_Through]
+    def __call__(self, *, manager: str) -> ManyRelatedManager[_To, _Through]: ...
     def add(
         self,
         *objs: _To | int,
@@ -214,7 +216,6 @@ class ManyRelatedManager(Manager[_To], Generic[_To, _Through]):
         through_defaults: Mapping[str, Any] | None = ...,
         **kwargs: Any,
     ) -> tuple[_To, bool]: ...
-    def __call__(self, *, manager: str) -> ManyRelatedManager[_To, _Through]: ...
 
 def create_forward_many_to_many_manager(
     superclass: type[BaseManager[_To]], rel: ManyToManyRel, reverse: bool

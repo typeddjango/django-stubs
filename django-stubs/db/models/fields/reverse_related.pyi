@@ -2,7 +2,7 @@ from collections.abc import Callable, Sequence
 from typing import Any, Literal
 
 from django.db.models.base import Model
-from django.db.models.fields import AutoField, Field, _AllLimitChoicesTo, _ChoicesList, _LimitChoicesTo
+from django.db.models.fields import Field, _AllLimitChoicesTo, _ChoicesList, _LimitChoicesTo
 from django.db.models.fields.related import ForeignKey, ForeignObject, ManyToManyField, OneToOneField
 from django.db.models.lookups import Lookup, StartsWith, Transform
 from django.db.models.query import _OrderByFieldName
@@ -22,6 +22,7 @@ class ForeignObjectRel(FieldCacheMixin):
     auto_created: bool
     concrete: Literal[False]
     editable: bool
+    empty_strings_allowed: bool
     is_relation: bool
     null: bool
     field: ForeignObject
@@ -30,7 +31,7 @@ class ForeignObjectRel(FieldCacheMixin):
     related_query_name: str | None
     limit_choices_to: _AllLimitChoicesTo | None
     parent_link: bool
-    on_delete: Callable
+    on_delete: Callable[..., Any] | None
     symmetrical: bool
     multiple: bool
     field_name: str | None
@@ -42,7 +43,7 @@ class ForeignObjectRel(FieldCacheMixin):
         related_query_name: str | None = None,
         limit_choices_to: _AllLimitChoicesTo | None = None,
         parent_link: bool = False,
-        on_delete: Callable | None = None,
+        on_delete: Callable[..., Any] | None = None,
     ) -> None: ...
     @cached_property
     def hidden(self) -> bool: ...
@@ -51,7 +52,7 @@ class ForeignObjectRel(FieldCacheMixin):
     @property
     def remote_field(self) -> ForeignObject: ...
     @property
-    def target_field(self) -> AutoField: ...
+    def target_field(self) -> Field: ...
     @cached_property
     def related_model(self) -> type[Model] | Literal["self"]: ...
     @cached_property
@@ -78,14 +79,16 @@ class ForeignObjectRel(FieldCacheMixin):
         ordering: Sequence[_OrderByFieldName] = (),
     ) -> _ChoicesList: ...
     def get_joining_fields(self) -> tuple[tuple[Field, Field], ...]: ...
-    def get_extra_restriction(
-        self, where_class: type[WhereNode], alias: str, related_alias: str
-    ) -> StartsWith | WhereNode | None: ...
+    def get_extra_restriction(self, alias: str, related_alias: str) -> StartsWith | WhereNode | None: ...
     def set_field_name(self) -> None: ...
+    @property
+    def identity(self) -> tuple[Any, ...]: ...
     @cached_property
     def accessor_name(self) -> str | None: ...
     def get_accessor_name(self, model: type[Model] | None = None) -> str | None: ...
     def get_path_info(self, filtered_relation: FilteredRelation | None = None) -> list[PathInfo]: ...
+    @cached_property
+    def path_infos(self) -> list[PathInfo]: ...
 
 class ManyToOneRel(ForeignObjectRel):
     field: ForeignKey
@@ -98,10 +101,12 @@ class ManyToOneRel(ForeignObjectRel):
         related_query_name: str | None = None,
         limit_choices_to: _AllLimitChoicesTo | None = None,
         parent_link: bool = False,
-        on_delete: Callable | None = None,
+        on_delete: Callable[..., Any] | None = None,
     ) -> None: ...
     def get_related_field(self) -> Field: ...
     def get_accessor_name(self, model: type[Model] | None = None) -> str: ...
+    @property
+    def identity(self) -> tuple[Any, ...]: ...
 
 class OneToOneRel(ManyToOneRel):
     field: OneToOneField
@@ -114,7 +119,7 @@ class OneToOneRel(ManyToOneRel):
         related_query_name: str | None = None,
         limit_choices_to: _AllLimitChoicesTo | None = None,
         parent_link: bool = False,
-        on_delete: Callable | None = None,
+        on_delete: Callable[..., Any] | None = None,
     ) -> None: ...
 
 class ManyToManyRel(ForeignObjectRel):
@@ -135,3 +140,5 @@ class ManyToManyRel(ForeignObjectRel):
         db_constraint: bool = True,
     ) -> None: ...
     def get_related_field(self) -> Field: ...
+    @property
+    def identity(self) -> tuple[Any, ...]: ...

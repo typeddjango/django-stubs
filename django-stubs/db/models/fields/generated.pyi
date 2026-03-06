@@ -11,7 +11,7 @@ from django.utils.choices import _Choices
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _StrOrPromise, cached_property
 
-class GeneratedField(models.Field):
+class GeneratedField(models.Field[Any, Any]):
     generated: ClassVar[Literal[True]]
     db_returning: Literal[True]
     _query: Query | None

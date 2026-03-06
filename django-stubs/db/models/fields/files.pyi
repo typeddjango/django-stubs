@@ -49,7 +49,7 @@ _M = TypeVar("_M", bound=Model, contravariant=True)
 class _UploadToCallable(Protocol[_M]):
     def __call__(self, instance: _M, filename: str, /) -> _PathCompatible: ...
 
-class FileField(Field):
+class FileField(Field[Any, Any]):
     attr_class: type[FieldFile]
     descriptor_class: type[FileDescriptor]
     storage: Storage
