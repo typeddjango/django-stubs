@@ -305,3 +305,13 @@ django.db.models.fields.files.ImageField.__get__
 django.db.models.fields.related.ForeignObject.__get__
 django.db.models.fields.related.ManyToManyField.__get__
 django.db.models.fields.related.OneToOneField.__get__
+
+# These are dynamically added at runtime with loose types
+django.utils.functional.LazyObject.__bool__
+django.utils.functional.LazyObject.__bytes__
+django.utils.functional.LazyObject.__dir__
+django.utils.functional.LazyObject.__hash__
+django.utils.functional.LazyObject.__iter__
+django.utils.functional.LazyObject.__len__
+django.utils.functional.LazyObject.__str__
+django.utils.functional.SimpleLazyObject.__add__
