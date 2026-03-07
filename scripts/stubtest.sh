@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Run this script with `./scripts/stubtest.sh`
+# Run this script with `./scripts/stubtest.sh [additional_stubtest_args]`
 
 set -e
 
@@ -14,3 +14,4 @@ stubtest django \
     --allowlist scripts/stubtest/allowlist.txt \
     --allowlist scripts/stubtest/allowlist_todo.txt \
     --allowlist scripts/stubtest/allowlist_todo_django52.txt \
+    "$@"
