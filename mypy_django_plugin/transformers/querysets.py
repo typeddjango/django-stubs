@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Literal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models.base import Model
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.related_descriptors import (
     ForwardManyToOneDescriptor,
@@ -11,6 +12,7 @@ from django.db.models.fields.related_descriptors import (
     ReverseOneToOneDescriptor,
 )
 from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.sql.query import Query
 from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
 from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, ListExpr, SetExpr, TupleExpr
@@ -525,7 +527,7 @@ def check_valid_prefetch_related_lookup(
     """Check if a lookup string resolve to something that can be prefetched"""
     current_model_cls = django_model.cls
     contenttypes_installed = django_context.apps_registry.is_installed("django.contrib.contenttypes")
-    for through_attr in lookup.split("__"):
+    for through_attr in lookup.split(LOOKUP_SEP):
         rel_obj_descriptor = getattr(current_model_cls, through_attr, None)
         if rel_obj_descriptor is None:
             ctx.api.fail(
@@ -660,7 +662,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
             # on the last item of the chain (e.g. Group), not on the root model (e.g. User).
             # We can't annotate an intermediate model from here, so skip adding the annotation
             # to the root model to avoid incorrectly attributing to_attr to it.
-            if lookup and "__" in lookup:
+            if lookup and LOOKUP_SEP in lookup:
                 continue
             new_attrs[to_attr] = api.named_generic_type(
                 "builtins.list",
@@ -796,7 +798,7 @@ def _validate_select_related_lookup(
         )
         return False
 
-    lookup_parts = lookup.split("__")
+    lookup_parts = lookup.split(LOOKUP_SEP)
     observed_model = model_cls
     for i, part in enumerate(lookup_parts):
         valid_choices = _get_select_related_field_choices(observed_model)
@@ -901,5 +903,30 @@ def validate_bulk_create(
     if unique_field_names is not None:
         for field_name in unique_field_names:
             _validate_bulk_create_unique_field(ctx, django_model.cls, field_name, method)
+
+    return ctx.default_return_type
+
+
+def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str]) -> None:
+    if len(parts) == 1 and parts[0] == "?":
+        return
+
+    try:
+        Query(model_cls).names_to_path(parts, model_cls._meta, fail_on_missing=True)
+    except FieldError as exc:
+        ctx.api.fail(exc.args[0], ctx.context)
+
+
+def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
+        return ctx.default_return_type
+
+    for lookup_value in _extract_field_names_from_varargs(ctx):
+        parts = lookup_value.removeprefix("-").split(LOOKUP_SEP)
+
+        if django_model.typ.extra_attrs and parts[0] in django_model.typ.extra_attrs.attrs:
+            # Skip validation for annotated fields
+            continue
+        _validate_order_by_lookup(ctx, django_model.cls, parts)
 
     return ctx.default_return_type

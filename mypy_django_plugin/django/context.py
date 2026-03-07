@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, Literal, Union
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Expression
 from django.db.models.fields import AutoField, CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
@@ -432,7 +433,7 @@ class DjangoContext:
         # instantiated, therefore it is never swapped out for abstract base classes.
         except AttributeError:
             pass
-        query_parts = lookup.split("__")
+        query_parts = lookup.split(LOOKUP_SEP)
         try:
             field = query.get_meta().get_field(query_parts[0])
         except FieldDoesNotExist:
@@ -445,7 +446,7 @@ class DjangoContext:
             return None
 
         related_model = self.get_field_related_model_cls(field)
-        sub_query = Query(related_model).solve_lookup_type("__".join(query_parts[1:]))
+        sub_query = Query(related_model).solve_lookup_type(LOOKUP_SEP.join(query_parts[1:]))
         entire_query_parts = [query_parts[0], *sub_query[1]]
         return sub_query[0], entire_query_parts, sub_query[2]
 
@@ -511,7 +512,7 @@ class DjangoContext:
         if not helpers.is_annotated_model(model_instance.type) or not model_instance.extra_attrs:
             return None
 
-        lookup_base_field, *annotation_lookup_parts = lookup.split("__")
+        lookup_base_field, *annotation_lookup_parts = lookup.split(LOOKUP_SEP)
 
         if lookup_base_field not in model_instance.extra_attrs.attrs:
             return None
