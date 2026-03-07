@@ -250,7 +250,6 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     @property
     def flatchoices(self) -> list[_Choice]: ...
     def save_form_data(self, instance: Model, data: Any) -> None: ...
-    # TODO: plugin support
     def formfield(
         self,
         form_class: type[forms.Field] | None = None,
