@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, NamedTuple, Union, cast
+from typing import Any, NamedTuple, Union, cast
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField, Field
@@ -15,13 +15,10 @@ from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import manytomany
 
-if TYPE_CHECKING:
-    from django.contrib.contenttypes.fields import GenericForeignKey
-
 
 def _get_current_field_from_assignment(
     ctx: FunctionContext, django_context: DjangoContext
-) -> Union["Field[Any, Any]", ForeignObjectRel, "GenericForeignKey"] | None:
+) -> Union["Field[Any, Any]", ForeignObjectRel] | None:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_type(outer_model_info):
         return None

@@ -41,9 +41,9 @@ class BaseSpatialField(Field[_ST, _GT]):
     srid: int
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        srid: int = ...,
-        spatial_index: bool = ...,
+        verbose_name: _StrOrPromise | None = None,
+        srid: int = 4326,
+        spatial_index: bool = True,
         *,
         name: str | None = ...,
         primary_key: bool = ...,
@@ -83,14 +83,14 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
     dim: int
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        dim: int = ...,
-        geography: bool = ...,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
         *,
         extent: tuple[float, float, float, float] = ...,
-        tolerance: float = ...,
-        srid: int = ...,
-        spatial_index: bool = ...,
+        tolerance: float = 0.05,
+        srid: int = 4326,
+        spatial_index: bool = True,
         name: str | None = ...,
         primary_key: bool = ...,
         max_length: int | None = ...,
@@ -114,6 +114,7 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+    def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
     def formfield(  # type: ignore[override]
         self,
         *,
@@ -122,7 +123,6 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         srid: Any = ...,
         **kwargs: Any,
     ) -> forms.GeometryField: ...
-    def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
 
 class PointField(GeometryField[_ST, _GT]):
     _pyi_private_set_type: Point | Combinable
@@ -180,8 +180,8 @@ class GeometryCollectionField(GeometryField[_ST, _GT]):
     geom_class: type[GeometryCollection]
     form_class: type[forms.GeometryCollectionField]
 
-class ExtentField(Field):
-    def get_internal_type(self) -> Any: ...
+class ExtentField(Field[Any, Any]):
+    def get_internal_type(self) -> str: ...
 
 class RasterField(BaseSpatialField):
     def db_type(self, connection: Any) -> Any: ...

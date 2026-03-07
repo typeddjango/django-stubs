@@ -1,7 +1,8 @@
+from collections.abc import Iterator
 from typing import Any
 
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.models.expressions import Func
+from django.db.models.expressions import Expression, Func
 from django.db.models.fields import Field
 from django.db.models.lookups import Exact, GreaterThan, GreaterThanOrEqual, In, IsNull, LessThan, LessThanOrEqual
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
@@ -10,7 +11,7 @@ class Tuple(Func):
     function: str
     output_field: Field
     def __len__(self) -> int: ...
-    def __iter__(self) -> Any: ...
+    def __iter__(self) -> Iterator[Expression]: ...
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
 class TupleLookupMixin:

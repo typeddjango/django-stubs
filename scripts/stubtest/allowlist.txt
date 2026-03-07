@@ -282,3 +282,26 @@ django.template.smartif.op
 #  so stubtest reports them as missing."
 django.contrib.gis.db.backends.postgis.base.PostGISBinaryDumper
 django.contrib.gis.db.backends.postgis.base.PostGISTextDumper
+
+# Field.__get__/__set__ are stub-only for the mypy plugin, they don't exist at runtime
+django.contrib.gis.db.models.Field.__get__
+django.contrib.gis.db.models.Field.__set__
+django.contrib.gis.db.models.FileField.__get__
+django.contrib.gis.db.models.ForeignObject.__get__
+django.contrib.gis.db.models.ImageField.__get__
+django.contrib.gis.db.models.ManyToManyField.__get__
+django.contrib.gis.db.models.OneToOneField.__get__
+django.db.models.Field.__get__
+django.db.models.Field.__set__
+django.db.models.FileField.__get__
+django.db.models.ForeignObject.__get__
+django.db.models.ImageField.__get__
+django.db.models.ManyToManyField.__get__
+django.db.models.OneToOneField.__get__
+django.db.models.fields.Field.__get__
+django.db.models.fields.Field.__set__
+django.db.models.fields.files.FileField.__get__
+django.db.models.fields.files.ImageField.__get__
+django.db.models.fields.related.ForeignObject.__get__
+django.db.models.fields.related.ManyToManyField.__get__
+django.db.models.fields.related.OneToOneField.__get__
