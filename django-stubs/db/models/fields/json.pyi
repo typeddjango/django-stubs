@@ -6,7 +6,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import lookups
 from django.db.models.expressions import Expression
 from django.db.models.fields import TextField
-from django.db.models.lookups import PostgresOperatorLookup, Transform
+from django.db.models.lookups import FieldGetDbPrepValueMixin, PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self
@@ -31,9 +31,11 @@ class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         **kwargs: Any,
     ) -> None: ...
     def from_db_value(self, value: str | None, expression: Expression, connection: BaseDatabaseWrapper) -> Any: ...
+    def get_transform(self, name: str) -> type[Transform] | KeyTransformFactory: ...  # type: ignore[override]
+    def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
 
-class DataContains(PostgresOperatorLookup): ...
-class ContainedBy(PostgresOperatorLookup): ...
+class DataContains(FieldGetDbPrepValueMixin, PostgresOperatorLookup): ...
+class ContainedBy(FieldGetDbPrepValueMixin, PostgresOperatorLookup): ...
 
 class HasKeyLookup(PostgresOperatorLookup):
     logical_operator: str | None

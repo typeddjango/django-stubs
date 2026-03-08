@@ -1,13 +1,15 @@
 from typing import Any, ClassVar
 
 from django.contrib.postgres.fields.array import ArrayField
+from django.contrib.postgres.utils import CheckPostgresInstalledMixin
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Field, TextField, Transform
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 
-class HStoreField(CheckFieldDefaultMixin, Field):
+class HStoreField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
     def get_transform(self, name: str) -> Any: ...
+    def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
 
 class KeyTransform(Transform):
     output_field: ClassVar[TextField]

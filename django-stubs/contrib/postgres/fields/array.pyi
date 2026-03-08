@@ -2,6 +2,8 @@ from collections.abc import Iterable, Sequence
 from typing import Any, ClassVar, TypeVar
 
 from _typeshed import Unused
+from django.contrib.postgres.utils import CheckPostgresInstalledMixin
+from django.core.checks import CheckMessage
 from django.core.validators import _ValidatorCallable
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Field
@@ -17,7 +19,7 @@ _ST = TypeVar("_ST")
 # __get__ return type
 _GT = TypeVar("_GT")
 
-class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
+class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST, _GT]):
     _pyi_private_set_type: Sequence[Any] | Combinable
     _pyi_private_get_type: list[Any]
 
@@ -56,10 +58,12 @@ class ArrayField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+    def check(self, **kwargs: Any) -> list[CheckMessage]: ...
     @property
     def description(self) -> str: ...  # type: ignore[override]
     def cast_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
     def get_placeholder(self, value: Unused, compiler: Unused, connection: BaseDatabaseWrapper) -> str: ...
     def get_transform(self, name: str) -> type[Transform] | None: ...
+    def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
 
 __all__ = ["ArrayField"]

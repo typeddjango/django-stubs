@@ -207,6 +207,22 @@ class DjangoContext:
 
         model_info = helpers.lookup_class_typeinfo(api, model_cls)
         for field in model_cls._meta.get_fields():
+            if contenttypes_in_apps:
+                from django.contrib.contenttypes.fields import GenericForeignKey
+
+                if isinstance(field, GenericForeignKey):
+                    # it's generic, so cannot set specific model
+                    field_name = field.name
+                    gfk_info = helpers.lookup_class_typeinfo(api, field.__class__)
+                    if gfk_info is None:
+                        gfk_set_type: MypyType = AnyType(TypeOfAny.unannotated)
+                    else:
+                        gfk_set_type = helpers.get_private_descriptor_type(
+                            gfk_info, "_pyi_private_set_type", is_nullable=True
+                        )
+                    expected_types[field_name] = gfk_set_type
+                    continue
+
             if isinstance(field, Field):
                 field_name = field.attname
                 # Can not determine target_field for recursive relationship when model is abstract
@@ -250,21 +266,6 @@ class DjangoContext:
                     model_set_type = helpers.convert_any_to_type(foreign_key_set_type, Instance(related_model_info, []))
 
                     expected_types[field_name] = model_set_type
-
-            elif contenttypes_in_apps:
-                from django.contrib.contenttypes.fields import GenericForeignKey
-
-                if isinstance(field, GenericForeignKey):
-                    # it's generic, so cannot set specific model
-                    field_name = field.name
-                    gfk_info = helpers.lookup_class_typeinfo(api, field.__class__)
-                    if gfk_info is None:
-                        gfk_set_type: MypyType = AnyType(TypeOfAny.unannotated)
-                    else:
-                        gfk_set_type = helpers.get_private_descriptor_type(
-                            gfk_info, "_pyi_private_set_type", is_nullable=True
-                        )
-                    expected_types[field_name] = gfk_set_type
 
         return expected_types
 
