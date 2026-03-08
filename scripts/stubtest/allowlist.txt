@@ -314,4 +314,3 @@ django.utils.functional.LazyObject.__hash__
 django.utils.functional.LazyObject.__iter__
 django.utils.functional.LazyObject.__len__
 django.utils.functional.LazyObject.__str__
-django.utils.functional.SimpleLazyObject.__add__
