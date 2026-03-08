@@ -1,0 +1,289 @@
+-   case: defer_valid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author
+        from django.db.models import F
+
+        # Simple fields
+        Article.objects.defer("id")
+        Article.objects.defer("title")
+        Article.objects.defer("content")
+        Article.objects.defer("published")
+
+        # Multiple fields in one call
+        Article.objects.defer("title", "content")
+
+        # FK field (by name and attname)
+        Article.objects.defer("author")
+        Article.objects.defer("author_id")
+
+        # FK traversal
+        Article.objects.defer("author__name")
+        Article.objects.defer("author__email")
+
+        # M2M (silently ignored by Django)
+        Article.objects.defer("tags")
+
+        # Clear deferrals
+        Article.objects.defer(None)
+
+        # Non-literal strings (skipped by validation)
+        field: str = "foo"
+        Article.objects.defer(field)
+
+        # Chained defer() calls are additive — each is valid
+        Article.objects.defer("title").defer("content")
+        Article.objects.defer("content").filter(published=True).defer("title")
+
+        # Re-deferring an already-deferred field is harmless
+        Article.objects.defer("title").defer("title")
+
+        # defer(None) clears all accumulated deferrals
+        Article.objects.defer("title").defer("content").defer(None)
+
+        # Valid double-underscore traversal alongside select_related()
+        Article.objects.select_related().defer("author__name")
+        Article.objects.select_related("author").defer("author__email")
+        Article.objects.select_related("author").defer("author__name", "author__email")
+
+        # Multi-level FK traversal with select_related
+        Article.objects.select_related("author__profile").defer("author__profile__bio")
+
+        # only() followed by defer() to exclude one of the loaded fields
+        Article.objects.only("title", "content").defer("content")
+
+        # defer() followed by only()
+        Article.objects.defer("content").only("title")
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Profile(models.Model):
+                    bio = models.TextField()
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+                    profile = models.ForeignKey(Profile, null=True, on_delete=models.SET_NULL)
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField(Tag)
+
+
+-   case: defer_invalid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author
+        from django.db.models import F
+        from typing import Literal
+
+        # Non-existent field
+        Article.objects.defer("nonexistent")  # E: Invalid field in "defer()": Article has no field named 'nonexistent'  [misc]
+
+        # Invalid chained lookup
+        Article.objects.defer("author__nonexistent")  # E: Invalid field in "defer()": Author has no field named 'nonexistent'  [misc]
+
+        # Nested lookup on non-relation field
+        Article.objects.defer("title__something")  # E: Invalid field in "defer()": something  [misc]
+
+        # Annotated fields cannot be deferred
+        Article.objects.annotate(foo=F("id")).defer("foo")  # E: Invalid field in "defer()": Article has no field named 'foo'  [misc]
+        Article.objects.annotate(bar=F("id")).defer("bar", "title")  # E: Invalid field in "defer()": Article has no field named 'bar'  [misc]
+        Article.objects.annotate(foo=F("id")).defer("nonexistent")  # E: Invalid field in "defer()": Article has no field named 'nonexistent'  [misc]
+
+        # Literal typed invalid
+        field: Literal["nonexistent"] = "nonexistent"
+        Article.objects.defer(field)  # E: Invalid field in "defer()": Article has no field named 'nonexistent'  [misc]
+
+        # Invalid field in a chain — error still raised
+        Article.objects.filter(published=True).defer("nonexistent")  # E: Invalid field in "defer()": Article has no field named 'nonexistent'  [misc]
+
+        # First defer valid, second invalid
+        Article.objects.defer("title").defer("nonexistent")  # E: Invalid field in "defer()": Article has no field named 'nonexistent'  [misc]
+
+        # Invalid after defer(None) reset
+        Article.objects.defer(None).defer("nonexistent")  # E: Invalid field in "defer()": Article has no field named 'nonexistent'  [misc]
+
+        # Invalid traversal even with select_related
+        Article.objects.select_related("author").defer("author__nonexistent")  # E: Invalid field in "defer()": Author has no field named 'nonexistent'  [misc]
+
+        # Attempting to defer the primary key (pk alias and concrete field name)
+        Article.objects.defer("pk")  # E: Invalid field in "defer()": Article has no field named 'pk'  [misc]
+
+        # Invalid field in only() when combined with defer()
+        Article.objects.only("nonexistent").defer("content")  # E: Invalid field in "only()": Article has no field named 'nonexistent'  [misc]
+        Article.objects.only("title").defer("nonexistent")  # E: Invalid field in "defer()": Article has no field named 'nonexistent'  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+
+-   case: only_valid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author
+        from django.db.models import F
+
+        # Simple fields
+        Article.objects.only("pk")
+        Article.objects.only("id")
+        Article.objects.only("title")
+        Article.objects.only("content")
+        Article.objects.only("published")
+
+        # Multiple fields
+        Article.objects.only("title", "content")
+
+        # FK field (by name and attname)
+        Article.objects.only("author")
+        Article.objects.only("author_id")
+
+        # FK traversal
+        Article.objects.only("author__name")
+        Article.objects.only("author__email")
+
+        # M2M
+        Article.objects.only("tags")
+
+        # Non-literal strings (skipped by validation)
+        field: str = "foo"
+        Article.objects.only(field)
+
+        # Chained only() calls — each is independently valid
+        Article.objects.only("title").only("content")
+        Article.objects.only("title", "content").only("published")
+        Article.objects.only("title").filter(published=True).only("content")
+
+        # Valid double-underscore traversal with select_related
+        Article.objects.select_related("author").only("title", "author__name")
+        Article.objects.select_related("author").only("author__email")
+
+        # Multi-level FK traversal with select_related
+        Article.objects.select_related("author__profile").only("title", "author__profile__bio")
+
+        # Two separate FK relations in one only() call
+        Article.objects.only("author__name", "editor__username")
+        Article.objects.only("title", "author__name", "editor__username")
+
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Profile(models.Model):
+                    bio = models.TextField()
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+                    profile = models.ForeignKey(Profile, null=True, on_delete=models.SET_NULL)
+
+                class Editor(models.Model):
+                    username = models.CharField(max_length=50)
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    editor = models.ForeignKey(Editor, null=True, on_delete=models.SET_NULL)
+                    tags = models.ManyToManyField(Tag)
+
+
+-   case: only_invalid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author
+        from django.db.models import F
+        from typing import Literal
+
+        # Non-existent field
+        Article.objects.only("nonexistent")  # E: Invalid field in "only()": Article has no field named 'nonexistent'  [misc]
+
+        # Invalid chained lookup
+        Article.objects.only("author__nonexistent")  # E: Invalid field in "only()": Author has no field named 'nonexistent'  [misc]
+
+        # Nested lookup on non-relation field
+        Article.objects.only("title__something")  # E: Invalid field in "only()": something  [misc]
+
+        # Annotated field skipped, valid real field alongside it
+        Article.objects.annotate(foo=F("id")).only("foo")  # E: Invalid field in "only()": Article has no field named 'foo'  [misc]
+        Article.objects.annotate(bar=F("id")).only("bar", "title")  # E: Invalid field in "only()": Article has no field named 'bar'  [misc]
+        Article.objects.annotate(foo=F("id")).only("nonexistent",)  # E: Invalid field in "only()": Article has no field named 'nonexistent'  [misc]
+
+        # Literal typed invalid
+        field: Literal["nonexistent"] = "nonexistent"
+        Article.objects.only(field)  # E: Invalid field in "only()": Article has no field named 'nonexistent'  [misc]
+
+        # Invalid field in a chained only() call
+        Article.objects.only("nonexistent").only("content")  # E: Invalid field in "only()": Article has no field named 'nonexistent'  [misc]
+        Article.objects.only("title").only("nonexistent")  # E: Invalid field in "only()": Article has no field named 'nonexistent'  [misc]
+
+        # Invalid traversal with select_related
+        Article.objects.select_related("author").only("title", "author__nonexistent")  # E: Invalid field in "only()": Author has no field named 'nonexistent'  [misc]
+
+        # Multi-level invalid traversal
+        Article.objects.select_related("author__profile").only("author__profile__nonexistent")  # E: Invalid field in "only()": Profile has no field named 'nonexistent'  [misc]
+
+        # Two FK relations — first invalid, second valid
+        Article.objects.only("author__nonexistent", "editor__username")  # E: Invalid field in "only()": Author has no field named 'nonexistent'  [misc]
+
+        # Two FK relations — first valid, second invalid
+        Article.objects.only("author__name", "editor__nonexistent")  # E: Invalid field in "only()": Editor has no field named 'nonexistent'  [misc]
+
+        # Both FK paths invalid — two errors expected
+        Article.objects.only("author__bad")  # E: Invalid field in "only()": Author has no field named 'bad'  [misc]
+        Article.objects.only("editor__bad")  # E: Invalid field in "only()": Editor has no field named 'bad'  [misc]
+
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Profile(models.Model):
+                    bio = models.TextField()
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+                    profile = models.ForeignKey(Profile, null=True, on_delete=models.SET_NULL)
+
+                class Editor(models.Model):
+                    username = models.CharField(max_length=50)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    editor = models.ForeignKey(Editor, null=True, on_delete=models.SET_NULL)
