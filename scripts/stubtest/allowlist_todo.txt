@@ -65,10 +65,8 @@ django.contrib.auth.models.User.user_permissions
 django.contrib.auth.models.User.username
 django.contrib.contenttypes.forms.generic_inlineformset_factory
 django.contrib.contenttypes.models.ContentType.app_label
-django.contrib.contenttypes.models.ContentType.app_labeled_name
 django.contrib.contenttypes.models.ContentType.id
 django.contrib.contenttypes.models.ContentType.model
-django.contrib.contenttypes.models.ContentTypeManager.__init__
 django.contrib.flatpages.models.FlatPage.content
 django.contrib.flatpages.models.FlatPage.enable_comments
 django.contrib.flatpages.models.FlatPage.id
@@ -86,10 +84,7 @@ django.contrib.gis.db.models.Field.description
 django.contrib.gis.db.models.Func.allowed_default
 django.contrib.gis.db.models.When.allowed_default
 django.contrib.gis.db.models.functions.Area.as_sql
-django.contrib.gis.db.models.functions.GeoFuncMixin.__init__
 django.contrib.gis.db.models.functions.GeoFuncMixin.as_sql
-django.contrib.gis.db.models.functions.GeoFuncMixin.name
-django.contrib.gis.db.models.functions.GeoFuncMixin.resolve_expression
 django.contrib.gis.db.models.functions.Length.as_sql
 django.contrib.gis.db.models.lookups.RasterBandTransform.as_sql
 django.contrib.gis.forms.BaseModelFormSet.model
