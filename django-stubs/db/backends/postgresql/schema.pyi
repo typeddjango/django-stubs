@@ -7,10 +7,7 @@ from django.db.models.indexes import Index
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     connection: DatabaseWrapper
-    sql_create_sequence: str
     sql_delete_sequence: str
-    sql_set_sequence_max: str
-    sql_set_sequence_owner: str
     sql_alter_sequence_type: str
     sql_create_index: str
     sql_create_index_concurrently: str

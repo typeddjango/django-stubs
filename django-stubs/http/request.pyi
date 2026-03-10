@@ -124,6 +124,7 @@ _Z = TypeVar("_Z")
 # we need to use an intermediary class for the `__init__` method.
 # See https://github.com/python/mypy/issues/17251
 # https://github.com/python/mypy/blob/c724a6a806655f94d0c705a7121e3d671eced96d/mypy/typeops.py#L148-L149
+@type_check_only
 class _QueryDictMixin:
     def __init__(
         self,

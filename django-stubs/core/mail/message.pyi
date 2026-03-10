@@ -59,7 +59,6 @@ class EmailAttachment(NamedTuple):
 
 class EmailMessage:
     content_subtype: str
-    mixed_subtype: str
     encoding: Any
     to: list[str]
     cc: list[Any]
@@ -105,7 +104,6 @@ class EmailMessage:
     def attach_file(self, path: str, mimetype: str | None = None) -> None: ...
 
 class EmailMultiAlternatives(EmailMessage):
-    alternative_subtype: str
     alternatives: list[tuple[_AttachmentContent, str]]
     def __init__(
         self,

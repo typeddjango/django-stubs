@@ -9,8 +9,6 @@ class BaseGeometryWidget(Widget):
     base_layer: str | None
     geom_type: str
     map_srid: int
-    map_width: int
-    map_height: int
     display_raw: bool
     supports_3d: bool
     template_name: str
