@@ -18,7 +18,6 @@ UserModel = _UserModel
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name: str
-    read_only: bool
     def get_context(self, name: str, value: Any, attrs: dict[str, Any] | None) -> dict[str, Any]: ...
 
 class ReadOnlyPasswordHashField(forms.Field):

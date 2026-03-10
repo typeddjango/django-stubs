@@ -39,9 +39,6 @@ class RawQuery:
     def params_type(self) -> type[dict | tuple] | None: ...
 
 class Query(BaseExpression):
-    related_ids: list[int] | None
-    related_updates: dict[type[Model], list[tuple[Field, None, int | str]]]
-    values: list[Any]
     alias_prefix: str
     subq_aliases: frozenset[Any]
     compiler: str
@@ -81,9 +78,6 @@ class Query(BaseExpression):
     extra_tables: tuple
     extra_order_by: Sequence[_OrderByFieldName]
     deferred_loading: tuple[set[str] | frozenset[str], bool]
-    explain_query: bool
-    explain_format: str | None
-    explain_options: dict[str, int]
     high_mark: int | None
     low_mark: int
     extra: dict[str, Any]

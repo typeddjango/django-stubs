@@ -46,7 +46,6 @@ class DomainNameValidator(RegexValidator):
 validate_domain_name: DomainNameValidator
 
 class URLValidator(RegexValidator):
-    ul: str
     ipv4_re: str
     ipv6_re: str
     hostname_re: str

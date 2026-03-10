@@ -15,7 +15,6 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query import _OrderByFieldName
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
-from django.forms import Widget
 from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
@@ -114,7 +113,6 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     _pyi_private_get_type: Any
     _pyi_lookup_exact_type: Any
 
-    widget: Widget
     help_text: _StrOrPromise
     attname: str
     auto_created: bool
