@@ -33,7 +33,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
             except LookupsAreUnsupported:
                 pass
             else:
-                if getattr(field, "null", None) is False:
+                if field is not None and getattr(field, "null", None) is False:
                     ctx.api.fail(
                         f'Field "{field.name}" does not allow NULL;'
                         f'using "__isnull=True" will always return an empty queryset.',
