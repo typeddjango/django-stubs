@@ -1,3 +1,4 @@
+from django.db.models.constants import LOOKUP_SEP
 from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance, LiteralType, ProperType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
@@ -23,23 +24,22 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
             continue
         provided_type = get_proper_type(provided_type)
 
-        if lookup_kwarg.endswith("__isnull"):
-            is_true_literal = isinstance(provided_type, LiteralType)
+        lookup_path, _, lookup_name = lookup_kwarg.rpartition(LOOKUP_SEP)
+        is_true_literal = isinstance(provided_type, LiteralType) and provided_type.value is True
 
-            if is_true_literal:
-                lookup = lookup_kwarg[:-8]
-
-                try:
-                    field, _ = django_context.resolve_lookup_into_field(model_cls, lookup)
-                except (LookupsAreUnsupported, Exception):
-                    field = None
-
-                if field is not None and not getattr(field, "null", False):
+        if lookup_name == "isnull" and is_true_literal:
+            try:
+                field, _ = django_context.resolve_lookup_into_field(model_cls, lookup_path)
+            except LookupsAreUnsupported:
+                pass
+            else:
+                if field.null is False:
                     ctx.api.fail(
-                        f'Filed "{field.name}" does not allow NULL;'
+                        f'Field "{field.name}" does not allow NULL;'
                         f'using "__isnull=True" will always return an empty queryset.',
                         ctx.context,
                     )
+
         if isinstance(provided_type, Instance) and provided_type.type.has_base(
             fullnames.COMBINABLE_EXPRESSION_FULLNAME
         ):
