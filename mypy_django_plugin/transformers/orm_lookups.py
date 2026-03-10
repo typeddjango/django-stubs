@@ -1,8 +1,8 @@
 from mypy.plugin import MethodContext
-from mypy.types import AnyType, Instance, ProperType, TypeOfAny, get_proper_type
+from mypy.types import AnyType, Instance, LiteralType, ProperType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 
@@ -11,6 +11,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
         return ctx.default_return_type
+    model_cls = django_model.cls
 
     # Expected formal arguments for filter methods are `*args` and `**kwargs`. We'll only typecheck
     # `**kwargs`, which means that `arg_names[1]` is what we're interested in.
@@ -21,6 +22,24 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
         if lookup_kwarg is None:
             continue
         provided_type = get_proper_type(provided_type)
+
+        if lookup_kwarg.endswith("__isnull"):
+            is_true_literal = isinstance(provided_type, LiteralType)
+
+            if is_true_literal:
+                lookup = lookup_kwarg[:-8]
+
+                try:
+                    field, _ = django_context.resolve_lookup_into_field(model_cls, lookup)
+                except (LookupsAreUnsupported, Exception):
+                    field = None
+
+                if field is not None and not getattr(field, "null", False):
+                    ctx.api.fail(
+                        f'Filed "{field.name}" does not allow NULL;'
+                        f'using "__isnull=True" will always return an empty queryset.',
+                        ctx.context,
+                    )
         if isinstance(provided_type, Instance) and provided_type.type.has_base(
             fullnames.COMBINABLE_EXPRESSION_FULLNAME
         ):
