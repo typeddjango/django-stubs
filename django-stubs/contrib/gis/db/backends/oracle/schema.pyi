@@ -7,7 +7,6 @@ from django.db.models.fields import Field
 class OracleGISSchemaEditor(DatabaseSchemaEditor):
     sql_add_geometry_metadata: str
     sql_add_spatial_index: str
-    sql_drop_spatial_index: str
     sql_clear_geometry_table_metadata: str
     sql_clear_geometry_field_metadata: str
     geometry_sql: Any

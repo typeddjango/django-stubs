@@ -40,7 +40,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     only_supports_unbounded_with_preceding_and_following: bool
     supports_aggregate_filter_clause: bool
     supported_explain_formats: set[str]
-    validates_explain_options: bool
     supports_deferrable_unique_constraints: bool
     has_json_operators: bool
     json_key_contains_list_matching_requires_list: bool
@@ -60,13 +59,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_16(self) -> bool: ...
     @cached_property
     def is_postgresql_17(self) -> bool: ...
-    has_brin_autosummarize: bool
-    has_websearch_to_tsquery: bool
-    supports_table_partitions: bool
     supports_covering_indexes: bool
-    supports_covering_gist_indexes: bool
     supports_non_deterministic_collations: bool
-    supports_alternate_collation_providers: bool
     can_return_rows_from_update: bool
     supports_aggregate_order_by_clause: bool
     @property

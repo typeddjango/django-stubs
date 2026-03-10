@@ -109,7 +109,6 @@ class BaseDatabaseFeatures:
     time_cast_precision: int
     create_test_procedure_without_params_sql: str | None
     create_test_procedure_with_int_param_sql: str | None
-    create_test_table_with_composite_primary_key: str | None
     supports_callproc_kwargs: bool
     supported_explain_formats: set[str]
     supports_default_in_lead_lag: bool
