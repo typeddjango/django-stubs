@@ -15,6 +15,7 @@ from typing_extensions import Self
 RAISE_ERROR: object
 host_validation_re: Pattern[str]
 
+@type_check_only
 class _PostDataProtocol(Protocol):
     def read(self, num_bytes: int | None = ..., /) -> bytes: ...
     def readline(self, limit: int | None = ..., /) -> bytes: ...
