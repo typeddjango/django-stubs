@@ -8,7 +8,9 @@
       class Book(models.Model):
         author = models.ForeignKey(Author, on_delete=models.CASCADE)
 
-      Book.objects.filter(author__name__isnull==False) # E: Field "name" does not allow NULL
+      Book.objects.filter(author__name__isnull==False)
+  out:  |
+      main:9: error: Field "name" does not allow NULL
 
 - case: filter_isnull_on_non_nullable_field
   main: |
