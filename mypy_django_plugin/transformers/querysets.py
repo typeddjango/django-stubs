@@ -12,6 +12,7 @@ from django.db.models.fields.related_descriptors import (
     ReverseOneToOneDescriptor,
 )
 from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.lookups import Transform
 from django.db.models.sql.query import Query
 from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
@@ -912,9 +913,18 @@ def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts:
         return
 
     try:
-        Query(model_cls).names_to_path(parts, model_cls._meta, fail_on_missing=True)
+        _, final_field, _, remainder = Query(model_cls).names_to_path(parts, model_cls._meta)
     except FieldError as exc:
         ctx.api.fail(exc.args[0], ctx.context)
+        return
+
+    if remainder:
+        # Check if the trailing part is a valid transform (e.g. __year, __month) on the field.
+        # Transforms are allowed in order_by, but lookups (e.g. __exact) are not.
+        lookup_cls = final_field.get_lookups().get(remainder[0])
+        if lookup_cls is None or not issubclass(lookup_cls, Transform):
+            msg = f"Cannot resolve keyword '{remainder[0]}' into field or transform on '{final_field.name}'."
+            ctx.api.fail(msg, ctx.context)
 
 
 def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> MypyType:

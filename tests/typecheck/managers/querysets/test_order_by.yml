@@ -85,7 +85,7 @@
         Article.objects.order_by("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
 
         # Invalid chained lookup
-        Article.objects.order_by("author__nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: article, email, id, name  [misc]
+        Article.objects.order_by("author__nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field or transform on 'author'.  [misc]
 
         # Descending invalid
         Article.objects.order_by("-nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
@@ -100,7 +100,7 @@
 
         # Literal typed invalid FK traversal
         field3: Literal["author__nonexistent"] = "author__nonexistent"
-        Article.objects.order_by(field3)  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: article, email, id, name  [misc]
+        Article.objects.order_by(field3)  # E: Cannot resolve keyword 'nonexistent' into field or transform on 'author'.  [misc]
 
         # earliest / latest with invalid fields
         Article.objects.earliest("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
@@ -112,10 +112,10 @@
             await Article.objects.alatest("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
 
         # Lookup suffix on a valid field — __exact is a lookup, not a traversal
-        Article.objects.order_by("title__exact")  # E: Cannot resolve keyword 'exact' into field. Join on 'title' not permitted.  [misc]
+        Article.objects.order_by("title__exact")  # E: Cannot resolve keyword 'exact' into field or transform on 'title'.  [misc]
 
         # Invalid field at depth > 2
-        Article.objects.order_by("author__name__nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Join on 'name' not permitted.  [misc]
+        Article.objects.order_by("author__name__nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field or transform on 'name'.  [misc]
 
         # values() then order_by with invalid field
         Article.objects.values("title").order_by("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
@@ -134,3 +134,26 @@
                     content = models.TextField()
                     published = models.BooleanField(default=False)
                     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="article")
+
+-   case: order_by_with_field_transforms
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article
+
+        Article.objects.order_by("created__year", "created__month")
+        Article.objects.order_by("-created__year")
+        Article.objects.order_by("author__created__year")
+        Article.objects.values("created__month", "created__year").order_by("created__year")
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Author(models.Model):
+                    created = models.DateTimeField(auto_now_add=True)
+
+                class Article(models.Model):
+                    created = models.DateTimeField(auto_now_add=True)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
