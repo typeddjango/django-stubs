@@ -9,6 +9,7 @@ from django.template.engine import Engine
 from django.template.library import Library
 from django.template.loaders.base import Loader
 from django.utils.safestring import SafeString
+from typing_extensions import override
 
 FILTER_SEPARATOR: str
 FILTER_ARGUMENT_SEPARATOR: str
@@ -106,6 +107,7 @@ class Lexer:
 class DebugLexer(Lexer):
     template_string: str
     verbatim: bool | str
+    @override
     def tokenize(self) -> list[Token]: ...
 
 class Parser:

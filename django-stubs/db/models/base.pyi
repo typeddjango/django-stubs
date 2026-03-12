@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Collection, Iterable, Sequence
 from typing import Any, ClassVar, Final, TypeVar, overload
 
@@ -7,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist, ObjectNotUpdated, Validat
 from django.db.models import BaseConstraint, Field, QuerySet
 from django.db.models.manager import Manager
 from django.db.models.options import Options
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 _Self = TypeVar("_Self", bound=Model)
 
@@ -53,7 +54,11 @@ class Model(metaclass=ModelBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     @classmethod
     def from_db(cls, db: str | None, field_names: Collection[str], values: Collection[Any]) -> Self: ...
-    def __getstate__(self) -> dict: ...
+    if sys.version_info >= (3, 11):
+        @override
+        def __getstate__(self) -> dict: ...
+    else:
+        def __getstate__(self) -> dict: ...
     def _get_pk_val(self, meta: Options[Self] | None = None) -> str: ...
     def get_deferred_fields(self) -> set[str]: ...
     def refresh_from_db(

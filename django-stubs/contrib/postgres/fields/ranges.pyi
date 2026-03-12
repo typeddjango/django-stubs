@@ -8,6 +8,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.lookups import PostgresOperatorLookup
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range  # type: ignore[import-untyped]
+from typing_extensions import override
 
 class RangeBoundary(models.Expression):
     lower: str
@@ -33,8 +34,11 @@ class RangeField(CheckPostgresInstalledMixin, models.Field[Any, _RangeT]):
     base_field: type[models.Field]
     range_type: type[_RangeT]
     def get_placeholder(self, value: Unused, compiler: Unused, connection: BaseDatabaseWrapper) -> str: ...
+    @override
     def get_prep_value(self, value: Any) -> Any | None: ...
+    @override
     def to_python(self, value: Any) -> Any: ...
+    @override
     def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
 
 class ContinuousRangeField(RangeField[_RangeT]):
@@ -65,6 +69,7 @@ class DateTimeRangeContains(PostgresOperatorLookup): ...
 
 class RangeContainedBy(PostgresOperatorLookup):
     type_mapping: dict[str, str]
+    @override
     def process_lhs(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
 class FullyLessThan(PostgresOperatorLookup): ...
@@ -75,10 +80,12 @@ class AdjacentToLookup(PostgresOperatorLookup): ...
 
 class RangeStartsWith(models.Transform):
     @property
+    @override
     def output_field(self) -> models.Field: ...
 
 class RangeEndsWith(models.Transform):
     @property
+    @override
     def output_field(self) -> models.Field: ...
 
 class IsEmpty(models.Transform):

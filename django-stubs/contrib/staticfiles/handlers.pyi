@@ -8,6 +8,7 @@ from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.http import HttpRequest
 from django.http.response import FileResponse, HttpResponseBase
+from typing_extensions import override
 
 if sys.version_info >= (3, 11):
     from wsgiref.types import StartResponse, WSGIEnvironment
@@ -30,6 +31,7 @@ class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):  # type: ignore[
     application: WSGIHandler
     base_url: ParseResult
     def __init__(self, application: WSGIHandler) -> None: ...
+    @override
     def __call__(
         self,
         environ: WSGIEnvironment,
@@ -40,6 +42,7 @@ class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):  # type: ign
     application: ASGIHandler
     base_url: ParseResult
     def __init__(self, application: ASGIHandler) -> None: ...
+    @override
     async def __call__(
         self,
         scope: dict[str, Any],

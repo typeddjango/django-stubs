@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Callable, Iterable
 from typing import Any, Protocol, TypeVar, overload, type_check_only
 
@@ -13,7 +14,7 @@ from django.db.models.utils import AltersData
 from django.utils._os import _PathCompatible
 from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 class FieldFile(File, AltersData):
     instance: Model
@@ -21,7 +22,9 @@ class FieldFile(File, AltersData):
     storage: Storage
     name: str | None
     def __init__(self, instance: Model, field: FileField, name: str | None) -> None: ...
+    @override
     def __eq__(self, other: object) -> bool: ...
+    @override
     def __hash__(self) -> int: ...
     file: Any
     @property
@@ -29,17 +32,25 @@ class FieldFile(File, AltersData):
     @property
     def url(self) -> str: ...
     @property
+    @override
     def size(self) -> int: ...
+    @override
     def open(self, mode: str = "rb") -> Self: ...  # type: ignore[override]
     def save(self, name: str, content: File, save: bool = True) -> None: ...
     def delete(self, save: bool = True) -> None: ...
     @property
+    @override
     def closed(self) -> bool: ...
-    def __getstate__(self) -> dict[str, Any]: ...
+    if sys.version_info >= (3, 11):
+        @override
+        def __getstate__(self) -> dict[str, Any]: ...
+    else:
+        def __getstate__(self) -> dict[str, Any]: ...
     def __setstate__(self, state: dict[str, Any]) -> None: ...
 
 class FileDescriptor(DeferredAttribute):
     field: FileField
+    @override
     def __get__(self, instance: Model | None, cls: type[Model] | None = None) -> FieldFile | FileDescriptor: ...
     def __set__(self, instance: Model, value: Any | None) -> None: ...
 
@@ -84,23 +95,30 @@ class FileField(Field[Any, Any]):
     ) -> None: ...
     # class access
     @overload
+    @override
     def __get__(self, instance: None, owner: Any) -> FileDescriptor: ...
     # Model instance access
     @overload
+    @override
     def __get__(self, instance: Model, owner: Any) -> FieldFile: ...
     # non-Model instances
     @overload
+    @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
+    @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
     def generate_filename(self, instance: Model | None, filename: _PathCompatible) -> str: ...
+    @override
     def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
 
 class ImageFileDescriptor(FileDescriptor):
     field: ImageField
+    @override
     def __set__(self, instance: Model, value: str | None) -> None: ...
 
 class ImageFieldFile(ImageFile, FieldFile):
     field: ImageField
+    @override
     def delete(self, save: bool = True) -> None: ...
 
 class ImageField(FileField):
@@ -116,12 +134,16 @@ class ImageField(FileField):
     ) -> None: ...
     # class access
     @overload
+    @override
     def __get__(self, instance: None, owner: Any) -> ImageFileDescriptor: ...
     # Model instance access
     @overload
+    @override
     def __get__(self, instance: Model, owner: Any) -> ImageFieldFile: ...
     # non-Model instances
     @overload
+    @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     def update_dimension_fields(self, instance: Model, force: bool = False, *args: Any, **kwargs: Any) -> None: ...
+    @override
     def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]

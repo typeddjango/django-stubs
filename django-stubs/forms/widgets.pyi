@@ -9,7 +9,7 @@ from django.forms.utils import _DataT, _FilesT
 from django.utils.choices import _Choices
 from django.utils.datastructures import _ListOrTuple
 from django.utils.safestring import SafeString
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 _OptAttrs: TypeAlias = dict[str, Any]
 
@@ -19,7 +19,9 @@ class MediaAsset:
     element_template: str
 
     def __init__(self, path: str, **attributes: Any) -> None: ...
+    @override
     def __eq__(self, other: object) -> bool: ...
+    @override
     def __hash__(self) -> int: ...
     def __html__(self) -> SafeString: ...
     @property
@@ -118,6 +120,7 @@ class PasswordInput(Input):
     input_type: str
     template_name: str
     def __init__(self, attrs: _OptAttrs | None = None, render_value: bool = False) -> None: ...
+    @override
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
 
 class HiddenInput(Input):
@@ -132,9 +135,13 @@ class FileInput(Input):
     input_type: str
     template_name: str
     needs_multipart_form: bool
+    @override
     def format_value(self, value: Any) -> None: ...
+    @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
+    @override
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
+    @override
     def use_required_attribute(self, initial: Any) -> bool: ...
 
 FILE_INPUT_CONTRADICTION: object
@@ -148,8 +155,11 @@ class ClearableFileInput(FileInput):
     def clear_checkbox_name(self, name: str) -> str: ...
     def clear_checkbox_id(self, name: str) -> str: ...
     def is_initial(self, value: File | str | None) -> bool: ...
+    @override
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
+    @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
+    @override
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
 
 class Textarea(Widget):
@@ -196,6 +206,7 @@ class ChoiceWidget(Widget):
     option_inherits_attrs: bool
     choices: _Choices
     def __init__(self, attrs: _OptAttrs | None = None, choices: _Choices = ()) -> None: ...
+    @override
     def subwidgets(self, name: str, value: Any, attrs: _OptAttrs | None = None) -> Iterator[dict[str, Any]]: ...
     def options(self, name: str, value: list[str], attrs: _OptAttrs | None = None) -> Iterator[dict[str, Any]]: ...
     def optgroups(
@@ -211,9 +222,13 @@ class ChoiceWidget(Widget):
         subindex: int | None = None,
         attrs: _OptAttrs | None = None,
     ) -> dict[str, Any]: ...
+    @override
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
+    @override
     def id_for_label(self, id_: str, index: str = "0") -> str: ...
+    @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
+    @override
     def format_value(self, value: Any) -> list[str]: ...  # type: ignore[override]
 
 class Select(ChoiceWidget):
@@ -223,30 +238,39 @@ class Select(ChoiceWidget):
     add_id_index: bool
     checked_attribute: Any
     option_inherits_attrs: bool
+    @override
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
+    @override
     def use_required_attribute(self, initial: Any) -> bool: ...
 
 class NullBooleanSelect(Select):
     def __init__(self, attrs: _OptAttrs | None = None) -> None: ...
+    @override
     def format_value(self, value: Any) -> str: ...  # type: ignore[override]
+    @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> bool | None: ...
 
 class SelectMultiple(Select):
     allow_multiple_selected: bool
+    @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
+    @override
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
 
 class RadioSelect(ChoiceWidget):
     input_type: str
     template_name: str
     option_template_name: str
+    @override
     def id_for_label(self, id_: str, index: str | None = None) -> str: ...
 
 class CheckboxSelectMultiple(RadioSelect):
     input_type: str
     template_name: str
     option_template_name: str
+    @override
     def use_required_attribute(self, initial: Any) -> bool: ...
+    @override
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
 
 class MultiWidget(Widget):
@@ -258,13 +282,19 @@ class MultiWidget(Widget):
         attrs: _OptAttrs | None = None,
     ) -> None: ...
     @property
+    @override
     def is_hidden(self) -> bool: ...
+    @override
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
+    @override
     def id_for_label(self, id_: str) -> str: ...
+    @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> list[Any]: ...
+    @override
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
     def decompress(self, value: Any) -> Any | None: ...
     @property
+    @override
     def needs_multipart_form(self) -> bool: ...  # type: ignore[override]
 
 class SplitDateTimeWidget(MultiWidget):
@@ -279,6 +309,7 @@ class SplitDateTimeWidget(MultiWidget):
         date_attrs: dict[str, str] | None = None,
         time_attrs: dict[str, str] | None = None,
     ) -> None: ...
+    @override
     def decompress(self, value: Any) -> tuple[datetime.date | None, datetime.time | None]: ...
 
 class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
@@ -313,10 +344,15 @@ class SelectDateWidget(Widget):
         months: Mapping[int, str] | None = None,
         empty_label: str | _ListOrTuple[str] | None = None,
     ) -> None: ...
+    @override
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
+    @override
     def format_value(self, value: Any) -> dict[str, str | int | None]: ...  # type: ignore[override]
+    @override
     def id_for_label(self, id_: str) -> str: ...
+    @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> str | None | Any: ...
+    @override
     def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
 
 __all__ = (

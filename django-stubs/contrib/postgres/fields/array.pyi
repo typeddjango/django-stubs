@@ -13,6 +13,7 @@ from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Transform
 from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
+from typing_extensions import override
 
 # __set__ value type
 _ST = TypeVar("_ST")
@@ -58,12 +59,17 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST,
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+    @override
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
     @property
+    @override
     def description(self) -> str: ...  # type: ignore[override]
+    @override
     def cast_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
     def get_placeholder(self, value: Unused, compiler: Unused, connection: BaseDatabaseWrapper) -> str: ...
+    @override
     def get_transform(self, name: str) -> type[Transform] | None: ...
+    @override
     def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
 
 __all__ = ["ArrayField"]

@@ -6,6 +6,7 @@ from django.db.models import Model, QuerySet
 from django.db.models.query import _OrderByFieldName
 from django.http import HttpRequest, HttpResponse
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from typing_extensions import override
 
 _M = TypeVar("_M", bound=Model)
 
@@ -44,6 +45,7 @@ class MultipleObjectMixin(ContextMixin, Generic[_M]):
     def get_context_object_name(self, object_list: _HasModel) -> str: ...
     @overload
     def get_context_object_name(self, object_list: Any) -> str | None: ...
+    @override
     def get_context_data(
         self, *, object_list: _SupportsPagination[_M] | None = ..., **kwargs: Any
     ) -> dict[str, Any]: ...

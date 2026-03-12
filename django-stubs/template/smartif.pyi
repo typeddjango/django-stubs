@@ -1,6 +1,7 @@
 from typing import Any, TypeAlias
 
 from django.template.defaulttags import TemplateLiteral
+from typing_extensions import override
 
 _Token: TypeAlias = list[int] | int | str
 
@@ -23,6 +24,7 @@ class Literal(TokenBase):
     id: str
     value: _Token | None
     def __init__(self, value: _Token | None) -> None: ...
+    @override
     def display(self) -> str: ...
     def eval(self, context: dict[Any, Any]) -> _Token | None: ...
 

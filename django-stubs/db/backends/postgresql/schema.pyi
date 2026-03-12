@@ -4,6 +4,7 @@ from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.postgresql.base import DatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.indexes import Index
+from typing_extensions import override
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     connection: DatabaseWrapper
@@ -18,6 +19,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_procedure: str
     sql_add_identity: str
     sql_drop_indentity: str  # typo in source: `indentity` instead of `identity`
+    @override
     def quote_value(self, value: Any) -> str: ...
+    @override
     def add_index(self, model: type[Model], index: Index, concurrently: bool = False) -> None: ...
+    @override
     def remove_index(self, model: type[Model], index: Index, concurrently: bool = False) -> None: ...

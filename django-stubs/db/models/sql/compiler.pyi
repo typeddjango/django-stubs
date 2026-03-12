@@ -13,6 +13,7 @@ from django.db.models.sql.query import Query
 from django.db.models.sql.subqueries import AggregateQuery, DeleteQuery, InsertQuery, UpdateQuery
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import cached_property
+from typing_extensions import override
 
 _ParamT: TypeAlias = str | int
 
@@ -147,7 +148,9 @@ class SQLInsertCompiler(SQLCompiler):
     def prepare_value(self, field: Any, value: Any) -> Any: ...
     def pre_save_val(self, field: Any, obj: Any) -> Any: ...
     def assemble_as_sql(self, fields: Any, value_rows: Any) -> tuple[list[list[str]], list[list[Any]]]: ...
+    @override
     def as_sql(self) -> list[_AsSqlType]: ...  # type: ignore[override]
+    @override
     def execute_sql(  # type: ignore[override]
         self, returning_fields: Sequence[str] | None = None
     ) -> list[tuple[Any]]: ...  # 1-tuple
@@ -158,20 +161,25 @@ class SQLDeleteCompiler(SQLCompiler):
     def single_alias(self) -> bool: ...
     @cached_property
     def contains_self_reference_subquery(self) -> bool: ...
+    @override
     def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
 
 class SQLUpdateCompiler(SQLCompiler):
     query: UpdateQuery
     returning_fields: Sequence[Any] | None
     returning_params: Sequence[Any]
+    @override
     def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
+    @override
     def execute_sql(self, result_type: Literal["cursor", "no results"]) -> int: ...  # type: ignore[override]
     def execute_returning_sql(self, returning_fields: Sequence[Any] | None) -> list[Sequence[Any]]: ...
+    @override
     def pre_sql_setup(self) -> None: ...  # type: ignore[override]
 
 class SQLAggregateCompiler(SQLCompiler):
     query: AggregateQuery
     col_count: int
+    @override
     def as_sql(self) -> _AsSqlType: ...  # type: ignore[override]
 
 def cursor_iter(

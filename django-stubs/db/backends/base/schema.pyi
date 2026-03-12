@@ -11,7 +11,7 @@ from django.db.models.constraints import BaseConstraint
 from django.db.models.fields import Field
 from django.db.models.indexes import Index
 from django.db.models.sql.compiler import _AsSqlType
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 logger: Logger
 
@@ -62,7 +62,9 @@ class BaseDatabaseSchemaEditor(AbstractContextManager[Any]):
     def __init__(self, connection: BaseDatabaseWrapper, collect_sql: bool = False, atomic: bool = True) -> None: ...
     deferred_sql: Any
     atomic: Any
+    @override
     def __enter__(self) -> Self: ...
+    @override
     def __exit__(
         self,
         exc_type: type[BaseException] | None,

@@ -5,6 +5,7 @@ from typing import Any
 from wsgiref import simple_server
 
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
+from typing_extensions import override
 
 def get_internal_wsgi_application() -> WSGIHandler: ...
 def is_broken_pipe_error() -> bool: ...
@@ -14,6 +15,7 @@ class WSGIServer(simple_server.WSGIServer):
     address_family: Any
     allow_reuse_address: Any
     def __init__(self, *args: Any, ipv6: bool = ..., allow_reuse_address: bool = ..., **kwargs: Any) -> None: ...
+    @override
     def handle_error(self, request: Any, client_address: Any) -> None: ...
 
 class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
@@ -22,6 +24,7 @@ class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
 
 class ServerHandler(simple_server.ServerHandler):
     def __init__(self, stdin: Any, stdout: Any, stderr: Any, environ: dict[str, Any], **kwargs: Any) -> None: ...
+    @override
     def handle_error(self) -> None: ...
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
@@ -31,12 +34,16 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     rfile: BytesIO
     wfile: BytesIO
     protocol_version: str
+    @override
     def address_string(self) -> str: ...
+    @override
     def log_message(self, format: str, *args: Any) -> None: ...
+    @override
     def get_environ(self) -> dict[str, str]: ...
     raw_requestline: bytes
     requestline: str
     request_version: str
+    @override
     def handle(self) -> None: ...
 
 def run(

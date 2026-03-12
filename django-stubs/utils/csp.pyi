@@ -2,6 +2,7 @@ import sys
 from collections.abc import Collection, Mapping
 
 from django.utils.functional import SimpleLazyObject
+from typing_extensions import override
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum as _StrEnum
@@ -28,6 +29,7 @@ class CSP(_StrEnum):
 
 class LazyNonce(SimpleLazyObject):
     def __init__(self) -> None: ...
+    @override
     def __bool__(self) -> bool: ...
 
 def generate_nonce() -> str: ...

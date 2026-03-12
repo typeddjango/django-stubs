@@ -4,7 +4,7 @@ from typing import Any, Literal, TypeVar
 from django.db.models import Choices, IntegerChoices, Model, TextChoices
 from django.utils.functional import _StrOrPromise, _StrPromise
 from django.utils.translation import gettext_lazy as _
-from typing_extensions import assert_type
+from typing_extensions import assert_type, override
 
 # Choices in a separate model to test that the plugin resolves types correctly.
 from tests.assert_type.db.models import _enums as imported
@@ -117,6 +117,7 @@ def is_suit_a_diamond(suit: Suit) -> str:
 # Choice type that overrides a property and uses `super()` to test the plugin resolve types correctly.
 class ShoutyTextChoices(TextChoices):
     @property
+    @override
     def label(self) -> str:
         return super().label.upper()
 

@@ -4,6 +4,7 @@ from django.contrib.auth.models import Permission, _AnyUser, _User, _UserModel, 
 from django.db.models import QuerySet
 from django.db.models.base import Model
 from django.http.request import HttpRequest
+from typing_extensions import override
 
 UserModel = _UserModel
 
@@ -22,9 +23,11 @@ class BaseBackend:
     async def ahas_perm(self, user_obj: _AnyUser, perm: str, obj: Model | None = ...) -> bool: ...
 
 class ModelBackend(BaseBackend):
+    @override
     def authenticate(
         self, request: HttpRequest | None, username: str | None = ..., password: str | None = ..., **kwargs: Any
     ) -> _User | None: ...
+    @override
     async def aauthenticate(
         self, request: HttpRequest | None, username: str | None = ..., password: str | None = ..., **kwargs: Any
     ) -> _User | None: ...
@@ -43,7 +46,9 @@ class AllowAllUsersModelBackend(ModelBackend): ...
 
 class RemoteUserBackend(ModelBackend):
     create_unknown_user: bool
+    @override
     def authenticate(self, request: HttpRequest | None, remote_user: str) -> _User | None: ...  # type: ignore[override]
+    @override
     async def aauthenticate(self, request: HttpRequest | None, remote_user: str) -> _User | None: ...  # type: ignore[override]
     def clean_username(self, username: str) -> str: ...
     def configure_user(self, request: HttpRequest | None, user: _UserType, created: bool = ...) -> _UserType: ...

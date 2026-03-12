@@ -17,7 +17,7 @@ from django.forms.forms import BaseForm, Form
 from django.forms.formsets import BaseFormSet
 from django.http.request import HttpRequest
 from django.utils.datastructures import _IndexableCollection
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, override
 
 _T = TypeVar("_T")
 
@@ -48,6 +48,7 @@ class NestedObjects(Collector):
     protected: set[Model]
     model_objs: defaultdict[str, set[Model]]
     def add_edge(self, source: Model | None, target: Model) -> None: ...
+    @override
     def collect(  # type: ignore[override]
         self,
         objs: _IndexableCollection[Model | None],
@@ -60,6 +61,7 @@ class NestedObjects(Collector):
         keep_parents: bool = ...,
         fail_on_restricted: bool = ...,
     ) -> None: ...
+    @override
     def related_objects(
         self, related_model: type[Model], related_fields: Iterable[Field], objs: _IndexableCollection[Model]
     ) -> QuerySet[Model]: ...
@@ -67,6 +69,7 @@ class NestedObjects(Collector):
     def nested(self, format_callback: None = None) -> list[Model]: ...
     @overload
     def nested(self, format_callback: Callable[[Model], _T]) -> list[_T]: ...
+    @override
     def can_fast_delete(self, *args: Unused, **kwargs: Unused) -> Literal[False]: ...
 
 @type_check_only

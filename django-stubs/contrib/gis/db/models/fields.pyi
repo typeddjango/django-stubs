@@ -18,6 +18,7 @@ from django.db.models.expressions import Combinable, Expression
 from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping
 from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
+from typing_extensions import override
 
 # __set__ value type
 _ST = TypeVar("_ST")
@@ -68,6 +69,7 @@ class BaseSpatialField(Field[_ST, _GT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+    @override
     def db_type(self, connection: Any) -> Any: ...
     def spheroid(self, connection: Any) -> Any: ...
     def units(self, connection: Any) -> Any: ...
@@ -75,8 +77,10 @@ class BaseSpatialField(Field[_ST, _GT]):
     def geodetic(self, connection: Any) -> Any: ...
     def get_placeholder(self, value: Any, compiler: Any, connection: Any) -> Any: ...
     def get_srid(self, obj: Any) -> Any: ...
+    @override
     def get_db_prep_value(self, value: Any, connection: Any, *args: Any, **kwargs: Any) -> Any: ...
     def get_raster_prep_value(self, value: Any, is_candidate: Any) -> Any: ...
+    @override
     def get_prep_value(self, value: Any) -> Any: ...
 
 class GeometryField(BaseSpatialField[_ST, _GT]):
@@ -114,7 +118,9 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+    @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
+    @override
     def formfield(  # type: ignore[override]
         self,
         *,
@@ -181,10 +187,14 @@ class GeometryCollectionField(GeometryField[_ST, _GT]):
     form_class: type[forms.GeometryCollectionField]
 
 class ExtentField(Field[Any, Any]):
+    @override
     def get_internal_type(self) -> str: ...
 
 class RasterField(BaseSpatialField):
+    @override
     def db_type(self, connection: Any) -> Any: ...
     def from_db_value(self, value: Any, expression: Any, connection: Any) -> Any: ...
+    @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
+    @override
     def get_transform(self, name: Any) -> Any: ...

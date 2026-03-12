@@ -3,6 +3,7 @@ from typing import Any
 from uuid import UUID
 
 from django.db.backends.base.operations import BaseDatabaseOperations
+from typing_extensions import override
 
 class DatabaseOperations(BaseDatabaseOperations):
     jsonfield_datatype_values: frozenset[str]
@@ -15,4 +16,5 @@ class DatabaseOperations(BaseDatabaseOperations):
     ) -> Callable: ...
     def convert_uuidfield_value(self, value: Any, expression: Any, connection: Any) -> UUID | None: ...
     def convert_booleanfield_value(self, value: Any, expression: Any, connection: Any) -> Any: ...
+    @override
     def format_json_path_numeric_index(self, num: int) -> str: ...

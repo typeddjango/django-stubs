@@ -2,6 +2,7 @@
     main: |
         from django.views.generic import DetailView
         from django.db.models import QuerySet
+        from typing_extensions import override
 
         from myapp.models import MyModel
 
@@ -9,6 +10,7 @@
             model = MyModel
             queryset = MyModel.objects.all()
 
+            @override
             def get_queryset(self) -> QuerySet[MyModel]:
                 self.get_object(super().get_queryset())
                 return super().get_queryset()
@@ -27,6 +29,7 @@
     main: |
         from django.views.generic import DetailView
         from django.db.models import QuerySet
+        from typing_extensions import override
 
         from myapp.models import MyModel, Other
 
@@ -34,6 +37,7 @@
             model = MyModel
             queryset = MyModel.objects.all()
 
+            @override
             def get_queryset(self) -> QuerySet[MyModel]:
                 self.get_object(super().get_queryset())
                 return super().get_queryset()
@@ -49,7 +53,7 @@
                 class Other(models.Model):
                     ...
     out: |
-      main:7: error: Incompatible types in assignment (expression has type "type[MyModel]", base class "SingleObjectMixin" defined the type as "type[Other]")  [assignment]
-      main:8: error: Incompatible types in assignment (expression has type "QuerySet[MyModel, MyModel]", base class "SingleObjectMixin" defined the type as "QuerySet[Other, Other] | None")  [assignment]
-      main:10: error: Return type "QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "QuerySet[Other, Other]" in supertype "django.views.generic.detail.SingleObjectMixin"  [override]
-      main:12: error: Incompatible return value type (got "QuerySet[Other, Other]", expected "QuerySet[MyModel, MyModel]")  [return-value]
+      main:8: error: Incompatible types in assignment (expression has type "type[MyModel]", base class "SingleObjectMixin" defined the type as "type[Other]")  [assignment]
+      main:9: error: Incompatible types in assignment (expression has type "QuerySet[MyModel, MyModel]", base class "SingleObjectMixin" defined the type as "QuerySet[Other, Other] | None")  [assignment]
+      main:12: error: Return type "QuerySet[MyModel, MyModel]" of "get_queryset" incompatible with return type "QuerySet[Other, Other]" in supertype "django.views.generic.detail.SingleObjectMixin"  [override]
+      main:14: error: Incompatible return value type (got "QuerySet[Other, Other]", expected "QuerySet[MyModel, MyModel]")  [return-value]

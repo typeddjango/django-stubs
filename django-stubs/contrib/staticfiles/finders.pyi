@@ -3,6 +3,7 @@ from typing import Any, Literal, overload
 
 from django.core.checks.messages import CheckMessage
 from django.core.files.storage import FileSystemStorage, Storage
+from typing_extensions import override
 
 searched_locations: Any
 
@@ -19,10 +20,13 @@ class FileSystemFinder(BaseFinder):
     storages: dict[str, Any]
     def __init__(self, app_names: Sequence[str] | None = None, *args: Any, **kwargs: Any) -> None: ...
     @overload
+    @override
     def find(self, path: str, find_all: Literal[False] = False) -> str | None: ...
     @overload
+    @override
     def find(self, path: str, find_all: Literal[True]) -> list[str]: ...
     def find_location(self, root: str, path: str, prefix: str | None = None) -> str | None: ...
+    @override
     def list(self, ignore_patterns: Iterable[str] | None) -> Iterable[Any]: ...
 
 class AppDirectoriesFinder(BaseFinder):
@@ -32,19 +36,25 @@ class AppDirectoriesFinder(BaseFinder):
     storages: dict[str, FileSystemStorage]
     def __init__(self, app_names: Iterable[str] | None = None, *args: Any, **kwargs: Any) -> None: ...
     @overload
+    @override
     def find(self, path: str, find_all: Literal[False] = False) -> str | None: ...
     @overload
+    @override
     def find(self, path: str, find_all: Literal[True]) -> list[str]: ...
     def find_in_app(self, app: str, path: str) -> str | None: ...
+    @override
     def list(self, ignore_patterns: Iterable[str] | None) -> Iterable[Any]: ...
 
 class BaseStorageFinder(BaseFinder):
     storage: Storage | None
     def __init__(self, storage: Storage | None = None, *args: Any, **kwargs: Any) -> None: ...
     @overload
+    @override
     def find(self, path: str, find_all: Literal[False] = False) -> str | None: ...
     @overload
+    @override
     def find(self, path: str, find_all: Literal[True]) -> list[str]: ...
+    @override
     def list(self, ignore_patterns: Iterable[str] | None) -> Iterable[Any]: ...
 
 class DefaultStorageFinder(BaseStorageFinder):

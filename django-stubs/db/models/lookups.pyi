@@ -8,6 +8,7 @@ from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamT
 from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
+from typing_extensions import override
 
 _T = TypeVar("_T")
 
@@ -23,7 +24,9 @@ class Lookup(Expression, Generic[_T]):
     def batch_process_rhs(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, rhs: OrderedSet | None = None
     ) -> tuple[list[str], list[str]]: ...
+    @override
     def get_source_expressions(self) -> list[Expression]: ...
+    @override
     def set_source_expressions(self, new_exprs: Sequence[Combinable | Expression]) -> None: ...
     def get_prep_lookup(self) -> Any: ...
     def get_prep_lhs(self) -> Any: ...
@@ -35,10 +38,13 @@ class Lookup(Expression, Generic[_T]):
     def rhs_is_direct_value(self) -> bool: ...
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
     @cached_property
+    @override
     def output_field(self) -> BooleanField: ...
     @property
+    @override
     def identity(self) -> tuple[type[Lookup], Any, Any]: ...
     @cached_property
+    @override
     def allowed_default(self) -> bool: ...  # type: ignore[override]
 
 class Transform(RegisterLookupMixin, Func):
@@ -48,6 +54,7 @@ class Transform(RegisterLookupMixin, Func):
     def get_bilateral_transforms(self) -> list[type[Transform]]: ...
 
 class BuiltinLookup(Lookup[_T]):
+    @override
     def process_lhs(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, lhs: Expression | None = None
     ) -> _AsSqlType: ...
@@ -75,6 +82,7 @@ class PostgresOperatorLookup(Lookup[_T]):
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup[_T]): ...
 
 class IExact(BuiltinLookup[_T]):
+    @override
     def process_rhs(self, qn: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
 class GreaterThan(FieldGetDbPrepValueMixin, BuiltinLookup[_T]): ...
@@ -102,6 +110,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup[_T]):
 
 class PatternLookup(BuiltinLookup[str]):
     param_pattern: str
+    @override
     def process_rhs(self, qn: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
 class Contains(PatternLookup): ...
@@ -121,18 +130,23 @@ class YearLookup(Lookup):
     def get_bound_params(self, start: Any, finish: Any) -> Any: ...
 
 class YearExact(YearLookup, Exact[_T]):
+    @override
     def get_bound_params(self, start: Any, finish: Any) -> tuple[Any, Any]: ...
 
 class YearGt(YearLookup, GreaterThan[_T]):
+    @override
     def get_bound_params(self, start: Any, finish: Any) -> tuple[Any]: ...
 
 class YearGte(YearLookup, GreaterThanOrEqual[_T]):
+    @override
     def get_bound_params(self, start: Any, finish: Any) -> tuple[Any]: ...
 
 class YearLt(YearLookup, LessThan[_T]):
+    @override
     def get_bound_params(self, start: Any, finish: Any) -> tuple[Any]: ...
 
 class YearLte(YearLookup, LessThanOrEqual[_T]):
+    @override
     def get_bound_params(self, start: Any, finish: Any) -> tuple[Any]: ...
 
 class UUIDTextMixin:

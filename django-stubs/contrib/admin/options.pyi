@@ -33,7 +33,7 @@ from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
-from typing_extensions import Self, TypedDict
+from typing_extensions import Self, TypedDict, override
 
 IS_POPUP_VAR: str
 TO_FIELD_VAR: str
@@ -184,6 +184,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     @property
     def urls(self) -> list[URLPattern]: ...
     @property
+    @override
     def media(self) -> Media: ...
     def get_model_perms(self, request: HttpRequest) -> dict[str, bool]: ...
     def get_form(
@@ -314,6 +315,7 @@ class InlineModelAdmin(BaseModelAdmin[_ChildModelT], Generic[_ChildModelT, _Pare
     has_registered_model: bool
     def __init__(self, parent_model: type[_ParentModelT], admin_site: AdminSite) -> None: ...
     @property
+    @override
     def media(self) -> Media: ...
     def get_extra(self, request: HttpRequest, obj: _ParentModelT | None = ..., **kwargs: Any) -> int: ...
     def get_min_num(self, request: HttpRequest, obj: _ParentModelT | None = ..., **kwargs: Any) -> int | None: ...
@@ -321,10 +323,15 @@ class InlineModelAdmin(BaseModelAdmin[_ChildModelT], Generic[_ChildModelT, _Pare
     def get_formset(
         self, request: HttpRequest, obj: _ParentModelT | None = ..., **kwargs: Any
     ) -> type[BaseInlineFormSet[_ChildModelT, _ParentModelT, forms.ModelForm[_ChildModelT]]]: ...
+    @override
     def get_queryset(self, request: HttpRequest) -> QuerySet[_ChildModelT]: ...
+    @override
     def has_add_permission(self, request: HttpRequest, obj: _ParentModelT | None) -> bool: ...  # type: ignore[override]
+    @override
     def has_change_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore[override]
+    @override
     def has_delete_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore[override]
+    @override
     def has_view_permission(self, request: HttpRequest, obj: _ParentModelT | None = ...) -> bool: ...  # type: ignore[override]
 
 class StackedInline(InlineModelAdmin[_ChildModelT, _ParentModelT]):

@@ -6,12 +6,14 @@ from django.db.models.expressions import Expression, Func
 from django.db.models.fields import Field
 from django.db.models.lookups import Exact, GreaterThan, GreaterThanOrEqual, In, IsNull, LessThan, LessThanOrEqual
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from typing_extensions import override
 
 class Tuple(Func):
     function: str
     output_field: Field
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[Expression]: ...
+    @override
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
 class TupleLookupMixin:
