@@ -446,6 +446,7 @@ See mypy section on [generic classes subclasses](https://mypy.readthedocs.io/en/
 - [`djangorestframework-stubs`](https://github.com/typeddjango/djangorestframework-stubs) - Stubs for Django REST Framework.
 - [`pytest-mypy-plugins`](https://github.com/typeddjango/pytest-mypy-plugins) - `pytest` plugin that we use for testing `mypy` stubs and plugins.
 - [`wemake-django-template`](https://github.com/wemake-services/wemake-django-template) - Create new typed Django projects in seconds.
+- [`django-modern-rest`](https://github.com/wemake-services/django-modern-rest) - Modern REST framework for Django with everything properly typed.
 
 ## Contributing
 
