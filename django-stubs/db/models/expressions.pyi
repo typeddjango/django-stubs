@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from decimal import Decimal
 from enum import Enum
 from typing import Any, ClassVar, Generic, Literal, TypeAlias, TypeVar
@@ -16,12 +16,13 @@ from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import cached_property
 from typing_extensions import Never, Self, override
 
+_Numeric: TypeAlias = float | Decimal
+_ExprListCompatible: TypeAlias = Sequence[BaseExpression | F | str] | BaseExpression | F | str
+
 class SQLiteNumericMixin:
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class OutputFieldIsNoneError(FieldError): ...
-
-_Numeric: TypeAlias = float | Decimal
 
 class Combinable:
     ADD: str
@@ -246,9 +247,7 @@ class ExpressionList(Func):
 
 class OrderByList(ExpressionList):
     @classmethod
-    def from_param(
-        cls, context: str, param: str | BaseExpression | Sequence[str | BaseExpression] | None
-    ) -> Self | None: ...
+    def from_param(cls, context: str, param: _ExprListCompatible | None) -> Self | None: ...
 
 _E = TypeVar("_E", bound=Q | Combinable)
 
@@ -339,12 +338,12 @@ class Window(SQLiteNumericMixin, Expression):
     contains_aggregate: bool
     contains_over_clause: bool
     partition_by: ExpressionList | None
-    order_by: ExpressionList | None
+    order_by: OrderByList | None
     def __init__(
         self,
         expression: BaseExpression,
-        partition_by: str | Iterable[BaseExpression | F] | F | BaseExpression | None = None,
-        order_by: Sequence[BaseExpression | F | str] | BaseExpression | F | str | None = None,
+        partition_by: _ExprListCompatible | None = None,
+        order_by: _ExprListCompatible | None = None,
         frame: WindowFrame | None = None,
         output_field: Field | None = None,
     ) -> None: ...
