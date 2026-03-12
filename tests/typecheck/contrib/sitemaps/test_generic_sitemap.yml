@@ -4,15 +4,18 @@
         from django.contrib.sitemaps.views import sitemap
         from django.db.models import QuerySet
         from django.urls import path, reverse
+        from typing_extensions import override
         from myapp.models import Offer
 
         class OfferSitemap(Sitemap[Offer]):
             priority = 1
             changefreq = "always"
 
+            @override
             def items(self) -> QuerySet[Offer]:
                 return Offer.objects.all()
 
+            @override
             def location(self, item: Offer) -> str:
                 return reverse(
                     "myapp:detail-offer",
@@ -23,8 +26,11 @@
                 )
 
         class WrongOfferSitemap(Sitemap[Offer]):
+            @override
             def items(self) -> str:
                 return "Yes"
+
+            @override
             def location(self, item: str) -> int:
                 return 1
 
@@ -44,12 +50,12 @@
             ),
         ]
     out: |
-        main:24: error: Return type "str" of "items" incompatible with return type "Iterable[Offer]" in supertype "django.contrib.sitemaps.Sitemap"  [override]
-        main:26: error: Return type "int" of "location" incompatible with return type "str" in supertype "django.contrib.sitemaps.Sitemap"  [override]
-        main:26: error: Argument 1 of "location" is incompatible with supertype "django.contrib.sitemaps.Sitemap"; supertype defines the argument type as "Offer"  [override]
-        main:26: note: This violates the Liskov substitution principle
-        main:26: note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
-        main:40: error: Argument 1 to "GenericSitemap" has incompatible type "dict[str, list[int]]"; expected "Mapping[str, datetime | QuerySet[Offer, Offer] | str]"  [arg-type]
+        main:28: error: Return type "str" of "items" incompatible with return type "Iterable[Offer]" in supertype "django.contrib.sitemaps.Sitemap"  [override]
+        main:32: error: Return type "int" of "location" incompatible with return type "str" in supertype "django.contrib.sitemaps.Sitemap"  [override]
+        main:32: error: Argument 1 of "location" is incompatible with supertype "django.contrib.sitemaps.Sitemap"; supertype defines the argument type as "Offer"  [override]
+        main:32: note: This violates the Liskov substitution principle
+        main:32: note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
+        main:46: error: Argument 1 to "GenericSitemap" has incompatible type "dict[str, list[int]]"; expected "Mapping[str, datetime | QuerySet[Offer, Offer] | str]"  [arg-type]
 
     installed_apps:
         - myapp
@@ -67,13 +73,16 @@
     main: |
         from django.contrib.sitemaps import Sitemap
         from django.urls import reverse
+        from typing_extensions import override
 
         class StaticViewSitemap(Sitemap[str]):
             priority = 1
             changefreq = "always"
 
+            @override
             def items(self) -> list[str]:
                 return ["home", "about", "contact", "recommendations", "privacy-policy", "blog"]
 
+            @override
             def location(self, item: str) -> str:
                 return reverse(item)

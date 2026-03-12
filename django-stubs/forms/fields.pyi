@@ -14,7 +14,7 @@ from django.forms.widgets import Widget
 from django.utils.choices import CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 # Problem: attribute `widget` is always of type `Widget` after field instantiation.
 # However, on class level it can be set to `Type[Widget]` too.
@@ -94,7 +94,9 @@ class CharField(Field):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def to_python(self, value: Any | None) -> str | None: ...
+    @override
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class IntegerField(Field):
@@ -120,7 +122,9 @@ class IntegerField(Field):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def to_python(self, value: Any | None) -> int | None: ...
+    @override
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class FloatField(IntegerField):
@@ -142,8 +146,11 @@ class FloatField(IntegerField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def to_python(self, value: Any | None) -> float | None: ...  # type: ignore[override]
+    @override
     def validate(self, value: float) -> None: ...
+    @override
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class DecimalField(IntegerField):
@@ -169,8 +176,11 @@ class DecimalField(IntegerField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def to_python(self, value: Any | None) -> Decimal | None: ...  # type: ignore[override]
+    @override
     def validate(self, value: Decimal) -> None: ...
+    @override
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class BaseTemporalField(Field):
@@ -191,26 +201,35 @@ class BaseTemporalField(Field):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def to_python(self, value: str | None) -> Any | None: ...
     def strptime(self, value: str, format: str) -> Any: ...
 
 class DateField(BaseTemporalField):
+    @override
     def to_python(self, value: None | str | datetime.datetime | datetime.date) -> datetime.date | None: ...
+    @override
     def strptime(self, value: str, format: str) -> datetime.date: ...
 
 class TimeField(BaseTemporalField):
+    @override
     def to_python(self, value: None | str | datetime.time) -> datetime.time | None: ...
+    @override
     def strptime(self, value: str, format: str) -> datetime.time: ...
 
 class DateTimeFormatsIterator:
     def __iter__(self) -> Iterator[str]: ...
 
 class DateTimeField(BaseTemporalField):
+    @override
     def to_python(self, value: None | str | datetime.datetime | datetime.date) -> datetime.datetime | None: ...
+    @override
     def strptime(self, value: str, format: str) -> datetime.datetime: ...
 
 class DurationField(Field):
+    @override
     def prepare_value(self, value: datetime.timedelta | str | None) -> str | None: ...
+    @override
     def to_python(self, value: Any | None) -> datetime.timedelta | None: ...
 
 class RegexField(CharField):
@@ -277,13 +296,19 @@ class FileField(Field):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def to_python(self, data: File | None) -> File | None: ...
+    @override
     def clean(self, data: Any, initial: Any | None = None) -> Any: ...
+    @override
     def bound_data(self, _: Any | None, initial: Any) -> Any: ...
+    @override
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
 
 class ImageField(FileField):
+    @override
     def to_python(self, data: File | None) -> File | None: ...
+    @override
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class URLField(CharField):
@@ -307,15 +332,21 @@ class URLField(CharField):
         label_suffix: str | None = ...,
         assume_scheme: str | None = None,
     ) -> None: ...
+    @override
     def to_python(self, value: Any | None) -> str | None: ...
 
 class BooleanField(Field):
+    @override
     def to_python(self, value: Any | None) -> bool: ...
+    @override
     def validate(self, value: Any) -> None: ...
+    @override
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
 
 class NullBooleanField(BooleanField):
+    @override
     def to_python(self, value: Any | None) -> bool | None: ...  # type: ignore[override]
+    @override
     def validate(self, value: Any) -> None: ...
 
 class ChoiceField(Field):
@@ -340,10 +371,13 @@ class ChoiceField(Field):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def __deepcopy__(self, memo: dict[int, Any]) -> Self: ...
     # Real return type of `to_python` is `str`, but it results in errors when
     # subclassing `ModelChoiceField`: `# type: ignore[override]` is not inherited
+    @override
     def to_python(self, value: Any | None) -> Any: ...
+    @override
     def validate(self, value: Any) -> None: ...
     def valid_value(self, value: Any) -> bool: ...
 
@@ -372,11 +406,15 @@ class TypedChoiceField(ChoiceField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def clean(self, value: Any) -> Any: ...
 
 class MultipleChoiceField(ChoiceField):
+    @override
     def to_python(self, value: Any | None) -> list[str]: ...
+    @override
     def validate(self, value: Any) -> None: ...
+    @override
     def has_changed(self, initial: Collection[Any] | None, data: Collection[Any] | None) -> bool: ...
 
 class TypedMultipleChoiceField(MultipleChoiceField):
@@ -400,7 +438,9 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def clean(self, value: Any) -> Any: ...
+    @override
     def validate(self, value: Any) -> None: ...
 
 class ComboField(Field):
@@ -421,6 +461,7 @@ class ComboField(Field):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def clean(self, value: Any) -> Any: ...
 
 class MultiValueField(Field):
@@ -443,10 +484,14 @@ class MultiValueField(Field):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def __deepcopy__(self, memo: dict[int, Any]) -> Self: ...
+    @override
     def validate(self, value: Any) -> None: ...
+    @override
     def clean(self, value: Any) -> Any: ...
     def compress(self, data_list: Any) -> Any: ...
+    @override
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
 
 class FilePathField(ChoiceField):
@@ -498,6 +543,7 @@ class SplitDateTimeField(MultiValueField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def compress(self, data_list: tuple[datetime.date, datetime.time] | None) -> datetime.datetime | None: ...
 
 class GenericIPAddressField(CharField):
@@ -519,6 +565,7 @@ class GenericIPAddressField(CharField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    @override
     def to_python(self, value: Any) -> str: ...
 
 class SlugField(CharField):
@@ -545,7 +592,9 @@ class SlugField(CharField):
     ) -> None: ...
 
 class UUIDField(CharField):
+    @override
     def prepare_value(self, value: Any | None) -> Any | None: ...
+    @override
     def to_python(self, value: Any) -> UUID | None: ...  # type: ignore[override]
 
 class InvalidJSONInput(str): ...
@@ -557,9 +606,13 @@ class JSONField(CharField):
     encoder: Any
     decoder: Any
     def __init__(self, encoder: Any | None = None, decoder: Any | None = None, **kwargs: Any) -> None: ...
+    @override
     def to_python(self, value: Any) -> Any: ...
+    @override
     def bound_data(self, data: Any, initial: Any) -> Any: ...
+    @override
     def prepare_value(self, value: Any) -> str: ...
+    @override
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
 
 __all__ = (

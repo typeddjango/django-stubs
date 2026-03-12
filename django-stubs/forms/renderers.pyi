@@ -7,6 +7,7 @@ from django.template.backends.django import DjangoTemplates as DjangoTemplatesR
 from django.template.backends.jinja2 import Jinja2 as Jinja2R
 from django.template.base import Template
 from django.utils.functional import cached_property
+from typing_extensions import override
 
 def get_default_renderer() -> BaseRenderer: ...
 
@@ -31,4 +32,5 @@ class Jinja2(EngineMixin, BaseRenderer):
     def backend(self) -> type[Jinja2R]: ...
 
 class TemplatesSetting(BaseRenderer):
+    @override
     def get_template(self, template_name: str) -> Template | None: ...

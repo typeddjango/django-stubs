@@ -9,7 +9,7 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Combinable
 from django.db.models.query_utils import Q
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 class Deferrable(Enum):
     DEFERRED = cast(str, ...)
@@ -52,7 +52,9 @@ class CheckConstraint(BaseConstraint):
         violation_error_code: str | None = None,
         violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
+    @override
     def check(self, model: type[Model], connection: BaseDatabaseWrapper) -> list[CheckMessage]: ...
+    @override
     def validate(
         self, model: type[Model], instance: Model, exclude: set[str] | None = None, using: str = "default"
     ) -> None: ...
@@ -93,8 +95,11 @@ class UniqueConstraint(BaseConstraint):
         violation_error_message: _StrOrPromise | None = None,
     ) -> None: ...
     @property
+    @override
     def contains_expressions(self) -> bool: ...
+    @override
     def check(self, model: type[Model], connection: BaseDatabaseWrapper) -> list[CheckMessage]: ...
+    @override
     def validate(
         self, model: type[Model], instance: Model, exclude: set[str] | None = None, using: str = "default"
     ) -> None: ...

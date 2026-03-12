@@ -12,12 +12,14 @@ from django.forms.fields import _ClassLevelWidgetT
 from django.forms.widgets import Widget
 from django.http.request import HttpRequest
 from django.utils.functional import _StrOrPromise
+from typing_extensions import override
 
 logger: Logger
 UserModel = _UserModel
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name: str
+    @override
     def get_context(self, name: str, value: Any, attrs: dict[str, Any] | None) -> dict[str, Any]: ...
 
 class ReadOnlyPasswordHashField(forms.Field):
@@ -25,7 +27,9 @@ class ReadOnlyPasswordHashField(forms.Field):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
 class UsernameField(forms.CharField):
+    @override
     def to_python(self, value: Any | None) -> Any | None: ...
+    @override
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class SetPasswordMixin(Generic[_UserType]):
@@ -65,6 +69,7 @@ class BaseUserCreationForm(forms.ModelForm[_UserType], Generic[_UserType]):
     password1: forms.Field
     password2: forms.Field
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
+    @override
     def save(self, commit: bool = ...) -> _UserType: ...
 
 class UserCreationForm(BaseUserCreationForm[_UserType]):
@@ -85,6 +90,7 @@ class AuthenticationForm(forms.Form):
     def confirm_login_allowed(self, user: _User) -> None: ...
     def get_user(self) -> _User: ...
     def get_invalid_login_error(self) -> ValidationError: ...
+    @override
     def clean(self) -> dict[str, Any]: ...
 
 class PasswordResetForm(forms.Form):
@@ -133,6 +139,7 @@ class AdminPasswordChangeForm(forms.Form, Generic[_UserType]):
     def __init__(self, user: _UserType, *args: Any, **kwargs: Any) -> None: ...
     def save(self, commit: bool = ...) -> _UserType: ...
     @property
+    @override
     def changed_data(self) -> list[str]: ...
 
 class AdminUserCreationForm(SetUnusablePasswordMixin, UserCreationForm):

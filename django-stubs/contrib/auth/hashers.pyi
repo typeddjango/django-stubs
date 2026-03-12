@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Any
 
 from django.utils.functional import _StrOrPromise
+from typing_extensions import override
 
 UNUSABLE_PASSWORD_PREFIX: str
 UNUSABLE_PASSWORD_SUFFIX_LENGTH: int
@@ -36,7 +37,9 @@ class BasePasswordHasher:
 class PBKDF2PasswordHasher(BasePasswordHasher):
     iterations: int
     digest: Any
+    @override
     def encode(self, password: str, salt: str, iterations: int | None = ...) -> str: ...
+    @override
     def decode(self, encoded: str) -> dict[str, str | int]: ...
 
 class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher): ...
@@ -50,6 +53,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
 class BCryptSHA256PasswordHasher(BasePasswordHasher):
     digest: Any
     rounds: int
+    @override
     def decode(self, encoded: str) -> dict[str, str | int]: ...
 
 class BCryptPasswordHasher(BCryptSHA256PasswordHasher): ...
@@ -59,10 +63,13 @@ class ScryptPasswordHasher(BasePasswordHasher):
     maxmem: int
     parallelism: int
     work_factor: int
+    @override
     def encode(
         self, password: str, salt: str, n: int | None = ..., r: int | None = ..., p: int | None = ...
     ) -> str: ...
+    @override
     def decode(self, encoded: str) -> dict[str, str | int]: ...
 
 class MD5PasswordHasher(BasePasswordHasher):
+    @override
     def decode(self, encoded: str) -> dict[str, str]: ...

@@ -7,6 +7,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
 from django.utils.connection import BaseConnectionHandler
 from django.utils.functional import cached_property
+from typing_extensions import override
 
 DEFAULT_DB_ALIAS: str
 DJANGO_VERSION_PICKLE_KEY: str
@@ -38,9 +39,11 @@ class DatabaseErrorWrapper:
 def load_backend(backend_name: str) -> Any: ...
 
 class ConnectionHandler(BaseConnectionHandler[BaseDatabaseWrapper]):
+    @override
     def configure_settings(self, databases: dict[str, Any] | None) -> dict[str, Any]: ...
     @property
     def databases(self) -> dict[str, dict[str, Any]]: ...
+    @override
     def create_connection(self, alias: str) -> BaseDatabaseWrapper: ...
 
 class ConnectionRouter:

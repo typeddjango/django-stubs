@@ -5,6 +5,7 @@ from types import ModuleType
 from typing import Any, TypeVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
+from typing_extensions import override
 
 from .client import DatabaseClient
 from .creation import DatabaseCreation
@@ -43,6 +44,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 FORMAT_QMARK_REGEX: Any
 
 class SQLiteCursorWrapper(Database.Cursor):
+    @override
     def execute(self, query: str, params: Iterable[Any] | None = None) -> SQLiteCursorWrapper: ...  # type: ignore[override]
+    @override
     def executemany(self, query: str, param_list: Iterable[Iterable[Any]]) -> SQLiteCursorWrapper: ...  # type: ignore[override]
     def convert_query(self, query: str, *, param_names: Any = None) -> str: ...

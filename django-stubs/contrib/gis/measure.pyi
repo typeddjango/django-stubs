@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Any, TypeAlias
 
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 _NUMERIC_TYPES: TypeAlias = int | float | Decimal
 
@@ -13,6 +13,7 @@ class MeasureBase:
     def __init__(self, default_unit: str | None = None, **kwargs: Any) -> None: ...
     standard: Any
     def __getattr__(self, name: str) -> float: ...
+    @override
     def __eq__(self, other: object) -> bool: ...
     def __lt__(self, other: Self) -> bool: ...
     def __le__(self, other: Self) -> bool: ...

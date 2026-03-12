@@ -3,6 +3,7 @@ from typing import Any
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.backends.oracle.base import DatabaseWrapper
 from django.utils.functional import cached_property
+from typing_extensions import override
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     connection: DatabaseWrapper
@@ -50,22 +51,31 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_json_negative_indexing: bool
 
     @cached_property
+    @override
     def django_test_skips(self) -> dict[str, set[str]]: ...  # type: ignore[override]
     @cached_property
+    @override
     def introspected_field_types(self) -> dict[str, str]: ...  # type: ignore[override]
     @cached_property
+    @override
     def test_collations(self) -> dict[str, str | None]: ...  # type: ignore[override]
     @cached_property
+    @override
     def supports_collation_on_charfield(self) -> bool: ...  # type: ignore[override]
     @cached_property
+    @override
     def supports_primitives_in_json_field(self) -> bool: ...  # type: ignore[override]
     @cached_property
+    @override
     def supports_frame_exclusion(self) -> bool: ...  # type: ignore[override]
     @cached_property
+    @override
     def supports_comparing_boolean_expr(self) -> bool: ...  # type: ignore[override]
     @cached_property
     def supports_aggregation_over_interval_types(self) -> bool: ...
     @cached_property
+    @override
     def bare_select_suffix(self) -> str: ...  # type: ignore[override]
     @cached_property
+    @override
     def supports_tuple_lookups(self) -> bool: ...  # type: ignore[override]

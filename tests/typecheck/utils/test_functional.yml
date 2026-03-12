@@ -2,7 +2,7 @@
     main: |
       from django.utils.functional import cached_property
       from typing import ClassVar
-      from typing_extensions import reveal_type
+      from typing_extensions import override, reveal_type
 
       class Foo:
           @cached_property
@@ -22,6 +22,7 @@
       # May be overridden by @property
       class Bar(Foo):
           @property
+          @override
           def attr(self) -> list[str]: ...
 
       # May be overridden by ClassVar
@@ -31,12 +32,14 @@
       # ClassVar may not be overridden by cached_property
       class Baz(Quux):
           @cached_property
+          @override
           def attr(self) -> list[str]: ...  # E: Cannot override writeable attribute with read-only property  [override]
 
 -   case: str_promise_proxy
     main:  |
       from typing_extensions import reveal_type
-      from django.utils.functional import Promise, lazystr, _StrPromise
+      from django.utils.functional import Promise, lazystr
+      from django_stubs_ext import StrOrPromise
 
       s = lazystr("asd")
 
@@ -47,13 +50,13 @@
       reveal_type(s.swapcase)        # N: Revealed type is "def () -> builtins.str"
       reveal_type(s.__getnewargs__)  # N: Revealed type is "def () -> tuple[builtins.str]"
       s.nonsense                     # E: "_StrPromise" has no attribute "nonsense"  [attr-defined]
-      f: _StrPromise | str
+      f: StrOrPromise
       reveal_type(f.format("asd"))   # N: Revealed type is "builtins.str"
       reveal_type(f + "asd")         # N: Revealed type is "builtins.str"
-      reveal_type("asd" + f)         # N: Revealed type is "Any | builtins.str"
+      reveal_type("asd" + f)         # N: Revealed type is "builtins.str"
 
       reveal_type(s + "bar")         # N: Revealed type is "builtins.str"
-      reveal_type("foo" + s)         # N: Revealed type is "Any"
+      reveal_type("foo" + s)         # N: Revealed type is "builtins.str"
       reveal_type(s % "asd")         # N: Revealed type is "builtins.str"
 
       def foo(content: str) -> None:

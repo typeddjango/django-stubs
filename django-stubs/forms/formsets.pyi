@@ -7,6 +7,7 @@ from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList, RenderableFormMixin, _DataT, _FilesT
 from django.forms.widgets import Media, MediaDefiningClass, Widget
 from django.utils.functional import cached_property
+from typing_extensions import override
 
 TOTAL_FORM_COUNT: str
 INITIAL_FORM_COUNT: str
@@ -22,6 +23,7 @@ _F = TypeVar("_F", bound=BaseForm)
 
 class ManagementForm(Form):
     cleaned_data: dict[str, int | None]
+    @override
     def clean(self) -> dict[str, int | None]: ...
 
 class BaseFormSet(Sized, RenderableFormMixin, Generic[_F]):
@@ -64,6 +66,7 @@ class BaseFormSet(Sized, RenderableFormMixin, Generic[_F]):
     ) -> None: ...
     def __iter__(self) -> Iterator[_F]: ...
     def __getitem__(self, index: int) -> _F: ...
+    @override
     def __len__(self) -> int: ...
     def __bool__(self) -> bool: ...
     @cached_property

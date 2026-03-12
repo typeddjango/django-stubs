@@ -9,6 +9,7 @@ from django.db.models.query import _OrderByFieldName
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
+from typing_extensions import override
 
 from .mixins import FieldCacheMixin
 
@@ -104,8 +105,10 @@ class ManyToOneRel(ForeignObjectRel):
         on_delete: Callable[..., Any] | None = None,
     ) -> None: ...
     def get_related_field(self) -> Field: ...
+    @override
     def get_accessor_name(self, model: type[Model] | None = None) -> str: ...
     @property
+    @override
     def identity(self) -> tuple[Any, ...]: ...
 
 class OneToOneRel(ManyToOneRel):
@@ -141,4 +144,5 @@ class ManyToManyRel(ForeignObjectRel):
     ) -> None: ...
     def get_related_field(self) -> Field: ...
     @property
+    @override
     def identity(self) -> tuple[Any, ...]: ...

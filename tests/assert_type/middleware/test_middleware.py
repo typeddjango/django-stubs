@@ -10,6 +10,7 @@ from django.http.response import (
 )
 from django.middleware.common import CommonMiddleware
 from django.middleware.locale import LocaleMiddleware
+from typing_extensions import override
 
 
 class CustomCommonMiddleware(CommonMiddleware):
@@ -44,5 +45,6 @@ class BrokenCustomRedirectFallbackMiddleware(RedirectFallbackMiddleware):
 
 
 class ResponseGoneFallbackMiddleware(RedirectFallbackMiddleware):
+    @override
     def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
         return self.response_gone_class()

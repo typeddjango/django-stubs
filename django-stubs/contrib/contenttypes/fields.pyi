@@ -14,6 +14,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
+from typing_extensions import override
 
 class GenericForeignKey(FieldCacheMixin, Field):
     # django-stubs implementation only fields
@@ -35,12 +36,16 @@ class GenericForeignKey(FieldCacheMixin, Field):
     ) -> None: ...
     name: Any
     model: Any
+    @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
+    @override
     def get_attname_column(self) -> tuple[str, None]: ...  # type: ignore[override]
     @cached_property
     def ct_field_attname(self) -> str: ...
+    @override
     def get_filter_kwargs_for_object(self, obj: Model) -> dict[str, ContentType | None]: ...
     def get_forward_related_filter(self, obj: Model) -> dict[str, int]: ...
+    @override
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
     def get_content_type(
         self,
@@ -52,7 +57,9 @@ class GenericForeignKey(FieldCacheMixin, Field):
     def get_prefetch_querysets(
         self, instances: list[Model] | QuerySet, querysets: list[QuerySet] | None = None
     ) -> tuple[list[Model], Callable[..., Any], Callable[..., Any], bool, str, bool]: ...
+    @override
     def __get__(self, instance: Model | None, cls: type[Model] | None = ...) -> Any | None: ...  # type: ignore[override]
+    @override
     def __set__(self, instance: Model, value: Any | None) -> None: ...
 
 class GenericRel(ForeignObjectRel):
@@ -82,13 +89,20 @@ class GenericRelation(ForeignObject[Any, Any]):
         limit_choices_to: _AllLimitChoicesTo | None = None,
         **kwargs: Any,
     ) -> None: ...
+    @override
     def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
+    @override
     def get_local_related_value(self, instance: Model) -> tuple[Any, ...]: ...
+    @override
     def get_foreign_related_value(self, instance: Model) -> tuple[Any, ...]: ...
+    @override
     def get_path_info(self, filtered_relation: FilteredRelation | None = None) -> list[PathInfo]: ...
+    @override
     def get_reverse_path_info(self, filtered_relation: FilteredRelation | None = None) -> list[PathInfo]: ...
+    @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
     def get_content_type(self) -> ContentType: ...
+    @override
     def get_extra_restriction(self, alias: str | None, remote_alias: str) -> WhereNode: ...
     def bulk_related_objects(self, objs: list[Model], using: str = "default") -> QuerySet: ...
 

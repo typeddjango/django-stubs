@@ -10,7 +10,7 @@ from django.db.models.manager import BaseManager, Manager
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
 from django.utils.functional import cached_property
-from typing_extensions import Never, Self
+from typing_extensions import Never, Self, override
 
 _M = TypeVar("_M", bound=Model)
 _F = TypeVar("_F", bound=Field)
@@ -37,9 +37,11 @@ class ForwardManyToOneDescriptor(Generic[_F]):
         self, instance: Model | None, cls: type[Model] | None = None
     ) -> Model | ForwardManyToOneDescriptor | None: ...
     def __set__(self, instance: Model, value: Model | None) -> None: ...
+    @override
     def __reduce__(self) -> tuple[Callable[..., Any], tuple[type[Model], str]]: ...
 
 class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor[_F]):
+    @override
     def get_object(self, instance: Model) -> Model: ...
 
 class ReverseOneToOneDescriptor(Generic[_From, _To]):
@@ -66,6 +68,7 @@ class ReverseOneToOneDescriptor(Generic[_From, _To]):
     @overload
     def __get__(self, instance: _From, cls: Any | None = None) -> _To: ...
     def __set__(self, instance: _From, value: _To | None) -> None: ...
+    @override
     def __reduce__(self) -> tuple[Callable[..., Any], tuple[type[_To], str]]: ...
 
 class ReverseManyToOneDescriptor(Generic[_To]):
@@ -138,10 +141,12 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_To, _Through]):
     @property
     def through(self) -> type[_Through]: ...
     @cached_property
+    @override
     def related_manager_cls(self) -> type[ManyRelatedManager[_To, _Through]]: ...  # type: ignore[override]
     @overload  # type: ignore[override]
     def __get__(self, instance: None, cls: Any | None = None) -> Self: ...
     @overload
+    @override
     def __get__(self, instance: Model, cls: Any | None = None) -> ManyRelatedManager[_To, _Through]: ...
 
 # Fake class, Django defines 'ManyRelatedManager' inside a function body
@@ -178,30 +183,35 @@ class ManyRelatedManager(Manager[_To], Generic[_To, _Through]):
         clear: bool = ...,
         through_defaults: Mapping[str, Any] | None = ...,
     ) -> None: ...
+    @override
     def create(
         self,
         *,
         through_defaults: Mapping[str, Any] | None = ...,
         **kwargs: Any,
     ) -> _To: ...
+    @override
     async def acreate(
         self,
         *,
         through_defaults: Mapping[str, Any] | None = ...,
         **kwargs: Any,
     ) -> _To: ...
+    @override
     def get_or_create(
         self,
         defaults: Mapping[str, Any] | None = ...,
         through_defaults: Mapping[str, Any] | None = ...,
         **kwargs: Any,
     ) -> tuple[_To, bool]: ...
+    @override
     async def aget_or_create(
         self,
         defaults: Mapping[str, Any] | None = ...,
         through_defaults: Mapping[str, Any] | None = ...,
         **kwargs: Any,
     ) -> tuple[_To, bool]: ...
+    @override
     def update_or_create(
         self,
         defaults: Mapping[str, Any] | None = ...,
@@ -209,6 +219,7 @@ class ManyRelatedManager(Manager[_To], Generic[_To, _Through]):
         through_defaults: Mapping[str, Any] | None = ...,
         **kwargs: Any,
     ) -> tuple[_To, bool]: ...
+    @override
     async def aupdate_or_create(
         self,
         defaults: Mapping[str, Any] | None = ...,

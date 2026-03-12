@@ -14,7 +14,7 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
 from django.db.models.sql.query import Query
 from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import cached_property
-from typing_extensions import Never, Self
+from typing_extensions import Never, Self, override
 
 _Numeric: TypeAlias = float | Decimal
 _ExprListCompatible: TypeAlias = Sequence[BaseExpression | F | str] | BaseExpression | F | str
@@ -153,6 +153,7 @@ class F(_Deconstructible, Combinable):
 
 class Sliced(F):
     def __init__(self, obj: F, subscript: int | slice) -> None: ...
+    @override
     def resolve_expression(
         self,
         query: Any | None = None,
@@ -183,6 +184,7 @@ class Func(SQLiteNumericMixin, Expression):
     source_expressions: list[Expression]
     extra: dict[Any, Any]
     def __init__(self, *expressions: Any, output_field: Field | None = None, **extra: Any) -> None: ...
+    @override
     def as_sql(
         self,
         compiler: SQLCompiler,
@@ -198,6 +200,7 @@ class Value(Expression):
     for_save: bool
     def __init__(self, value: Any, output_field: Field | None = None) -> None: ...
     @property
+    @override
     def empty_result_set_value(self) -> Any: ...
 
 class RawSQL(Expression):
@@ -216,6 +219,7 @@ class Col(Expression):
     contains_column_references: Literal[True]
     possibly_multivalued: Literal[False]
     def __init__(self, alias: str, target: Field, output_field: Field | None = None) -> None: ...
+    @override
     def relabeled_clone(self, relabels: Mapping[str, str]) -> Self: ...
 
 class ColPairs(Expression):
@@ -228,10 +232,12 @@ class ColPairs(Expression):
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[Col]: ...
     def get_cols(self) -> list[Col]: ...
+    @override
     def relabeled_clone(self, relabels: Mapping[str, str]) -> Self: ...
 
 class Ref(Expression):
     def __init__(self, refs: str, source: Expression) -> None: ...
+    @override
     def relabeled_clone(self, relabels: Mapping[str, str]) -> Self: ...
 
 class ExpressionList(Func):
@@ -251,6 +257,7 @@ class ExpressionWrapper(Expression, Generic[_E]):
 
 class NegatedExpression(ExpressionWrapper[_E]):
     def __init__(self, expression: _E) -> None: ...
+    @override
     def __invert__(self) -> _E: ...  # type: ignore[override]
 
 class When(Expression):
@@ -258,6 +265,7 @@ class When(Expression):
     condition: Any
     result: Any
     def __init__(self, condition: Any | None = None, then: Any | None = None, **lookups: Any) -> None: ...
+    @override
     def as_sql(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, template: str | None = None, **extra_context: Any
     ) -> _AsSqlType: ...
@@ -271,6 +279,7 @@ class Case(Expression):
     def __init__(
         self, *cases: Any, default: Any | None = None, output_field: Field | None = None, **extra: Any
     ) -> None: ...
+    @override
     def as_sql(
         self,
         compiler: SQLCompiler,
@@ -291,6 +300,7 @@ class Subquery(BaseExpression, Combinable):
     @property
     def external_aliases(self) -> set[str]: ...
     def get_external_cols(self) -> list[Col]: ...
+    @override
     def as_sql(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, template: str | None = None, **extra_context: Any
     ) -> _AsSqlType: ...
@@ -313,11 +323,14 @@ class OrderBy(Expression):
         nulls_first: bool | None = None,
         nulls_last: bool | None = None,
     ) -> None: ...
+    @override
     def as_sql(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, template: str | None = None, **extra_context: Any
     ) -> _AsSqlType: ...
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
+    @override
     def asc(self) -> None: ...  # type: ignore[override]
+    @override
     def desc(self) -> None: ...  # type: ignore[override]
 
 class Window(SQLiteNumericMixin, Expression):
@@ -334,9 +347,11 @@ class Window(SQLiteNumericMixin, Expression):
         frame: WindowFrame | None = None,
         output_field: Field | None = None,
     ) -> None: ...
+    @override
     def as_sql(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, template: str | None = None
     ) -> _AsSqlType: ...
+    @override
     def as_sqlite(  # type: ignore[override]
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper
     ) -> _AsSqlType: ...

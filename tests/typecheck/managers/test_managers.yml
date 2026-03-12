@@ -460,16 +460,18 @@
     installed_apps:
         - myapp
     out: |
-        myapp/models:5: error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "django.db.models.manager.Manager"  [override]
-        myapp/models:6: error: Incompatible return value type (got "_T", expected "MyModel")  [return-value]
+        myapp/models:7: error: Return type "MyModel" of "create" incompatible with return type "_T" in supertype "django.db.models.manager.Manager"  [override]
+        myapp/models:8: error: Incompatible return value type (got "_T", expected "MyModel")  [return-value]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
                 from typing import Any
                 from django.db import models
-                class MyModelManager(models.Manager):
+                from typing_extensions import override
 
+                class MyModelManager(models.Manager):
+                    @override
                     def create(self, **kwargs: Any) -> 'MyModel':
                         return super().create(**kwargs)
 
@@ -490,8 +492,10 @@
             content: |
                 from typing import Any
                 from django.db import models
-                class MyModelManager(models.Manager['MyModel']):
+                from typing_extensions import override
 
+                class MyModelManager(models.Manager['MyModel']):
+                    @override
                     def create(self, **kwargs: Any) -> 'MyModel':
                         return super().create(**kwargs)
 

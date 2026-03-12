@@ -9,6 +9,7 @@ from django.forms.renderers import BaseRenderer
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
+from typing_extensions import override
 
 _DataT: TypeAlias = Mapping[str, Any]  # noqa: PYI047
 
@@ -27,6 +28,7 @@ class RenderableMixin:
     ) -> SafeString: ...
     # This is a lie, but this is how it is supposed to be used,
     # in reallity it is `__str__ = __html__ = render`:
+    @override
     def __str__(self) -> SafeString: ...
     def __html__(self) -> SafeString: ...
 

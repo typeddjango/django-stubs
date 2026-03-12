@@ -6,6 +6,7 @@ from django.http.request import QueryDict
 from django.template.base import FilterExpression, Parser, PartialTemplate, Token
 from django.template.context import Context
 from django.utils.safestring import SafeString
+from typing_extensions import override
 
 from .base import Node, NodeList
 from .library import Library
@@ -172,6 +173,7 @@ def do_for(parser: Parser, token: Token) -> ForNode: ...
 class TemplateLiteral(Literal):
     text: str
     def __init__(self, value: FilterExpression, text: str) -> None: ...
+    @override
     def display(self) -> str: ...
 
 class TemplateIfParser(IfParser):

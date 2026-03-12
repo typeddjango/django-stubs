@@ -3,6 +3,7 @@ from typing import Any, ClassVar
 
 from django.db.models.expressions import BaseExpression, Combinable
 from django.db.models.query import _OrderByFieldName
+from typing_extensions import override
 
 class OrderableAggMixin:
     allow_order_by: ClassVar[bool]
@@ -13,4 +14,5 @@ class OrderableAggMixin:
         order_by: Sequence[_OrderByFieldName] = ...,
         **extra: Any,
     ) -> None: ...
+    @override
     def __init_subclass__(cls, *args: Any, **kwargs: Any) -> None: ...
