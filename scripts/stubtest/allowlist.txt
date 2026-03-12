@@ -138,7 +138,6 @@ django.db.backends.base.base.BaseDatabaseWrapper.features_class
 django.db.backends.base.base.BaseDatabaseWrapper.introspection_class
 django.db.backends.base.base.BaseDatabaseWrapper.ops
 django.db.backends.base.base.BaseDatabaseWrapper.ops_class
-django.db.backends.oracle.base.DatabaseWrapper.ops
 
 # Attributes defaulting to None messing with mypy
 django.contrib.admin.options.InlineModelAdmin.model
