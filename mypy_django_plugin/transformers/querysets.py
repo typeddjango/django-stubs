@@ -535,9 +535,11 @@ def check_valid_prefetch_related_lookup(
     for through_attr in lookup.split(LOOKUP_SEP):
         rel_obj_descriptor = getattr(current_model_cls, through_attr, None)
         if rel_obj_descriptor is None:
+            # If current_model_cls is "self", we cannot use `__name__` and want "self".
+            model_name = getattr(current_model_cls, "__name__", current_model_cls)
             ctx.api.fail(
                 (
-                    f'Cannot find "{through_attr}" on "{current_model_cls.__name__}" object, '
+                    f'Cannot find "{through_attr}" on "{model_name}" object, '
                     f'"{lookup}" is an invalid parameter to "prefetch_related()"'
                 ),
                 ctx.context,
@@ -547,8 +549,10 @@ def check_valid_prefetch_related_lookup(
             from django.contrib.contenttypes.fields import GenericForeignKey
 
             if not isinstance(rel_obj_descriptor, GenericForeignKey):
+                # If current_model_cls is "self", we cannot use `__name__` and want "self".
+                model_name = getattr(current_model_cls, "__name__", current_model_cls)
                 ctx.api.fail(
-                    f'"{through_attr}" on "{current_model_cls.__name__}" is not a GenericForeignKey, '
+                    f'"{through_attr}" on "{model_name}" is not a GenericForeignKey, '
                     f"GenericPrefetch can only be used with GenericForeignKey fields",
                     ctx.context,
                 )
@@ -556,10 +560,10 @@ def check_valid_prefetch_related_lookup(
         elif isinstance(rel_obj_descriptor, ForwardManyToOneDescriptor):
             current_model_cls = rel_obj_descriptor.field.remote_field.model
         elif isinstance(rel_obj_descriptor, ReverseOneToOneDescriptor):
-            current_model_cls = rel_obj_descriptor.related.related_model  # type:ignore[assignment] # Can't be 'self' for non abstract models
+            current_model_cls = rel_obj_descriptor.related.related_model
         elif isinstance(rel_obj_descriptor, ManyToManyDescriptor):
             current_model_cls = (
-                rel_obj_descriptor.rel.related_model if rel_obj_descriptor.reverse else rel_obj_descriptor.rel.model  # type:ignore[assignment] # Can't be 'self' for non abstract models
+                rel_obj_descriptor.rel.related_model if rel_obj_descriptor.reverse else rel_obj_descriptor.rel.model
             )
         elif isinstance(rel_obj_descriptor, ReverseManyToOneDescriptor):
             if contenttypes_installed:
@@ -568,7 +572,7 @@ def check_valid_prefetch_related_lookup(
                 if isinstance(rel_obj_descriptor, ReverseGenericManyToOneDescriptor):
                     current_model_cls = rel_obj_descriptor.rel.model
                     continue
-            current_model_cls = rel_obj_descriptor.rel.related_model  # type:ignore[assignment] # Can't be 'self' for non abstract models
+            current_model_cls = rel_obj_descriptor.rel.related_model
         else:
             if contenttypes_installed:
                 from django.contrib.contenttypes.fields import GenericForeignKey
