@@ -1,14 +1,18 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from mypy.checkmember import analyze_member_access
 from mypy.errorcodes import ATTR_DEFINED
 from mypy.nodes import CallExpr, MemberExpr
-from mypy.plugin import AttributeContext
 from mypy.types import AnyType, Instance, TypeOfAny
 from mypy.types import Type as MypyType
 from mypy.version import __version__ as mypy_version
 
 from mypy_django_plugin.lib import helpers
+
+if TYPE_CHECKING:
+    from mypy.plugin import AttributeContext
 
 mypy_version_info = tuple(map(int, mypy_version.partition("+")[0].split(".")))
 

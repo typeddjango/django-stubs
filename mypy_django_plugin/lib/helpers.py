@@ -1,7 +1,7 @@
-from collections.abc import Iterable, Iterator
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, cast
 
-from django.db.models.base import Model
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
@@ -59,6 +59,9 @@ from typing_extensions import Self
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+
+    from django.db.models.base import Model
     from django.db.models.fields import Field
 
     from mypy_django_plugin.django.context import DjangoContext
@@ -211,7 +214,7 @@ class DjangoModel(NamedTuple):
         return self.typ.type
 
     @classmethod
-    def from_model_type(cls, model_type: Instance, django_context: "DjangoContext") -> Self | None:
+    def from_model_type(cls, model_type: Instance, django_context: DjangoContext) -> Self | None:
         model_info = model_type.type
         is_annotated = is_annotated_model(model_info)
 
@@ -249,7 +252,7 @@ def extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) 
 
 def get_model_info_from_qs_ctx(
     ctx: MethodContext,
-    django_context: "DjangoContext",
+    django_context: DjangoContext,
 ) -> DjangoModel | None:
     """
     Extract DjangoModel details from a queryset/manager `MethodContext`
@@ -411,7 +414,7 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
     return AnyType(TypeOfAny.explicit)
 
 
-def get_field_lookup_exact_type(api: TypeChecker, field: "Field[Any, Any]") -> MypyType:
+def get_field_lookup_exact_type(api: TypeChecker, field: Field[Any, Any]) -> MypyType:
     if isinstance(field, RelatedField | ForeignObjectRel):
         # Not using field.related_model because that may have str value "self"
         lookup_type_class = field.remote_field.model
@@ -487,7 +490,7 @@ def get_current_module(api: TypeChecker) -> MypyFile:
 
 
 def make_oneoff_named_tuple(
-    api: TypeChecker, name: str, fields: "dict[str, MypyType]", extra_bases: list[Instance] | None = None
+    api: TypeChecker, name: str, fields: dict[str, MypyType], extra_bases: list[Instance] | None = None
 ) -> TupleType:
     current_module = get_current_module(api)
     if extra_bases is None:
@@ -498,7 +501,7 @@ def make_oneoff_named_tuple(
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 
 
-def make_tuple(api: "TypeChecker", fields: list[MypyType]) -> TupleType:
+def make_tuple(api: TypeChecker, fields: list[MypyType]) -> TupleType:
     # fallback for tuples is any builtins.tuple instance
     fallback = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.special_form)])
     return TupleType(fields, fallback=fallback)
@@ -545,7 +548,7 @@ def make_typeddict(
     )
 
 
-def resolve_string_attribute_value(attr_expr: Expression, django_context: "DjangoContext") -> str | None:
+def resolve_string_attribute_value(attr_expr: Expression, django_context: DjangoContext) -> str | None:
     if isinstance(attr_expr, StrExpr):
         return attr_expr.value
 
@@ -630,7 +633,7 @@ def is_abstract_model(model: TypeInfo) -> bool:
 
 
 def resolve_lazy_reference(
-    reference: str, *, api: TypeChecker | SemanticAnalyzer, django_context: "DjangoContext", ctx: Context
+    reference: str, *, api: TypeChecker | SemanticAnalyzer, django_context: DjangoContext, ctx: Context
 ) -> TypeInfo | None:
     """
     Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a
@@ -665,7 +668,7 @@ def get_model_from_expression(
     *,
     self_model: TypeInfo,
     api: TypeChecker | SemanticAnalyzer,
-    django_context: "DjangoContext",
+    django_context: DjangoContext,
 ) -> Instance | None:
     """
     Attempts to resolve an expression to a 'TypeInfo' instance. Any lazy reference

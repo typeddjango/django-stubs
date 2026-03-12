@@ -1,12 +1,17 @@
-from typing import NamedTuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, NamedTuple
 
 from mypy.nodes import AssignmentStmt, NameExpr, Node, TypeInfo
-from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import Instance, ProperType, UninhabitedType, get_proper_type
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
+
+if TYPE_CHECKING:
+    from mypy.plugin import FunctionContext, MethodContext
+
+    from mypy_django_plugin.django.context import DjangoContext
 
 
 class M2MThrough(NamedTuple):

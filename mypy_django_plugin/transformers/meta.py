@@ -1,11 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.core.exceptions import FieldDoesNotExist
-from mypy.plugin import MethodContext
 from mypy.types import AnyType, Instance, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, get_field_type_from_model_type_info
 from mypy_django_plugin.lib import helpers
 from mypy_django_plugin.lib.helpers import DjangoModel
+
+if TYPE_CHECKING:
+    from mypy.plugin import MethodContext
 
 
 def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: DjangoContext) -> MypyType:

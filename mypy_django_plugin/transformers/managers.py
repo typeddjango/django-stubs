@@ -1,6 +1,7 @@
-from typing import Final
+from __future__ import annotations
 
-from mypy.checker import TypeChecker
+from typing import TYPE_CHECKING, Final
+
 from mypy.copytype import copy_type
 from mypy.nodes import (
     GDEF,
@@ -17,9 +18,7 @@ from mypy.nodes import (
     SymbolTableNode,
     TypeInfo,
 )
-from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.plugins.common import add_method_to_class
-from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.subtypes import find_member
 from mypy.types import (
@@ -40,6 +39,11 @@ from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.lib import fullnames, helpers
+
+if TYPE_CHECKING:
+    from mypy.checker import TypeChecker
+    from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
+    from mypy.semanal import SemanticAnalyzer
 
 MANAGER_METHODS_RETURNING_QUERYSET: Final = frozenset(
     (
