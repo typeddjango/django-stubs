@@ -1,11 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from mypy.nodes import MemberExpr
-from mypy.plugin import AttributeContext
 from mypy.types import AnyType, TypeOfAny
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin.config import DjangoPluginConfig
-from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
+
+if TYPE_CHECKING:
+    from mypy.plugin import AttributeContext
+
+    from mypy_django_plugin.config import DjangoPluginConfig
+    from mypy_django_plugin.django.context import DjangoContext
 
 
 def get_type_of_settings_attribute(

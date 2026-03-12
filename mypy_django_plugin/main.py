@@ -1,13 +1,13 @@
+from __future__ import annotations
+
 import itertools
 import sys
-from collections.abc import Callable
 from functools import cached_property, partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from mypy.build import PRI_MED, PRI_MYPY
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
-from mypy.options import Options
 from mypy.plugin import (
     AnalyzeTypeContext,
     AttributeContext,
@@ -18,7 +18,6 @@ from mypy.plugin import (
     Plugin,
     ReportConfigContext,
 )
-from mypy.types import Type as MypyType
 from typing_extensions import override
 
 from mypy_django_plugin.config import DjangoPluginConfig
@@ -52,6 +51,12 @@ from mypy_django_plugin.transformers.models import (
     set_auth_user_model_boolean_fields,
 )
 from mypy_django_plugin.transformers.request import check_querydict_is_mutable
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from mypy.options import Options
+    from mypy.types import Type as MypyType
 
 
 class NewSemanalDjangoPlugin(Plugin):

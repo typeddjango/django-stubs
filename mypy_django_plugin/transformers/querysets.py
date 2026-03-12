@@ -1,8 +1,8 @@
-from collections.abc import Sequence
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Literal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db.models.base import Model
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.related_descriptors import (
@@ -14,20 +14,24 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.lookups import Transform
 from django.db.models.sql.query import Query
-from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
 from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, ListExpr, SetExpr, TupleExpr
-from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.helpers import DjangoModel
 from mypy_django_plugin.transformers.models import get_annotated_type
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from django.db.models.base import Model
     from django.db.models.options import _AnyField
+    from mypy.checker import TypeChecker
+    from mypy.plugin import FunctionContext, MethodContext
+
+    from mypy_django_plugin.lib.helpers import DjangoModel
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
@@ -708,7 +712,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
 
 def _try_get_field(
     ctx: MethodContext, model_cls: type[Model], field_name: str, *, resolve_pk: bool = False
-) -> "_AnyField | None":
+) -> _AnyField | None:
     opts = model_cls._meta
     resolved_name = opts.pk.name if resolve_pk and field_name == "pk" else field_name
     try:
@@ -718,7 +722,7 @@ def _try_get_field(
         return None
 
 
-def _check_field_concrete(ctx: MethodContext, field: "_AnyField", field_name: str, method: str) -> bool:
+def _check_field_concrete(ctx: MethodContext, field: _AnyField, field_name: str, method: str) -> bool:
     if not field.concrete or field.many_to_many:
         ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
         return False
@@ -728,7 +732,7 @@ def _check_field_concrete(ctx: MethodContext, field: "_AnyField", field_name: st
 def _check_field_not_pk(
     ctx: MethodContext,
     model_cls: type[Model],
-    field: "_AnyField",
+    field: _AnyField,
     field_name: str,
     method: str,
     *,

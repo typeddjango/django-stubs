@@ -1,12 +1,11 @@
-from collections import deque
-from collections.abc import Iterable
-from functools import cached_property
-from typing import Any, cast
+from __future__ import annotations
 
-from django.db.models import Manager, Model
+from collections import deque
+from functools import cached_property
+from typing import TYPE_CHECKING, Any, cast
+
 from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToManyRel, OneToOneRel
-from mypy.checker import TypeChecker
 from mypy.nodes import (
     ARG_STAR2,
     MDEF,
@@ -22,7 +21,6 @@ from mypy.nodes import (
     TypeInfo,
     Var,
 )
-from mypy.plugin import AnalyzeTypeContext, AttributeContext, ClassDefContext
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
 from mypy.typeanal import TypeAnalyser
@@ -31,8 +29,6 @@ from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars, fill_typevars_with_any
 from typing_extensions import override
 
-from mypy_django_plugin.config import DjangoPluginConfig
-from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
@@ -43,6 +39,16 @@ from mypy_django_plugin.transformers.managers import (
     create_manager_info_from_from_queryset_call,
 )
 from mypy_django_plugin.transformers.manytomany import M2MArguments, M2MThrough, M2MTo
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from django.db.models import Manager, Model
+    from mypy.checker import TypeChecker
+    from mypy.plugin import AnalyzeTypeContext, AttributeContext, ClassDefContext
+
+    from mypy_django_plugin.config import DjangoPluginConfig
+    from mypy_django_plugin.django.context import DjangoContext
 
 
 class ModelClassInitializer:
@@ -295,7 +301,7 @@ class AddDefaultPrimaryKey(ModelClassInitializer):
 
     def create_autofield(
         self,
-        auto_field: "Field[Any, Any]",
+        auto_field: Field[Any, Any],
         dest_name: str,
         existing_field: bool,
     ) -> None:
@@ -365,7 +371,7 @@ class AddRelatedModelsId(ModelClassInitializer):
 
 
 class AddManagers(ModelClassInitializer):
-    def lookup_manager(self, fullname: str, manager: "Manager[Any]") -> TypeInfo | None:
+    def lookup_manager(self, fullname: str, manager: Manager[Any]) -> TypeInfo | None:
         manager_info = self.lookup_typeinfo(fullname)
         if manager_info is None:
             manager_info = self.get_dynamic_manager(fullname, manager)
@@ -450,7 +456,7 @@ class AddManagers(ModelClassInitializer):
 
         return None
 
-    def get_dynamic_manager(self, fullname: str, manager: "Manager[Any]") -> TypeInfo | None:
+    def get_dynamic_manager(self, fullname: str, manager: Manager[Any]) -> TypeInfo | None:
         """
         Try to get a dynamically defined manager
         """

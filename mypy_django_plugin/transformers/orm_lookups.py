@@ -1,10 +1,17 @@
-from mypy.plugin import MethodContext
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from mypy.types import AnyType, Instance, ProperType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
+
+if TYPE_CHECKING:
+    from mypy.plugin import MethodContext
+
+    from mypy_django_plugin.django.context import DjangoContext
 
 
 def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext) -> MypyType:

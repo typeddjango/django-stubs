@@ -1,11 +1,18 @@
-from django.db.models.base import Model
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from mypy.errorcodes import CALL_ARG
-from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import Instance, get_proper_type
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import helpers
+
+if TYPE_CHECKING:
+    from django.db.models.base import Model
+    from mypy.plugin import FunctionContext, MethodContext
+
+    from mypy_django_plugin.django.context import DjangoContext
 
 
 def get_actual_types(ctx: MethodContext | FunctionContext, expected_keys: list[str]) -> list[tuple[str, MypyType]]:

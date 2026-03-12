@@ -1,7 +1,13 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from mypy.nodes import TypeInfo
-from mypy.plugin import ClassDefContext
 
 from mypy_django_plugin.lib import fullnames, helpers
+
+if TYPE_CHECKING:
+    from mypy.plugin import ClassDefContext
 
 
 def make_meta_nested_class_inherit_from_any(ctx: ClassDefContext) -> None:
