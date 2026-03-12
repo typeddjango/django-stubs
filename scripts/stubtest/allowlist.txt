@@ -57,6 +57,10 @@ django.utils.functional.Promise.__deepcopy__
 django.utils.functional.Promise.__radd__
 django.utils.functional.Promise.__mod__
 
+# DEFAULT_TRIM_VALUE is a SimpleLazyObject at runtime, which causes stubtest to crash
+# when trying to infer its type as a LiteralType (stubtest bug).
+django.contrib.gis.geos.prototypes.io.DEFAULT_TRIM_VALUE
+
 # `classonlymethod` is an alias for `@classmethod` which is disjoint:
 django.utils.decorators.classonlymethod
 
