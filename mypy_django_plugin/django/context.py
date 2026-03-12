@@ -372,7 +372,7 @@ class DjangoContext:
         else:
             related_model_cls = field.field.model
 
-        if related_model_cls is None:
+        if related_model_cls is None:  # type: ignore[comparison-overlap]
             raise UnregisteredModelError
 
         if isinstance(related_model_cls, str):
@@ -421,7 +421,7 @@ class DjangoContext:
         self, model_cls: type[Model], lookup: str
     ) -> tuple[Sequence[str], Sequence[str], Expression | Literal[False]] | None:
         query = Query(model_cls)
-        if (lookup == "pk" or lookup.startswith("pk__")) and query.get_meta().pk is None:
+        if (lookup == "pk" or lookup.startswith("pk__")) and query.get_meta().pk is None:  # type: ignore[comparison-overlap]
             # Primary key lookup when no primary key field is found, model is presumably
             # abstract and we can't say anything about 'pk'.
             return None
