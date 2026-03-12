@@ -209,13 +209,7 @@ This happens because these Django classes do not support [`__class_getitem__`](h
 
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?
 
-Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/stable/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type
-
-```python
-Union[User, AnonymousUser]
-```
-
-where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
+Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/stable/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type `User | AnonymousUser` where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
 
 If you want a `HttpRequest` that you can type-annotate with where you know that the user is authenticated you can subclass the normal `HttpRequest` class like so:
 
