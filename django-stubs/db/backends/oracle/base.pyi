@@ -23,7 +23,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     features: DatabaseFeatures
     introspection: DatabaseIntrospection
     validation: DatabaseValidation
-    ops: DatabaseOperations
 
     client_class: type[DatabaseClient]
     creation_class: type[DatabaseCreation]
