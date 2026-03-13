@@ -25,9 +25,9 @@ class ListFilter:
     title: _StrOrPromise | None
     template: str
     request: HttpRequest
-    used_parameters: dict[str, bool | datetime | str]
+    used_parameters: dict[str, list[str] | list[bool]]
     def __init__(
-        self, request: HttpRequest, params: dict[str, str], model: type[Model], model_admin: ModelAdmin
+        self, request: HttpRequest, params: dict[str, list[str]], model: type[Model], model_admin: ModelAdmin
     ) -> None: ...
     def has_output(self) -> bool: ...
     def choices(self, changelist: ChangeList) -> Iterator[_ListFilterChoices]: ...
@@ -39,6 +39,8 @@ class FacetsMixin:
     def get_facet_queryset(self, changelist: ChangeList) -> dict[str, int]: ...
 
 class SimpleListFilter(FacetsMixin, ListFilter):
+    # SimpleListFilter stores scalar str (value[-1]) instead of list, breaking the base class contract
+    used_parameters: dict[str, str]  # type: ignore[assignment]
     parameter_name: str | None
     lookup_choices: list[tuple[str, _StrOrPromise]]
     def value(self) -> str | None: ...
@@ -52,7 +54,7 @@ class FieldListFilter(FacetsMixin, ListFilter):
         self,
         field: Field,
         request: HttpRequest,
-        params: dict[str, str],
+        params: dict[str, list[str]],
         model: type[Model],
         model_admin: ModelAdmin,
         field_path: str,
@@ -66,7 +68,7 @@ class FieldListFilter(FacetsMixin, ListFilter):
         cls,
         field: Field,
         request: HttpRequest,
-        params: dict[str, str],
+        params: dict[str, list[str]],
         model: type[Model],
         model_admin: ModelAdmin,
         field_path: str,
