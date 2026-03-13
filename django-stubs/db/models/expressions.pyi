@@ -67,7 +67,8 @@ class BaseExpression:
     is_summary: bool
     filterable: bool
     window_compatible: bool
-    allowed_default: bool
+    @property
+    def allowed_default(self) -> bool: ...
     constraint_validation_compatible: bool
     set_returning: bool
     allows_composite_expressions: bool
@@ -121,6 +122,9 @@ class Expression(_Deconstructible, BaseExpression, Combinable):
     def identity(self) -> tuple[Any, ...]: ...
 
 class CombinedExpression(SQLiteNumericMixin, Expression):
+    @property
+    @override
+    def allowed_default(self) -> bool: ...
     connector: str
     lhs: Combinable
     rhs: Combinable
@@ -177,6 +181,9 @@ class OuterRef(F):
     def relabeled_clone(self, relabels: Any) -> Self: ...
 
 class Func(SQLiteNumericMixin, Expression):
+    @property
+    @override
+    def allowed_default(self) -> bool: ...
     function: str | None = None
     template: str
     arg_joiner: str
@@ -252,6 +259,9 @@ class OrderByList(ExpressionList):
 _E = TypeVar("_E", bound=Q | Combinable)
 
 class ExpressionWrapper(Expression, Generic[_E]):
+    @property
+    @override
+    def allowed_default(self) -> bool: ...
     def __init__(self, expression: _E, output_field: Field) -> None: ...
     expression: _E
 
@@ -261,6 +271,9 @@ class NegatedExpression(ExpressionWrapper[_E]):
     def __invert__(self) -> _E: ...  # type: ignore[override]
 
 class When(Expression):
+    @property
+    @override
+    def allowed_default(self) -> bool: ...
     template: str
     condition: Any
     result: Any
@@ -271,6 +284,9 @@ class When(Expression):
     ) -> _AsSqlType: ...
 
 class Case(Expression):
+    @property
+    @override
+    def allowed_default(self) -> bool: ...
     template: str
     case_joiner: str
     cases: Any

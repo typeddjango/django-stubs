@@ -77,12 +77,8 @@ django.contrib.flatpages.models.FlatPage.title
 django.contrib.flatpages.models.FlatPage.url
 django.contrib.gis.admin.site
 django.contrib.gis.db.backends.spatialite.base.DatabaseWrapper.ops
-django.contrib.gis.db.models.Case.allowed_default
 django.contrib.gis.db.models.CharField.description
-django.contrib.gis.db.models.ExpressionWrapper.allowed_default
 django.contrib.gis.db.models.Field.description
-django.contrib.gis.db.models.Func.allowed_default
-django.contrib.gis.db.models.When.allowed_default
 django.contrib.gis.db.models.functions.Area.as_sql
 django.contrib.gis.db.models.functions.GeoFuncMixin.as_sql
 django.contrib.gis.db.models.functions.Length.as_sql
@@ -120,17 +116,8 @@ django.db.connection
 django.db.migrations.recorder.MigrationRecorder.Migration.get_next_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.get_previous_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.id
-django.db.models.Case.allowed_default
 django.db.models.CharField.description
-django.db.models.ExpressionWrapper.allowed_default
 django.db.models.Field.description
-django.db.models.Func.allowed_default
-django.db.models.When.allowed_default
-django.db.models.expressions.Case.allowed_default
-django.db.models.expressions.CombinedExpression.allowed_default
-django.db.models.expressions.ExpressionWrapper.allowed_default
-django.db.models.expressions.Func.allowed_default
-django.db.models.expressions.When.allowed_default
 django.db.models.expressions.connector
 django.db.models.expressions.d
 django.db.models.expressions.field_types
@@ -151,7 +138,7 @@ django.db.models.expressions.rhs
 django.db.models.expressions.result
 django.db.models.expressions.lhs
 
-# These functions exist in Django 5.2 but are missing from stubs (need to be added):
+# Django 6.0.3 security fix new APIs:
 django.utils._os.makedirs
 django.utils._os.safe_makedirs
 django.utils.inspect.signature
