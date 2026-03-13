@@ -931,11 +931,16 @@ def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> Mypy
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
         return ctx.default_return_type
 
+    selected_fields = _get_selected_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else None
+
     for lookup_value in _extract_field_names_from_varargs(ctx):
         parts = lookup_value.removeprefix("-").split(LOOKUP_SEP)
 
         if django_model.typ.extra_attrs and parts[0] in django_model.typ.extra_attrs.attrs:
             # Skip validation for annotated fields
+            continue
+        if selected_fields is not None and parts[0] in selected_fields:
+            # Skip validation for fields selected via values()/values_list()
             continue
         _validate_order_by_lookup(ctx, django_model.cls, parts)
 

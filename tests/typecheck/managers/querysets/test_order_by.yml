@@ -57,6 +57,9 @@
         # values() / values_list() then order_by
         Article.objects.values("title").order_by("title")
         Article.objects.values_list("title", flat=True).order_by("title")
+
+        # values() with annotation then order_by
+        Article.objects.values(name=F("author__name")).order_by("name")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
