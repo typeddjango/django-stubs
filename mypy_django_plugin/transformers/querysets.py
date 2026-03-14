@@ -725,6 +725,16 @@ def _check_field_concrete(ctx: MethodContext, field: "_AnyField", field_name: st
     return True
 
 
+def _check_field_unique(
+    ctx: MethodContext, model_cls: type[Model], field: "_AnyField", field_name: str, method: str
+) -> bool:
+    unique_fields = [c.fields[0] for c in model_cls._meta.total_unique_constraints if len(c.fields) == 1]
+    if not getattr(field, "unique", None) and field_name not in unique_fields:
+        ctx.api.fail(f'"{method}()"\'s field_name must be a unique field but "{field_name}" isn\'t', ctx.context)
+        return False
+    return True
+
+
 def _check_field_not_pk(
     ctx: MethodContext,
     model_cls: type[Model],
@@ -908,10 +918,7 @@ def validate_bulk_create(
     return ctx.default_return_type
 
 
-def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str]) -> None:
-    if len(parts) == 1 and parts[0] == "?":
-        return
-
+def _validate_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str]) -> None:
     try:
         _, final_field, _, remainder = Query(model_cls).names_to_path(parts, model_cls._meta)
     except FieldError as exc:
@@ -927,6 +934,13 @@ def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts:
             ctx.api.fail(msg, ctx.context)
 
 
+def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str]) -> None:
+    if len(parts) == 1 and parts[0] == "?":
+        return
+
+    _validate_lookup(ctx, model_cls, parts)
+
+
 def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
         return ctx.default_return_type
@@ -936,8 +950,7 @@ def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> Mypy
     for lookup_value in _extract_field_names_from_varargs(ctx):
         parts = lookup_value.removeprefix("-").split(LOOKUP_SEP)
 
-        if django_model.typ.extra_attrs and parts[0] in django_model.typ.extra_attrs.attrs:
-            # Skip validation for annotated fields
+        if django_model.is_annotated_field(field_name=parts[0]):
             continue
         if selected_fields is not None and parts[0] in selected_fields:
             # Skip validation for fields selected via values()/values_list()
@@ -967,5 +980,47 @@ def validate_defer_only(ctx: MethodContext, django_context: DjangoContext, *, is
         return ctx.default_return_type
 
     _validate_defer_only_fields(ctx, django_model.cls, field_names, is_defer=is_defer)
+
+    return ctx.default_return_type
+
+
+def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
+        return ctx.default_return_type
+
+    for lookup_value in _extract_field_names_from_varargs(ctx):
+        parts = lookup_value.split(LOOKUP_SEP)
+        if django_model.is_annotated_field(field_name=parts[0]):
+            continue
+        _validate_lookup(ctx, django_model.cls, parts)
+
+    return ctx.default_return_type
+
+
+def validate_update(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None or not (
+        kwargs := gather_kwargs(ctx)
+    ):
+        return ctx.default_return_type
+
+    for field_name in kwargs:
+        field = _try_get_field(ctx, django_model.cls, field_name)
+        if field is not None:
+            _check_field_concrete(ctx, field, field_name, method="update")
+
+    return ctx.default_return_type
+
+
+def validate_in_bulk(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    if (
+        (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None
+        or (field_name_expr := helpers.get_call_argument_by_name(ctx, "field_name")) is None
+        or (field_name := helpers.resolve_string_attribute_value(field_name_expr, django_context)) is None
+        or field_name == "pk"
+        or (field := _try_get_field(ctx, django_model.cls, field_name)) is None
+    ):
+        return ctx.default_return_type
+
+    _check_field_unique(ctx, django_model.cls, field, field_name, method="in_bulk")
 
     return ctx.default_return_type
