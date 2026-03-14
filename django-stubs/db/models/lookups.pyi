@@ -45,7 +45,7 @@ class Lookup(Expression, Generic[_T]):
     def identity(self) -> tuple[type[Lookup], Any, Any]: ...
     @cached_property
     @override
-    def allowed_default(self) -> bool: ...
+    def allowed_default(self) -> bool: ...  # type: ignore[override]
 
 class Transform(RegisterLookupMixin, Func):
     bilateral: bool

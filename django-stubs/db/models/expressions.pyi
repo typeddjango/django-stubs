@@ -67,8 +67,7 @@ class BaseExpression:
     is_summary: bool
     filterable: bool
     window_compatible: bool
-    @cached_property
-    def allowed_default(self) -> bool: ...
+    allowed_default: bool
     constraint_validation_compatible: bool
     set_returning: bool
     allows_composite_expressions: bool
@@ -124,7 +123,7 @@ class Expression(_Deconstructible, BaseExpression, Combinable):
 class CombinedExpression(SQLiteNumericMixin, Expression):
     @cached_property
     @override
-    def allowed_default(self) -> bool: ...
+    def allowed_default(self) -> bool: ...  # type: ignore[override]
     connector: str
     lhs: Combinable
     rhs: Combinable
@@ -183,7 +182,7 @@ class OuterRef(F):
 class Func(SQLiteNumericMixin, Expression):
     @cached_property
     @override
-    def allowed_default(self) -> bool: ...
+    def allowed_default(self) -> bool: ...  # type: ignore[override]
     function: str | None = None
     template: str
     arg_joiner: str
@@ -261,7 +260,7 @@ _E = TypeVar("_E", bound=Q | Combinable)
 class ExpressionWrapper(Expression, Generic[_E]):
     @property
     @override
-    def allowed_default(self) -> bool: ...
+    def allowed_default(self) -> bool: ...  # type: ignore[override]
     def __init__(self, expression: _E, output_field: Field) -> None: ...
     expression: _E
 
@@ -273,7 +272,7 @@ class NegatedExpression(ExpressionWrapper[_E]):
 class When(Expression):
     @cached_property
     @override
-    def allowed_default(self) -> bool: ...
+    def allowed_default(self) -> bool: ...  # type: ignore[override]
     template: str
     condition: Any
     result: Any
@@ -286,7 +285,7 @@ class When(Expression):
 class Case(Expression):
     @cached_property
     @override
-    def allowed_default(self) -> bool: ...
+    def allowed_default(self) -> bool: ...  # type: ignore[override]
     template: str
     case_joiner: str
     cases: Any
