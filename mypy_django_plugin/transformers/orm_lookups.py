@@ -1,8 +1,9 @@
+from django.db.models.constants import LOOKUP_SEP
 from mypy.plugin import MethodContext
-from mypy.types import AnyType, Instance, ProperType, TypeOfAny, get_proper_type
+from mypy.types import AnyType, Instance, LiteralType, ProperType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin.django.context import DjangoContext
+from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 
@@ -11,6 +12,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
         return ctx.default_return_type
+    model_cls = django_model.cls
 
     # Expected formal arguments for filter methods are `*args` and `**kwargs`. We'll only typecheck
     # `**kwargs`, which means that `arg_names[1]` is what we're interested in.
@@ -21,6 +23,23 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
         if lookup_kwarg is None:
             continue
         provided_type = get_proper_type(provided_type)
+
+        lookup_path, _, lookup_name = lookup_kwarg.rpartition(LOOKUP_SEP)
+        is_true_literal = isinstance(provided_type, LiteralType) and provided_type.value is True
+
+        if lookup_name == "isnull" and is_true_literal:
+            try:
+                field, _ = django_context.resolve_lookup_into_field(model_cls, lookup_path)
+            except LookupsAreUnsupported:
+                pass
+            else:
+                if field is not None and getattr(field, "null", None) is False:
+                    ctx.api.fail(
+                        f'Field "{field.name}" does not allow NULL;'
+                        f'using "__isnull=True" will always return an empty queryset.',
+                        ctx.context,
+                    )
+
         if isinstance(provided_type, Instance) and provided_type.type.has_base(
             fullnames.COMBINABLE_EXPRESSION_FULLNAME
         ):
