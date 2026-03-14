@@ -39,6 +39,8 @@ class RangeField(CheckPostgresInstalledMixin, models.Field[Any, _RangeT]):
     @override
     def to_python(self, value: Any) -> Any: ...
     @override
+    def value_to_string(self, obj: models.Model) -> str | None: ...  # type: ignore[override]
+    @override
     def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
 
 class ContinuousRangeField(RangeField[_RangeT]):
