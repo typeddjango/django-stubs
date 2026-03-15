@@ -120,6 +120,13 @@ class Expression(_Deconstructible, BaseExpression, Combinable):
     @cached_property
     def identity(self) -> tuple[Any, ...]: ...
 
+def register_combinable_fields(
+    lhs: type[Field],
+    connector: str,
+    rhs: type[Field],
+    result: type[Field],
+) -> None: ...
+
 class CombinedExpression(SQLiteNumericMixin, Expression):
     @cached_property
     @override
@@ -395,10 +402,3 @@ class RowRange(WindowFrame):
 
 class ValueRange(WindowFrame):
     frame_type: str
-
-def register_combinable_fields(
-    lhs: type[Field],
-    connector: str,
-    rhs: type[Field],
-    result: type[Field],
-) -> None: ...
