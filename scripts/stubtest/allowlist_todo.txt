@@ -121,7 +121,6 @@ django.db.models.Field.description
 django.db.models.expressions.connector
 django.db.models.expressions.d
 django.db.models.expressions.field_types
-django.db.models.expressions.register_combinable_fields
 django.db.models.fields.CharField.description
 django.db.models.fields.Field.description
 django.db.models.fields.json.CaseInsensitiveMixin.process_lhs
