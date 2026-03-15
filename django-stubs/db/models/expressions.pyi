@@ -395,3 +395,10 @@ class RowRange(WindowFrame):
 
 class ValueRange(WindowFrame):
     frame_type: str
+
+def register_combinable_fields(
+    lhs: type[Field],
+    connector: str,
+    rhs: type[Field],
+    result: type[Field],
+) -> None: ...
