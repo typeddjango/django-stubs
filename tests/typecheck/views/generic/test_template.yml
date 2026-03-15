@@ -14,3 +14,23 @@
         class MyTemplateView(TemplateView):
             template_name = "template.html"
             extra_context = MappingProxyType({})
+
+-   case: template_view_returns_template_response
+    main: |
+        from typing import reveal_type
+
+        from django.views.generic import TemplateView
+        from django.test import RequestFactory
+
+
+        class MyView(TemplateView):
+            template_name = "template.html"
+
+
+        rf = RequestFactory()
+        request = rf.get("/")
+        view = MyView.as_view()
+        response = view(request)
+
+        reveal_type(response)  # N: Revealed type is "django.template.response.TemplateResponse"
+        reveal_type(response.rendered_content)  # N: Revealed type is "builtins.str"
