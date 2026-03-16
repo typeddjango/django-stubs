@@ -238,7 +238,7 @@ wheels = [
 
 [[package]]
 name = "django-stubs"
-version = "5.2.8"
+version = "6.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "django", version = "5.2.12", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
@@ -349,7 +349,7 @@ tests = [
 
 [[package]]
 name = "django-stubs-ext"
-version = "5.2.8"
+version = "6.0.0"
 source = { editable = "ext" }
 dependencies = [
     { name = "django", version = "5.2.12", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
