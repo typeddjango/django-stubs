@@ -242,7 +242,7 @@ django.contrib.auth.views.UserModel
 django.db.migrations.operations.base.OperationCategory.__new__
 
 # These are dynamically added when using `save(commit=False)`
-# See https://docs.djangoproject.com/en/5.2/topics/forms/modelforms/#the-save-method
+# See https://docs.djangoproject.com/en/stable/topics/forms/modelforms/#the-save-method
 django.forms.BaseModelForm.save_m2m
 django.forms.BaseModelFormSet.save_m2m
 django.forms.models.BaseModelForm.save_m2m
