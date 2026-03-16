@@ -83,7 +83,6 @@ django.contrib.gis.db.models.functions.Area.as_sql
 django.contrib.gis.db.models.functions.GeoFuncMixin.as_sql
 django.contrib.gis.db.models.functions.Length.as_sql
 django.contrib.gis.db.models.lookups.RasterBandTransform.as_sql
-django.contrib.gis.forms.BaseModelFormSet.model
 django.contrib.gis.forms.inlineformset_factory
 django.contrib.gis.forms.modelformset_factory
 django.contrib.redirects.models.Redirect.id
@@ -124,13 +123,10 @@ django.db.models.expressions.field_types
 django.db.models.fields.CharField.description
 django.db.models.fields.Field.description
 django.db.models.fields.json.CaseInsensitiveMixin.process_lhs
-django.forms.BaseModelFormSet.model
 django.forms.inlineformset_factory
 django.forms.modelformset_factory
-django.forms.models.BaseModelFormSet.model
 django.forms.models.inlineformset_factory
 django.forms.models.modelformset_factory
-django.forms.widgets.ChoiceWidget.template_name
 
 # mypy 1.9.0 new issues:
 django.db.models.expressions.rhs

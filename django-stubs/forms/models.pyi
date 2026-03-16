@@ -112,7 +112,7 @@ def modelform_factory(
 _ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
 
 class BaseModelFormSet(BaseFormSet[_ModelFormT], AltersData, Generic[_M, _ModelFormT]):
-    model: type[_M]
+    model: type[_M] | None
     edit_only: bool
     unique_fields: Collection[str]
     queryset: QuerySet[_M] | None
@@ -241,10 +241,6 @@ def inlineformset_factory(
 ) -> type[BaseInlineFormSet[_M, _ParentM, _ModelFormT]]: ...
 
 class InlineForeignKeyField(Field):
-    disabled: bool
-    help_text: _StrOrPromise
-    required: bool
-    show_hidden_initial: bool
     widget: _ClassLevelWidgetT
     parent_instance: Model
     pk_field: bool
@@ -276,11 +272,6 @@ class ModelChoiceIterator(BaseChoiceIterator):
     def choice(self, obj: Model) -> tuple[ModelChoiceIteratorValue, str]: ...
 
 class ModelChoiceField(ChoiceField, Generic[_M]):
-    disabled: bool
-    help_text: _StrOrPromise
-    required: bool
-    show_hidden_initial: bool
-    validators: list[Any]
     iterator: type[ModelChoiceIterator]
     empty_label: _StrOrPromise | None
     queryset: QuerySet[_M] | None
@@ -320,11 +311,6 @@ class ModelChoiceField(ChoiceField, Generic[_M]):
     def has_changed(self, initial: Model | int | str | UUID | None, data: int | str | None) -> bool: ...
 
 class ModelMultipleChoiceField(ModelChoiceField[_M]):
-    disabled: bool
-    empty_label: _StrOrPromise | None
-    help_text: _StrOrPromise
-    required: bool
-    show_hidden_initial: bool
     widget: _ClassLevelWidgetT
     hidden_widget: type[Widget]
     def __init__(self, queryset: Manager[_M] | QuerySet[_M] | None, **kwargs: Any) -> None: ...
