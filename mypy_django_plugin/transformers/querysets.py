@@ -296,7 +296,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     """
     Extract proper return type for QuerySet.values(*fields, **expressions) method calls.
 
-    See https://docs.djangoproject.com/en/5.2/ref/models/querysets/#values
+    See https://docs.djangoproject.com/en/stable/ref/models/querysets/#values
     """
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None or django_model.is_annotated:
@@ -603,7 +603,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     """
     Extract annotated attributes via `prefetch_related(Prefetch(..., to_attr=...))`
 
-    See https://docs.djangoproject.com/en/5.2/ref/models/querysets/#prefetch-objects
+    See https://docs.djangoproject.com/en/stable/ref/models/querysets/#prefetch-objects
     """
     api = helpers.get_typechecker_api(ctx)
 

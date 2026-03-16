@@ -109,7 +109,7 @@
         reveal_type(foos_dict.difference(bars_dict)) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.MyModel1, TypedDict({'name': builtins.str})]"
 
         # `values()` QuerySet -- One field, different name, the first one takes precedence.
-        # cf https://docs.djangoproject.com/en/5.2/ref/models/querysets/#django.db.models.query.QuerySet.union
+        # cf https://docs.djangoproject.com/en/stable/ref/models/querysets/#django.db.models.query.QuerySet.union
         foos_dict2 = MyModel1.objects.all().values("name")
         bars_dict2 = MyModel2.objects.all().values("id")
 
