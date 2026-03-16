@@ -8,6 +8,7 @@ from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin, _DataT, _FilesT
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.functional import _StrOrPromise, cached_property
+from typing_extensions import override
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 
@@ -58,6 +59,8 @@ class BaseForm(RenderableFormMixin):
     def add_initial_prefix(self, field_name: str) -> str: ...
     @property
     def template_name(self) -> str: ...
+    @override
+    def get_context(self) -> dict[str, Any]: ...
     def non_field_errors(self) -> ErrorList: ...
     @overload
     def add_error(

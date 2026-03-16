@@ -63,7 +63,7 @@ class Widget(metaclass=MediaDefiningClass):
     is_required: bool
     supports_microseconds: bool
     attrs: _OptAttrs
-    template_name: str
+    template_name: str | None
     use_fieldset: bool
     def __init__(self, attrs: _OptAttrs | None = None) -> None: ...
     def __deepcopy__(self, memo: dict[int, Any]) -> Self: ...
@@ -86,6 +86,8 @@ class Widget(metaclass=MediaDefiningClass):
 class Input(Widget):
     input_type: str | None
     template_name: str
+    @override
+    def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
 
 class TextInput(Input):
     input_type: str
@@ -129,6 +131,12 @@ class HiddenInput(Input):
 
 class MultipleHiddenInput(HiddenInput):
     template_name: str
+    @override
+    def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
+    @override
+    def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
+    @override
+    def format_value(self, value: Any) -> list[str]: ...  # type: ignore[override]
 
 class FileInput(Input):
     allow_multiple_selected: bool
@@ -156,6 +164,8 @@ class ClearableFileInput(FileInput):
     def clear_checkbox_id(self, name: str) -> str: ...
     def is_initial(self, value: File | str | None) -> bool: ...
     @override
+    def format_value(self, value: Any) -> Any: ...
+    @override
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
@@ -171,6 +181,8 @@ class DateTimeBaseInput(TextInput):
     format: str | None
     supports_microseconds: bool
     def __init__(self, attrs: _OptAttrs | None = None, format: str | None = None) -> None: ...
+    @override
+    def format_value(self, value: Any) -> str | None: ...
 
 class DateInput(DateTimeBaseInput):
     format_key: str
@@ -195,11 +207,19 @@ class CheckboxInput(Input):
     input_type: str
     template_name: str
     def __init__(self, attrs: _OptAttrs | None = None, check_test: _CheckCallable | None = None) -> None: ...
+    @override
+    def format_value(self, value: Any) -> str | None: ...
+    @override
+    def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
+    @override
+    def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
+    @override
+    def value_omitted_from_data(self, data: _DataT, files: _FilesT, name: str) -> bool: ...
 
 class ChoiceWidget(Widget):
     allow_multiple_selected: bool
     input_type: str | None
-    template_name: str
+    template_name: str | None
     option_template_name: str | None
     add_id_index: bool
     checked_attribute: Any

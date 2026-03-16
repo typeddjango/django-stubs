@@ -100,6 +100,7 @@ class CharField(Field):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class IntegerField(Field):
+    widget: _ClassLevelWidgetT
     max_value: int | Callable[[], int] | None
     min_value: int | Callable[[], int] | None
     step_size: int | Callable[[], int] | None
@@ -206,12 +207,14 @@ class BaseTemporalField(Field):
     def strptime(self, value: str, format: str) -> Any: ...
 
 class DateField(BaseTemporalField):
+    widget: _ClassLevelWidgetT
     @override
     def to_python(self, value: None | str | datetime.datetime | datetime.date) -> datetime.date | None: ...
     @override
     def strptime(self, value: str, format: str) -> datetime.date: ...
 
 class TimeField(BaseTemporalField):
+    widget: _ClassLevelWidgetT
     @override
     def to_python(self, value: None | str | datetime.time) -> datetime.time | None: ...
     @override
@@ -221,6 +224,9 @@ class DateTimeFormatsIterator:
     def __iter__(self) -> Iterator[str]: ...
 
 class DateTimeField(BaseTemporalField):
+    widget: _ClassLevelWidgetT
+    @override
+    def prepare_value(self, value: Any) -> Any: ...
     @override
     def to_python(self, value: None | str | datetime.datetime | datetime.date) -> datetime.datetime | None: ...
     @override
@@ -256,6 +262,7 @@ class RegexField(CharField):
     ) -> None: ...
 
 class EmailField(CharField):
+    widget: _ClassLevelWidgetT
     def __init__(
         self,
         *,
@@ -277,6 +284,7 @@ class EmailField(CharField):
     ) -> None: ...
 
 class FileField(Field):
+    widget: _ClassLevelWidgetT
     allow_empty_file: bool
     max_length: int | None
     def __init__(
@@ -312,6 +320,7 @@ class ImageField(FileField):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class URLField(CharField):
+    widget: _ClassLevelWidgetT
     def __init__(
         self,
         *,
@@ -336,6 +345,7 @@ class URLField(CharField):
     def to_python(self, value: Any | None) -> str | None: ...
 
 class BooleanField(Field):
+    widget: _ClassLevelWidgetT
     @override
     def to_python(self, value: Any | None) -> bool: ...
     @override
@@ -344,6 +354,7 @@ class BooleanField(Field):
     def has_changed(self, initial: Any | None, data: Any | None) -> bool: ...
 
 class NullBooleanField(BooleanField):
+    widget: _ClassLevelWidgetT
     @override
     def to_python(self, value: Any | None) -> bool | None: ...  # type: ignore[override]
     @override
@@ -410,6 +421,8 @@ class TypedChoiceField(ChoiceField):
     def clean(self, value: Any) -> Any: ...
 
 class MultipleChoiceField(ChoiceField):
+    widget: _ClassLevelWidgetT
+    hidden_widget: type[Widget]
     @override
     def to_python(self, value: Any | None) -> list[str]: ...
     @override
@@ -524,6 +537,8 @@ class FilePathField(ChoiceField):
     ) -> None: ...
 
 class SplitDateTimeField(MultiValueField):
+    widget: _ClassLevelWidgetT
+    hidden_widget: type[Widget]
     def __init__(
         self,
         *,
