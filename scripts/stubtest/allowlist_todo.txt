@@ -117,9 +117,6 @@ django.db.migrations.recorder.MigrationRecorder.Migration.get_previous_by_applie
 django.db.migrations.recorder.MigrationRecorder.Migration.id
 django.db.models.CharField.description
 django.db.models.Field.description
-django.db.models.expressions.connector
-django.db.models.expressions.d
-django.db.models.expressions.field_types
 django.db.models.fields.CharField.description
 django.db.models.fields.Field.description
 django.db.models.fields.json.CaseInsensitiveMixin.process_lhs
@@ -127,11 +124,6 @@ django.forms.inlineformset_factory
 django.forms.modelformset_factory
 django.forms.models.inlineformset_factory
 django.forms.models.modelformset_factory
-
-# mypy 1.9.0 new issues:
-django.db.models.expressions.rhs
-django.db.models.expressions.result
-django.db.models.expressions.lhs
 
 # Django 6.0.3 security fix new APIs:
 django.utils._os.makedirs

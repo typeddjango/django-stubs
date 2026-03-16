@@ -127,6 +127,16 @@ def register_combinable_fields(
     result: type[Field],
 ) -> None: ...
 
+# These are leaked loop variables from the module-level loop that registers
+# combinable field types (`for d in _connector_combinations`). They are not
+# part of the public API but are visible as module attributes at runtime.
+d: dict[str, list[tuple[type[Field[Any, Any]], type[Field[Any, Any]], type[Field[Any, Any]]]]]
+connector: str
+field_types: list[tuple[type[Field[Any, Any]], type[Field[Any, Any]], type[Field[Any, Any]]]]
+lhs: type[Field[Any, Any]]
+rhs: type[Field[Any, Any]]
+result: type[Field[Any, Any]]
+
 class CombinedExpression(SQLiteNumericMixin, Expression):
     @cached_property
     @override
