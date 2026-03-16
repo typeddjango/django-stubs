@@ -14,7 +14,7 @@ from django.http.request import HttpRequest
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, override
 
 class _ListFilterChoices(TypedDict):
     selected: bool
@@ -43,6 +43,7 @@ class SimpleListFilter(FacetsMixin, ListFilter):
     lookup_choices: list[tuple[str, _StrOrPromise]]
     def value(self) -> str | None: ...
     def lookups(self, request: HttpRequest, model_admin: ModelAdmin) -> Iterable[tuple[str, _StrOrPromise]] | None: ...
+    @override
     def choices(self, changelist: ChangeList) -> Iterator[_ListFilterChoices]: ...
 
 class FieldListFilter(FacetsMixin, ListFilter):
@@ -72,6 +73,7 @@ class FieldListFilter(FacetsMixin, ListFilter):
         model_admin: ModelAdmin,
         field_path: str,
     ) -> FieldListFilter: ...
+    @override
     def choices(self, changelist: ChangeList) -> Iterator[_ListFilterChoices]: ...
 
 class RelatedFieldListFilter(FieldListFilter):
