@@ -917,6 +917,9 @@ def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts:
     except FieldError as exc:
         ctx.api.fail(exc.args[0], ctx.context)
         return
+    except AttributeError:
+        # Can happen when model._meta.pk is None (e.g. abstract models)
+        return
 
     if remainder:
         # Check if the trailing part is a valid transform (e.g. __year, __month) on the field.
