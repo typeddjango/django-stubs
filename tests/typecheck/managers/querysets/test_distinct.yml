@@ -1,0 +1,90 @@
+-   case: distinct_valid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author
+        from django.db.models import F
+
+        # Bare distinct (no field names)
+        Article.objects.distinct()
+
+        # Simple fields
+        Article.objects.distinct("title")
+        Article.objects.distinct("pk")
+        Article.objects.distinct("id")
+
+        # FK traversal
+        Article.objects.distinct("author__name")
+
+        # Multiple fields
+        Article.objects.distinct("title", "author__name")
+
+        # FK id field
+        Article.objects.distinct("author_id")
+
+        # Annotated fields
+        Article.objects.annotate(foo=F("id")).distinct("foo")
+
+        # Non-literal strings (skipped by validation)
+        field: str = "foo"
+        Article.objects.distinct(field)
+
+        # Reverse FK traversal
+        Author.objects.distinct("article__title")
+
+        # Chained
+        Article.objects.filter(published=True).distinct("title")
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="article")
+
+
+-   case: distinct_invalid_fields
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author
+        from typing import Literal
+
+        # Non-existent field
+        Article.objects.distinct("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
+
+        # Invalid chained lookup
+        Article.objects.distinct("author__nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: article, email, id, name  [misc]
+
+        # Lookup suffix on a valid field
+        Article.objects.distinct("title__exact")  # E: Cannot resolve keyword 'exact' into field. Join on 'title' not permitted.  [misc]
+
+        # Literal typed invalid
+        field: Literal["nonexistent"] = "nonexistent"
+        Article.objects.distinct(field)  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: author, author_id, content, id, published, title  [misc]
+
+        # Invalid field at depth > 2
+        Article.objects.distinct("author__name__nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Join on 'name' not permitted.  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+                    email = models.EmailField()
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="article")

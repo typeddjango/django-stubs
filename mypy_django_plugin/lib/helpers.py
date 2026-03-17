@@ -225,6 +225,10 @@ class DjangoModel(NamedTuple):
 
         return cls(cls=model_cls, typ=model_type, is_annotated=is_annotated)
 
+    def is_annotated_field(self, field_name: str) -> bool:
+        """Whether this field name was annotated via annotate/values"""
+        return bool(self.typ.extra_attrs and field_name in self.typ.extra_attrs.attrs)
+
 
 def extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Instance | None:
     """Extract the django model `Instance` associated to a queryset `Instance`"""

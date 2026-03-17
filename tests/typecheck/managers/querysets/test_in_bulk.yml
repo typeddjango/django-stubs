@@ -1,0 +1,64 @@
+-   case: in_bulk_valid
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article
+
+        # Default (no field_name — uses pk)
+        Article.objects.in_bulk()
+
+        # Explicit pk
+        Article.objects.in_bulk(field_name="pk")
+
+        # Unique field
+        Article.objects.in_bulk(field_name="slug")
+
+        # Non-literal field_name (skipped by validation)
+        field: str = "title"
+        Article.objects.in_bulk(field_name=field)
+
+        # With id_list
+        Article.objects.in_bulk([1, 2, 3])
+        Article.objects.in_bulk([1, 2], field_name="pk")
+
+        # Async variant with valid field
+        async def test_async() -> None:
+            await Article.objects.ain_bulk(field_name="slug")
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    slug = models.SlugField(unique=True)
+                    published = models.BooleanField(default=False)
+
+
+-   case: in_bulk_invalid
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article
+
+        # Non-existent field
+        Article.objects.in_bulk(field_name="nonexistent")  # E: Article has no field named 'nonexistent'  [misc]
+
+        # Non-unique field
+        Article.objects.in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # Async variant with invalid field
+        async def test_async() -> None:
+            await Article.objects.ain_bulk(field_name="nonexistent")  # E: Article has no field named 'nonexistent'  [misc]
+            await Article.objects.ain_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    slug = models.SlugField(unique=True)
+                    published = models.BooleanField(default=False)
