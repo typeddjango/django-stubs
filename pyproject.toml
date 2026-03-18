@@ -67,11 +67,15 @@ pyright = [
 pyrefly = [
   "pyrefly==0.57.0",
 ]
+ty = [
+  "ty==0.0.23",
+]
 
 dev = [
   {include-group = "tests"},
   {include-group = "pyright"},
   {include-group = "pyrefly"},
+  {include-group = "ty"},
 ]
 
 [project.urls]

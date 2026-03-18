@@ -6,7 +6,7 @@ UniqueConstraint(fields=["name"], name="unique_name")
 # There's no overload case for passing both expression and 'fields'
 UniqueConstraint(  # type: ignore[call-overload]  # pyrefly: ignore[no-matching-overload]
     Lower("name"),
-    fields=["name"],  # pyright: ignore[reportArgumentType]
+    fields=["name"],  # pyright: ignore[reportArgumentType]  # ty: ignore[invalid-argument-type]
     name="unique_mess",
 )
 

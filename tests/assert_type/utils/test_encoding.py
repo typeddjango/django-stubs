@@ -25,7 +25,7 @@ def test_force_str() -> None:
     assert_type(force_str(123), str)
     assert_type(force_str(123, strings_only=True), int)
     assert_type(force_str("foo"), str)
-    assert_type(force_str("foo", strings_only=True), str)
+    assert_type(force_str("foo", strings_only=True), str)  # ty: ignore[type-assertion-failure]
     assert_type(force_str(S("foo"), strings_only=True), S)
 
 
@@ -38,5 +38,5 @@ def test_smart_str() -> None:
     assert_type(smart_str(123), str)
     assert_type(smart_str(123, strings_only=True), int)
     assert_type(smart_str("foo"), str)
-    assert_type(smart_str("foo", strings_only=True), str)
+    assert_type(smart_str("foo", strings_only=True), str)  # ty: ignore[type-assertion-failure]
     assert_type(smart_str(S("foo"), strings_only=True), S)

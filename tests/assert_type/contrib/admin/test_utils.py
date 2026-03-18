@@ -68,19 +68,19 @@ assert person_tuple_admin.fields is not None
 assert person_fieldset_list_admin.fieldsets is not None
 assert person_fieldset_tuple_admin.fieldsets is not None
 
-assert_type(flatten(person_list_admin.fields), list[str])
+assert_type(flatten(person_list_admin.fields), list[str])  # ty: ignore[no-matching-overload,type-assertion-failure]
 assert_type(flatten(person_list_admin.get_fields(request)), list[str])
 assert_type(flatten(person_tuple_admin.fields), list[str])
 assert_type(flatten(person_tuple_admin.get_fields(request)), list[str])
 
-assert_type(flatten(person_list_admin.list_display), list[_DisplayT[Person]])
-assert_type(flatten(person_list_admin.get_list_display(request)), list[_DisplayT[Person]])
-assert_type(flatten(person_tuple_admin.list_display), list[_DisplayT[Person]])
-assert_type(flatten(person_tuple_admin.get_list_display(request)), list[_DisplayT[Person]])
+assert_type(flatten(person_list_admin.list_display), list[_DisplayT[Person]])  # ty: ignore[no-matching-overload,type-assertion-failure]
+assert_type(flatten(person_list_admin.get_list_display(request)), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
+assert_type(flatten(person_tuple_admin.list_display), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
+assert_type(flatten(person_tuple_admin.get_list_display(request)), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
 
-assert_type(flatten_fieldsets(person_fieldset_list_admin.fieldsets), list[str])
+assert_type(flatten_fieldsets(person_fieldset_list_admin.fieldsets), list[str])  # ty: ignore[invalid-argument-type]
 assert_type(flatten_fieldsets(person_fieldset_list_admin.get_fieldsets(request)), list[str])
-assert_type(flatten_fieldsets(person_fieldset_tuple_admin.fieldsets), list[str])
+assert_type(flatten_fieldsets(person_fieldset_tuple_admin.fieldsets), list[str])  # ty: ignore[invalid-argument-type]
 assert_type(flatten_fieldsets(person_fieldset_tuple_admin.get_fieldsets(request)), list[str])
 
 
