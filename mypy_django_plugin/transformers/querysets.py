@@ -912,6 +912,10 @@ def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts:
     if len(parts) == 1 and parts[0] == "?":
         return
 
+    # Abstract models don't have a pk field, skip validation
+    if model_cls._meta.abstract:
+        return
+
     try:
         _, final_field, _, remainder = Query(model_cls).names_to_path(parts, model_cls._meta)
     except FieldError as exc:

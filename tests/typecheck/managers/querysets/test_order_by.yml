@@ -138,6 +138,31 @@
                     published = models.BooleanField(default=False)
                     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="article")
 
+# Regression test for https://github.com/typeddjango/django-stubs/issues/3184
+# Abstract models have _meta.pk = None, which caused an AttributeError crash
+# in Django's Query.names_to_path() when validating order_by lookups.
+-   case: order_by_abstract_model_no_crash
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import AbstractModel
+        from django.db.models import QuerySet
+
+        def test(qs: QuerySet[AbstractModel]) -> None:
+            qs.order_by("pk")
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class AbstractModel(models.Model):
+                    class Meta:
+                        abstract = True
+
+                class ConcreteModel(AbstractModel):
+                    pass
+
 -   case: order_by_with_field_transforms
     installed_apps:
         - myapp
