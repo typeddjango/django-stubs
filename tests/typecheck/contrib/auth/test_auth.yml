@@ -93,3 +93,27 @@
 
               class MyUser(models.Model):
                   ...
+
+-   case: test_abstract_user_meta_inheritance
+    main: |
+        from django.contrib.auth.models import AbstractUser
+
+        class CustomUser(AbstractUser):
+            class Meta(AbstractUser.Meta):
+                pass
+    custom_settings: |
+        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth")
+
+-   case: test_auth_form_meta_inheritance
+    main: |
+        from django.contrib.auth.forms import BaseUserCreationForm, UserChangeForm
+
+        class CustomUserCreationForm(BaseUserCreationForm):
+            class Meta(BaseUserCreationForm.Meta):
+                pass
+
+        class CustomUserChangeForm(UserChangeForm):
+            class Meta(UserChangeForm.Meta):
+                pass
+    custom_settings: |
+        INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth")

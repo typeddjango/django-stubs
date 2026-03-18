@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from logging import Logger
-from typing import Any, Generic
+from typing import Any, ClassVar, Generic
 
 from django import forms
 from django.contrib.auth.models import _User, _UserModel, _UserType
@@ -68,6 +68,12 @@ class BaseUserCreationForm(forms.ModelForm[_UserType], Generic[_UserType]):
     error_messages: _ErrorMessagesDict
     password1: forms.Field
     password2: forms.Field
+
+    class Meta:
+        model: ClassVar[type[_User]]
+        fields: ClassVar[tuple[str, ...]]
+        field_classes: ClassVar[dict[str, type[forms.Field]]]
+
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     @override
     def save(self, commit: bool = ...) -> _UserType: ...
@@ -77,6 +83,12 @@ class UserCreationForm(BaseUserCreationForm[_UserType]):
 
 class UserChangeForm(forms.ModelForm[_UserType]):
     password: forms.Field
+
+    class Meta:
+        model: ClassVar[type[_User]]
+        fields: ClassVar[str]
+        field_classes: ClassVar[dict[str, type[forms.Field]]]
+
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
 class AuthenticationForm(forms.Form):

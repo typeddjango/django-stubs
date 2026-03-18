@@ -79,6 +79,9 @@ class PermissionsMixin(models.Model):
     groups = models.ManyToManyField(Group)
     user_permissions = models.ManyToManyField(Permission)
 
+    class Meta:
+        abstract: ClassVar[bool]
+
     def get_user_permissions(self, obj: Model | None = ...) -> set[str]: ...
     async def aget_user_permissions(self, obj: Model | None = ...) -> set[str]: ...
     def get_group_permissions(self, obj: Model | None = ...) -> set[str]: ...
@@ -94,6 +97,11 @@ class PermissionsMixin(models.Model):
 
 class AbstractUser(AbstractBaseUser, PermissionsMixin):
     username_validator: UnicodeUsernameValidator
+
+    class Meta:
+        abstract: ClassVar[bool]
+        verbose_name: ClassVar[str]
+        verbose_name_plural: ClassVar[str]
 
     username = models.CharField(max_length=150)
     first_name = models.CharField(max_length=30, blank=True)

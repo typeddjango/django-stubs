@@ -17,6 +17,9 @@ class BaseUserManager(models.Manager[_T]):
 class AbstractBaseUser(models.Model):
     REQUIRED_FIELDS: ClassVar[list[str]]
 
+    class Meta:
+        abstract: ClassVar[bool]
+
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_active: bool | BooleanField[bool | Combinable, bool]
