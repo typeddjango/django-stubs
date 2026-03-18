@@ -1,5 +1,7 @@
 # It is used in `mypy.ini` only.
 # The following installed apps are required for stubtest to run correctly.
+from __future__ import annotations
+
 INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.admin",
