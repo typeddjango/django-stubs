@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import builtins
 import logging
-from collections.abc import Iterable
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from django import VERSION
 from django.contrib.admin import ModelAdmin
@@ -32,6 +33,9 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
 from typing_extensions import override
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 __all__ = ["monkeypatch"]
 

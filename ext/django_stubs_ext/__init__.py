@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .aliases import QuerySetAny as QuerySetAny
 from .aliases import StrOrPromise, StrPromise
 from .aliases import ValuesQuerySet as ValuesQuerySet
