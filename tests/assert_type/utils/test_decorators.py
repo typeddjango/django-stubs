@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.contrib.auth.decorators import login_required
-from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from django.middleware.cache import CacheMiddleware
 from django.utils.decorators import (
@@ -13,6 +14,9 @@ from django.utils.decorators import (
 )
 from django.views.generic.base import View
 from typing_extensions import assert_type, override
+
+if TYPE_CHECKING:
+    from django.http.request import HttpRequest
 
 decorator = decorator_from_middleware(
     CacheMiddleware  # pyrefly: ignore[bad-argument-type]

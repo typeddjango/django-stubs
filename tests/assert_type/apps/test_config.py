@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.apps.config import AppConfig
 from django.utils.functional import cached_property
 from typing_extensions import assert_type, override

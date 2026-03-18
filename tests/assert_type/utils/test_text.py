@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.utils.functional import _StrPromise
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy

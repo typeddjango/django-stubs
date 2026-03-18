@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.db.models.functions import Lower
 

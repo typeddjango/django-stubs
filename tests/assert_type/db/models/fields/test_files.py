@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db import models
 from django.db.models.fields.files import FieldFile, ImageFieldFile
 from typing_extensions import assert_type
