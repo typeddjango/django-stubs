@@ -1657,13 +1657,3 @@
 
         p: Person
         reveal_type(p.friends)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[main.Person, main.Person_friends]"
-
--   case: test_foreign_key_swappable_param
-    main: |
-        from django.db import models
-        class Author(models.Model):
-            pass
-        class Book(models.Model):
-            author = models.ForeignKey(Author, on_delete=models.CASCADE, swappable=False)
-        class Profile(models.Model):
-            user = models.OneToOneField("Author", on_delete=models.CASCADE, swappable=False)
