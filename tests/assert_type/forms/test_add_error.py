@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.core.exceptions import ValidationError
 from django.forms import BaseForm
 from django.utils.functional import lazystr

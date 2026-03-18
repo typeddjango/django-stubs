@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.test import Client
 from django.urls import reverse, reverse_lazy
 

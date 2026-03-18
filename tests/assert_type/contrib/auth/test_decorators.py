@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib.auth.decorators import user_passes_test
-from django.http import HttpRequest, HttpResponse
 from django.urls import reverse, reverse_lazy
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest, HttpResponse
 
 reversed_url = reverse("url")
 lazy_url = reverse_lazy("namespace:url")

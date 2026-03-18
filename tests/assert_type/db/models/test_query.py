@@ -1,10 +1,16 @@
-from collections.abc import Sequence
+from __future__ import annotations
 
-from django.db.models import Model
+from typing import TYPE_CHECKING
+
 from django.db.models.query import (
     aprefetch_related_objects,  # pyright: ignore[reportUnknownVariableType]
     prefetch_related_objects,  # pyright: ignore[reportUnknownVariableType]
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from django.db.models import Model
 
 models_list: list[Model] = []
 prefetch_related_objects(models_list, "pk")

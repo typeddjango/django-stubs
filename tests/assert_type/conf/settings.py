@@ -1,6 +1,10 @@
-from pathlib import Path
+from __future__ import annotations
 
-from django_stubs_ext.settings import TemplatesSetting
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django_stubs_ext.settings import TemplatesSetting
 
 BASE_DIR = Path(__file__).resolve().parent
 
