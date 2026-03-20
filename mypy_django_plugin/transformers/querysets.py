@@ -250,12 +250,20 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         if check_valid_attr_value(ctx, django_context, django_model, attr_name)
     }
 
+    existing_row_extra_attrs: dict[str, MypyType] = {}
+    if len(default_return_type.args) > 1:
+        original_row_type = get_proper_type(default_return_type.args[1])
+        if isinstance(original_row_type, Instance) and original_row_type.extra_attrs:
+            existing_row_extra_attrs = dict(original_row_type.extra_attrs.attrs)
+
+    all_fields = {**existing_row_extra_attrs, **expression_types}
+
     annotated_type: ProperType = django_model.typ
-    if expression_types:
+    if all_fields:
         fields_dict = helpers.make_typeddict(
             api,
-            fields=expression_types,
-            required_keys=set(expression_types.keys()),
+            fields=all_fields,
+            required_keys=set(all_fields.keys()),
             readonly_keys=set(),
         )
         annotated_type = get_annotated_type(api, django_model.typ, fields_dict=fields_dict)
@@ -465,6 +473,29 @@ def _get_selected_fields_from_queryset_type(qs_type: Instance) -> set[str] | Non
     return None
 
 
+def _get_annotated_fields_from_queryset_type(qs_type: Instance) -> set[str]:
+    """
+    Derive annotated field names from a QuerySet type.
+
+    Sources:
+      - args[0].extra_attrs: from .annotate() calls
+      - args[1].extra_attrs: from WithAnnotations[Model, TypedDict]
+    """
+    fields: set[str] = set()
+
+    if len(qs_type.args) >= 1:
+        model_type = get_proper_type(qs_type.args[0])
+        if isinstance(model_type, Instance) and model_type.extra_attrs:
+            fields.update(model_type.extra_attrs.attrs.keys())
+
+    if len(qs_type.args) >= 2:
+        row_type = get_proper_type(qs_type.args[1])
+        if isinstance(row_type, Instance) and row_type.extra_attrs:
+            fields.update(row_type.extra_attrs.attrs.keys())
+
+    return fields
+
+
 def check_valid_attr_value(
     ctx: MethodContext,
     django_context: DjangoContext,
@@ -482,6 +513,7 @@ def check_valid_attr_value(
         - new_attr_names: A mapping of field names to types currently being added to the model
     """
     deselected_fields: set[str] | None = None
+    annotated_fields: set[str] = set()
     if isinstance(ctx.type, Instance):
         selected_fields = _get_selected_fields_from_queryset_type(ctx.type)
         if selected_fields is not None:
@@ -489,6 +521,7 @@ def check_valid_attr_value(
             deselected_fields = model_field_names - selected_fields
             new_attr_names = new_attr_names or set()
             new_attr_names.update(selected_fields - model_field_names)
+        annotated_fields = _get_annotated_fields_from_queryset_type(ctx.type)
 
     is_conflicting_attr_value = bool(
         # 1. Conflict with another symbol on the model (If not de-selected via a prior .values/.values_list call).
@@ -499,7 +532,7 @@ def check_valid_attr_value(
         # Ex:
         #     User.objects.annotate(foo=...).prefetch_related(Prefetch(...,to_attr="foo"))
         #     User.objects.prefetch_related(Prefetch(...,to_attr="foo")).prefetch_related(Prefetch(...,to_attr="foo"))
-        or (model.typ.extra_attrs and attr_name in model.typ.extra_attrs.attrs)
+        or attr_name in annotated_fields
         # 3. Conflict with another symbol added in the current processing.
         # Ex:
         #     User.objects.prefetch_related(
@@ -936,11 +969,12 @@ def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> Mypy
         return ctx.default_return_type
 
     selected_fields = _get_selected_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else None
+    annotated_fields = _get_annotated_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else set()
 
     for lookup_value in _extract_field_names_from_varargs(ctx):
         parts = lookup_value.removeprefix("-").split(LOOKUP_SEP)
 
-        if django_model.typ.extra_attrs and parts[0] in django_model.typ.extra_attrs.attrs:
+        if parts[0] in annotated_fields:
             # Skip validation for annotated fields
             continue
         if selected_fields is not None and parts[0] in selected_fields:
