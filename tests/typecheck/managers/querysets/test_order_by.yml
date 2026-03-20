@@ -185,3 +185,111 @@
                 class Article(models.Model):
                     created = models.DateTimeField(auto_now_add=True)
                     author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+-   case: order_by_with_annotations_typeddict
+    installed_apps:
+        - myapp
+    main: |
+        from typing import TYPE_CHECKING, TypedDict
+        from django.db.models import QuerySet, Value, IntegerField
+        from django_stubs_ext import WithAnnotations
+        from myapp.models import Item
+
+        class ExtraAnnotation(TypedDict):
+            extra_id: int | None
+
+        if TYPE_CHECKING:
+            ItemWithExtraAnnotation = WithAnnotations[Item, ExtraAnnotation]
+        else:
+            ItemWithExtraAnnotation = Item
+
+        ItemWithExtraAnnotationQuerySet = QuerySet[Item, ItemWithExtraAnnotation]
+
+        def annotate_extra(qs: QuerySet[Item]) -> ItemWithExtraAnnotationQuerySet:
+            return qs.annotate(extra_id=Value(None, output_field=IntegerField()))
+
+        qs = annotate_extra(Item.objects.all())
+        qs.order_by("extra_id")
+        qs.order_by("-extra_id")
+        qs.order_by("name", "extra_id")
+        qs.order_by("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: id, name  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Item(models.Model):
+                    name = models.CharField(max_length=100)
+
+
+-   case: order_by_combined_annotate_and_withannotations
+    installed_apps:
+        - myapp
+    main: |
+        from typing import TYPE_CHECKING, TypedDict
+        from django.db.models import QuerySet, F
+        from django_stubs_ext import WithAnnotations
+        from myapp.models import Item
+        class DeclaredAnnotation(TypedDict):
+            declared_field: int
+
+        if TYPE_CHECKING:
+            ItemWithDeclared = WithAnnotations[Item, DeclaredAnnotation]
+        else:
+            ItemWithDeclared = Item
+
+        def get_qs() -> QuerySet[Item, ItemWithDeclared]:
+            return Item.objects.all()  # type: ignore[return-value]
+
+        qs = get_qs().annotate(runtime_field=F("id"))
+        qs.order_by("declared_field")
+        qs.order_by("runtime_field")
+        qs.order_by("declared_field", "-runtime_field", "name")
+        qs.order_by("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: id, name  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Item(models.Model):
+                    name = models.CharField(max_length=100)
+
+
+-   case: order_by_with_multiple_withannotations_fields
+    installed_apps:
+        - myapp
+    main: |
+        from typing import TYPE_CHECKING, TypedDict
+        from django.db.models import QuerySet
+        from django_stubs_ext import WithAnnotations
+        from myapp.models import Item
+
+        class MultipleAnnotations(TypedDict):
+            field_a: int
+            field_b: str
+            field_c: float
+
+        if TYPE_CHECKING:
+            ItemWithMultiple = WithAnnotations[Item, MultipleAnnotations]
+        else:
+            ItemWithMultiple = Item
+
+        def get_qs() -> QuerySet[Item, ItemWithMultiple]:
+            return Item.objects.all()  # type: ignore[return-value]
+
+        qs = get_qs()
+        qs.order_by("field_a")
+        qs.order_by("-field_b")
+        qs.order_by("field_c")
+        qs.order_by("field_a", "-field_b", "field_c", "name")
+        qs.order_by("nonexistent")  # E: Cannot resolve keyword 'nonexistent' into field. Choices are: id, name  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Item(models.Model):
+                    name = models.CharField(max_length=100)

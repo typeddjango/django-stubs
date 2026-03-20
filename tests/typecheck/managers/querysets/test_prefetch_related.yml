@@ -201,6 +201,43 @@
         )
 
 
+-   case: prefetch_related_to_attr_conflict_with_withannotations
+    installed_apps:
+        - myapp
+    main: |
+        from django.db.models import Prefetch, QuerySet, Value, IntegerField
+        from myapp.models import Article, Tag
+        from typing import TYPE_CHECKING, TypedDict
+        from django_stubs_ext import WithAnnotations
+
+        class ExtraAnnotation(TypedDict):
+            extra_id: int | None
+
+        if TYPE_CHECKING:
+            ArticleWithExtra = WithAnnotations[Article, ExtraAnnotation]
+        else:
+            ArticleWithExtra = Article
+
+        ArticleWithExtraQuerySet = QuerySet[Article, ArticleWithExtra]
+
+        def annotate_extra(qs: QuerySet[Article]) -> ArticleWithExtraQuerySet:
+            return qs.annotate(extra_id=Value(None, output_field=IntegerField()))
+
+        qs = annotate_extra(Article.objects.all())
+        qs.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="extra_id"))  # E: Attribute "extra_id" already defined on "myapp.models.Article"  [no-redef]
+        qs.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="prefetched_tags"))
+
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Tag(models.Model): ...
+                class Article(models.Model):
+                    tags = models.ManyToManyField(to=Tag, related_name="articles", blank=True)
+
+
 -   case: prefetch_related_to_attr_conflict_with_model_attr
     installed_apps:
         - myapp
