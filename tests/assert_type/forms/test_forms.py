@@ -7,6 +7,6 @@ def test_in_operator(form: Form, field: str) -> None:
     assert_type(field in form, bool)
 
     # Invalid: non-str types should error
-    _ = 123 in form  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]
-    _ = None in form  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]
-    _ = b"field" in form  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]
+    _ = 123 in form  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]  # pyrefly: ignore[unsupported-operation]  # ty: ignore[unsupported-operator]
+    _ = None in form  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]  # pyrefly: ignore[unsupported-operation]  # ty: ignore[unsupported-operator]
+    _ = b"field" in form  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]  # pyrefly: ignore[unsupported-operation]  # ty: ignore[unsupported-operator]

@@ -5,7 +5,7 @@ from decimal import Decimal
 from io import StringIO
 from logging import Logger
 from types import TracebackType
-from typing import Any, Protocol, SupportsIndex, TypeAlias
+from typing import Any, Protocol, SupportsIndex, TypeAlias, type_check_only
 
 from django.apps.registry import Apps
 from django.conf import LazySettings, Settings
