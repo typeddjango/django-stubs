@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 
+from django.contrib.auth.models import AnonymousUser
 from django.db.models import Model
 from django.db.models.query import (
     QuerySet,
@@ -36,6 +37,10 @@ async def test_async() -> None:
     await aprefetch_related_objects(models_frozenset, "pk")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
 
 
-def test_in_operator(qs: QuerySet[Model], raw_qs: RawQuerySet[Model], obj: Model | None) -> None:
+def test_in_operator(qs: QuerySet[Model], raw_qs: RawQuerySet[Model], obj: Model) -> None:
     assert_type(obj in qs, bool)
     assert_type(obj in raw_qs, bool)
+
+
+def test_in_operator_with_anon(qs: QuerySet[Model], user_or_anon: Model | AnonymousUser) -> None:
+    assert_type(user_or_anon in qs, bool)

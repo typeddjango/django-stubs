@@ -12,7 +12,6 @@ from django.conf import LazySettings, Settings
 from django.core.checks.registry import CheckRegistry
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.lookups import Lookup, Transform
-from django.db.models.query import _SupportsMembership
 from django.db.models.query_utils import RegisterLookupMixin
 from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
@@ -87,7 +86,11 @@ class override_system_checks(TestContextDecorator):
     old_checks: set[Callable]
     old_deployment_checks: set[Callable]
 
-class CaptureQueriesContext(_SupportsMembership):
+@type_check_only
+class _CaptureQueriesContainsMixin:
+    def __contains__(self, item: dict[str, str], /) -> bool: ...
+
+class CaptureQueriesContext(_CaptureQueriesContainsMixin):
     connection: BaseDatabaseWrapper
     force_debug_cursor: bool
     initial_queries: int
