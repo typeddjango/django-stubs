@@ -1,7 +1,7 @@
 import datetime
 import sys
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence, Sized
-from typing import Any, Generic, Literal, NamedTuple, TypeAlias, overload
+from typing import Any, Generic, Literal, NamedTuple, Protocol, TypeAlias, overload, type_check_only
 
 from django.db.backends.utils import _ExecuteQuery
 from django.db.models import Manager
@@ -57,7 +57,12 @@ class NamedValuesListIterable(ValuesListIterable[NamedTuple]):
 class FlatValuesListIterable(BaseIterable[_T]):
     def __iter__(self) -> Iterator[_T]: ...
 
-class QuerySet(Iterable[_Row], Sized, Generic[_Model, _Row]):
+# Explicit __contains__ for `in` operator with union types
+@type_check_only
+class _SupportsMembership(Protocol):
+    def __contains__(self, item: object, /) -> bool: ...
+
+class QuerySet(_SupportsMembership, Iterable[_Row], Sized, Generic[_Model, _Row]):
     model: type[_Model]
     query: Query
     _iterable_class: type[BaseIterable]
@@ -234,7 +239,7 @@ class QuerySet(Iterable[_Row], Sized, Generic[_Model, _Row]):
     def _fetch_all(self) -> None: ...
     def resolve_expression(self, *args: Any, **kwargs: Any) -> Any: ...
 
-class RawQuerySet(Iterable[_Model], Sized):
+class RawQuerySet(_SupportsMembership, Iterable[_Model], Sized):
     raw_query: RawQuery | str
     model: type[_Model] | None
     query: RawQuery

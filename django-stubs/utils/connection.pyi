@@ -1,6 +1,7 @@
 from collections.abc import Iterator, Sequence
 from typing import Any, Generic, TypeVar
 
+from django.db.models.query import _SupportsMembership
 from django.utils.functional import cached_property
 from typing_extensions import override
 
@@ -19,7 +20,7 @@ class ConnectionProxy(Generic[_T]):
 
 class ConnectionDoesNotExist(Exception): ...
 
-class BaseConnectionHandler(Generic[_T]):
+class BaseConnectionHandler(_SupportsMembership, Generic[_T]):
     settings_name: str | None
     exception_class: type[Exception]
     thread_critical: bool
