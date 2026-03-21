@@ -1,7 +1,8 @@
 from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Sequence
-from typing import Any, ClassVar, overload, type_check_only
+from typing import Any, ClassVar, overload
 
 from django.core.exceptions import ValidationError
+from django.db.models.query import _SupportsContains
 from django.forms.boundfield import BoundField
 from django.forms.fields import Field
 from django.forms.renderers import BaseRenderer
@@ -12,11 +13,7 @@ from typing_extensions import override
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass): ...
 
-@type_check_only
-class _FormContainsMixin:
-    def __contains__(self, item: str, /) -> bool: ...
-
-class BaseForm(_FormContainsMixin, RenderableFormMixin):
+class BaseForm(_SupportsContains[str], RenderableFormMixin):
     default_renderer: BaseRenderer | type[BaseRenderer] | None
     field_order: Iterable[str] | None
     use_required_attribute: bool

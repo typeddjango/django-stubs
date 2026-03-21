@@ -3,7 +3,6 @@ import sys
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence, Sized
 from typing import Any, Generic, Literal, NamedTuple, TypeAlias, overload, type_check_only
 
-from django.contrib.auth.models import AnonymousUser
 from django.db.backends.utils import _ExecuteQuery
 from django.db.models import Manager
 from django.db.models.base import Model
@@ -13,6 +12,7 @@ from django.utils.functional import cached_property
 from typing_extensions import Self, TypeVar, override
 
 _T = TypeVar("_T", covariant=True)
+_ContainsT = TypeVar("_ContainsT")
 _Model = TypeVar("_Model", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True, default=_Model)  # ONLY use together with _Model
 _TupleT = TypeVar("_TupleT", bound=tuple[Any, ...], covariant=True)
@@ -27,8 +27,6 @@ _PrefetchedQuerySetT = TypeVar("_PrefetchedQuerySetT", bound=QuerySet[Model], co
 _ToAttrT = TypeVar("_ToAttrT", bound=str, covariant=True, default=str)
 
 _OrderByFieldName: TypeAlias = str | Combinable
-
-_ModelOrAnon: TypeAlias = Model | AnonymousUser
 
 MAX_GET_RESULTS: int
 REPR_OUTPUT_SIZE: int
@@ -61,10 +59,10 @@ class FlatValuesListIterable(BaseIterable[_T]):
     def __iter__(self) -> Iterator[_T]: ...
 
 @type_check_only
-class _QuerySetContainsMixin:
-    def __contains__(self, item: _ModelOrAnon, /) -> bool: ...
+class _SupportsContains(Generic[_ContainsT]):
+    def __contains__(self, item: _ContainsT, /) -> bool: ...
 
-class QuerySet(_QuerySetContainsMixin, Iterable[_Row], Sized, Generic[_Model, _Row]):
+class QuerySet(_SupportsContains[object], Iterable[_Row], Sized, Generic[_Model, _Row]):
     model: type[_Model]
     query: Query
     _iterable_class: type[BaseIterable]
@@ -241,7 +239,7 @@ class QuerySet(_QuerySetContainsMixin, Iterable[_Row], Sized, Generic[_Model, _R
     def _fetch_all(self) -> None: ...
     def resolve_expression(self, *args: Any, **kwargs: Any) -> Any: ...
 
-class RawQuerySet(_QuerySetContainsMixin, Iterable[_Model], Sized):
+class RawQuerySet(_SupportsContains[object], Iterable[_Model], Sized):
     raw_query: RawQuery | str
     model: type[_Model] | None
     query: RawQuery

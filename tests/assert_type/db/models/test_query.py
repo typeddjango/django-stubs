@@ -44,3 +44,8 @@ def test_in_operator(qs: QuerySet[Model], raw_qs: RawQuerySet[Model], obj: Model
 
 def test_in_operator_with_anon(qs: QuerySet[Model], user_or_anon: Model | AnonymousUser) -> None:
     assert_type(user_or_anon in qs, bool)
+
+
+def test_in_operator_with_none(qs: QuerySet[Model]) -> None:
+    # With __contains__(object), None is accepted (needed for union types like Model | None)
+    assert_type(None in qs, bool)

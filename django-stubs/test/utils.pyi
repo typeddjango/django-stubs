@@ -5,17 +5,18 @@ from decimal import Decimal
 from io import StringIO
 from logging import Logger
 from types import TracebackType
-from typing import Any, Protocol, SupportsIndex, TypeAlias, TypeVar, type_check_only
+from typing import Any, Protocol, SupportsIndex, TypeAlias
 
 from django.apps.registry import Apps
 from django.conf import LazySettings, Settings
 from django.core.checks.registry import CheckRegistry
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.lookups import Lookup, Transform
+from django.db.models.query import _SupportsContains
 from django.db.models.query_utils import RegisterLookupMixin
 from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
-from typing_extensions import Self, override
+from typing_extensions import Self, TypeVar, override
 
 _TestClass: TypeAlias = type[SimpleTestCase]
 
@@ -86,11 +87,7 @@ class override_system_checks(TestContextDecorator):
     old_checks: set[Callable]
     old_deployment_checks: set[Callable]
 
-@type_check_only
-class _CaptureQueriesContainsMixin:
-    def __contains__(self, item: dict[str, str], /) -> bool: ...
-
-class CaptureQueriesContext(_CaptureQueriesContainsMixin):
+class CaptureQueriesContext(_SupportsContains[dict[str, str]]):
     connection: BaseDatabaseWrapper
     force_debug_cursor: bool
     initial_queries: int
