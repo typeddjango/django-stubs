@@ -12,7 +12,7 @@ from django.utils.functional import cached_property
 from typing_extensions import Self, TypeVar, override
 
 _T = TypeVar("_T", covariant=True)
-_ContainsT_co = TypeVar("_ContainsT_co", covariant=True)
+_ContainsT = TypeVar("_ContainsT")
 _Model = TypeVar("_Model", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True, default=_Model)  # ONLY use together with _Model
 _TupleT = TypeVar("_TupleT", bound=tuple[Any, ...], covariant=True)
@@ -59,8 +59,8 @@ class FlatValuesListIterable(BaseIterable[_T]):
     def __iter__(self) -> Iterator[_T]: ...
 
 @type_check_only
-class _SupportsContains(Generic[_ContainsT_co]):
-    def __contains__(self, item: _ContainsT_co, /) -> bool: ...
+class _SupportsContains(Generic[_ContainsT]):
+    def __contains__(self, item: _ContainsT, /) -> bool: ...
 
 class QuerySet(_SupportsContains[object], Iterable[_Row], Sized, Generic[_Model, _Row]):
     model: type[_Model]
