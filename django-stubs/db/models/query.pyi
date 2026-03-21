@@ -1,7 +1,7 @@
 import datetime
 import sys
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence, Sized
-from typing import Any, Generic, Literal, NamedTuple, TypeAlias, overload
+from typing import Any, Generic, Literal, NamedTuple, TypeAlias, overload, type_check_only
 
 from django.db.backends.utils import _ExecuteQuery
 from django.db.models import Manager
@@ -12,6 +12,7 @@ from django.utils.functional import cached_property
 from typing_extensions import Self, TypeVar, override
 
 _T = TypeVar("_T", covariant=True)
+_ContainsT = TypeVar("_ContainsT")
 _Model = TypeVar("_Model", bound=Model, covariant=True)
 _Row = TypeVar("_Row", covariant=True, default=_Model)  # ONLY use together with _Model
 _TupleT = TypeVar("_TupleT", bound=tuple[Any, ...], covariant=True)
@@ -57,7 +58,11 @@ class NamedValuesListIterable(ValuesListIterable[NamedTuple]):
 class FlatValuesListIterable(BaseIterable[_T]):
     def __iter__(self) -> Iterator[_T]: ...
 
-class QuerySet(Iterable[_Row], Sized, Generic[_Model, _Row]):
+@type_check_only
+class _SupportsContains(Generic[_ContainsT]):
+    def __contains__(self, item: _ContainsT, /) -> bool: ...
+
+class QuerySet(_SupportsContains[object], Iterable[_Row], Sized, Generic[_Model, _Row]):
     model: type[_Model]
     query: Query
     _iterable_class: type[BaseIterable]
@@ -234,7 +239,7 @@ class QuerySet(Iterable[_Row], Sized, Generic[_Model, _Row]):
     def _fetch_all(self) -> None: ...
     def resolve_expression(self, *args: Any, **kwargs: Any) -> Any: ...
 
-class RawQuerySet(Iterable[_Model], Sized):
+class RawQuerySet(_SupportsContains[object], Iterable[_Model], Sized):
     raw_query: RawQuery | str
     model: type[_Model] | None
     query: RawQuery
