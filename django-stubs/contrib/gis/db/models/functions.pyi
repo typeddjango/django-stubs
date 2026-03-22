@@ -20,7 +20,7 @@ class GeoFuncMixin:
     def name(self) -> str: ...
     @cached_property
     def geo_field(self) -> Any: ...
-    def as_sql(  # type: ignore[override]
+    def as_sql(
         self,
         compiler: SQLCompiler,
         connection: BaseDatabaseWrapper,
@@ -102,7 +102,7 @@ class BoundingCircle(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[m
 class Centroid(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     arity: int
 
-class ClosestPoint(GeomOutputGeoFunc):  # type: ignore[misc]
+class ClosestPoint(GeomOutputGeoFunc):
     arity: int
     geom_param_pos: tuple[int, int]
 
@@ -169,7 +169,7 @@ class IsValid(OracleToleranceMixin, GeoFuncMixin, StandardTransform):  # type: i
     @override
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
-class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):  # type: ignore[misc]
+class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     spheroid: Any
     def __init__(self, expr1: Any, spheroid: bool = True, **extra: Any) -> None: ...
     @override
@@ -212,10 +212,10 @@ class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):  # type: ig
 class PointOnSurface(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     arity: int
 
-class Reverse(GeoFunc):  # type: ignore[misc]
+class Reverse(GeoFunc):
     arity: int
 
-class Rotate(GeomOutputGeoFunc):  # type: ignore[misc]
+class Rotate(GeomOutputGeoFunc):
     def __init__(self, expression: Any, angle: Any, origin: Any | None = None, **extra: Any) -> None: ...
 
 class Scale(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):  # type: ignore[misc]
