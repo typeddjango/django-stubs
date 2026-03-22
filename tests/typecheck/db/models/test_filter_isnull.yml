@@ -1,22 +1,192 @@
-- case: filter_isnull_on_related_field
+- case: filter_isnull_true_on_non_nullable_field_is_an_error
   main: |
-      from django.db import models
+    from myapp.models import MyModel
+    MyModel.objects.filter(name__isnull=True)  # E: Field "name" does not allow NULL; using "__isnull=True" will always return an empty queryset.  [misc]
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
 
-      class Author(models.Model):
-        name = models.CharField(null=False)
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100)
 
-      class Book(models.Model):
-        author = models.ForeignKey(Author, on_delete=models.CASCADE)
+            class Meta:
+                app_label = "myapp"
 
-      Book.objects.filter(author__name__isnull==False)
-  out:  |
-      main:9: error: Field "name" does not allow NULL
 
-- case: filter_isnull_on_non_nullable_field
+- case: filter_isnull_false_on_non_nullable_field_is_a_noop_error
   main: |
-      from django.db import models
+    from myapp.models import MyModel
+    MyModel.objects.filter(name__isnull=False)  # E: Field "name" does not allow NULL; using "__isnull=False" is a no-op and can be removed.  [misc]
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
 
-      class User(models.model):
-        username = models.CharField(null=False)
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100)
 
-      User.objects.filter(username__isnull=True) # E: Field "username" does not allow NULL
+            class Meta:
+                app_label = "myapp"
+
+
+- case: filter_isnull_true_on_nullable_field_is_allowed
+  main: |
+    from myapp.models import MyModel
+    MyModel.objects.filter(name__isnull=True)
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100, null=True)
+
+            class Meta:
+                app_label = "myapp"
+
+
+- case: filter_isnull_false_on_nullable_field_is_allowed
+  main: |
+    from myapp.models import MyModel
+    MyModel.objects.filter(name__isnull=False)
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100, null=True)
+
+            class Meta:
+                app_label = "myapp"
+
+
+- case: filter_isnull_with_plain_bool_variable_does_not_raise
+  # A runtime bool variable is not a LiteralType — its value cannot be
+  # statically determined, so no error should be emitted.
+  main: |
+    from myapp.models import MyModel
+    flag: bool
+    MyModel.objects.filter(name__isnull=flag)
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100)
+
+            class Meta:
+                app_label = "myapp"
+
+
+- case: filter_isnull_true_on_related_field_traversal_non_nullable
+  # Traversing a FK: the resolved leaf field "name" is non-nullable → error.
+  main: |
+    from myapp.models import Order
+    Order.objects.filter(customer__name__isnull=True)  # E: Field "name" does not allow NULL; using "__isnull=True" will always return an empty queryset.  [misc]
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class Customer(models.Model):
+            name = models.CharField(max_length=100)
+
+            class Meta:
+                app_label = "myapp"
+
+        class Order(models.Model):
+            customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+
+            class Meta:
+                app_label = "myapp"
+
+
+- case: filter_isnull_true_on_nullable_fk_field_itself_is_allowed
+  # __isnull directly on a nullable FK ("has no related object") must not be flagged.
+  main: |
+    from myapp.models import Order
+    Order.objects.filter(customer__isnull=True)
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class Customer(models.Model):
+            name = models.CharField(max_length=100)
+
+            class Meta:
+                app_label = "myapp"
+
+        class Order(models.Model):
+            customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
+
+            class Meta:
+                app_label = "myapp"
+
+
+- case: filter_isnull_mixed_kwargs_only_non_nullable_field_errors
+  # Only the non-nullable field produces an error; the nullable one is silent.
+  main: |
+    from myapp.models import MyModel
+    MyModel.objects.filter(
+        name__isnull=True,  # E: Field "name" does not allow NULL; using "__isnull=True" will always return an empty queryset.  [misc]
+        bio__isnull=True,
+    )
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100)
+            bio = models.TextField(null=True)
+
+            class Meta:
+                app_label = "myapp"
+
+
+- case: filter_isnull_on_integer_field_non_nullable
+  # The check is field-type-agnostic: IntegerField with null=False also triggers.
+  main: |
+    from myapp.models import MyModel
+    MyModel.objects.filter(age__isnull=True)  # E: Field "age" does not allow NULL; using "__isnull=True" will always return an empty queryset.  [misc]
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class MyModel(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                app_label = "myapp"
