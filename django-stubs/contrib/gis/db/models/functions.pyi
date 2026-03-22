@@ -20,16 +20,11 @@ class GeoFuncMixin:
     def name(self) -> str: ...
     @cached_property
     def geo_field(self) -> Any: ...
-    # GeoFuncMixin.as_sql drops `template` and `arg_joiner` vs Func.as_sql, but forwards
-    # **extra_context to super().as_sql — so callers can still pass them and they work.
-    # We keep the full Func.as_sql-compatible signature here to avoid MRO conflicts.
-    def as_sql(
+    def as_sql(  # type: ignore[override]
         self,
         compiler: SQLCompiler,
         connection: BaseDatabaseWrapper,
         function: str | None = None,
-        template: str | None = None,
-        arg_joiner: str | None = None,
         **extra_context: Any,
     ) -> _AsSqlType: ...
     def resolve_expression(
@@ -38,7 +33,8 @@ class GeoFuncMixin:
         **kwargs: Any,
     ) -> Any: ...
 
-class GeoFunc(GeoFuncMixin, Func): ...
+class GeoFunc(GeoFuncMixin, Func):  # type: ignore[misc]
+    ...
 
 class GeomOutputGeoFunc(GeoFunc):
     @cached_property
@@ -98,19 +94,19 @@ class AsWKT(GeoFunc):
     output_field: ClassVar[TextField]
     arity: int
 
-class BoundingCircle(OracleToleranceMixin, GeomOutputGeoFunc):
+class BoundingCircle(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     def __init__(self, expression: Any, num_seg: int = 48, **extra: Any) -> None: ...
     @override
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
-class Centroid(OracleToleranceMixin, GeomOutputGeoFunc):
+class Centroid(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     arity: int
 
-class ClosestPoint(GeomOutputGeoFunc):
+class ClosestPoint(GeomOutputGeoFunc):  # type: ignore[misc]
     arity: int
     geom_param_pos: tuple[int, int]
 
-class Difference(OracleToleranceMixin, GeomOutputGeoFunc):
+class Difference(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     arity: int
     geom_param_pos: Any
 
@@ -119,7 +115,7 @@ class DistanceResultMixin:
     def output_field(self) -> DistanceField: ...
     def source_is_geography(self) -> Any: ...
 
-class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
+class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):  # type: ignore[misc]
     geom_param_pos: Any
     spheroid: Any
     def __init__(self, expr1: Any, expr2: Any, spheroid: Any | None = None, **extra: Any) -> None: ...
@@ -154,26 +150,26 @@ class GeometryDistance(GeoFunc):
     arg_joiner: str
     geom_param_pos: Any
 
-class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
+class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     arity: int
     geom_param_pos: Any
 
-class GeometryType(GeoFuncMixin, StandardTransform):
+class GeometryType(GeoFuncMixin, StandardTransform):  # type: ignore[misc]
     lookup_name: str
     output_field: ClassVar[CharField]
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
-class IsEmpty(GeoFuncMixin, StandardTransform):
+class IsEmpty(GeoFuncMixin, StandardTransform):  # type: ignore[misc]
     lookup_name: str
     output_field: ClassVar[BooleanField]
 
-class IsValid(OracleToleranceMixin, GeoFuncMixin, StandardTransform):
+class IsValid(OracleToleranceMixin, GeoFuncMixin, StandardTransform):  # type: ignore[misc]
     lookup_name: str
     output_field: ClassVar[BooleanField]
     @override
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
-class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
+class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):  # type: ignore[misc]
     spheroid: Any
     def __init__(self, expr1: Any, spheroid: bool = True, **extra: Any) -> None: ...
     @override
@@ -205,7 +201,7 @@ class NumPoints(GeoFunc):
     output_field: ClassVar[IntegerField]
     arity: int
 
-class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
+class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):  # type: ignore[misc]
     arity: int
     def as_postgresql(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
@@ -213,22 +209,22 @@ class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     @override
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
-class PointOnSurface(OracleToleranceMixin, GeomOutputGeoFunc):
+class PointOnSurface(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     arity: int
 
-class Reverse(GeoFunc):
+class Reverse(GeoFunc):  # type: ignore[misc]
     arity: int
 
-class Rotate(GeomOutputGeoFunc):
+class Rotate(GeomOutputGeoFunc):  # type: ignore[misc]
     def __init__(self, expression: Any, angle: Any, origin: Any | None = None, **extra: Any) -> None: ...
 
-class Scale(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):
+class Scale(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     def __init__(self, expression: Any, x: Any, y: Any, z: float = 0.0, **extra: Any) -> None: ...
 
-class SnapToGrid(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):
+class SnapToGrid(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     def __init__(self, expression: Any, *args: Any, **extra: Any) -> None: ...
 
-class SymDifference(OracleToleranceMixin, GeomOutputGeoFunc):
+class SymDifference(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     arity: int
     geom_param_pos: Any
 
@@ -239,6 +235,6 @@ class Translate(Scale):
     @override
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
-class Union(OracleToleranceMixin, GeomOutputGeoFunc):
+class Union(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
     arity: int
     geom_param_pos: Any
