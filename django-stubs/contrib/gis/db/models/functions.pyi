@@ -20,6 +20,18 @@ class GeoFuncMixin:
     def name(self) -> str: ...
     @cached_property
     def geo_field(self) -> Any: ...
+    # GeoFuncMixin.as_sql drops `template` and `arg_joiner` vs Func.as_sql, but forwards
+    # **extra_context to super().as_sql — so callers can still pass them and they work.
+    # We keep the full Func.as_sql-compatible signature here to avoid MRO conflicts.
+    def as_sql(
+        self,
+        compiler: SQLCompiler,
+        connection: BaseDatabaseWrapper,
+        function: str | None = None,
+        template: str | None = None,
+        arg_joiner: str | None = None,
+        **extra_context: Any,
+    ) -> _AsSqlType: ...
     def resolve_expression(
         self,
         *args: Any,
@@ -45,6 +57,10 @@ class Area(OracleToleranceMixin, GeoFunc):
     @cached_property
     @override
     def output_field(self) -> AreaField: ...
+    @override
+    def as_sql(  # type: ignore[override]
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
+    ) -> _AsSqlType: ...
     @override
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
@@ -160,6 +176,10 @@ class IsValid(OracleToleranceMixin, GeoFuncMixin, StandardTransform):
 class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     spheroid: Any
     def __init__(self, expr1: Any, spheroid: bool = True, **extra: Any) -> None: ...
+    @override
+    def as_sql(  # type: ignore[override]
+        self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
+    ) -> _AsSqlType: ...
     def as_postgresql(
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> _AsSqlType: ...
