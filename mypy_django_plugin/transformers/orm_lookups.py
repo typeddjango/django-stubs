@@ -23,7 +23,6 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
         return ctx.default_return_type
-    model_cls = django_model.cls
 
     # Expected formal arguments for filter methods are `*args` and `**kwargs`. We'll only typecheck
     # `**kwargs`, which means that `arg_names[1]` is what we're interested in.
@@ -44,13 +43,13 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
                 field = None
 
                 try:
-                    real_model_cls = django_context.get_model_class_by_fullname(model_cls.fullname)
+                    real_model_cls = django_context.get_model_class_by_fullname(django_model.cls.fullname)
                     if real_model_cls is not None:
                         path_parts = lookup_path.split(LOOKUP_SEP)
                         current_model = real_model_cls
 
                         for part in path_parts:
-                            field = current_model._meta.get_fidld(part)
+                            field = current_model._meta.get_field(part)
 
                             if hasattr(field, "related_model") and field.related_model is not None:
                                 current_model = field.related_model
