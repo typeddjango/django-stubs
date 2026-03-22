@@ -160,4 +160,5 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
+required-imports = ["from __future__ import annotations"]
 split-on-trailing-comma = false

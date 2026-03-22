@@ -1,7 +1,11 @@
-from pathlib import Path
-from typing import Any, TypedDict, type_check_only
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, TypedDict, type_check_only
 
 from typing_extensions import NotRequired
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @type_check_only

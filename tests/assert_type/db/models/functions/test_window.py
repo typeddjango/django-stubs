@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db.models import F, Value
 from django.db.models.functions import Lag, Lead, NthValue
 

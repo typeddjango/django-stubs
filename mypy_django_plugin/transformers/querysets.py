@@ -1,8 +1,8 @@
-from collections.abc import Sequence
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Literal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db.models.base import Model
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields.related import RelatedField
 from django.db.models.fields.related_descriptors import (
@@ -14,20 +14,24 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.lookups import Transform
 from django.db.models.sql.query import Query
-from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
 from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, ListExpr, SetExpr, TupleExpr
-from mypy.plugin import FunctionContext, MethodContext
 from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
-from mypy_django_plugin.lib.helpers import DjangoModel
 from mypy_django_plugin.transformers.models import get_annotated_type
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from django.db.models.base import Model
     from django.db.models.options import _AnyField
+    from mypy.checker import TypeChecker
+    from mypy.plugin import FunctionContext, MethodContext
+
+    from mypy_django_plugin.lib.helpers import DjangoModel
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
@@ -564,9 +568,11 @@ def check_valid_prefetch_related_lookup(
     for through_attr in lookup.split(LOOKUP_SEP):
         rel_obj_descriptor = getattr(current_model_cls, through_attr, None)
         if rel_obj_descriptor is None:
+            # If current_model_cls is "self", we cannot use `__name__` and want "self".
+            model_name = getattr(current_model_cls, "__name__", current_model_cls)
             ctx.api.fail(
                 (
-                    f'Cannot find "{through_attr}" on "{current_model_cls.__name__}" object, '
+                    f'Cannot find "{through_attr}" on "{model_name}" object, '
                     f'"{lookup}" is an invalid parameter to "prefetch_related()"'
                 ),
                 ctx.context,
@@ -576,8 +582,10 @@ def check_valid_prefetch_related_lookup(
             from django.contrib.contenttypes.fields import GenericForeignKey
 
             if not isinstance(rel_obj_descriptor, GenericForeignKey):
+                # If current_model_cls is "self", we cannot use `__name__` and want "self".
+                model_name = getattr(current_model_cls, "__name__", current_model_cls)
                 ctx.api.fail(
-                    f'"{through_attr}" on "{current_model_cls.__name__}" is not a GenericForeignKey, '
+                    f'"{through_attr}" on "{model_name}" is not a GenericForeignKey, '
                     f"GenericPrefetch can only be used with GenericForeignKey fields",
                     ctx.context,
                 )
@@ -585,10 +593,10 @@ def check_valid_prefetch_related_lookup(
         elif isinstance(rel_obj_descriptor, ForwardManyToOneDescriptor):
             current_model_cls = rel_obj_descriptor.field.remote_field.model
         elif isinstance(rel_obj_descriptor, ReverseOneToOneDescriptor):
-            current_model_cls = rel_obj_descriptor.related.related_model  # type:ignore[assignment] # Can't be 'self' for non abstract models
+            current_model_cls = rel_obj_descriptor.related.related_model
         elif isinstance(rel_obj_descriptor, ManyToManyDescriptor):
             current_model_cls = (
-                rel_obj_descriptor.rel.related_model if rel_obj_descriptor.reverse else rel_obj_descriptor.rel.model  # type:ignore[assignment] # Can't be 'self' for non abstract models
+                rel_obj_descriptor.rel.related_model if rel_obj_descriptor.reverse else rel_obj_descriptor.rel.model
             )
         elif isinstance(rel_obj_descriptor, ReverseManyToOneDescriptor):
             if contenttypes_installed:
@@ -597,7 +605,7 @@ def check_valid_prefetch_related_lookup(
                 if isinstance(rel_obj_descriptor, ReverseGenericManyToOneDescriptor):
                     current_model_cls = rel_obj_descriptor.rel.model
                     continue
-            current_model_cls = rel_obj_descriptor.rel.related_model  # type:ignore[assignment] # Can't be 'self' for non abstract models
+            current_model_cls = rel_obj_descriptor.rel.related_model
         else:
             if contenttypes_installed:
                 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -741,7 +749,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
 
 def _try_get_field(
     ctx: MethodContext, model_cls: type[Model], field_name: str, *, resolve_pk: bool = False
-) -> "_AnyField | None":
+) -> _AnyField | None:
     opts = model_cls._meta
     resolved_name = opts.pk.name if resolve_pk and field_name == "pk" else field_name
     try:
@@ -751,7 +759,7 @@ def _try_get_field(
         return None
 
 
-def _check_field_concrete(ctx: MethodContext, field: "_AnyField", field_name: str, method: str) -> bool:
+def _check_field_concrete(ctx: MethodContext, field: _AnyField, field_name: str, method: str) -> bool:
     if not field.concrete or field.many_to_many:
         ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
         return False
@@ -761,7 +769,7 @@ def _check_field_concrete(ctx: MethodContext, field: "_AnyField", field_name: st
 def _check_field_not_pk(
     ctx: MethodContext,
     model_cls: type[Model],
-    field: "_AnyField",
+    field: _AnyField,
     field_name: str,
     method: str,
     *,

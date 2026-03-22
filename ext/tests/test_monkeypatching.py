@@ -1,17 +1,22 @@
+from __future__ import annotations
+
 import builtins
-from collections.abc import Iterable
 from contextlib import suppress
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import pytest
-from _pytest.fixtures import FixtureRequest
-from _pytest.monkeypatch import MonkeyPatch
 from django.db.models import Model
 from django.forms.models import ModelForm
 
 import django_stubs_ext
 from django_stubs_ext import patch
 from django_stubs_ext.patch import _need_generic, _VersionSpec
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from _pytest.fixtures import FixtureRequest
+    from _pytest.monkeypatch import MonkeyPatch
 
 
 class _MakeGenericClasses(Protocol):

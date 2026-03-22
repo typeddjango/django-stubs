@@ -62,11 +62,11 @@ person_tuple_admin = PersonTupleAdmin(Person, admin_site)
 person_fieldset_list_admin = PersonFieldsetListAdmin(Person, admin_site)
 person_fieldset_tuple_admin = PersonFieldsetTupleAdmin(Person, admin_site)
 
-# For some reason, pyright cannot see that these are not `None`.
-assert person_list_admin.fields is not None
-assert person_tuple_admin.fields is not None
-assert person_fieldset_list_admin.fieldsets is not None
-assert person_fieldset_tuple_admin.fieldsets is not None
+# For some reason, pyright cannot see that these are not `None` so we need to ignore these for mypy.
+assert person_list_admin.fields is not None  # type: ignore[comparison-overlap]
+assert person_tuple_admin.fields is not None  # type: ignore[comparison-overlap]
+assert person_fieldset_list_admin.fieldsets is not None  # type: ignore[comparison-overlap]
+assert person_fieldset_tuple_admin.fieldsets is not None  # type: ignore[comparison-overlap]
 
 assert_type(flatten(person_list_admin.fields), list[str])  # ty: ignore[no-matching-overload,type-assertion-failure]
 assert_type(flatten(person_list_admin.get_fields(request)), list[str])

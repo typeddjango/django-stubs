@@ -1,6 +1,7 @@
-from typing import Final
+from __future__ import annotations
 
-from mypy.checker import TypeChecker
+from typing import TYPE_CHECKING, Final
+
 from mypy.copytype import copy_type
 from mypy.nodes import (
     GDEF,
@@ -17,9 +18,7 @@ from mypy.nodes import (
     SymbolTableNode,
     TypeInfo,
 )
-from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.plugins.common import add_method_to_class
-from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.subtypes import find_member
 from mypy.types import (
@@ -40,6 +39,11 @@ from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.lib import fullnames, helpers
+
+if TYPE_CHECKING:
+    from mypy.checker import TypeChecker
+    from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
+    from mypy.semanal import SemanticAnalyzer
 
 MANAGER_METHODS_RETURNING_QUERYSET: Final = frozenset(
     (
@@ -377,7 +381,7 @@ def create_manager_info_from_from_queryset_call(
         return None
 
     base_manager_info, queryset_info = call_expr.callee.expr.node, call_expr.args[0].node
-    if queryset_info.fullname is None:
+    if queryset_info.fullname is None:  # type: ignore[comparison-overlap]
         # In some cases, due to the way the semantic analyzer works, only
         # passed_queryset.name is available. But it should be analyzed again,
         # so this isn't a problem.

@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from enum import Enum, auto
+from typing import TYPE_CHECKING
 
 from django.db.models.constants import LOOKUP_SEP
 from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo, Var
-from mypy.plugin import AttributeContext
 from mypy.typeanal import make_optional_type
 from mypy.types import (
     AnyType,
@@ -20,6 +22,9 @@ from mypy.types import (
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.lib import fullnames
+
+if TYPE_CHECKING:
+    from mypy.plugin import AttributeContext
 
 
 # TODO: [mypy 1.14+] Remove this backport of `TypeInfo.enum_members`.
@@ -47,7 +52,7 @@ class _LabelLaziness(Enum):
     MIXED = auto()
 
     @classmethod
-    def make(cls, lazy: bool | None) -> "_LabelLaziness":
+    def make(cls, lazy: bool | None) -> _LabelLaziness:
         return cls.LAZY if lazy else cls.NON_LAZY
 
 

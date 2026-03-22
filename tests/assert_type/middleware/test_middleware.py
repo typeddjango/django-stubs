@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib.redirects.middleware import RedirectFallbackMiddleware
-from django.http.request import HttpRequest
 from django.http.response import (
     FileResponse,
     HttpResponse,
@@ -11,6 +14,9 @@ from django.http.response import (
 from django.middleware.common import CommonMiddleware
 from django.middleware.locale import LocaleMiddleware
 from typing_extensions import override
+
+if TYPE_CHECKING:
+    from django.http.request import HttpRequest
 
 
 class CustomCommonMiddleware(CommonMiddleware):

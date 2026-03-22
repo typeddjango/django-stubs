@@ -1,6 +1,12 @@
-from mypy.plugin import MethodContext
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from mypy.types import Type as MypyType
 from mypy.types import UninhabitedType, get_proper_type
+
+if TYPE_CHECKING:
+    from mypy.plugin import MethodContext
 
 
 def check_querydict_is_mutable(ctx: MethodContext) -> MypyType:
