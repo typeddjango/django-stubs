@@ -62,6 +62,7 @@ class FlatValuesListIterable(BaseIterable[_T]):
 class _SupportsContains(Generic[_ContainsT]):
     def __contains__(self, item: _ContainsT, /) -> bool: ...
 
+# Using `object` (not `_Row | None`) to satisfy Collection protocol and support `User | AnonymousUser` patterns
 class QuerySet(_SupportsContains[object], Iterable[_Row], Sized, Generic[_Model, _Row]):
     model: type[_Model]
     query: Query

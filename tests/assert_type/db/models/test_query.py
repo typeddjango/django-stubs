@@ -37,15 +37,17 @@ async def test_async() -> None:
     await aprefetch_related_objects(models_frozenset, "pk")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
 
 
-def test_in_operator(qs: QuerySet[Model], raw_qs: RawQuerySet[Model], obj: Model) -> None:
+def test_in_operator(
+    qs: QuerySet[Model],
+    raw_qs: RawQuerySet[Model],
+    obj: Model,
+    user_or_anon: Model | AnonymousUser,
+    obj_or_none: Model | None,
+) -> None:
     assert_type(obj in qs, bool)
     assert_type(obj in raw_qs, bool)
-
-
-def test_in_operator_with_anon(qs: QuerySet[Model], user_or_anon: Model | AnonymousUser) -> None:
     assert_type(user_or_anon in qs, bool)
-
-
-def test_in_operator_with_none(qs: QuerySet[Model]) -> None:
-    # With __contains__(object), None is accepted (needed for union types like Model | None)
+    assert_type(obj_or_none in qs, bool)
     assert_type(None in qs, bool)
+    assert_type("test" in qs, bool)
+    assert_type(42 in qs, bool)
