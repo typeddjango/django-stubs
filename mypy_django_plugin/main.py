@@ -43,6 +43,7 @@ from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
     reparametrize_any_manager_hook,
+    reparametrize_any_queryset_hook,
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import (
@@ -232,6 +233,8 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(fullname)
         if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
             return reparametrize_any_manager_hook
+        if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+            return reparametrize_any_queryset_hook
         return None
 
     @override

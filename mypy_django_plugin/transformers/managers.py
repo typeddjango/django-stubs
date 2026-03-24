@@ -589,6 +589,58 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     )
 
 
+def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
+    """
+    Add implicit generics to QuerySet subclasses that are defined without generic.
+
+    Eg.
+
+        class MyQuerySet(models.QuerySet): ...
+
+    is interpreted as:
+
+        _Model = TypeVar('_Model', bound=Model, covariant=True)
+        _Row = TypeVar('_Row', covariant=True, default=_Model)
+        class MyQuerySet(models.QuerySet[_Model, _Row]): ...
+
+    Note that this does not happen if mypy is run with disallow_any_generics = True,
+    as not specifying the generic type is then considered an error.
+    """
+    queryset = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
+    if queryset is None or queryset.node is None:
+        return
+    assert isinstance(queryset.node, TypeInfo)
+
+    if queryset.node.type_vars:
+        # We've already been here
+        return
+
+    parent_queryset = next(
+        (base for base in queryset.node.bases if base.type.has_base(fullnames.QUERYSET_CLASS_FULLNAME)),
+        None,
+    )
+    if parent_queryset is None or len(parent_queryset.args) != 2:
+        return
+
+    model_param = get_proper_type(parent_queryset.args[0])
+    if not isinstance(model_param, AnyType) or model_param.type_of_any is not TypeOfAny.from_omitted_generics:
+        return
+
+    type_vars = tuple(parent_queryset.type.defn.type_vars)
+
+    # If we end up with placeholders we need to defer so the placeholders are
+    # resolved in a future iteration
+    if any(has_placeholder(type_var) for type_var in type_vars):
+        if not ctx.api.final_iteration:
+            ctx.api.defer()
+        else:
+            return
+
+    parent_queryset.args = type_vars
+    queryset.node.defn.type_vars = list(type_vars)
+    queryset.node.add_type_vars()
+
+
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
     """
     Add implicit generics to manager classes that are defined without generic.

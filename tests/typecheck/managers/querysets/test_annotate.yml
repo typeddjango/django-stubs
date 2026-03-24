@@ -552,3 +552,35 @@
         from django.db import models
         class MyModel(models.Model):
             name = models.CharField(max_length=100)
+
+- case: annotate_on_implicitly_generic_custom_queryset
+  main: |
+    from typing_extensions import reveal_type
+    from myapp.models import MyModel
+    from django.db.models import Count
+
+    qs = MyModel.objects.all().annotate(num_items=Count("id"))
+    obj = qs.get()
+    reveal_type(obj.num_items)  # N: Revealed type is "Any"
+    obj.nonexistent  # E: "MyModel@AnnotatedWith[TypedDict({'num_items': Any})]" has no attribute "nonexistent"  [attr-defined]
+
+    # Custom queryset methods remain available after annotate
+    qs.custom_method()
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        from typing_extensions import Self
+
+        class MyQuerySet(models.QuerySet):
+            def custom_method(self) -> Self:
+                return self.filter(name="test")
+
+        MyManager = models.Manager.from_queryset(MyQuerySet)
+
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100)
+            objects = MyManager()

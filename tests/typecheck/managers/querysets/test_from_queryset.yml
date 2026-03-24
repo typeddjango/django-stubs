@@ -1042,3 +1042,32 @@
                 # Forward-referenced metaclass defined after use
                 class ForwardMCS(type):
                     pass
+
+-   case: subclass_queryset_without_type_parameters_disallow_any_generics
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)
+        reveal_type(MyModel.objects.get())
+    installed_apps:
+        - myapp
+    mypy_config: |
+        [mypy-myapp.models]
+        disallow_any_generics = true
+    out: |
+        main:3: note: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
+        main:4: note: Revealed type is "myapp.models.MyModel"
+        myapp/models:3: error: Missing type parameters for generic type "QuerySet"  [type-arg]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class MyQuerySet(models.QuerySet):
+                    pass
+
+                MyManager = models.Manager.from_queryset(MyQuerySet)
+
+                class MyModel(models.Model):
+                    objects = MyManager()
