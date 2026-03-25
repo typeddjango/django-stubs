@@ -299,9 +299,6 @@
         # We don't know the type of an unknown lookup
         reveal_type(values_list_flat_unknown)  # N: Revealed type is "Any"
 
-        values_no_params = Blog.objects.annotate(foo=F('id')).values().get()
-        reveal_type(values_no_params)  # N: Revealed type is "builtins.dict[builtins.str, Any]"
-
         values_list_no_params = Blog.objects.annotate(foo=F('id')).values_list().get()
         reveal_type(values_list_no_params)  # N: Revealed type is "builtins.tuple[Any, ...]"
 
@@ -655,3 +652,46 @@
                 from django.db import models
                 class User(models.Model):
                     username = models.CharField(max_length=100)
+
+- case: test_values_on_with_annotations_queryset
+  main: |
+    from typing_extensions import TypedDict, reveal_type
+    from django.db.models import QuerySet
+    from django_stubs_ext import WithAnnotations
+    from myapp.models import MyModel
+
+    class MyAnnotations(TypedDict):
+        extra_id: int | None
+
+    AnnotatedModel = WithAnnotations[MyModel, MyAnnotations]
+
+    def get_qs() -> QuerySet[AnnotatedModel]:
+        ...
+
+    qs = get_qs()
+
+    # .values() with annotation field should produce a TypedDict
+    values_result = qs.values("extra_id").get()
+    reveal_type(values_result)  # N: Revealed type is "TypedDict({'extra_id': builtins.int | None})"
+
+    # .values() with model field should still work
+    model_field_values = qs.values("name").get()
+    reveal_type(model_field_values)  # N: Revealed type is "TypedDict({'name': builtins.str})"
+
+    # .values() with both model and annotation fields
+    mixed_values = qs.values("name", "extra_id").get()
+    reveal_type(mixed_values)  # N: Revealed type is "TypedDict({'name': builtins.str, 'extra_id': builtins.int | None})"
+
+    # .values() with no params on annotated queryset includes model + annotation fields
+    bare_values = qs.values().get()
+    reveal_type(bare_values)  # N: Revealed type is "TypedDict({'id': builtins.int, 'name': builtins.str, 'extra_id': builtins.int | None})"
+
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100)

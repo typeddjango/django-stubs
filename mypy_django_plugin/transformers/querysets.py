@@ -361,6 +361,15 @@ def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: Dj
     return field_lookups
 
 
+def _get_annotation_field_types(model_type: Instance) -> dict[str, MypyType]:
+    """Extract annotation field types from an annotated model's TypedDict type argument."""
+    if model_type.args:
+        annotations = get_proper_type(model_type.args[0])
+        if isinstance(annotations, TypedDictType):
+            return dict(annotations.items)
+    return {}
+
+
 def extract_proper_type_queryset_values(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     """
     Extract proper return type for QuerySet.values(*fields, **expressions) method calls.
@@ -368,7 +377,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     See https://docs.djangoproject.com/en/stable/ref/models/querysets/#values
     """
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
-    if django_model is None or django_model.is_annotated:
+    if django_model is None:
         return ctx.default_return_type
 
     default_return_type = get_proper_type(ctx.default_return_type)
@@ -379,22 +388,37 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     if field_lookups is None:
         return AnyType(TypeOfAny.from_error)
 
+    annotation_types = _get_annotation_field_types(django_model.typ) if django_model.is_annotated else {}
+
     # Bare `.values()` case
     if len(field_lookups) == 0 and not ctx.args[1]:
         for field in django_context.get_model_fields(django_model.cls):
             field_lookups.append(field.attname)
-
+        field_lookups.extend(annotation_types)
     column_types: dict[str, MypyType] = {}
 
     # Collect `*fields` types -- `.values("id", "name")`
     for field_lookup in field_lookups:
+        # Check annotation fields first for annotated querysets
+        if field_lookup in annotation_types:
+            column_types[field_lookup] = annotation_types[field_lookup]
+            continue
+
         field_lookup_type = get_field_type_from_lookup(
-            ctx, django_context, django_model.cls, lookup=field_lookup, method="values"
+            ctx,
+            django_context,
+            django_model.cls,
+            lookup=field_lookup,
+            method="values",
+            silent_on_error=django_model.is_annotated,
         )
         if field_lookup_type is None:
-            return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
-
-        column_types[field_lookup] = field_lookup_type
+            if django_model.is_annotated:
+                column_types[field_lookup] = AnyType(TypeOfAny.from_omitted_generics)
+            else:
+                return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
+        else:
+            column_types[field_lookup] = field_lookup_type
 
     # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
     column_types.update(gather_expression_types(ctx))
