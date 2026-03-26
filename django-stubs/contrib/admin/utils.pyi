@@ -1,7 +1,7 @@
 import datetime
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Literal, TypeVar, overload, type_check_only
+from typing import Any, Literal, TypeAlias, TypeVar, overload, type_check_only
 from uuid import UUID
 
 from _typeshed import Unused
@@ -20,6 +20,8 @@ from django.utils.datastructures import _IndexableCollection
 from typing_extensions import TypedDict, override
 
 _T = TypeVar("_T")
+
+_NestedList: TypeAlias = _T | list[_NestedList[_T]]
 
 QUOTE_MAP: dict[int, str]
 UNQUOTE_MAP: dict[str, str]
@@ -66,9 +68,9 @@ class NestedObjects(Collector):
         self, related_model: type[Model], related_fields: Iterable[Field], objs: _IndexableCollection[Model]
     ) -> QuerySet[Model]: ...
     @overload
-    def nested(self, format_callback: None = None) -> list[Model]: ...
+    def nested(self, format_callback: None = None) -> list[_NestedList[Model]]: ...
     @overload
-    def nested(self, format_callback: Callable[[Model], _T]) -> list[_T]: ...
+    def nested(self, format_callback: Callable[[Model], _T]) -> list[_NestedList[_T]]: ...
     @override
     def can_fast_delete(self, *args: Unused, **kwargs: Unused) -> Literal[False]: ...
 
