@@ -89,7 +89,9 @@ class DjangoPluginConfig:
         try:
             config: dict[str, Any] = data["tool"]["django-stubs"]
         except KeyError:
-            toml_exit(MISSING_SECTION.format(section="tool.django-stubs"))
+            if not os.getenv(DJANGO_SETTINGS_ENV_VAR):
+                toml_exit(MISSING_SECTION.format(section="tool.django-stubs"))
+            config = {}
 
         django_settings_module = config.get("django_settings_module") or os.getenv(DJANGO_SETTINGS_ENV_VAR)
         if not django_settings_module:
@@ -117,9 +119,10 @@ class DjangoPluginConfig:
 
         section = "mypy.plugins.django-stubs"
         if not parser.has_section(section):
-            exit_with_error(MISSING_SECTION.format(section=section))
+            if not os.getenv(DJANGO_SETTINGS_ENV_VAR):
+                exit_with_error(MISSING_SECTION.format(section=section))
 
-        if parser.has_option(section, "django_settings_module"):
+        if parser.has_section(section) and parser.has_option(section, "django_settings_module"):
             django_settings_module = parser.get(section, "django_settings_module").strip("'\"")
         else:
             django_settings_module = os.getenv(DJANGO_SETTINGS_ENV_VAR, "")

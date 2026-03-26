@@ -241,3 +241,33 @@ def test_correct_configuration_with_django_setting_from_env(boolean_value: str) 
 
     assert config.django_settings_module == django_settings_env_value
     assert config.strict_settings is (boolean_value.lower() == "true")
+
+
+def test_toml_missing_section_with_env_var() -> None:
+    """Missing [tool.django-stubs] section works when DJANGO_SETTINGS_MODULE is set."""
+    config_file_contents = """
+    [tool.mypy]
+    plugins = ["mypy_django_plugin.main"]
+    """
+    with write_to_file(config_file_contents, suffix=".toml") as filename:
+        with mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": "my.module"}):
+            config = DjangoPluginConfig(filename)
+
+    assert config.django_settings_module == "my.module"
+    assert config.strict_settings is True
+
+
+def test_ini_missing_section_with_env_var() -> None:
+    """Missing [mypy.plugins.django-stubs] section works when DJANGO_SETTINGS_MODULE is set."""
+    config_file_contents = "\n".join(
+        [
+            "[mypy]",
+            "plugins = mypy_django_plugin.main",
+        ]
+    )
+    with write_to_file(config_file_contents) as filename:
+        with mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": "my.module"}):
+            config = DjangoPluginConfig(filename)
+
+    assert config.django_settings_module == "my.module"
+    assert config.strict_settings is True
