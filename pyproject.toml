@@ -153,6 +153,7 @@ ignore = [
 "tests/*.py" = ["INP001", "PGH003", "RUF012"]
 "ext/tests/*.py" = ["INP001"]
 "setup.py" = ["INP001"]
+"tests/assert_type/*.py" = ["B", "UP013"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead. If you type a metaclass, add a noqa"

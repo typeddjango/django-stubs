@@ -112,17 +112,6 @@
                 reveal_type(form.save)  # N: Revealed type is "def (commit: builtins.bool =) -> Any"
                 return HttpResponse()
 
--   case: successmessagemixin_compatible_with_formmixin
-    main: |
-        from django.views.generic.edit import FormMixin
-        from django.contrib.messages.views import SuccessMessageMixin
-
-        class FormFirstView(FormMixin, SuccessMessageMixin):
-            pass
-
-        class SuccessMessageFirstView(FormMixin, SuccessMessageMixin):
-            pass
-
 -   case: generic_modelchoicefield_label_from_instance
     main: |
         from django import forms

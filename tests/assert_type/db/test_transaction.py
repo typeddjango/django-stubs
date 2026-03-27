@@ -45,3 +45,23 @@ def view_func2(request: HttpRequest, arg: str) -> HttpResponse: ...
 
 
 assert_type(view_func2(HttpRequest(), "test"), HttpResponse)
+
+
+# atomic as decorator on class methods
+class ClassWithAtomicMethod:
+    @atomic
+    def atomic_method1(self, abc: int) -> str:
+        return ""
+
+    @atomic(savepoint=True)
+    def atomic_method2(self) -> None:
+        pass
+
+    @atomic(using="db", savepoint=True)
+    def atomic_method3(self, myparam: str) -> int:
+        return 0
+
+
+assert_type(ClassWithAtomicMethod().atomic_method1(1), str)
+assert_type(ClassWithAtomicMethod().atomic_method3("x"), int)
+ClassWithAtomicMethod().atomic_method1("abc")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
