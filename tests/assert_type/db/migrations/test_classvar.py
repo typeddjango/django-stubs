@@ -11,8 +11,8 @@ class ExplicitMigration(migrations.Migration):
 
 # Non-ClassVar annotations are incorrect
 class ExplicitIncorrectMigration(migrations.Migration):
-    operations: list[Operation] = []  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
-    initial: bool = True  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
+    operations: list[Operation] = []  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-assignment]
+    initial: bool = True  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]
 
 
 class ImplicitMigration(migrations.Migration):
