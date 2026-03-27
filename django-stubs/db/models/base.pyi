@@ -66,13 +66,13 @@ class Model(AltersData, metaclass=ModelBase):
         self,
         using: str | None = None,
         fields: Iterable[str] | None = None,
-        from_queryset: QuerySet[Model] | None = None,
+        from_queryset: QuerySet[Self] | None = None,
     ) -> None: ...
     async def arefresh_from_db(
         self,
         using: str | None = None,
         fields: Iterable[str] | None = None,
-        from_queryset: QuerySet[Model] | None = None,
+        from_queryset: QuerySet[Self] | None = None,
     ) -> None: ...
     def serializable_value(self, field_name: str) -> Any: ...
     def save(
@@ -101,7 +101,7 @@ class Model(AltersData, metaclass=ModelBase):
     ) -> None: ...
     def _do_update(
         self,
-        base_qs: QuerySet[Model],
+        base_qs: QuerySet[Self],
         using: str | None,
         pk_val: Any,
         values: Collection[tuple[Field, type[Model] | None, Any]],
