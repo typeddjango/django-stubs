@@ -69,6 +69,7 @@ pyrefly = [
 ]
 ty = [
   "ty==0.0.26",
+  "psycopg2-binary"
 ]
 
 dev = [

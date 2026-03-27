@@ -300,6 +300,7 @@ tests = [
     { name = "pyyaml" },
 ]
 ty = [
+    { name = "psycopg2-binary" },
     { name = "ty" },
 ]
 
@@ -325,6 +326,7 @@ dev = [
     { name = "jinja2", specifier = "==3.1.6" },
     { name = "mysqlclient", specifier = "==2.2.8" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.3.3" },
+    { name = "psycopg2-binary" },
     { name = "psycopg2-binary", specifier = "==2.9.11" },
     { name = "pyrefly", specifier = "==0.58.0" },
     { name = "pyright", specifier = "==1.1.408" },
@@ -351,7 +353,10 @@ tests = [
     { name = "pytest-xdist", specifier = "==3.8.0" },
     { name = "pyyaml", specifier = "==6.0.3" },
 ]
-ty = [{ name = "ty", specifier = "==0.0.26" }]
+ty = [
+    { name = "psycopg2-binary" },
+    { name = "ty", specifier = "==0.0.26" },
+]
 
 [[package]]
 name = "django-stubs-ext"
