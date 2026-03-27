@@ -10,7 +10,7 @@ response = HttpResponse()
 # We can assign any objects, but get bytes back:
 response.content = "abc"
 assert_type(response.content, bytes)
-
+assert_type(response.text, str)
 # StreamingHttpResponse
 # =====================
 
