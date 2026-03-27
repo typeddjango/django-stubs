@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 from django.test import override_settings
 from django.test.utils import CaptureQueriesContext
 from typing_extensions import assert_type
@@ -14,4 +12,4 @@ def test() -> None:
     pass
 
 
-assert_type(test, Callable[[], None])
+assert_type(test(), None)
