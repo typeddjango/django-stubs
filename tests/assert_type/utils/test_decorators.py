@@ -6,7 +6,7 @@ from django.utils.decorators import decorator_from_middleware, decorator_from_mi
 from typing_extensions import assert_type
 
 decorator = decorator_from_middleware(
-    CacheMiddleware  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+    CacheMiddleware  # pyrefly: ignore[bad-argument-type]
 )
 assert_type(
     decorator,
@@ -14,7 +14,7 @@ assert_type(
 )
 
 factory = decorator_from_middleware_with_args(
-    CacheMiddleware  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+    CacheMiddleware  # pyrefly: ignore[bad-argument-type]
 )
 assert_type(
     factory,
