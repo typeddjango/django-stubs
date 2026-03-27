@@ -17,11 +17,11 @@ assert_type(DefaultStorageFinder().find("filepath"), str | None)
 assert_type(finders.find("filepath", find_all=True), list[str])
 
 for finder in finders.get_finders():
-    assert_type(finder.find("filepath", find_all=True), list[str])
+    assert_type(finder.find("filepath", find_all=True), list[str])  # ty: ignore[type-assertion-failure]
 
-assert_type(FileSystemFinder().find("filepath", find_all=True), list[str])
-assert_type(AppDirectoriesFinder().find("filepath", find_all=True), list[str])
-assert_type(DefaultStorageFinder().find("filepath", find_all=True), list[str])
+assert_type(FileSystemFinder().find("filepath", find_all=True), list[str])  # ty: ignore[type-assertion-failure]
+assert_type(AppDirectoriesFinder().find("filepath", find_all=True), list[str])  # ty: ignore[type-assertion-failure]
+assert_type(DefaultStorageFinder().find("filepath", find_all=True), list[str])  # ty: ignore[type-assertion-failure]
 
 # FileSystemFinder-specific
 assert_type(FileSystemFinder().find_location(".", "filepath"), str | None)
