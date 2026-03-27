@@ -1,0 +1,9 @@
+from wsgiref.simple_server import make_server
+
+from django.core.handlers.wsgi import WSGIHandler
+
+make_server(
+    "0.0.0.0",
+    8080,
+    WSGIHandler(),
+)
