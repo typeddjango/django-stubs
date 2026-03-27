@@ -16,9 +16,30 @@ from django.db.models.lookups import Transform
 from django.db.models.sql.query import Query
 from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
-from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, ListExpr, SetExpr, TupleExpr, Var
+from mypy.nodes import (
+    ARG_NAMED,
+    ARG_NAMED_OPT,
+    ARG_STAR,
+    CallExpr,
+    Decorator,
+    Expression,
+    ListExpr,
+    SetExpr,
+    TupleExpr,
+    Var,
+)
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
+from mypy.types import (
+    AnyType,
+    CallableType,
+    Instance,
+    LiteralType,
+    ProperType,
+    TupleType,
+    TypedDictType,
+    TypeOfAny,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
@@ -199,9 +220,10 @@ def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
 
 
 def _resolve_output_field_type(expr_type: MypyType) -> MypyType | None:
-    """Try to resolve the Python type for an expression's output_field ClassVar.
+    """Try to resolve the Python type for an expression's output_field.
 
-    Returns None if the output_field can't be statically resolved.
+    Handles both ClassVar declarations (Var nodes) and @property/@cached_property
+    definitions (Decorator nodes). Returns None if the type can't be statically resolved.
     """
     proper = get_proper_type(expr_type)
     if not isinstance(proper, Instance):
@@ -212,10 +234,15 @@ def _resolve_output_field_type(expr_type: MypyType) -> MypyType | None:
         return None
 
     node = output_field_sym.node
-    if not isinstance(node, Var) or node.type is None:
-        return None
+    field_type: ProperType | None = None
 
-    field_type = get_proper_type(node.type)
+    if isinstance(node, Var) and node.type is not None:
+        field_type = get_proper_type(node.type)
+    elif isinstance(node, Decorator) and node.var.is_property:
+        func_type = node.func.type
+        if isinstance(func_type, CallableType):
+            field_type = get_proper_type(func_type.ret_type)
+
     if not isinstance(field_type, Instance):
         return None
 

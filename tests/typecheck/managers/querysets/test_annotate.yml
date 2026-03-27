@@ -585,7 +585,7 @@
             name = models.CharField(max_length=100)
             objects = MyManager()
 
--   case: annotate_resolves_output_field_type
+-   case: annotate_resolves_output_field_type_from_classvar
     main: |
         from typing_extensions import reveal_type
         from myapp.models import User
@@ -630,3 +630,28 @@
                 class User(models.Model):
                     username = models.CharField(max_length=100)
                     created_at = models.DateTimeField()
+
+-   case: annotate_resolves_output_field_from_property
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import User
+        from django.contrib.postgres.aggregates import ArrayAgg
+        from django.contrib.postgres.expressions import ArraySubquery
+
+        # ArrayAgg has output_field as @property → ArrayField → list[Any]
+        usernames = User.objects.annotate(usernames=ArrayAgg('username')).get().usernames
+        reveal_type(usernames) # N: Revealed type is "builtins.list[Any]"
+
+        # ArraySubquery has output_field as @cached_property → ArrayField → list[Any]
+        sub_ids = User.objects.annotate(sub_ids=ArraySubquery(User.objects.values('id'))).get().sub_ids
+        reveal_type(sub_ids) # N: Revealed type is "builtins.list[Any]"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
