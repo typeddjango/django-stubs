@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist, ObjectNotUpdated, Validat
 from django.db.models import BaseConstraint, Field, QuerySet
 from django.db.models.manager import Manager
 from django.db.models.options import Options
+from django.db.models.utils import AltersData
 from typing_extensions import Self, override
 
 _Self = TypeVar("_Self", bound=Model)
@@ -35,7 +36,7 @@ class ModelBase(type):
     @property
     def _default_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
 
-class Model(metaclass=ModelBase):
+class Model(AltersData, metaclass=ModelBase):
     # Note: these two metaclass generated attributes don't really exist on the 'Model'
     # class, runtime they are only added on concrete subclasses of 'Model'. The
     # metaclass also sets up correct inheritance from concrete parent models exceptions.
@@ -59,19 +60,19 @@ class Model(metaclass=ModelBase):
         def __getstate__(self) -> dict: ...
     else:
         def __getstate__(self) -> dict: ...
-    def _get_pk_val(self, meta: Options[Self] | None = None) -> str: ...
+    def _get_pk_val(self, meta: Options[Model] | None = None) -> str: ...
     def get_deferred_fields(self) -> set[str]: ...
     def refresh_from_db(
         self,
         using: str | None = None,
         fields: Iterable[str] | None = None,
-        from_queryset: QuerySet[Self] | None = None,
+        from_queryset: QuerySet[Model] | None = None,
     ) -> None: ...
     async def arefresh_from_db(
         self,
         using: str | None = None,
         fields: Iterable[str] | None = None,
-        from_queryset: QuerySet[Self] | None = None,
+        from_queryset: QuerySet[Model] | None = None,
     ) -> None: ...
     def serializable_value(self, field_name: str) -> Any: ...
     def save(
@@ -100,7 +101,7 @@ class Model(metaclass=ModelBase):
     ) -> None: ...
     def _do_update(
         self,
-        base_qs: QuerySet[Self],
+        base_qs: QuerySet[Model],
         using: str | None,
         pk_val: Any,
         values: Collection[tuple[Field, type[Model] | None, Any]],
@@ -114,7 +115,7 @@ class Model(metaclass=ModelBase):
     def clean(self) -> None: ...
     def validate_unique(self, exclude: Collection[str] | None = None) -> None: ...
     def date_error_message(self, lookup_type: str, field_name: str, unique_for: str) -> ValidationError: ...
-    def unique_error_message(self, model_class: type[Self], unique_check: Sequence[str]) -> ValidationError: ...
+    def unique_error_message(self, model_class: type[Model], unique_check: Sequence[str]) -> ValidationError: ...
     def get_constraints(self) -> list[tuple[type[Model], Sequence[BaseConstraint]]]: ...
     def validate_constraints(self, exclude: Collection[str] | None = None) -> None: ...
     def full_clean(
