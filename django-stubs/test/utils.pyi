@@ -17,7 +17,6 @@ from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
 from typing_extensions import Self, TypeVar, override
 
-
 _TestClass: TypeAlias = type[SimpleTestCase]
 _DecoratedTest: TypeAlias = Callable[..., Any] | _TestClass
 _DT = TypeVar("_DT", bound=_DecoratedTest)
@@ -82,7 +81,9 @@ class override_system_checks(TestContextDecorator):
     registry: CheckRegistry
     new_checks: list[Callable[..., Any]]
     deployment_checks: list[Callable[..., Any]] | None
-    def __init__(self, new_checks: list[Callable[..., Any]], deployment_checks: list[Callable[..., Any]] | None = ...) -> None: ...
+    def __init__(
+        self, new_checks: list[Callable[..., Any]], deployment_checks: list[Callable[..., Any]] | None = ...
+    ) -> None: ...
     old_checks: set[Callable[..., Any]]
     old_deployment_checks: set[Callable[..., Any]]
 
@@ -152,11 +153,9 @@ class TimeKeeperProtocol(Protocol):
 def dependency_ordered(
     test_databases: Iterable[tuple[_Signature, _TestDatabase]], dependencies: Mapping[str, list[str]]
 ) -> list[tuple[_Signature, _TestDatabase]]: ...
-
 def get_unique_databases_and_mirrors(
     aliases: set[str] | None = ...,
 ) -> tuple[dict[_Signature, _TestDatabase], dict[str, Any]]: ...
-
 def setup_databases(
     verbosity: int,
     interactive: bool,
@@ -169,17 +168,13 @@ def setup_databases(
     serialized_aliases: Iterable[str] | None = ...,
     **kwargs: Any,
 ) -> list[tuple[BaseDatabaseWrapper, str, bool]]: ...
-
 def teardown_databases(
     old_config: Iterable[tuple[Any, str, bool]], verbosity: int, parallel: int = ..., keepdb: bool = ...
 ) -> None: ...
-
 def require_jinja2(test_func: _C) -> _C: ...
-
 def register_lookup(
     field: type[RegisterLookupMixin], *lookups: type[Lookup | Transform], lookup_name: str | None = ...
 ) -> AbstractContextManager[None]: ...
-
 def garbage_collect() -> None: ...
 
 __all__ = (
