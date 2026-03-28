@@ -331,6 +331,10 @@ class NewSemanalDjangoPlugin(Plugin):
             "django_version": importlib.metadata.version("django"),
             "django_stubs_version": importlib.metadata.version("django-stubs"),
         }
+        try:
+            extra_data["django_stubs_ext_version"] = importlib.metadata.version("django-stubs-ext")
+        except importlib.metadata.PackageNotFoundError:
+            pass
         return self.plugin_config.to_json(extra_data)
 
 
