@@ -12,17 +12,16 @@ from django.conf import LazySettings, Settings
 from django.core.checks.registry import CheckRegistry
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.lookups import Lookup, Transform
-from django.db.models.query import _SupportsContains
 from django.db.models.query_utils import RegisterLookupMixin
 from django.test.runner import DiscoverRunner
 from django.test.testcases import SimpleTestCase
 from typing_extensions import Self, TypeVar, override
 
-_TestClass: TypeAlias = type[SimpleTestCase]
 
-_DecoratedTest: TypeAlias = Callable | _TestClass
+_TestClass: TypeAlias = type[SimpleTestCase]
+_DecoratedTest: TypeAlias = Callable[..., Any] | _TestClass
 _DT = TypeVar("_DT", bound=_DecoratedTest)
-_C = TypeVar("_C", bound=Callable)  # Any callable
+_C = TypeVar("_C", bound=Callable[..., Any])  # Any callable
 
 TZ_SUPPORT: bool
 
@@ -81,13 +80,14 @@ class modify_settings(override_settings):
 
 class override_system_checks(TestContextDecorator):
     registry: CheckRegistry
-    new_checks: list[Callable]
-    deployment_checks: list[Callable] | None
-    def __init__(self, new_checks: list[Callable], deployment_checks: list[Callable] | None = ...) -> None: ...
-    old_checks: set[Callable]
-    old_deployment_checks: set[Callable]
+    new_checks: list[Callable[..., Any]]
+    deployment_checks: list[Callable[..., Any]] | None
+    def __init__(self, new_checks: list[Callable[..., Any]], deployment_checks: list[Callable[..., Any]] | None = ...) -> None: ...
+    old_checks: set[Callable[..., Any]]
+    old_deployment_checks: set[Callable[..., Any]]
 
-class CaptureQueriesContext(_SupportsContains[dict[str, str]]):
+# Private API removed, iterable-based
+class CaptureQueriesContext(Iterable[dict[str, str]]):
     connection: BaseDatabaseWrapper
     force_debug_cursor: bool
     initial_queries: int
@@ -108,13 +108,13 @@ class CaptureQueriesContext(_SupportsContains[dict[str, str]]):
 
 class ignore_warnings(TestContextDecorator):
     ignore_kwargs: dict[str, Any]
-    filter_func: Callable
+    filter_func: Callable[..., Any]
     def __init__(self, **kwargs: Any) -> None: ...
     catch_warnings: AbstractContextManager[list | None]
 
 requires_tz_support: Any
 
-def isolate_lru_cache(lru_cache_object: Callable) -> AbstractContextManager[None]: ...
+def isolate_lru_cache(lru_cache_object: Callable[..., Any]) -> AbstractContextManager[None]: ...
 
 class override_script_prefix(TestContextDecorator):
     prefix: str
@@ -152,9 +152,11 @@ class TimeKeeperProtocol(Protocol):
 def dependency_ordered(
     test_databases: Iterable[tuple[_Signature, _TestDatabase]], dependencies: Mapping[str, list[str]]
 ) -> list[tuple[_Signature, _TestDatabase]]: ...
+
 def get_unique_databases_and_mirrors(
     aliases: set[str] | None = ...,
 ) -> tuple[dict[_Signature, _TestDatabase], dict[str, Any]]: ...
+
 def setup_databases(
     verbosity: int,
     interactive: bool,
@@ -167,13 +169,17 @@ def setup_databases(
     serialized_aliases: Iterable[str] | None = ...,
     **kwargs: Any,
 ) -> list[tuple[BaseDatabaseWrapper, str, bool]]: ...
+
 def teardown_databases(
     old_config: Iterable[tuple[Any, str, bool]], verbosity: int, parallel: int = ..., keepdb: bool = ...
 ) -> None: ...
+
 def require_jinja2(test_func: _C) -> _C: ...
+
 def register_lookup(
     field: type[RegisterLookupMixin], *lookups: type[Lookup | Transform], lookup_name: str | None = ...
 ) -> AbstractContextManager[None]: ...
+
 def garbage_collect() -> None: ...
 
 __all__ = (
