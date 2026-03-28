@@ -520,6 +520,11 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     if queryset_info is None:
         return _defer()
 
+    # If any of the queryset's type vars have unresolved bounds (placeholders),
+    # defer to avoid generating methods with unresolved types that crash mypy.
+    if any(has_placeholder(tv) for tv in queryset_info.defn.type_vars):
+        return _defer()
+
     # either a manual `as_manager` definition or this is a deferral pass
     if "as_manager" in queryset_info.names:
         return
