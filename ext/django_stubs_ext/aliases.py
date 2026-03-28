@@ -1,6 +1,8 @@
 import typing
 
 if typing.TYPE_CHECKING:
+    from django.contrib.admin.options import _FieldOpts as FieldOpts
+    from django.contrib.admin.options import _FieldsetSpec as FieldsetSpec
     from django.db.models.query import _QuerySet
     from django.utils.functional import _StrOrPromise as StrOrPromise
     from django.utils.functional import _StrPromise as StrPromise
@@ -13,8 +15,10 @@ else:
     from django.utils.functional import Promise as StrPromise
 
     StrOrPromise = str | StrPromise
+    FieldOpts = dict
+    FieldsetSpec = list
     # Deprecated type aliases. Use the QuerySet class directly instead.
     QuerySetAny = QuerySet
     ValuesQuerySet = QuerySet
 
-__all__ = ["QuerySetAny", "StrOrPromise", "StrPromise", "ValuesQuerySet"]
+__all__ = ["FieldOpts", "FieldsetSpec", "QuerySetAny", "StrOrPromise", "StrPromise", "ValuesQuerySet"]
