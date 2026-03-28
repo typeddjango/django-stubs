@@ -38,46 +38,87 @@ To do so follow this [official github guide](https://docs.github.com/en/free-pro
 We use [uv](https://github.com/astral-sh/uv) to manage our dev dependencies.
 To install it, see their [installation guide](https://docs.astral.sh/uv/getting-started/installation/)
 
-Once it's done, simply run the following command to automatically setup a virtual environment and install dev dependencies:
+We use [just](https://github.com/casey/just) as a command runner. Install it with:
+
+```bash
+uv tool install rust-just
+```
+
+Then bootstrap your environment (installs pre-commit hooks and syncs dependencies):
+
+```bash
+just bootstrap
+```
+
+<details>
+<summary>Manual setup (without <code>just</code>)</summary>
 
 ```bash
 uv sync
 source .venv/bin/activate
+pre-commit install --install-hooks
 ```
-
-Finally, install the pre-commit hooks:
-
-```bash
-pre-commit install
-```
+</details>
 
 ### Testing and Linting
 
-We use `mypy`, `pytest`, `ruff`, and `black` for quality control. `ruff` and `black` are executed using pre-commit when you make a commit.
-To ensure there are not formatting or typing issues in the entire repository you can run:
+Running `just` at the root of the repository lists all available recipes:
 
-```bash
-pre-commit run --all-files
+```
+$ just
+Available recipes:
+    [dev]
+    bootstrap      # Bootstrap dev environment: install pre-commit hooks and sync dependencies
+    lint           # Run pre-commit hooks on all files
+    pre-mr-check   # Run all checks before submitting a PR
+    clean          # Remove mypy cache
+
+    [typecheck]
+    mypy           # Run mypy on plugin, ext, scripts, stubs and tests
+    pyright        # Run pyright on test cases
+    pyrefly        # Run pyrefly on test cases
+    ty             # Run ty on test cases
+
+    [test]
+    test *args     # Run pytest test suite
+    stubtest *args # Run stubtest to check stubs match runtime
+    ext-test       # Run django-stubs-ext tests
+
+    [build]
+    build          # Build all packages
+    lock-check     # Check that uv.lock is up to date
 ```
 
-NOTE: This command will not only lint but also modify files - so make sure to commit whatever changes you've made before hand.
-You can also run pre-commit per file or for a specific path, simply replace "--all-files" with a target (see [this guide](https://codeburst.io/tool-your-django-project-pre-commit-hooks-e1799d84551f) for more info).
-
-To execute the unit tests, simply run:
+Before submitting a PR, run all checks at once:
 
 ```bash
-pytest -n auto
+just pre-mr-check
 ```
 
-If you get some unexpected results or want to be sure that tests run is not affected by previous one, remove `mypy` cache:
+Or run individual checks:
 
 ```bash
-rm -r .mypy_cache
+just lint          # pre-commit hooks (ruff, codespell, ...)
+just mypy          # mypy on plugin, ext, scripts, stubs and tests
+just test          # pytest test suite
+just stubtest      # stubtest: check stubs match runtime
+just pyright       # pyright on test cases
+just ty            # ty on test cases
+just pyrefly       # pyrefly on test cases
 ```
+
+Extra arguments can be passed to `test` and `stubtest`:
+
+```bash
+just test -- -k test_name
+just stubtest -- --allowlist extra.txt
+```
+
+If you get unexpected results, clear the mypy cache with `just clean`.
 
 ### Testing stubs with `stubtest`
 
-Run [`./scripts/stubtest.sh`](scripts/stubtest.sh) to test that stubs and sources are in-line.
+Run `just stubtest` (or [`./scripts/stubtest.sh`](scripts/stubtest.sh) directly) to test that stubs and sources are in-line.
 
 We have some special files to allow errors:
 
