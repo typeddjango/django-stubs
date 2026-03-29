@@ -1,4 +1,8 @@
+from typing import Any
+
+from django.contrib.messages.views import SuccessMessageMixin
 from django.forms import Form
+from django.views.generic.edit import FormMixin
 from typing_extensions import assert_type
 
 
@@ -10,3 +14,12 @@ def test_in_operator(form: Form, field: str) -> None:
     _ = 123 in form  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]  # pyrefly: ignore[unsupported-operation]  # ty: ignore[unsupported-operator]
     _ = None in form  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]  # pyrefly: ignore[unsupported-operation]  # ty: ignore[unsupported-operator]
     _ = b"field" in form  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]  # pyrefly: ignore[unsupported-operation]  # ty: ignore[unsupported-operator]
+
+
+# SuccessMessageMixin is compatible with FormMixin
+class FormFirstView(FormMixin[Any], SuccessMessageMixin[Any]):
+    pass
+
+
+class SuccessMessageFirstView(SuccessMessageMixin[Any], FormMixin[Any]):
+    pass

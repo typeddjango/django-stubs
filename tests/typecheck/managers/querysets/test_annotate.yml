@@ -561,8 +561,8 @@
 
     qs = MyModel.objects.all().annotate(num_items=Count("id"))
     obj = qs.get()
-    reveal_type(obj.num_items)  # N: Revealed type is "Any"
-    obj.nonexistent  # E: "MyModel@AnnotatedWith[TypedDict({'num_items': Any})]" has no attribute "nonexistent"  [attr-defined]
+    reveal_type(obj.num_items)  # N: Revealed type is "builtins.int"
+    obj.nonexistent  # E: "MyModel@AnnotatedWith[TypedDict({'num_items': int})]" has no attribute "nonexistent"  [attr-defined]
 
     # Custom queryset methods remain available after annotate
     qs.custom_method()
@@ -584,3 +584,74 @@
         class MyModel(models.Model):
             name = models.CharField(max_length=100)
             objects = MyManager()
+
+-   case: annotate_resolves_output_field_type_from_classvar
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import User
+        from django.db.models import Count, Exists, OuterRef
+        from django.db.models.functions import Length, Now, Right, TruncDate, TruncTime
+
+        # Count has output_field: ClassVar[IntegerField] → int
+        user_count = User.objects.annotate(user_count=Count('id')).get().user_count
+        reveal_type(user_count) # N: Revealed type is "builtins.int"
+
+        # Exists has output_field: ClassVar[BooleanField] → bool
+        has_users = User.objects.annotate(has_users=Exists(User.objects.filter(pk=OuterRef('pk')))).get().has_users
+        reveal_type(has_users) # N: Revealed type is "builtins.bool"
+
+        # Length has output_field: ClassVar[IntegerField] → int
+        name_len = User.objects.annotate(name_len=Length('username')).get().name_len
+        reveal_type(name_len) # N: Revealed type is "builtins.int"
+
+        # Now has output_field: ClassVar[DateTimeField] → datetime
+        current_time = User.objects.annotate(current_time=Now()).get().current_time
+        reveal_type(current_time) # N: Revealed type is "datetime.datetime"
+
+        # Right (inherits from Left) has output_field: ClassVar[CharField] → str
+        suffix = User.objects.annotate(suffix=Right('username', 3)).get().suffix
+        reveal_type(suffix) # N: Revealed type is "builtins.str"
+
+        # TruncDate has output_field: ClassVar[DateField] → date
+        created_date = User.objects.annotate(created_date=TruncDate('created_at')).get().created_date
+        reveal_type(created_date) # N: Revealed type is "datetime.date"
+
+        # TruncTime has output_field: ClassVar[TimeField] → time
+        created_time = User.objects.annotate(created_time=TruncTime('created_at')).get().created_time
+        reveal_type(created_time) # N: Revealed type is "datetime.time"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+                    created_at = models.DateTimeField()
+
+-   case: annotate_resolves_output_field_from_property
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import User
+        from django.contrib.postgres.aggregates import ArrayAgg
+        from django.contrib.postgres.expressions import ArraySubquery
+
+        # ArrayAgg has output_field as @property → ArrayField → list[Any]
+        usernames = User.objects.annotate(usernames=ArrayAgg('username')).get().usernames
+        reveal_type(usernames) # N: Revealed type is "builtins.list[Any]"
+
+        # ArraySubquery has output_field as @cached_property → ArrayField → list[Any]
+        sub_ids = User.objects.annotate(sub_ids=ArraySubquery(User.objects.values('id'))).get().sub_ids
+        reveal_type(sub_ids) # N: Revealed type is "builtins.list[Any]"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)

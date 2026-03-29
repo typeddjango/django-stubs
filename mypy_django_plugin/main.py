@@ -1,3 +1,4 @@
+import importlib.metadata
 import itertools
 import sys
 from collections.abc import Callable
@@ -327,7 +328,13 @@ class NewSemanalDjangoPlugin(Plugin):
         # Cache would be cleared if any settings do change.
         extra_data = {
             "AUTH_USER_MODEL": self.django_context.settings.AUTH_USER_MODEL,
+            "django_version": importlib.metadata.version("django"),
+            "django_stubs_version": importlib.metadata.version("django-stubs"),
         }
+        try:
+            extra_data["django_stubs_ext_version"] = importlib.metadata.version("django-stubs-ext")
+        except importlib.metadata.PackageNotFoundError:
+            pass
         return self.plugin_config.to_json(extra_data)
 
 

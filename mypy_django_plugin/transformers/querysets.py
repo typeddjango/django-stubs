@@ -16,9 +16,30 @@ from django.db.models.lookups import Transform
 from django.db.models.sql.query import Query
 from mypy.checker import TypeChecker
 from mypy.errorcodes import NO_REDEF
-from mypy.nodes import ARG_NAMED, ARG_NAMED_OPT, ARG_STAR, CallExpr, Expression, ListExpr, SetExpr, TupleExpr
+from mypy.nodes import (
+    ARG_NAMED,
+    ARG_NAMED_OPT,
+    ARG_STAR,
+    CallExpr,
+    Decorator,
+    Expression,
+    ListExpr,
+    SetExpr,
+    TupleExpr,
+    Var,
+)
 from mypy.plugin import FunctionContext, MethodContext
-from mypy.types import AnyType, Instance, LiteralType, ProperType, TupleType, TypedDictType, TypeOfAny, get_proper_type
+from mypy.types import (
+    AnyType,
+    CallableType,
+    Instance,
+    LiteralType,
+    ProperType,
+    TupleType,
+    TypedDictType,
+    TypeOfAny,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
@@ -198,12 +219,45 @@ def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
     return kwargs
 
 
+def _resolve_output_field_type(expr_type: MypyType) -> MypyType | None:
+    """Try to resolve the Python type for an expression's output_field.
+
+    Handles both ClassVar declarations (Var nodes) and @property/@cached_property
+    definitions (Decorator nodes). Returns None if the type can't be statically resolved.
+    """
+    proper = get_proper_type(expr_type)
+    if not isinstance(proper, Instance):
+        return None
+
+    output_field_sym = proper.type.get("output_field")
+    if output_field_sym is None or output_field_sym.node is None:
+        return None
+
+    node = output_field_sym.node
+    field_type: ProperType | None = None
+
+    if isinstance(node, Var) and node.type is not None:
+        field_type = get_proper_type(node.type)
+    elif isinstance(node, Decorator) and node.var.is_property:
+        func_type = node.func.type
+        if isinstance(func_type, CallableType):
+            field_type = get_proper_type(func_type.ret_type)
+
+    if not isinstance(field_type, Instance):
+        return None
+
+    return helpers.get_private_descriptor_type(field_type.type, "_pyi_private_get_type", is_nullable=False)
+
+
 def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType]:
     kwargs = gather_kwargs(ctx)
     if not kwargs:
         return {}
 
-    # For now, we don't try to resolve the output_field of the field would be, but use Any.
+    # Try to resolve the output_field type for each expression. For expressions
+    # with a static ClassVar output_field (e.g. Count → IntegerField → int),
+    # we can infer the concrete Python type. Otherwise, fall back to Any.
+    #
     # NOTE: It's important that we use 'special_form' for 'Any' as otherwise we can
     # get stuck with mypy interpreting an overload ambiguity towards the
     # overloaded 'Field.__get__' method when its 'model' argument gets matched. This
@@ -230,7 +284,14 @@ def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType]:
     # select due to the 'Any' in 'TypedDict({"foo": Any})'. But if we specify the
     # 'Any' as 'TypeOfAny.special_form' mypy doesn't consider the model instance to
     # contain 'Any' and the ambiguity goes away.
-    return {name: AnyType(TypeOfAny.special_form) for name, _ in kwargs.items()}
+    result: dict[str, MypyType] = {}
+    for name, expr_type in kwargs.items():
+        resolved = _resolve_output_field_type(expr_type)
+        if resolved is not None and not isinstance(get_proper_type(resolved), AnyType):
+            result[name] = resolved
+        else:
+            result[name] = AnyType(TypeOfAny.special_form)
+    return result
 
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:

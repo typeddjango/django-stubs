@@ -8,6 +8,7 @@ from django.db.models import Manager
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable, OrderBy
 from django.db.models.sql.query import Query, RawQuery
+from django.db.models.utils import AltersData
 from django.utils.functional import cached_property
 from typing_extensions import Self, TypeVar, override
 
@@ -63,7 +64,7 @@ class _SupportsContains(Generic[_ContainsT]):
     def __contains__(self, item: _ContainsT, /) -> bool: ...
 
 # Using `object` (not `_Row | None`) to satisfy Collection protocol and support `User | AnonymousUser` patterns
-class QuerySet(_SupportsContains[object], Iterable[_Row], Sized, Generic[_Model, _Row]):
+class QuerySet(AltersData, _SupportsContains[object], Iterable[_Row], Sized, Generic[_Model, _Row]):
     model: type[_Model]
     query: Query
     _iterable_class: type[BaseIterable]
