@@ -224,7 +224,7 @@ class DjangoContext:
                     continue
 
             if isinstance(field, Field):
-                field_name = field.attname
+                field_name = getattr(field, "attname", field.name)
                 # Can not determine target_field for recursive relationship when model is abstract
                 if field.related_model == "self" and model_cls._meta.abstract:
                     continue
@@ -341,7 +341,7 @@ class DjangoContext:
     ) -> MypyType:
         """Get a type of __get__ for this specific Django field."""
         if isinstance(field, Field):
-            get_type = _get_field_get_type_from_model_type_info(model_info, field.attname)
+            get_type = _get_field_get_type_from_model_type_info(model_info, getattr(field, "attname", field.name))
             if get_type is not None:
                 return get_type
 
