@@ -1,3 +1,13 @@
+<!--
+AI Policy.
+
+Copied from
+https://github.com/astral-sh/.github/blob/main/AI_POLICY.md
+under MIT license.
+
+All the credit goes to the Astral team.
+-->
+
 We support using AI (i.e., LLMs) as tools for coding. However, you remain
 responsible for any code you publish and we are responsible for any code we
 merge and release. We hold a high bar for all contributions to our projects.
