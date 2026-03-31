@@ -215,5 +215,5 @@
             T = TypeVar("T", bound=Animal)
 
             def create_animal_generic(klass: type[T], name: str) -> T:
-                reveal_type(klass)  # N: Revealed type is "type[T`-1]"
+                reveal_type(klass)  # N: Revealed type is "type[T]"
                 return klass._default_manager.create(name=name)
