@@ -3,9 +3,9 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel, MyModelWithoutSelf
         reveal_type(MyModel.objects.example_simple())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.MyQuerySet[myapp.models.MyModel]]"
-        reveal_type(MyModel.objects.example_simple().just_int())  # N: Revealed type is "builtins.int"
-        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.MyQuerySet[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "list[myapp.models.MyQuerySet[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_simple().just_int())  # N: Revealed type is "int"
+        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "dict[str, myapp.models.MyQuerySet[myapp.models.MyModel]]"
         reveal_type(MyModel.objects.test_custom_manager())  # N: Revealed type is "myapp.models.CustomManagerFromMyQuerySet[myapp.models.MyModel]"
         reveal_type(MyModelWithoutSelf.objects.method())  # N: Revealed type is "myapp.models.QuerySetWithoutSelf"
     installed_apps:
@@ -78,8 +78,8 @@
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
-        reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "builtins.str"
+        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "str"
+        reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "str"
         reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
@@ -109,7 +109,7 @@
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "myapp.querysets.ModelQuerySet"
         reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "typing.Iterable[myapp.querysets.Custom]"
-        reveal_type(MyModel.objects.queryset_method_3())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.queryset_method_3())  # N: Revealed type is "str"
         reveal_type(MyModel.objects.queryset_method_4([]))  # N: Revealed type is "None"
         reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "myapp.querysets.ModelQuerySet"
         reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.querysets.ModelQuerySet"
@@ -233,7 +233,7 @@
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "myapp.querysets.ModelQuerySet"
         reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "typing.Iterable[myapp.querysets.Custom]"
-        reveal_type(MyModel.objects.queryset_method_3())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.queryset_method_3())  # N: Revealed type is "str"
         reveal_type(MyModel.objects.queryset_method_4([]))  # N: Revealed type is "None"
         reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "myapp.querysets.ModelQuerySet"
         reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.querysets.ModelQuerySet"
@@ -300,7 +300,7 @@
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -325,7 +325,7 @@
         reveal_type(kls.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel1] | myapp.models.ManagerFromModelQuerySet2[myapp.models.MyModel2]"
         reveal_type(kls.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet1 | myapp.models.ModelQuerySet2"
         reveal_type(kls.objects.get())  # N: Revealed type is "myapp.models.MyModel1 | myapp.models.MyModel2"
-        reveal_type(kls.objects.queryset_method())  # N: Revealed type is "builtins.int | builtins.str"
+        reveal_type(kls.objects.queryset_method())  # N: Revealed type is "int | str"
     installed_apps:
         - myapp
     files:
@@ -357,8 +357,8 @@
         reveal_type(NewManager())  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ModelBaseManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.objects.manager_only_method())  # N: Revealed type is "builtins.int"
-        reveal_type(MyModel.objects.manager_and_queryset_method())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.manager_only_method())  # N: Revealed type is "int"
+        reveal_type(MyModel.objects.manager_and_queryset_method())  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -384,12 +384,12 @@
         reveal_type(NewManager())  # N: Revealed type is "myapp.models.NewManager[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.NewManager[myapp.models.MyModel]"
         reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.objects.manager_only_method())  # N: Revealed type is "builtins.int"
-        reveal_type(MyModel.objects.manager_and_queryset_method())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.manager_only_method())  # N: Revealed type is "int"
+        reveal_type(MyModel.objects.manager_and_queryset_method())  # N: Revealed type is "str"
         reveal_type(OtherManager())  # N: Revealed type is "myapp.models.X[Never]"
         reveal_type(OtherModel.objects)  # N: Revealed type is "myapp.models.X[myapp.models.OtherModel]"
-        reveal_type(OtherModel.objects.manager_only_method())  # N: Revealed type is "builtins.int"
-        reveal_type(OtherModel.objects.manager_and_queryset_method())  # N: Revealed type is "builtins.str"
+        reveal_type(OtherModel.objects.manager_only_method())  # N: Revealed type is "int"
+        reveal_type(OtherModel.objects.manager_and_queryset_method())  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -418,7 +418,7 @@
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -443,8 +443,8 @@
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.queryset_method)  # N: Revealed type is "def (param: builtins.str | None =) -> builtins.str | None"
-        reveal_type(MyModel().objects.queryset_method('str'))  # N: Revealed type is "builtins.str | None"
+        reveal_type(MyModel().objects.queryset_method)  # N: Revealed type is "def (param: str | None =) -> str | None"
+        reveal_type(MyModel().objects.queryset_method('str'))  # N: Revealed type is "str | None"
     installed_apps:
         - myapp
     files:
@@ -473,7 +473,7 @@
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is "def (param: builtins.int | builtins.str) -> Never"
+        reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is "def (param: int | str) -> Never"
         reveal_type(MyModel().objects.base_queryset_method(2))  # N: Revealed type is "Never"
     installed_apps:
         - myapp
@@ -505,8 +505,8 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "builtins.str"
-        reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "builtins.int"
+        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "str"
+        reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "int"
     installed_apps:
         - myapp
     files:
@@ -534,12 +534,12 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "str"
         reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
 
         # Overloads
-        reveal_type(MyModel.objects.overloaded_method(1))  # N: Revealed type is "builtins.int"
-        reveal_type(MyModel.objects.overloaded_method('a'))  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.overloaded_method(1))  # N: Revealed type is "int"
+        reveal_type(MyModel.objects.overloaded_method('a'))  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -664,22 +664,22 @@
         reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.complex_filter)  # N: Revealed type is "def (filter_obj: Any) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.defer)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet, def (*fields: builtins.str) -> myapp.models.MyQuerySet)"
+        reveal_type(MyModel.objects.defer)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet, def (*fields: str) -> myapp.models.MyQuerySet)"
         reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any]) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: builtins.str) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: str) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.extra)  # N: Revealed type is "def (select: builtins.dict[builtins.str, Any] | None =, where: typing.Sequence[builtins.str] | None =, params: typing.Sequence[Any] | None =, tables: typing.Sequence[builtins.str] | None =, order_by: typing.Sequence[builtins.str | django.db.models.expressions.Combinable] | None =, select_params: typing.Sequence[Any] | None =) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.extra)  # N: Revealed type is "def (select: dict[str, Any] | None =, where: typing.Sequence[str] | None =, params: typing.Sequence[Any] | None =, tables: typing.Sequence[str] | None =, order_by: typing.Sequence[str | django.db.models.expressions.Combinable] | None =, select_params: typing.Sequence[Any] | None =) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.intersection)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any]) -> myapp.models.MyQuerySet"
         reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: builtins.str) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.order_by)  # N: Revealed type is "def (*field_names: builtins.str | django.db.models.expressions.Combinable) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet, def (*lookups: builtins.str | django.db.models.query.Prefetch[_LookupT`-1, _PrefetchedQuerySetT`-2 = django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model], _ToAttrT`-3 = builtins.str]) -> myapp.models.MyQuerySet)"
+        reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: str) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.order_by)  # N: Revealed type is "def (*field_names: str | django.db.models.expressions.Combinable) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet, def (*lookups: str | django.db.models.query.Prefetch[_LookupT`-1, _PrefetchedQuerySetT`-2 = django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model], _ToAttrT`-3 = str]) -> myapp.models.MyQuerySet)"
         reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: builtins.bool =, skip_locked: builtins.bool =, of: typing.Sequence[builtins.str] =, no_key: builtins.bool =) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.select_related)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet, def (*fields: builtins.str) -> myapp.models.MyQuerySet)"
-        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any], all: builtins.bool =) -> myapp.models.MyQuerySet"
-        reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: builtins.str | None) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: bool =, skip_locked: bool =, of: typing.Sequence[str] =, no_key: bool =) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.select_related)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet, def (*fields: str) -> myapp.models.MyQuerySet)"
+        reveal_type(MyModel.objects.union)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any], all: bool =) -> myapp.models.MyQuerySet"
+        reveal_type(MyModel.objects.using)  # N: Revealed type is "def (alias: str | None) -> myapp.models.MyQuerySet"
     installed_apps:
         - myapp
     files:
@@ -788,7 +788,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel, Generated, ManagerFromModelQuerySet
-        reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "builtins.int"
+        reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "int"
         reveal_type(Generated())  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet2[Never]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet2[myapp.models.MyModel]"
     installed_apps:
@@ -853,7 +853,7 @@
         from typing_extensions import reveal_type
         from myapp.models import BaseManager
 
-        reveal_type(BaseManager().ttl)  # N: Revealed type is "builtins.int"
+        reveal_type(BaseManager().ttl)  # N: Revealed type is "int"
     installed_apps:
         - myapp
     files:
@@ -884,8 +884,8 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import Concrete
-        reveal_type(Concrete.objects.qs_meth())  # N: Revealed type is "builtins.int"
-        reveal_type(Concrete.objects.manager_meth())  # N: Revealed type is "builtins.str"
+        reveal_type(Concrete.objects.qs_meth())  # N: Revealed type is "int"
+        reveal_type(Concrete.objects.manager_meth())  # N: Revealed type is "str"
     mypy_config: |
         [mypy.plugins.django-stubs]
         django_settings_module = myapp
@@ -1011,7 +1011,7 @@
         reveal_type(MyModel.objects.custom_method())
     out: |
         main:3: error: Access to generic instance variables via class is ambiguous  [misc]
-        main:3: note: Revealed type is "builtins.str"
+        main:3: note: Revealed type is "str"
     mypy_config: |
         [mypy.plugins.django-stubs]
         django_settings_module = myapp

@@ -35,8 +35,8 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel().text)  # N: Revealed type is "builtins.str"
-        reveal_type(MyModel().text_nullable)  # N: Revealed type is "builtins.str | None"
+        reveal_type(MyModel().text)  # N: Revealed type is "str"
+        reveal_type(MyModel().text_nullable)  # N: Revealed type is "str | None"
         MyModel().text = None  # E: Incompatible types in assignment (expression has type "None", variable has type "str | int | Combinable")  [assignment]
         MyModel().text_nullable = None
     installed_apps:
@@ -54,7 +54,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel().lst)  # N: Revealed type is "builtins.list[builtins.str] | None"
+        reveal_type(MyModel().lst)  # N: Revealed type is "list[str] | None"
     installed_apps:
         - myapp
     files:
@@ -92,7 +92,7 @@
         from myapp.models import Inventory
         parent = Inventory()
         core = Inventory(parent_id=parent.id)
-        reveal_type(core.parent_id)  # N: Revealed type is "builtins.int | None"
+        reveal_type(core.parent_id)  # N: Revealed type is "int | None"
         reveal_type(core.parent)  # N: Revealed type is "myapp.models.Inventory | None"
         Inventory(parent=None)
         Inventory(parent_id=None)

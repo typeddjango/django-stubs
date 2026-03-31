@@ -95,7 +95,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
 
         example = Example()
         reveal_type(example.count)
-        # Revealed type is "builtins.int"
+        # Revealed type is "int"
 
         example.count = 1.5  # ok
         example.count = 'a'

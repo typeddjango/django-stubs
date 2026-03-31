@@ -3,9 +3,9 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel, MyModelWithoutSelf
         reveal_type(MyModel.objects.example_simple())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.MyQuerySet[myapp.models.MyModel]]"
-        reveal_type(MyModel.objects.example_simple().just_int())  # N: Revealed type is "builtins.int"
-        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.MyQuerySet[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "list[myapp.models.MyQuerySet[myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_simple().just_int())  # N: Revealed type is "int"
+        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "dict[str, myapp.models.MyQuerySet[myapp.models.MyModel]]"
         reveal_type(MyModelWithoutSelf.objects.method())  # N: Revealed type is "myapp.models.QuerySetWithoutSelf"
 
     installed_apps:
@@ -85,7 +85,7 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "str"
         reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
     installed_apps:
         - myapp
@@ -106,7 +106,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel, ManagerFromModelQuerySet
-        reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "builtins.int"
+        reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "int"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
         reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
     installed_apps:
@@ -131,7 +131,7 @@
         from myapp.models import MyModel
         reveal_type(MyModel.objects.custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet"
         reveal_type(MyModel.objects.all().custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet"
-        reveal_type(MyModel.objects.returns_int_sequence())  # N: Revealed type is "typing.Sequence[builtins.int]"
+        reveal_type(MyModel.objects.returns_int_sequence())  # N: Revealed type is "typing.Sequence[int]"
     installed_apps:
         - myapp
     files:
@@ -158,7 +158,7 @@
         kls: type[MyModel1 | MyModel2] = MyModel1
         reveal_type(kls.objects.custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet1 | myapp.models.ModelQuerySet2"
         reveal_type(kls.objects.all().custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet1 | myapp.models.ModelQuerySet2"
-        reveal_type(kls.objects.returns_thing())  # N: Revealed type is "builtins.int | builtins.str"
+        reveal_type(kls.objects.returns_thing())  # N: Revealed type is "int | str"
         reveal_type(kls.objects.get())  # N: Revealed type is "myapp.models.MyModel1 | myapp.models.MyModel2"
     installed_apps:
         - myapp
@@ -245,7 +245,7 @@
         reveal_type(MyModel.objects.dummy_override())  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.example_mixin(MyModel()))  # N: Revealed type is "myapp.models.MyModel"
         reveal_type(MyModel.objects.example_other_mixin())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.objects.example_union())  # N: Revealed type is "myapp.models.MyModel | builtins.list[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_union())  # N: Revealed type is "myapp.models.MyModel | list[myapp.models.MyModel]"
         reveal_type(MyOtherModel.objects.example())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.example_2())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.override())  # N: Revealed type is "myapp.models.MyOtherModel"
@@ -255,7 +255,7 @@
         reveal_type(MyOtherModel.objects.example_other_mixin())  # N: Revealed type is "myapp.models.MyOtherModel"
         reveal_type(MyOtherModel.objects.test_self())  # N: Revealed type is "myapp.models._MyModelQuerySet2[myapp.models.MyOtherModel]"
         reveal_type(MyOtherModel.objects.test_sub_self())  # N: Revealed type is "myapp.models._MyModelQuerySet2[myapp.models.MyOtherModel]"
-        reveal_type(MyOtherModel.objects.example_union())  # N: Revealed type is "myapp.models.MyOtherModel | builtins.list[myapp.models.MyOtherModel]"
+        reveal_type(MyOtherModel.objects.example_union())  # N: Revealed type is "myapp.models.MyOtherModel | list[myapp.models.MyOtherModel]"
     installed_apps:
         - myapp
     files:
@@ -308,19 +308,19 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel, BaseQuerySet
         reveal_type(MyModel.objects.example())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "builtins.list[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_list())  # N: Revealed type is "list[myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_type())  # N: Revealed type is "type[myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_tuple_simple())  # N: Revealed type is "tuple[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_tuple_list())  # N: Revealed type is "builtins.tuple[myapp.models.MyModel, ...]"
-        reveal_type(MyModel.objects.example_tuple_double())  # N: Revealed type is "tuple[builtins.int, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_tuple_list())  # N: Revealed type is "tuple[myapp.models.MyModel, ...]"
+        reveal_type(MyModel.objects.example_tuple_double())  # N: Revealed type is "tuple[int, myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_class())  # N: Revealed type is "myapp.models.Example[myapp.models.MyModel]"
         reveal_type(MyModel.objects.example_type_class())  # N: Revealed type is "type[myapp.models.Example[myapp.models.MyModel]]"
         reveal_type(MyModel.objects.example_collection())  # N: Revealed type is "typing.Collection[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_set())  # N: Revealed type is "builtins.set[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "builtins.dict[builtins.str, myapp.models.MyModel]"
-        reveal_type(MyModel.objects.example_list_dict())  # N: Revealed type is "builtins.list[builtins.dict[builtins.str, myapp.models.MyModel]]"
+        reveal_type(MyModel.objects.example_set())  # N: Revealed type is "set[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "dict[str, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.example_list_dict())  # N: Revealed type is "list[dict[str, myapp.models.MyModel]]"
         class TestQuerySet(BaseQuerySet[str]): ... # E: Type argument "str" of "BaseQuerySet" must be a subtype of "Model"  [type-var]
-        reveal_type(MyModel.objects.example_t(5))  # N: Revealed type is "builtins.int"
+        reveal_type(MyModel.objects.example_t(5))  # N: Revealed type is "int"
         MyModel.objects.example_arg(5, "5")  # E: Argument 1 to "example_arg" of "BaseQuerySet" has incompatible type "int"; expected "MyModel"  [arg-type]
         reveal_type(MyModel.objects.example_arg(MyModel(), "5"))  # N: Revealed type is "myapp.models.MyModel"
     installed_apps:
@@ -392,7 +392,7 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.custom_method())  # N: Revealed type is "builtins.int"
+        reveal_type(MyModel.objects.custom_method())  # N: Revealed type is "int"
     installed_apps:
         - myapp
     files:

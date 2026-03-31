@@ -404,14 +404,14 @@
         reveal_type(User.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.User]"
         reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User, myapp.models.User]"
         reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User"
-        reveal_type(User.objects.get_instance())  # N: Revealed type is "builtins.int"
+        reveal_type(User.objects.get_instance())  # N: Revealed type is "int"
         reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
 
         from myapp.models import ChildUser
         reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.ChildUser, myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.get())  # N: Revealed type is "myapp.models.ChildUser"
-        reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "builtins.int"
+        reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "int"
         reveal_type(ChildUser.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
     installed_apps:
         - myapp
@@ -436,7 +436,7 @@
         from typing_extensions import reveal_type
         from myapp.models import ModelA, ModelB, ManagerA
         reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ManagerA[myapp.models.ModelA]"
-        reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> builtins.str"
+        reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> str"
     installed_apps:
         - myapp
     files:
@@ -624,8 +624,8 @@
         myapp/models:57: note: Revealed type is "Any"
         myapp/models:58: note: Revealed type is "myapp.models.Booking | None"
         myapp/models:59: note: Revealed type is "myapp.models.Booking"
-        myapp/models:60: note: Revealed type is "builtins.list[myapp.models.Booking]"
-        myapp/models:61: note: Revealed type is "builtins.list[myapp.models.Booking]"
+        myapp/models:60: note: Revealed type is "list[myapp.models.Booking]"
+        myapp/models:61: note: Revealed type is "list[myapp.models.Booking]"
         myapp/models:65: note: Revealed type is "def () -> django.db.models.query.QuerySet[myapp.models.Booking, myapp.models.Booking]"
         myapp/models:66: error: "RelatedManager[Booking]" has no attribute "custom"  [attr-defined]
         myapp/models:66: note: Revealed type is "Any"

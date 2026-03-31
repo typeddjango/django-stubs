@@ -4,7 +4,7 @@
         from myapp.models import MyUser
         user = MyUser(name='user', gender='M')
         user.get_name_display()  # E: "MyUser" has no attribute "get_name_display"; maybe "get_gender_display"?  [attr-defined]
-        reveal_type(user.get_gender_display())  # N: Revealed type is "builtins.str"
+        reveal_type(user.get_gender_display())  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:

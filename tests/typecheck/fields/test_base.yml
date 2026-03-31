@@ -3,11 +3,11 @@
         from typing_extensions import reveal_type
         from myapp.models import User
         user = User(small_int=1, name='user', slug='user', text='user')
-        reveal_type(user.id)  # N: Revealed type is "builtins.int"
-        reveal_type(user.small_int)  # N: Revealed type is "builtins.int"
-        reveal_type(user.name)  # N: Revealed type is "builtins.str"
-        reveal_type(user.slug)  # N: Revealed type is "builtins.str"
-        reveal_type(user.text)  # N: Revealed type is "builtins.str"
+        reveal_type(user.id)  # N: Revealed type is "int"
+        reveal_type(user.small_int)  # N: Revealed type is "int"
+        reveal_type(user.name)  # N: Revealed type is "str"
+        reveal_type(user.slug)  # N: Revealed type is "str"
+        reveal_type(user.text)  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -27,7 +27,7 @@
         from typing_extensions import reveal_type
         from myapp.models import Booking
         booking = Booking()
-        reveal_type(booking.id)  # N: Revealed type is "builtins.int"
+        reveal_type(booking.id)  # N: Revealed type is "int"
         reveal_type(booking.time_range)  # N: Revealed type is "Any"
         reveal_type(booking.some_decimal)  # N: Revealed type is "decimal.Decimal"
     installed_apps:
@@ -50,7 +50,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import User
-        reveal_type(User().id)  # N: Revealed type is "builtins.int"
+        reveal_type(User().id)  # N: Revealed type is "int"
     installed_apps:
         - myapp
     files:
@@ -66,7 +66,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import User
-        reveal_type(User().my_pk)  # N: Revealed type is "builtins.int"
+        reveal_type(User().my_pk)  # N: Revealed type is "int"
         User().id  # E: "User" has no attribute "id"  [attr-defined]
     installed_apps:
         - myapp
@@ -85,7 +85,7 @@
         MyModel(nulltext="")
         MyModel(nulltext=None)
         MyModel().nulltext=None
-        reveal_type(MyModel().nulltext)  # N: Revealed type is "builtins.str | None"
+        reveal_type(MyModel().nulltext)  # N: Revealed type is "str | None"
     installed_apps:
         - myapp
     files:
@@ -103,7 +103,7 @@
         MyModel(notnulltext=None)  # E: Incompatible type for "notnulltext" of "MyModel" (got "None", expected "str | int | Combinable")  [misc]
         MyModel(notnulltext="")
         MyModel().notnulltext = None  # E: Incompatible types in assignment (expression has type "None", variable has type "str | int | Combinable")  [assignment]
-        reveal_type(MyModel().notnulltext)  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel().notnulltext)  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -118,7 +118,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyUser
-        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[builtins.str | builtins.int | django.db.models.expressions.Combinable, builtins.str]"
+        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[str | int | django.db.models.expressions.Combinable, str]"
     installed_apps:
         - myapp
     files:
@@ -135,15 +135,15 @@
         from django.db import models
         class MyClass:
             myfield: models.IntegerField[int, int]
-        reveal_type(MyClass.myfield)  # N: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.IntegerField[builtins.int, builtins.int]]"
-        reveal_type(MyClass.myfield.field)  # N: Revealed type is "django.db.models.fields.IntegerField[builtins.int, builtins.int]"
-        reveal_type(MyClass().myfield)  # N: Revealed type is "django.db.models.fields.IntegerField[builtins.int, builtins.int]"
+        reveal_type(MyClass.myfield)  # N: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.IntegerField[int, int]]"
+        reveal_type(MyClass.myfield.field)  # N: Revealed type is "django.db.models.fields.IntegerField[int, int]"
+        reveal_type(MyClass().myfield)  # N: Revealed type is "django.db.models.fields.IntegerField[int, int]"
 
 -   case: fields_inside_mixins_used_in_model_subclasses_resolved_as_primitives
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel, AuthMixin
-        reveal_type(MyModel().username)  # N: Revealed type is "builtins.str"
+        reveal_type(MyModel().username)  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -182,7 +182,7 @@
             message = models.BinaryField()
         obj = EncodedMessage(b'\x010')
 
-        reveal_type(obj.message) # N: Revealed type is "builtins.bytes | builtins.memoryview[builtins.int]"
+        reveal_type(obj.message) # N: Revealed type is "bytes | memoryview[int]"
 
 -  case: test_small_auto_field_class_presents_as_int
    main: |
@@ -192,7 +192,7 @@
             small = models.SmallAutoField(primary_key=True)
         obj = MyModel()
 
-        reveal_type(obj.small) # N: Revealed type is "builtins.int"
+        reveal_type(obj.small) # N: Revealed type is "int"
 
 - case: test_ignores_renamed_field
   main: |
@@ -202,7 +202,7 @@
         from typing_extensions import reveal_type
         from myapp.models import RenamedField
         instance = RenamedField()
-        reveal_type(instance.modelname) # N: Revealed type is "builtins.int"
+        reveal_type(instance.modelname) # N: Revealed type is "int"
         instance.fieldname # E: "RenamedField" has no attribute "fieldname"  [attr-defined]
         instance.modelname = 1
         instance.fieldname = 1 # E: "RenamedField" has no attribute "fieldname"  [attr-defined]

@@ -4,11 +4,11 @@
         from typing_extensions import reveal_type
         from django.conf import settings
         # standard settings
-        reveal_type(settings.AUTH_USER_MODEL)  # N: Revealed type is "builtins.str"
-        reveal_type(settings.ROOT_DIR)  # N: Revealed type is "builtins.str"
+        reveal_type(settings.AUTH_USER_MODEL)  # N: Revealed type is "str"
+        reveal_type(settings.ROOT_DIR)  # N: Revealed type is "str"
         reveal_type(settings.APPS_DIR)  # N: Revealed type is "pathlib.Path"
-        reveal_type(settings.NUMBERS)  # N: Revealed type is "builtins.list[builtins.str]"
-        reveal_type(settings.DICT)  # N: Revealed type is "builtins.dict[Any, Any]"
+        reveal_type(settings.NUMBERS)  # N: Revealed type is "list[str]"
+        reveal_type(settings.DICT)  # N: Revealed type is "dict[Any, Any]"
     custom_settings: |
         from base import *
         SECRET_KEY = 112233
@@ -25,8 +25,8 @@
     main: |
         from typing_extensions import reveal_type
         from django.conf import settings
-        reveal_type(settings.AUTH_USER_MODEL)  # N: Revealed type is "builtins.str"
-        reveal_type(settings.AUTHENTICATION_BACKENDS)  # N: Revealed type is "typing.Sequence[builtins.str]"
+        reveal_type(settings.AUTH_USER_MODEL)  # N: Revealed type is "str"
+        reveal_type(settings.AUTHENTICATION_BACKENDS)  # N: Revealed type is "typing.Sequence[str]"
     installed_apps: []
 
 -   case: fail_if_there_is_no_setting
@@ -58,7 +58,7 @@
       if hasattr(settings, 'NON_EXISTENT_SETTING') and settings.NON_EXISTENT_SETTING:
           reveal_type(settings.NON_EXISTENT_SETTING)
     out: |
-      main:4: note: Revealed type is "builtins.str"
+      main:4: note: Revealed type is "str"
       main:5: error: 'Settings' object has no attribute 'NON_EXISTENT_SETTING'  [misc]
       main:6: error: 'Settings' object has no attribute 'NON_EXISTENT_SETTING'  [misc]
       main:6: note: Revealed type is "Any"
@@ -71,7 +71,7 @@
         from django.conf import settings
 
         # Global:
-        reveal_type(settings.SECRET_KEY)  # N: Revealed type is "builtins.str"
+        reveal_type(settings.SECRET_KEY)  # N: Revealed type is "str"
 
         # Custom:
         reveal_type(settings.A)  # N: Revealed type is "Any"
@@ -92,7 +92,7 @@
         from django.conf import settings
 
         # Global:
-        reveal_type(settings.SECRET_KEY)  # N: Revealed type is "builtins.str"
+        reveal_type(settings.SECRET_KEY)  # N: Revealed type is "str"
 
         # Custom:
         reveal_type(settings.A)  # E: 'Settings' object has no attribute 'A'  [misc] # N: Revealed type is "Any"

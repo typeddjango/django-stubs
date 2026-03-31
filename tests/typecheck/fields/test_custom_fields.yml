@@ -3,21 +3,21 @@
         from typing_extensions import reveal_type
         from myapp.models import User, CustomFieldValue
         user = User()
-        reveal_type(user.id)  # N: Revealed type is "builtins.int"
+        reveal_type(user.id)  # N: Revealed type is "int"
         reveal_type(user.my_custom_field1)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field2)  # N: Revealed type is "myapp.models.CustomFieldValue"
-        reveal_type(user.my_custom_field3)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field3)  # N: Revealed type is "bool"
         reveal_type(user.my_custom_field4)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field5)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field6)  # N: Revealed type is "myapp.models.CustomFieldValue"
-        reveal_type(user.my_custom_field7)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field7)  # N: Revealed type is "bool"
         reveal_type(user.my_custom_field8)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field9)  # N: Revealed type is "myapp.models.CustomFieldValue"
-        reveal_type(user.my_custom_field10)  # N: Revealed type is "builtins.bool"
-        reveal_type(user.my_custom_field11)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field10)  # N: Revealed type is "bool"
+        reveal_type(user.my_custom_field11)  # N: Revealed type is "bool"
         reveal_type(user.my_custom_field12)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
         reveal_type(user.my_custom_field13)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
-        reveal_type(user.my_custom_field14)  # N: Revealed type is "builtins.bool | None"
+        reveal_type(user.my_custom_field14)  # N: Revealed type is "bool | None"
         reveal_type(user.my_custom_field15)  # N: Revealed type is "None"
 
         reveal_type(user.my_custom_field_any1)  # N: Revealed type is "Any"

@@ -24,8 +24,8 @@
         from typing_extensions import reveal_type
         from myapp.models import Book
         book = Book()
-        reveal_type(book.publisher_id)  # N: Revealed type is "builtins.int"
-        reveal_type(book.owner_id)  # N: Revealed type is "builtins.int"
+        reveal_type(book.publisher_id)  # N: Revealed type is "int"
+        reveal_type(book.owner_id)  # N: Revealed type is "int"
     installed_apps:
         - django.contrib.auth
         - django.contrib.contenttypes
@@ -319,11 +319,11 @@
         from myapp.models import App, Member
         reveal_type(Member().apps)  # N: Revealed type is "myapp.models.App_ManyRelatedManager[myapp.models.Member_apps]"
         reveal_type(Member().apps.get())  # N: Revealed type is "myapp.models.App"
-        reveal_type(Member().apps.app_method())  # N: Revealed type is "builtins.str"
+        reveal_type(Member().apps.app_method())  # N: Revealed type is "str"
         Member().apps.add(App())
         reveal_type(App().members)  # N: Revealed type is "myapp.models.Member_ManyRelatedManager[myapp.models.Member_apps]"
         reveal_type(App().members.get())  # N: Revealed type is "myapp.models.Member"
-        reveal_type(App().members.member_method())  # N: Revealed type is "builtins.int"
+        reveal_type(App().members.member_method())  # N: Revealed type is "int"
         App().members.add(Member())
         reveal_type(Member.apps.field)  # N: Revealed type is "django.db.models.fields.related.ManyToManyField[myapp.models.App, myapp.models.Member_apps]"
         reveal_type(App.members)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.Member, myapp.models.Member_apps]"
@@ -393,9 +393,9 @@
         reveal_type(User.friends.through.objects.get())  # N: Revealed type is "myapp.models.User_friends"
         reveal_type(User.friends.through._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.User_friends]"
         reveal_type(User.friends.through().from_user)  # N: Revealed type is "myapp.models.User"
-        reveal_type(User.friends.through().from_user_id)  # N: Revealed type is "builtins.int"
+        reveal_type(User.friends.through().from_user_id)  # N: Revealed type is "int"
         reveal_type(User.friends.through().to_user)  # N: Revealed type is "myapp.models.User"
-        reveal_type(User.friends.through().to_user_id)  # N: Revealed type is "builtins.int"
+        reveal_type(User.friends.through().to_user_id)  # N: Revealed type is "int"
         reveal_type(User.friends.through)  # N: Revealed type is "type[myapp.models.User_friends]"
     installed_apps:
         - myapp
@@ -447,14 +447,14 @@
         from typing_extensions import reveal_type
         from myapp.models import Book, Book2
 
-        reveal_type(Book().publisher_id)  # N: Revealed type is "builtins.str"
+        reveal_type(Book().publisher_id)  # N: Revealed type is "str"
         Book(publisher_id=1)
         Book(publisher_id='hello')
         Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "str | int | Combinable")  [misc]
         Book.objects.create(publisher_id=1)
         Book.objects.create(publisher_id='hello')
 
-        reveal_type(Book2().publisher_id)  # N: Revealed type is "builtins.int"
+        reveal_type(Book2().publisher_id)  # N: Revealed type is "int"
         Book2(publisher_id=1)
         Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
         Book2.objects.create(publisher_id=1)
@@ -716,14 +716,14 @@
         user = MyUser()
         reveal_type(user.book_set) # N: Revealed type is "myapp.models.Book_RelatedManager"
         reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
-        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: myapp.models.Book | builtins.int, bulk: builtins.bool =)"
-        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: myapp.models.Article | builtins.int, bulk: builtins.bool =)"
+        reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: myapp.models.Book | int, bulk: bool =)"
+        reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: myapp.models.Article | int, bulk: bool =)"
         reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Book, myapp.models.Book]"
         reveal_type(user.book_set.get())  # N: Revealed type is "myapp.models.Book"
         reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Article, myapp.models.Article]"
         reveal_type(user.article_set.get())  # N: Revealed type is "myapp.models.Article"
-        reveal_type(user.book_set.queryset_method())  # N: Revealed type is "builtins.int"
-        reveal_type(user.article_set.queryset_method())  # N: Revealed type is "builtins.int"
+        reveal_type(user.book_set.queryset_method())  # N: Revealed type is "int"
+        reveal_type(user.article_set.queryset_method())  # N: Revealed type is "int"
     installed_apps:
         - myapp
     files:
@@ -812,10 +812,10 @@
         from typing_extensions import reveal_type
         from myapp.models import User
         reveal_type(User().parent)  # N: Revealed type is "myapp.models.AbstractUser"
-        reveal_type(User().parent_id)  # N: Revealed type is "builtins.int"
+        reveal_type(User().parent_id)  # N: Revealed type is "int"
 
         reveal_type(User().parent2)  # N: Revealed type is "myapp.models.AbstractUser | None"
-        reveal_type(User().parent2_id)  # N: Revealed type is "builtins.int | None"
+        reveal_type(User().parent2_id)  # N: Revealed type is "int | None"
     installed_apps:
         - myapp
     files:
@@ -864,11 +864,11 @@
         from myapp.models import User, Order, Product
         reveal_type(User().orders)  # N: Revealed type is "myapp.models.Order_RelatedManager"
         reveal_type(User().orders.get())  # N: Revealed type is "myapp.models.Order"
-        reveal_type(User().orders.manager_method())  # N: Revealed type is "builtins.int"
-        reveal_type(Product.objects.queryset_method())  # N: Revealed type is "builtins.int"
+        reveal_type(User().orders.manager_method())  # N: Revealed type is "int"
+        reveal_type(Product.objects.queryset_method())  # N: Revealed type is "int"
         reveal_type(Order().products)  # N: Revealed type is "myapp.models.Product_RelatedManager"
         reveal_type(Order().products.get())  # N: Revealed type is "myapp.models.Product"
-        reveal_type(Order().products.queryset_method())  # N: Revealed type is "builtins.int"
+        reveal_type(Order().products.queryset_method())  # N: Revealed type is "int"
         cond: bool
         if cond:
             manager = User().products
@@ -963,7 +963,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import User
-        reveal_type(User().purchases)  # N: Revealed type is "builtins.int"
+        reveal_type(User().purchases)  # N: Revealed type is "int"
         User().purchases.filter()  # E: "int" has no attribute "filter"  [attr-defined]
     installed_apps:
         - myapp
@@ -1128,7 +1128,7 @@
         from myapp.models import Other
         reveal_type(Other.explicit_descriptor)  # N: Revealed type is "django.db.models.fields.related_descriptors.ReverseManyToOneDescriptor[myapp.models.MyModel]"
         reveal_type(Other().explicit_descriptor)  # N: Revealed type is "myapp.models.MyModel_RelatedManager"
-        reveal_type(Other().explicit_descriptor.custom_method())  # N: Revealed type is "builtins.int"
+        reveal_type(Other().explicit_descriptor.custom_method())  # N: Revealed type is "int"
     installed_apps:
         -   myapp
     monkeypatch: true
@@ -1252,14 +1252,14 @@
         main:5: note: Revealed type is "myapp.models.MyModel"
         main:7: note: Revealed type is "myapp.models.CustomThrough"
         main:8: note: Revealed type is "myapp.models.Other"
-        main:9: note: Revealed type is "builtins.int"
+        main:9: note: Revealed type is "int"
         main:10: note: Revealed type is "myapp.models.MyModel"
-        main:13: note: Revealed type is "builtins.int"
-        main:14: note: Revealed type is "builtins.int"
+        main:13: note: Revealed type is "int"
+        main:14: note: Revealed type is "int"
         main:15: note: Revealed type is "myapp.models.MyModel"
-        main:16: note: Revealed type is "builtins.int"
+        main:16: note: Revealed type is "int"
         main:17: note: Revealed type is "myapp.models.Other"
-        main:18: note: Revealed type is "builtins.int"
+        main:18: note: Revealed type is "int"
         main:20: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
         main:21: note: Revealed type is "django.db.models.fields.related_descriptors.ForwardManyToOneDescriptor[django.db.models.fields.related.ForeignKey[myapp.models.MyModel | django.db.models.expressions.Combinable, myapp.models.MyModel]]"
         main:22: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
@@ -1267,20 +1267,20 @@
         main:25: note: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[myapp.models.MyModel, myapp.models.MyModel_auto_through]"
         main:26: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
         main:27: note: Revealed type is "myapp.models.MyModel_auto_through"
-        main:29: note: Revealed type is "builtins.str"
-        main:30: note: Revealed type is "builtins.str"
-        main:31: note: Revealed type is "def (*objs: myapp.models.MyModel | builtins.int, through_defaults: typing.Mapping[builtins.str, Any] | None =)"
+        main:29: note: Revealed type is "str"
+        main:30: note: Revealed type is "str"
+        main:31: note: Revealed type is "def (*objs: myapp.models.MyModel | int, through_defaults: typing.Mapping[str, Any] | None =)"
         main:33: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:34: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:36: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_auto_through]"
         main:37: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
-        main:38: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable | None, builtins.int]]"
+        main:38: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[float | int | str | django.db.models.expressions.Combinable | None, int]]"
         main:39: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_other_again]"
         main:40: note: Revealed type is "type[myapp.models.MyModel_other_again]"
-        main:41: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable | None, builtins.int]]"
+        main:41: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[float | int | str | django.db.models.expressions.Combinable | None, int]]"
         main:42: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.CustomThrough]"
         main:43: note: Revealed type is "type[myapp.models.CustomThrough]"
-        main:44: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[builtins.float | builtins.int | builtins.str | django.db.models.expressions.Combinable, builtins.int]]"
+        main:44: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[float | int | str | django.db.models.expressions.Combinable, int]]"
     installed_apps:
         -   myapp
     files:
@@ -1603,25 +1603,25 @@
         # With builtin manager/queryset
         Author().book_set.filter(featured=True)
         Author().book_set.filter(xyz=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().book_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, tuple[builtins.bool]]"
+        reveal_type(Author().book_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, tuple[bool]]"
         Author().book_set.values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().book_set.values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'featured': builtins.bool})]"
+        reveal_type(Author().book_set.values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'featured': bool})]"
         Author().book_set.values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().book_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, tuple[builtins.bool]]"
+        reveal_type(Author().book_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, tuple[bool]]"
         Author().book_set.filter(featured=True).values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().book_set.filter(featured=True).values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'featured': builtins.bool})]"
+        reveal_type(Author().book_set.filter(featured=True).values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Book, TypedDict({'featured': bool})]"
         Author().book_set.filter(featured=True).values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
 
         # With a custom manager/queryset
         Author().other_set.filter(featured=True)
         Author().other_set.filter(xyz=True)  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().other_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, tuple[builtins.bool]]"
+        reveal_type(Author().other_set.values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, tuple[bool]]"
         Author().other_set.values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().other_set.values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, TypedDict({'featured': builtins.bool})]"
+        reveal_type(Author().other_set.values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, TypedDict({'featured': bool})]"
         Author().other_set.values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().other_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, tuple[builtins.bool]]"
+        reveal_type(Author().other_set.filter(featured=True).values_list("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, tuple[bool]]"
         Author().other_set.filter(featured=True).values_list("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
-        reveal_type(Author().other_set.filter(featured=True).values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, TypedDict({'featured': builtins.bool})]"
+        reveal_type(Author().other_set.filter(featured=True).values("featured"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Other, TypedDict({'featured': bool})]"
         Author().other_set.filter(featured=True).values("xyz")  # E: Cannot resolve keyword 'xyz' into field. Choices are: authors, featured, id  [misc]
     installed_apps:
         - myapp

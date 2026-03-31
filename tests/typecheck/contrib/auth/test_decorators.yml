@@ -21,11 +21,11 @@
 
         @login_required(redirect_field_name='a', login_url='b')
         def view_func3(request: WSGIRequest, arg: str) -> HttpResponse: ...
-        reveal_type(view_func3)  # N: Revealed type is "def (request: django.core.handlers.wsgi.WSGIRequest, arg: builtins.str) -> django.http.response.HttpResponse"
+        reveal_type(view_func3)  # N: Revealed type is "def (request: django.core.handlers.wsgi.WSGIRequest, arg: str) -> django.http.response.HttpResponse"
 
         @login_required(redirect_field_name='a', login_url='b')
         async def view_func4(request: ASGIRequest, arg: str) -> HttpResponse: ...
-        reveal_type(view_func4)  # N: Revealed type is "def (request: django.core.handlers.asgi.ASGIRequest, arg: builtins.str) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
+        reveal_type(view_func4)  # N: Revealed type is "def (request: django.core.handlers.asgi.ASGIRequest, arg: str) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
 
         # This is non-conventional usage, but covered in Django tests, so we allow it.
 

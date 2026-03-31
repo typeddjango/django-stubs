@@ -10,18 +10,18 @@
 
         reveal_type(Abstract1.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         reveal_type(Abstract2.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
-        reveal_type(Concrete1.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.DoesNotExist"
-        reveal_type(Concrete2.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.DoesNotExist"
+        reveal_type(Concrete1.DoesNotExist)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete1.DoesNotExist"
+        reveal_type(Concrete2.DoesNotExist)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete2.DoesNotExist"
 
         reveal_type(Abstract1.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
         reveal_type(Abstract2.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
-        reveal_type(Concrete1.NotUpdated)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.NotUpdated"
-        reveal_type(Concrete2.NotUpdated)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.NotUpdated"
+        reveal_type(Concrete1.NotUpdated)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete1.NotUpdated"
+        reveal_type(Concrete2.NotUpdated)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete2.NotUpdated"
 
         reveal_type(Abstract1.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
         reveal_type(Abstract2.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
-        reveal_type(Concrete1.MultipleObjectsReturned)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.MultipleObjectsReturned"
-        reveal_type(Concrete2.MultipleObjectsReturned)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.MultipleObjectsReturned"
+        reveal_type(Concrete1.MultipleObjectsReturned)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete1.MultipleObjectsReturned"
+        reveal_type(Concrete2.MultipleObjectsReturned)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete2.MultipleObjectsReturned"
 
         reveal_type(super(Concrete1, Concrete1()).DoesNotExist())  # N: Revealed type is "django.core.exceptions.ObjectDoesNotExist"
         reveal_type(super(Concrete2, Concrete2()).DoesNotExist())  # N: Revealed type is "myapp.models.Concrete1.DoesNotExist"
@@ -115,18 +115,18 @@
 
         reveal_type(Abstract1.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         reveal_type(Abstract2.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
-        reveal_type(Concrete1.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.DoesNotExist"
-        reveal_type(Concrete2.DoesNotExist)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.DoesNotExist"
+        reveal_type(Concrete1.DoesNotExist)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete1.DoesNotExist"
+        reveal_type(Concrete2.DoesNotExist)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete2.DoesNotExist"
 
         reveal_type(Abstract1.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
         reveal_type(Abstract2.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
-        reveal_type(Concrete1.NotUpdated)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.NotUpdated"
-        reveal_type(Concrete2.NotUpdated)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.NotUpdated"
+        reveal_type(Concrete1.NotUpdated)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete1.NotUpdated"
+        reveal_type(Concrete2.NotUpdated)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete2.NotUpdated"
 
         reveal_type(Abstract1.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
         reveal_type(Abstract2.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
-        reveal_type(Concrete1.MultipleObjectsReturned)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete1.MultipleObjectsReturned"
-        reveal_type(Concrete2.MultipleObjectsReturned)  # N: Revealed type is "def (*args: builtins.object) -> myapp.models.Concrete2.MultipleObjectsReturned"
+        reveal_type(Concrete1.MultipleObjectsReturned)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete1.MultipleObjectsReturned"
+        reveal_type(Concrete2.MultipleObjectsReturned)  # N: Revealed type is "def (*args: object) -> myapp.models.Concrete2.MultipleObjectsReturned"
 
         reveal_type(super(Concrete1, Concrete1()).DoesNotExist())  # N: Revealed type is "django.core.exceptions.ObjectDoesNotExist"
         reveal_type(super(Concrete2, Concrete2()).DoesNotExist())  # N: Revealed type is "myapp.models.Concrete1.DoesNotExist"
