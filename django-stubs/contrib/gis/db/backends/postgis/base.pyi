@@ -1,4 +1,3 @@
-from functools import lru_cache
 from typing import Any
 
 from django.db.backends.postgresql.base import DatabaseWrapper as Psycopg2DatabaseWrapper
@@ -30,7 +29,7 @@ class GeometryType: ...
 class GeographyType: ...
 class RasterType: ...
 
-@lru_cache
+# Uses @functools.lru_cache
 def postgis_adapters(
     geo_oid: int | None,
     geog_oid: int | None,
