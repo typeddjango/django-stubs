@@ -653,7 +653,7 @@
                 class User(models.Model):
                     username = models.CharField(max_length=100)
 
-- case: test_values_on_with_annotations_queryset
+- case: test_values_and_values_list_on_with_annotations_queryset
   main: |
     from typing_extensions import TypedDict, reveal_type
     from django.db.models import QuerySet
@@ -685,6 +685,32 @@
     # .values() with no params on annotated queryset includes model + annotation fields
     bare_values = qs.values().get()
     reveal_type(bare_values)  # N: Revealed type is "TypedDict({'id': int, 'name': str, 'extra_id': int | None})"
+
+    # .values_list() with annotation field should resolve its type
+    vl_annotation = qs.values_list("extra_id").get()
+    reveal_type(vl_annotation)  # N: Revealed type is "tuple[int | None]"
+
+    # .values_list() with model field should still work
+    vl_model = qs.values_list("name").get()
+    reveal_type(vl_model)  # N: Revealed type is "tuple[str]"
+
+    # .values_list() with both model and annotation fields
+    vl_mixed = qs.values_list("name", "extra_id").get()
+    reveal_type(vl_mixed)  # N: Revealed type is "tuple[str, int | None]"
+
+    # .values_list(flat=True) with annotation field
+    vl_flat = qs.values_list("extra_id", flat=True).get()
+    reveal_type(vl_flat)  # N: Revealed type is "int | None"
+
+    # .values_list(named=True) with annotation field
+    vl_named = qs.values_list("name", "extra_id", named=True).get()
+    reveal_type(vl_named.name)  # N: Revealed type is "str"
+    reveal_type(vl_named.extra_id)  # N: Revealed type is "int | None"
+
+    # .values_list(named=True) with no params merges model + annotation fields
+    vl_named_bare = qs.values_list(named=True).get()
+    reveal_type(vl_named_bare.name)  # N: Revealed type is "str"
+    reveal_type(vl_named_bare.extra_id)  # N: Revealed type is "int | None"
 
   installed_apps:
     - myapp
