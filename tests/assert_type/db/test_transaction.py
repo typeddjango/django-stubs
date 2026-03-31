@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db.transaction import atomic, non_atomic_requests
 from django.http import HttpRequest, HttpResponse
 from typing_extensions import assert_type

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db.migrations import RunSQL
 
 RunSQL(sql="SOME SQL")

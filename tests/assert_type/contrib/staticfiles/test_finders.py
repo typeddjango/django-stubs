@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.staticfiles import finders
 from django.contrib.staticfiles.finders import AppDirectoriesFinder, BaseFinder, DefaultStorageFinder, FileSystemFinder
 from typing_extensions import assert_type

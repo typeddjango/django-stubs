@@ -1,9 +1,12 @@
-from typing import Any, ClassVar
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.utils.functional import Promise, cached_property, classproperty, lazystr
 from typing_extensions import assert_type, override
 
-from django_stubs_ext import StrOrPromise
+if TYPE_CHECKING:
+    from django_stubs_ext import StrOrPromise
 
 
 # cached_property: class vs instance attributes

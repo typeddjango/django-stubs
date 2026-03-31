@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db import connection, connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper

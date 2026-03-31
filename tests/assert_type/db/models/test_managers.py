@@ -4,6 +4,8 @@ A TypeVar with a forward-referenced bound used in a QuerySet subclass
 caused 'Must not defer during final iteration' crash in mypy.
 """
 
+from __future__ import annotations
+
 from typing import TypeVar
 
 from django.db import models

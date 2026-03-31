@@ -1,9 +1,13 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from django.contrib.messages.views import SuccessMessageMixin
-from django.forms import Form
 from django.views.generic.edit import FormMixin
 from typing_extensions import assert_type
+
+if TYPE_CHECKING:
+    from django.forms import Form
 
 
 def test_in_operator(form: Form, field: str) -> None:

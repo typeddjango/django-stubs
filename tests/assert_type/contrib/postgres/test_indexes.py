@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.postgres.indexes import BrinIndex, BTreeIndex, GinIndex, GistIndex, HashIndex, OpClass, SpGistIndex
 from django.db import models
 from django.db.models import Index

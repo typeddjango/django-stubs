@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.utils.datastructures import MultiValueDict
 from typing_extensions import assert_type
 

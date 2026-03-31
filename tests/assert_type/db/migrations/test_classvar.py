@@ -1,7 +1,11 @@
-from typing import ClassVar
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import migrations
-from django.db.migrations.operations.base import Operation
+
+if TYPE_CHECKING:
+    from django.db.migrations.operations.base import Operation
 
 
 class ExplicitMigration(migrations.Migration):

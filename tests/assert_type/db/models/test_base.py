@@ -1,8 +1,14 @@
-from collections.abc import Iterable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from django.db import models
-from django.db.models.query import QuerySet
 from typing_extensions import assert_type, override
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from django.db.models.query import QuerySet
 
 
 class MyModel(models.Model):

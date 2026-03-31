@@ -1,9 +1,13 @@
-from collections.abc import Sequence
-from typing import Any
+from __future__ import annotations
 
-from django.apps.config import AppConfig
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
+
 from django.core.checks import CheckMessage, Warning, register
 from typing_extensions import assert_type
+
+if TYPE_CHECKING:
+    from django.apps.config import AppConfig
 
 
 @register("foo", deploy=True)

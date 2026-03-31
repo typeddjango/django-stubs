@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.tasks import task
 from typing_extensions import assert_type
 

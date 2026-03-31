@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from typing import Any
