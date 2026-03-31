@@ -15,13 +15,10 @@ django.contrib.admin.models.LogEntry.object_id
 django.contrib.admin.models.LogEntry.object_repr
 django.contrib.admin.models.LogEntry.user
 django.contrib.admin.models.LogEntry.user_id
-django.contrib.admin.site
 django.contrib.admin.sites.site
 django.contrib.auth.admin.UserAdmin.fieldsets
 django.contrib.auth.base_user.AbstractBaseUser.last_login
 django.contrib.auth.base_user.AbstractBaseUser.password
-django.contrib.auth.models.AbstractBaseUser.last_login
-django.contrib.auth.models.AbstractBaseUser.password
 django.contrib.auth.models.AbstractUser.date_joined
 django.contrib.auth.models.AbstractUser.email
 django.contrib.auth.models.AbstractUser.first_name
@@ -75,16 +72,11 @@ django.contrib.flatpages.models.FlatPage.sites
 django.contrib.flatpages.models.FlatPage.template_name
 django.contrib.flatpages.models.FlatPage.title
 django.contrib.flatpages.models.FlatPage.url
-django.contrib.gis.admin.site
 django.contrib.gis.db.backends.spatialite.base.DatabaseWrapper.ops
-django.contrib.gis.db.models.CharField.description
-django.contrib.gis.db.models.Field.description
 django.contrib.gis.db.models.functions.Area.as_sql
 django.contrib.gis.db.models.functions.GeoFuncMixin.as_sql
 django.contrib.gis.db.models.functions.Length.as_sql
 django.contrib.gis.db.models.lookups.RasterBandTransform.as_sql
-django.contrib.gis.forms.inlineformset_factory
-django.contrib.gis.forms.modelformset_factory
 django.contrib.redirects.models.Redirect.id
 django.contrib.redirects.models.Redirect.new_path
 django.contrib.redirects.models.Redirect.old_path
@@ -115,16 +107,12 @@ django.db.connection
 django.db.migrations.recorder.MigrationRecorder.Migration.get_next_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.get_previous_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.id
-django.db.models.CharField.description
-django.db.models.Field.description
 django.db.models.expressions.connector
 django.db.models.expressions.d
 django.db.models.expressions.field_types
 django.db.models.fields.CharField.description
 django.db.models.fields.Field.description
 django.db.models.fields.json.CaseInsensitiveMixin.process_lhs
-django.forms.inlineformset_factory
-django.forms.modelformset_factory
 django.forms.models.inlineformset_factory
 django.forms.models.modelformset_factory
 
