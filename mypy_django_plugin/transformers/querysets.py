@@ -147,8 +147,8 @@ def get_values_list_row_type(
 
     column_types = {}
     for field_lookup in field_lookups:
-        if field_lookup in annotation_types:
-            column_types[field_lookup] = annotation_types[field_lookup]
+        if annotation_type := annotation_types.get(field_lookup):
+            column_types[field_lookup] = annotation_type
             continue
 
         lookup_field_type = get_field_type_from_lookup(
@@ -412,8 +412,8 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     # Collect `*fields` types -- `.values("id", "name")`
     for field_lookup in field_lookups:
         # Check annotation fields first for annotated querysets
-        if field_lookup in annotation_types:
-            column_types[field_lookup] = annotation_types[field_lookup]
+        if annotation_type := annotation_types.get(field_lookup):
+            column_types[field_lookup] = annotation_type
             continue
 
         field_lookup_type = get_field_type_from_lookup(
