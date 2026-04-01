@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import builtins
-import logging
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from django import VERSION
@@ -38,8 +37,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
 __all__ = ["monkeypatch"]
-
-logger = logging.getLogger(__name__)
 
 _T = TypeVar("_T")
 _VersionSpec = tuple[int, int]
