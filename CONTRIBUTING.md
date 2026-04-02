@@ -80,7 +80,7 @@ Available recipes:
     ty             # Run ty on test cases
 
     [test]
-    test *args     # Run pytest test suite
+    test *args='tests' # Run pytest test suite
     stubtest *args # Run stubtest to check stubs match runtime
     ext-test       # Run django-stubs-ext tests
 
@@ -110,8 +110,8 @@ just pyrefly       # pyrefly on test cases
 Extra arguments can be passed to `test` and `stubtest`:
 
 ```bash
-just test -- -k test_name
-just stubtest -- --allowlist extra.txt
+just test -k test_name
+just stubtest --allowlist extra.txt
 ```
 
 If you get unexpected results, clear the mypy cache with `just clean`.

@@ -6,8 +6,8 @@ _default:
 [group('dev')]
 bootstrap:
     uv tool install pre-commit
-    pre-commit install --install-hooks
     uv sync
+    pre-commit install --install-hooks
 
 # Run pre-commit hooks on all files
 [group('dev')]
@@ -16,7 +16,7 @@ lint:
 
 # Run all checks before submitting a PR
 [group('dev')]
-pre-mr-check: lint ty pyrefly mypy stubtest pyright test
+pre-mr-check: lint ty pyrefly mypy stubtest pyright test ext-test
 
 # Remove mypy cache
 [group('dev')]
@@ -49,8 +49,8 @@ ty:
 
 # Run pytest test suite
 [group('test')]
-test *args:
-    uv run pytest -n auto tests {{ args }}
+test *args='tests':
+    uv run pytest -n auto {{ args }}
 
 # Run stubtest to check stubs match runtime
 [group('test')]
