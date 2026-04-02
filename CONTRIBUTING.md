@@ -80,7 +80,8 @@ Available recipes:
     ty             # Run ty on test cases
 
     [test]
-    test *args='tests' # Run pytest test suite
+    test +args     # Run pytest on specific files or with custom args (no xdist)
+    all-test       # Run full pytest test suite with parallel workers
     stubtest *args # Run stubtest to check stubs match runtime
     ext-test       # Run django-stubs-ext tests
 
@@ -100,7 +101,8 @@ Or run individual checks:
 ```bash
 just lint          # pre-commit hooks (ruff, codespell, ...)
 just mypy          # mypy on plugin, ext, scripts, stubs and tests
-just test          # pytest test suite
+just test tests/test_xyz.yml  # run specific tests (no xdist)
+just all-test      # full pytest suite (parallel)
 just stubtest      # stubtest: check stubs match runtime
 just pyright       # pyright on test cases
 just ty            # ty on test cases
@@ -110,7 +112,7 @@ just pyrefly       # pyrefly on test cases
 Extra arguments can be passed to `test` and `stubtest`:
 
 ```bash
-just test -k test_name
+just test tests -k test_name
 just stubtest --allowlist extra.txt
 ```
 

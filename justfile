@@ -16,7 +16,7 @@ lint:
 
 # Run all checks before submitting a PR
 [group('dev')]
-pre-mr-check: lint ty pyrefly mypy stubtest pyright test ext-test
+pre-mr-check: lint ty pyrefly mypy stubtest pyright ext-test all-test
 
 # Remove mypy cache
 [group('dev')]
@@ -47,10 +47,15 @@ pyrefly:
 ty:
     uv run ty check tests/assert_type
 
-# Run pytest test suite
+# Run pytest on specific files or with custom args
 [group('test')]
-test *args='tests':
-    uv run pytest -n auto {{ args }}
+test +args:
+    uv run pytest {{ args }}
+
+# Run full pytest test suite with parallel workers
+[group('test')]
+all-test:
+    uv run pytest -n auto tests
 
 # Run stubtest to check stubs match runtime
 [group('test')]
