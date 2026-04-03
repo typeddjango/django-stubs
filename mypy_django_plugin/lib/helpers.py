@@ -59,7 +59,7 @@ from typing_extensions import Self
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterable, Iterator, Mapping
 
     from django.db.models.base import Model
     from django.db.models.fields import Field
@@ -499,6 +499,17 @@ def make_oneoff_named_tuple(
         current_module, name, bases=[api.named_generic_type("typing.NamedTuple", []), *extra_bases], fields=fields
     )
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
+
+
+def extend_oneoff_named_tuple(
+    api: TypeChecker, name: str, original: TupleType, extra_fields: Mapping[str, MypyType]
+) -> TupleType:
+    existing_fields = {
+        field_name: sym.node.type or AnyType(TypeOfAny.special_form)
+        for field_name, sym in original.partial_fallback.type.names.items()
+        if sym.plugin_generated and isinstance(sym.node, Var)
+    }
+    return make_oneoff_named_tuple(api, name, {**existing_fields, **extra_fields})
 
 
 def make_tuple(api: TypeChecker, fields: list[MypyType]) -> TupleType:

@@ -352,13 +352,8 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         elif isinstance(original_row_type, TupleType):
             if original_row_type.partial_fallback.type.has_base("typing.NamedTuple"):
                 # Rebuild the NamedTuple with existing fields + annotation fields.
-                existing_fields = {
-                    name: sym.node.type or AnyType(TypeOfAny.special_form)
-                    for name, sym in original_row_type.partial_fallback.type.names.items()
-                    if sym.plugin_generated and isinstance(sym.node, Var)
-                }
                 annotation_fields = {name: AnyType(TypeOfAny.from_omitted_generics) for name in expression_types}
-                row_type = helpers.make_oneoff_named_tuple(api, "Row", {**existing_fields, **annotation_fields})
+                row_type = helpers.extend_oneoff_named_tuple(api, "Row", original_row_type, annotation_fields)
             else:
                 row_type = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.from_omitted_generics)])
         elif isinstance(original_row_type, Instance) and helpers.is_model_type(original_row_type.type):
