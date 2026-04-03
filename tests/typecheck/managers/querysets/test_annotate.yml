@@ -323,13 +323,12 @@
         qs2 = Blog.objects.values_list('text').annotate(foo=F('id'))
         reveal_type(qs2) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], tuple[Any, ...]]"
         qs3 = Blog.objects.values_list('text', named=True).annotate(foo=F('id'))
-        # TODO: Would be nice to infer a NamedTuple which contains the field 'text' (str) + any number of other fields.
-        #  The reason it would have to appear to have any other fields is that annotate could potentially be called with
-        #  arbitrary parameters such that we wouldn't know how many extra fields there might be.
-        #  But it's not trivial to make such a NamedTuple, partly because since it is also an ordinary tuple, it would
-        #  have to have an arbitrary length, but still have certain fields at certain indices with specific types.
-        #  For now, Any :)
-        reveal_type(qs3) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], Any]"
+        reveal_type(qs3) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], tuple[str, Any, fallback=main.Row3]]"
+        qs3_chained = Blog.objects.values_list('text', named=True).annotate(foo=F('id')).annotate(bar=F('num_posts'))
+        qs3_chained_row = qs3_chained.get()
+        reveal_type(qs3_chained_row.text) # N: Revealed type is "str"
+        reveal_type(qs3_chained_row.foo) # N: Revealed type is "Any"
+        reveal_type(qs3_chained_row.bar) # N: Revealed type is "Any"
         qs4 = Blog.objects.values_list('text', flat=True).annotate(foo=F('id'))
         reveal_type(qs4) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], str]"
 
@@ -345,8 +344,7 @@
 
         before_values_list_named_no_params = Blog.objects.values_list(named=True).annotate(foo=F('id')).get()
         reveal_type(before_values_list_named_no_params.foo) # N: Revealed type is "Any"
-        # TODO: Would be nice to infer str:
-        reveal_type(before_values_list_named_no_params.text) # N: Revealed type is "Any"
+        reveal_type(before_values_list_named_no_params.text) # N: Revealed type is "str"
 
     installed_apps:
         - myapp
