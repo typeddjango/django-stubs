@@ -140,10 +140,6 @@ def _process_dynamic_method(
     # used by the typing stubs.
     if method_name in MANAGER_METHODS_RETURNING_QUERYSET:
         ret_type = queryset_instance
-        # Keep method-level type variables (e.g. _LookupT in prefetch_related)
-        # but remove Self since we've replaced the return type.
-        if base_that_has_method.self_type:
-            variables = tuple(v for v in variables if v.id != base_that_has_method.self_type.id)
     args_types = method_type.arg_types[1:]
     if _has_compatible_type_vars(base_that_has_method):
         typed_var = manager_instance.args or queryset_info.bases[0].args
@@ -161,6 +157,10 @@ def _process_dynamic_method(
     if base_that_has_method.self_type:
         # Manages -> Self returns
         ret_type = _replace_type_var(ret_type, base_that_has_method.self_type.fullname, queryset_instance)
+        # The `self` argument is also stripped (lines below), so its `Self` type variable
+        # has no binding site and should be removed. Other method-level type variables
+        # (e.g. _LookupT in prefetch_related) are preserved for call-site inference.
+        variables = tuple(v for v in variables if v.id != base_that_has_method.self_type.id)
 
     # Drop any 'self' argument as our manager is already initialized
     return method_type.copy_modified(
