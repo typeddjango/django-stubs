@@ -517,3 +517,40 @@
 
                 class TaggedItem(models.Model):
                     tag = models.CharField(max_length=100)
+
+-   case: prefetch_related_from_queryset_incompatible_type
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Object, RelatedObject
+        from django.db.models import Prefetch
+
+        Object.objects.prefetch_related(Prefetch("related_objects")).all()
+
+        Object.objects.prefetch_related(Prefetch("related_objects", queryset=RelatedObject.objects.select_related("other_object"))).all()
+
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                import typing
+                from django.db import models
+
+                T = typing.TypeVar("T", bound="models.Model")
+                class BaseManager(models.Manager[T]): ...
+
+                class BaseObject(models.Model):
+                    objects = BaseManager["BaseObject"]()
+
+                class ObjectQuerySet(models.QuerySet["Object"]): ...
+
+                class ObjectManager(BaseManager["Object"]): ...
+
+                class Object(BaseObject):
+                    objects: typing.ClassVar = ObjectManager.from_queryset(ObjectQuerySet)()
+
+                class OtherObject(models.Model): ...
+
+                class RelatedObject(models.Model):
+                    object = models.ForeignKey(Object, on_delete=models.CASCADE, related_name="related_objects")
+                    other_object = models.ForeignKey(OtherObject, on_delete=models.CASCADE)
