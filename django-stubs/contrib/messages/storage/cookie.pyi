@@ -2,7 +2,7 @@ import json
 from collections.abc import Callable, Sequence
 from typing import Any
 
-from django.contrib.messages.storage.base import BaseStorage, Message 
+from django.contrib.messages.storage.base import BaseStorage
 from typing_extensions import override
 
 class MessageEncoder(json.JSONEncoder):
@@ -18,7 +18,7 @@ class MessageEncoder(json.JSONEncoder):
 
 class MessageDecoder(json.JSONDecoder):
 
-    def process_messages(self, obj: Any) -> list[Message] | dict[str, Any]: ...
+    def process_messages(self, obj: Any) -> Any: ...
     
     @override
     def decode(self, s: str, **kwargs: Any) -> Any: ...  # type: ignore[override]
