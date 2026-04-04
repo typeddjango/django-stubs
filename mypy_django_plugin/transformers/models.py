@@ -1170,11 +1170,11 @@ def get_annotated_type(
         if model_type.args:
             annotations = get_proper_type(model_type.args[0])
             if isinstance(annotations, TypedDictType):
-                fields_dict = helpers.make_typeddict(
-                    api,
-                    fields={**annotations.items, **fields_dict.items},
+                fields_dict = TypedDictType(
+                    items={**annotations.items, **fields_dict.items},
                     required_keys={*annotations.required_keys, *fields_dict.required_keys},
                     readonly_keys={*annotations.readonly_keys, *fields_dict.readonly_keys},
+                    fallback=annotations.fallback,
                 )
     else:
         annotated_model = helpers.lookup_fully_qualified_typeinfo(api, model_type.type.fullname + "@AnnotatedWith")

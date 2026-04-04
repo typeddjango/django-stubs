@@ -333,12 +333,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
 
     annotated_type: ProperType = django_model.typ
     if all_fields:
-        fields_dict = helpers.make_typeddict(
-            api,
-            fields=all_fields,
-            required_keys=set(all_fields.keys()),
-            readonly_keys=set(),
-        )
+        fields_dict = helpers.make_typeddict(api, all_fields)
         annotated_type = get_annotated_type(api, django_model.typ, fields_dict=fields_dict)
 
     row_type: MypyType
@@ -434,7 +429,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
     # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
     column_types.update(gather_expression_types(ctx))
-    row_type = helpers.make_typeddict(ctx.api, column_types, set(column_types.keys()), set())
+    row_type = helpers.make_typeddict(ctx.api, column_types)
     return default_return_type.copy_modified(args=[django_model.typ, row_type])
 
 
@@ -818,12 +813,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     if not new_attrs:
         return ctx.default_return_type
 
-    fields_dict = helpers.make_typeddict(
-        api,
-        fields=new_attrs,
-        required_keys=set(new_attrs.keys()),
-        readonly_keys=set(),
-    )
+    fields_dict = helpers.make_typeddict(api, new_attrs)
 
     annotated_model = get_annotated_type(api, qs_model.typ, fields_dict=fields_dict)
 
