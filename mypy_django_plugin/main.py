@@ -278,34 +278,31 @@ class NewSemanalDjangoPlugin(Plugin):
             )
 
         info = self._get_typeinfo_or_none(class_name)
+        if not info:
+            return None
 
         # Lookup of the '.is_superuser' attribute
-        if info and info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
+        if info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
 
         # Lookup of the 'user.is_staff' or 'user.is_active' attribute
-        if info and info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
+        if info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
 
         # Lookup of a method on a dynamically generated manager class
         # i.e. a manager class only existing while mypy is running, not collected from the AST
-        if (
-            info
-            and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
-            and "from_queryset_manager" in helpers.get_django_metadata(info)
-        ):
+        if info.has_base(
+            fullnames.BASE_MANAGER_CLASS_FULLNAME
+        ) and "from_queryset_manager" in helpers.get_django_metadata(info):
             return resolve_manager_method
 
-        if info and info.has_base(fullnames.STR_PROMISE_FULLNAME):
+        if info.has_base(fullnames.STR_PROMISE_FULLNAME):
             return resolve_str_promise_attribute
 
-        if info and (
-            (
-                info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
-                and attr_name in {"choices", "labels", "values", "__empty__"}
-            )
-            or (info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name in {"label", "value"})
-        ):
+        if (
+            info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
+            and attr_name in {"choices", "labels", "values", "__empty__"}
+        ) or (info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name in {"label", "value"}):
             return choices.transform_into_proper_attr_type
 
         return None
