@@ -719,3 +719,29 @@
         from django.db import models
         class MyModel(models.Model):
             name = models.CharField(max_length=100)
+
+# Regression test from https://github.com/typeddjango/django-stubs/issues/1049
+- case: custom_queryset_with_annotations_issue_1049
+  main: |
+    from typing_extensions import reveal_type
+    from myapp.models import Accommodation, SomeQuerySet
+    from django.db.models import Value
+
+    queryset = SomeQuerySet().annotate(hello=Value(True)).filter(is_on_shelf=True).annotate(hi=Value(False))
+    reveal_type(queryset)  # N: Revealed type is "myapp.models.SomeQuerySet[myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})], myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})]]"
+    reveal_type(queryset.first())  # N: Revealed type is "myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})] | None"
+    reveal_type(queryset.get(pk=1))  # N: Revealed type is "myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})]"
+    reveal_type(queryset[0])  # N: Revealed type is "myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})]"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class Accommodation(models.Model):
+            is_on_shelf = models.BooleanField()
+
+        class SomeQuerySet(models.QuerySet["Accommodation"]):
+            pass
