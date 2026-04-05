@@ -99,6 +99,16 @@ build-backend = "uv_build"
 module-name = ["django-stubs", "mypy_django_plugin"]
 module-root = ""
 
+[tool.ty.terminal]
+error-on-warning = true
+
+[tool.ty.analysis]
+# Respect only `# ty: ignore` (ignore `# type: ignore`)
+respect-type-ignore-comments = false
+
+[tool.ty.rules]
+empty-body = "ignore"
+
 [tool.codespell]
 ignore-words-list = "aadd,acount,asend,indentity,nam"
 

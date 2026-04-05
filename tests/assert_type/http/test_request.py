@@ -12,15 +12,15 @@ assert_type(QueryDict("querystring", True), QueryDict)
 assert_type(QueryDict("querystring", mutable=True), QueryDict)
 
 # Test constructor overloads -- Immutable
-assert_type(QueryDict(), _ImmutableQueryDict)  # ty: ignore[type-assertion-failure]
-assert_type(QueryDict("querystring"), _ImmutableQueryDict)  # ty: ignore[type-assertion-failure]
-assert_type(QueryDict("querystring", False), _ImmutableQueryDict)  # ty: ignore[type-assertion-failure]
-assert_type(QueryDict("querystring", mutable=False), _ImmutableQueryDict)  # ty: ignore[type-assertion-failure]
+assert_type(QueryDict(), _ImmutableQueryDict)
+assert_type(QueryDict("querystring"), _ImmutableQueryDict)
+assert_type(QueryDict("querystring", False), _ImmutableQueryDict)
+assert_type(QueryDict("querystring", mutable=False), _ImmutableQueryDict)
 
 
 # Test ImmutableQueryDict
 q = QueryDict()
-assert_type(q["a"], str)  # ty: ignore[type-assertion-failure]
+assert_type(q["a"], str)
 assert_type(q.get("a"), str | None)
 assert_type(q.items(), Iterator[tuple[str, str | list[object]]])
 assert_type(q.getlist("a"), list[str])  # ty: ignore[type-assertion-failure]
