@@ -387,6 +387,32 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     return reparametrize_queryset(default_return_type, [annotated_type, row_type])
 
 
+def merge_annotations_from_custom_method(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """
+    Method hook for custom QuerySet/Manager methods that return annotated querysets.
+
+    Ensures extra_attrs are set on annotated model Instances (so attribute access works)
+    and merges annotations from the caller queryset with annotations from the return type.
+    """
+    django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
+    if django_model is None:
+        return ctx.default_return_type
+
+    default_return_type = get_proper_type(ctx.default_return_type)
+    if not (
+        isinstance(default_return_type, Instance)
+        and (ret_model := helpers.extract_model_type_from_queryset(default_return_type))
+        and helpers.is_annotated_model(ret_model.type)
+        and ret_model.args
+        and isinstance(new_td := get_proper_type(ret_model.args[0]), TypedDictType)
+    ):
+        return ctx.default_return_type
+
+    api = helpers.get_typechecker_api(ctx)
+    annotated_type = get_annotated_type(api, django_model.typ, fields_dict=new_td)
+    return reparametrize_queryset(default_return_type, [annotated_type, annotated_type])
+
+
 def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> list[str] | None:
     field_lookups = []
     for field_lookup_expr in lookup_exprs:

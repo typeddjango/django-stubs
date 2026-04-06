@@ -745,3 +745,153 @@
 
         class SomeQuerySet(models.QuerySet["Accommodation"]):
             pass
+
+- case: custom_queryset_method_with_annotations
+  main: |
+    from typing_extensions import reveal_type
+    from myapp.models import FooModel
+    from django.db.models.expressions import F
+
+    # Simple method
+    qs = FooModel.objects.with_bar()
+    reveal_type(qs)  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})], myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})]]"
+    obj = qs.get()
+    reveal_type(obj.bar)  # N: Revealed type is "str"
+    reveal_type(obj.name)  # N: Revealed type is "str"
+    obj.nonexistent  # E: "FooModel@AnnotatedWith[BarDict]" has no attribute "nonexistent"  [attr-defined]
+
+    # Chained methods
+    qs2 = FooModel.objects.with_bar().with_baz()
+    reveal_type(qs2)  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel@AnnotatedWith[TypedDict({'bar': str, 'baz': int})], myapp.models.FooModel@AnnotatedWith[TypedDict({'bar': str, 'baz': int})]]"
+    obj2 = qs2[0]
+    reveal_type(obj2.bar)  # N: Revealed type is "str"
+    reveal_type(obj2.baz)  # N: Revealed type is "int"
+    reveal_type(obj2.name)  # N: Revealed type is "str"
+
+    # Chained with regular methods
+    filtered = FooModel.objects.with_bar().filter(name="x")
+    maybe = filtered.first()
+    reveal_type(maybe)  # N: Revealed type is "myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})] | None"
+    if maybe:
+        reveal_type(maybe.bar)  # N: Revealed type is "str"
+        reveal_type(maybe.name)  # N: Revealed type is "str"
+
+    # Built-in .annotate() then custom method
+    mixed = FooModel.objects.annotate(extra=F("id")).with_bar()
+    mixed_obj = mixed.get()
+    reveal_type(mixed_obj.extra)  # N: Revealed type is "Any"
+    reveal_type(mixed_obj.bar)  # N: Revealed type is "str"
+
+    # Instance extraction propagate annotations correctly
+    qs3 = FooModel.objects.with_bar()
+    reveal_type(qs3.get().bar)  # N: Revealed type is "str"
+    reveal_type(qs3[0].bar)  # N: Revealed type is "str"
+    first = qs3.first()
+    if first:
+        reveal_type(first.bar)  # N: Revealed type is "str"
+    for item in qs3:
+        reveal_type(item.bar)  # N: Revealed type is "str"
+        break
+
+    # later annotation overrides
+    collision = FooModel.objects.with_bar().with_bar_int()
+    reveal_type(collision.get().bar)  # N: Revealed type is "int"
+
+    # Custom method without WithAnnotations: noop
+    plain = FooModel.objects.active()
+    reveal_type(plain)  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel, myapp.models.FooModel]"
+
+    # Custom then .annotate() then custom: all three layers merge
+    triple = FooModel.objects.with_bar().annotate(extra=F("id")).with_baz()
+    triple_obj = triple.get()
+    reveal_type(triple_obj.bar)  # N: Revealed type is "str"
+    reveal_type(triple_obj.extra)  # N: Revealed type is "Any"
+    reveal_type(triple_obj.baz)  # N: Revealed type is "int"
+
+    # Works on queryset too
+    triple = FooModel.objects.all().with_bar().annotate(extra=F("id")).with_baz()
+    triple_obj = triple.get()
+    reveal_type(triple_obj.bar)  # N: Revealed type is "str"
+    reveal_type(triple_obj.extra)  # N: Revealed type is "Any"
+    reveal_type(triple_obj.baz)  # N: Revealed type is "int"
+
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from typing_extensions import TypedDict, Self
+        from django.db import models
+        from django_stubs_ext import WithAnnotations
+
+        class BarDict(TypedDict):
+            bar: str
+
+        class BazDict(TypedDict):
+            baz: int
+
+        class BarIntDict(TypedDict):
+            bar: int
+
+        class FooQuerySet(models.QuerySet):
+            def with_bar(self) -> "FooQuerySet[WithAnnotations[FooModel, BarDict]]":
+                return self.annotate(bar=models.Value("x"))  # type: ignore[no-any-return]
+
+            def with_baz(self) -> "FooQuerySet[WithAnnotations[FooModel, BazDict]]":
+                return self.annotate(baz=models.Value(1))  # type: ignore[no-any-return]
+
+            def with_bar_int(self) -> "FooQuerySet[WithAnnotations[FooModel, BarIntDict]]":
+                return self.annotate(bar=models.Value(1))  # type: ignore[no-any-return]
+
+            def active(self) -> Self:
+                return self.filter(active=True)
+
+        FooManager = models.Manager.from_queryset(FooQuerySet)
+
+        class FooModel(models.Model):
+            name = models.CharField(max_length=100)
+            objects = FooManager()
+
+# Regression test from https://github.com/typeddjango/django-stubs/issues/2681#issuecomment-3610917062
+- case: custom_queryset_with_annotations_issue_2681_comment
+  main: |
+    from typing_extensions import reveal_type
+    from myapp.models import FooModel
+
+    reveal_type(FooModel.objects.with_bar())  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})], myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})]]"
+    reveal_type(FooModel.objects.with_bar().with_baz())  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel@AnnotatedWith[TypedDict({'bar': str, 'baz': str})], myapp.models.FooModel@AnnotatedWith[TypedDict({'bar': str, 'baz': str})]]"
+
+    obj = FooModel.objects.with_bar().with_baz().get()
+    reveal_type(obj.bar)  # N: Revealed type is "str"
+    reveal_type(obj.baz)  # N: Revealed type is "str"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from typing_extensions import TypedDict, TypeVar
+        from django.db import models
+        from django.db.models import Manager
+        from django_stubs_ext import WithAnnotations
+
+        class BarDict(TypedDict):
+            bar: str
+
+        class BazDict(TypedDict):
+            baz: str
+
+        _Model = TypeVar("_Model", bound=models.Model, covariant=True)
+
+        class FooQuerySet(models.QuerySet[_Model]):
+            def with_bar(self) -> "FooQuerySet[WithAnnotations[FooModel, BarDict]]":
+                return self.annotate(bar=models.Value("bar"))  # type: ignore[no-any-return]
+
+            def with_baz(self) -> "FooQuerySet[WithAnnotations[FooModel, BazDict]]":
+                return self.annotate(baz=models.Value("baz"))  # type: ignore[no-any-return]
+
+        FooManager = Manager.from_queryset(FooQuerySet)
+
+        class FooModel(models.Model):
+            objects = FooManager()

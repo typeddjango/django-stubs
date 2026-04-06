@@ -231,6 +231,9 @@ class NewSemanalDjangoPlugin(Plugin):
         if method_name == "get_field" and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
             return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
+        if helpers.has_any_of_bases(info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]):
+            return partial(querysets.merge_annotations_from_custom_method, django_context=self.django_context)
+
         return None
 
     @override
