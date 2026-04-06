@@ -99,6 +99,10 @@ build-backend = "uv_build"
 module-name = ["django-stubs", "mypy_django_plugin"]
 module-root = ""
 
+[tool.pyrefly]
+# Respect only `# pyrefly: ignore` (ignore `# type: ignore`)
+enabled-ignores = ["pyrefly"]
+
 [tool.ty.terminal]
 error-on-warning = true
 
