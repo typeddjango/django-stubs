@@ -728,7 +728,7 @@
     from django.db.models import Value
 
     queryset = SomeQuerySet().annotate(hello=Value(True)).filter(is_on_shelf=True).annotate(hi=Value(False))
-    reveal_type(queryset)  # N: Revealed type is "myapp.models.SomeQuerySet[myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})], myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})]]"
+    reveal_type(queryset)  # N: Revealed type is "myapp.models.SomeQuerySet"
     reveal_type(queryset.first())  # N: Revealed type is "myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})] | None"
     reveal_type(queryset.get(pk=1))  # N: Revealed type is "myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})]"
     reveal_type(queryset[0])  # N: Revealed type is "myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})]"

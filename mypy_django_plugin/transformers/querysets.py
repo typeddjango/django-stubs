@@ -332,7 +332,7 @@ def reparametrize_queryset(instance: Instance, args: list[MypyType]) -> Instance
         if base.type.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
             instance.type.bases[i] = base.copy_modified(args=args)
 
-    return instance.copy_modified(args=args)
+    return instance
 
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
