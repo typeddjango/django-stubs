@@ -1,0 +1,39 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:best-practices"],
+  suppressNotifications: ["prEditedNotification"],
+  mode: "full",
+  // Wait 3 days before proposing updates to limit supply chain attack exposure
+  minimumReleaseAge: "3 days",
+  lockFileMaintenance: {
+    enabled: true,
+    automerge: true,
+    automergeType: "branch",
+    schedule: ["* * * * 1"],
+    automergeSchedule: ["* * * * 2"],
+  },
+  packageRules: [
+    {
+      matchPackageNames: ["mypy"],
+      rangeStrategy: "widen",
+    },
+    {
+      // NOTE: Keep `test-older-django` python version in sync
+      matchPackageNames: ["python"],
+      allowedVersions: "3.10",
+    },
+    {
+      // Group upload/download artifact updates, the versions are dependent
+      groupName: "Artifact GitHub Actions dependencies",
+      matchManagers: ["github-actions"],
+      matchPackageNames: ["actions/upload-artifact", "actions/download-artifact"],
+    },
+    {
+      // Don't update GitHub runners (e.g. 'runs-on: ubuntu-latest')
+      groupName: "GitHub runners",
+      matchManagers: ["github-actions"],
+      matchDatasources: ["github-runners"],
+      enabled: false,
+    },
+  ],
+}
