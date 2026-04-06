@@ -208,12 +208,7 @@ class NewSemanalDjangoPlugin(Plugin):
         if method_name == "__init_subclass__" or fullname.startswith("builtins."):
             return None
 
-        if class_fullname.endswith("QueryDict"):
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYDICT_CLASS_FULLNAME):
-                return check_querydict_is_mutable
-
-        elif method_name == "__get__":
+        if method_name == "__get__":
             hooks = {
                 fullnames.MANYTOMANY_FIELD_FULLNAME: manytomany.refine_many_to_many_related_manager,
                 fullnames.MANY_TO_MANY_DESCRIPTOR: manytomany.refine_many_to_many_related_manager,
@@ -221,16 +216,20 @@ class NewSemanalDjangoPlugin(Plugin):
             }
             return hooks.get(class_fullname)
 
-        if method_name in self.manager_and_queryset_method_hooks:
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and helpers.has_any_of_bases(
-                info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]
-            ):
-                return self.manager_and_queryset_method_hooks[method_name]
-        elif method_name == "get_field":
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
-                return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
+        info = self._get_typeinfo_or_none(class_fullname)
+        if not info:
+            return None
+
+        if class_fullname.endswith("QueryDict") and info.has_base(fullnames.QUERYDICT_CLASS_FULLNAME):
+            return check_querydict_is_mutable
+
+        if method_name in self.manager_and_queryset_method_hooks and helpers.has_any_of_bases(
+            info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]
+        ):
+            return self.manager_and_queryset_method_hooks[method_name]
+
+        if method_name == "get_field" and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
+            return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
         return None
 
