@@ -206,7 +206,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
 
     if flat and named:
         ctx.api.fail("'flat' and 'named' can't be used together", ctx.context)
-        return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
+        return reparametrize_queryset(default_return_type, [django_model.typ, AnyType(TypeOfAny.from_error)])
 
     annotation_types = _get_annotation_field_types(django_model.typ) if django_model.is_annotated else {}
     row_type = get_values_list_row_type(
@@ -217,7 +217,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
         flat=flat,
         named=named,
     )
-    ret = default_return_type.copy_modified(args=[django_model.typ, row_type])
+    ret = reparametrize_queryset(default_return_type, [django_model.typ, row_type])
     if not named and (field_lookups := resolve_field_lookups(ctx.args[0], django_context)):
         # For non-named values_list, the row type does not encode column names.
         # Attach selected field names to the returned QuerySet instance so that
@@ -318,6 +318,23 @@ def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType]:
     return result
 
 
+def reparametrize_queryset(instance: Instance, args: list[MypyType]) -> Instance:
+    """Reparametrize a QuerySet instance with new type arguments.
+
+    When the instance's type is generic, the args are applied directly.
+    Otherwise, walks the base class hierarchy to find the closest generic
+    QuerySet ancestor and applies args to that instead.
+    """
+    if instance.type.is_generic():
+        return instance.copy_modified(args=args)
+
+    for i, base in enumerate(instance.type.bases):
+        if base.type.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+            instance.type.bases[i] = base.copy_modified(args=args)
+
+    return instance.copy_modified(args=args)
+
+
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
@@ -367,7 +384,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
             row_type = annotated_type
     else:
         row_type = annotated_type
-    return default_return_type.copy_modified(args=[annotated_type, row_type])
+    return reparametrize_queryset(default_return_type, [annotated_type, row_type])
 
 
 def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> list[str] | None:
@@ -435,14 +452,14 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
             if django_model.is_annotated:
                 column_types[field_lookup] = AnyType(TypeOfAny.from_omitted_generics)
             else:
-                return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
+                return reparametrize_queryset(default_return_type, [django_model.typ, AnyType(TypeOfAny.from_error)])
         else:
             column_types[field_lookup] = field_lookup_type
 
     # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
     column_types.update(gather_expression_types(ctx))
     row_type = helpers.make_typeddict(ctx.api, column_types)
-    return default_return_type.copy_modified(args=[django_model.typ, row_type])
+    return reparametrize_queryset(default_return_type, [django_model.typ, row_type])
 
 
 def _infer_prefetch_queryset_type(queryset_expr: Expression, api: TypeChecker) -> Instance | None:
@@ -839,7 +856,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     else:
         row_type = annotated_model
 
-    return default_return_type.copy_modified(args=[annotated_model, row_type])
+    return reparametrize_queryset(default_return_type, [annotated_model, row_type])
 
 
 def _try_get_field(
