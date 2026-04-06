@@ -500,7 +500,7 @@ def _resolve_prefetch_queryset_argument(
     # First try to get queryset type from specialized type arg
     queryset_type = get_proper_type(type_arg)
     if isinstance(queryset_type, Instance):
-        elem_model = helpers.extract_model_type_from_queryset(queryset_type, api)
+        elem_model = helpers.extract_model_type_from_queryset(queryset_type)
         # If we got a valid specific model type, return the queryset type
         if elem_model is not None and elem_model.type.fullname != fullnames.MODEL_CLASS_FULLNAME:
             return queryset_type
@@ -805,7 +805,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
         # 3.b) Extract model type from queryset type (or from the lookup value)
         elem_model: Instance | None = None
         if queryset_type is not None and isinstance(queryset_type, Instance):
-            elem_model = helpers.extract_model_type_from_queryset(queryset_type, api)
+            elem_model = helpers.extract_model_type_from_queryset(queryset_type)
         elif lookup:
             try:
                 observed_model_cls = django_context.resolve_lookup_into_field(qs_model.cls, lookup)[1]

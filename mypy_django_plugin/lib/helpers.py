@@ -229,7 +229,7 @@ class DjangoModel(NamedTuple):
         return cls(cls=model_cls, typ=model_type, is_annotated=is_annotated)
 
 
-def extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Instance | None:
+def extract_model_type_from_queryset(queryset_type: Instance) -> Instance | None:
     """Extract the django model `Instance` associated to a queryset `Instance`"""
     for base_type in [queryset_type, *queryset_type.type.bases]:
         if (
@@ -257,8 +257,7 @@ def get_model_info_from_qs_ctx(
     """
     Extract DjangoModel details from a queryset/manager `MethodContext`
     """
-    api = get_typechecker_api(ctx)
-    if not (isinstance(ctx.type, Instance) and (model_type := extract_model_type_from_queryset(ctx.type, api))):
+    if not (isinstance(ctx.type, Instance) and (model_type := extract_model_type_from_queryset(ctx.type))):
         return None
 
     return DjangoModel.from_model_type(model_type, django_context)
