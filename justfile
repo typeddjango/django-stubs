@@ -35,7 +35,7 @@ mypy:
 # Run pyright on test cases
 [group('typecheck')]
 pyright:
-    uv run pyright -p pyrightconfig.testcases.json
+    uv run pyright
 
 # Run pyrefly on test cases
 [group('typecheck')]

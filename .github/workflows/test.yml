@@ -160,17 +160,10 @@ jobs:
       - name: Add venv to path
         run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
 
-      - name: Run pyright on the stubs
-        uses: jakebailey/pyright-action@v3
-        with:
-          version: PATH
-          annotate: false
-        continue-on-error: true  # TODO: remove this part
       - name: Run pyright on the test cases
         uses: jakebailey/pyright-action@v3
         with:
           version: PATH
-          project: ./pyrightconfig.testcases.json
 
   run-pyrefly:
     timeout-minutes: 10
