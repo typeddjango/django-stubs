@@ -58,7 +58,7 @@ if TYPE_CHECKING:
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
     """
     Fill the manager TypeVar on instantiation using the enclosing class.
-    For ex:
+    For example:
 
         class MyModel(Model):
             objects = MyManager()
