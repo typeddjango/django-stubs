@@ -541,20 +541,36 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
     return typ
 
 
+def _get_fallback_typeddict(api: SemanticAnalyzer | CheckerPluginInterface) -> Instance:
+    if isinstance(api, CheckerPluginInterface):
+        return api.named_generic_type("typing._TypedDict", [])
+    return api.named_type("typing._TypedDict", [])
+
+
 def make_typeddict(
     api: SemanticAnalyzer | CheckerPluginInterface,
     fields: dict[str, MypyType],
 ) -> TypedDictType:
     """Create a TypedDict from a python dict of field names and types."""
-    if isinstance(api, CheckerPluginInterface):
-        fallback_type = api.named_generic_type("typing._TypedDict", [])
-    else:
-        fallback_type = api.named_type("typing._TypedDict", [])
     return TypedDictType(
         items=fields,
         required_keys=set(fields.keys()),
         readonly_keys=set(),
-        fallback=fallback_type,
+        fallback=_get_fallback_typeddict(api),
+    )
+
+
+def merge_typeddict(
+    api: SemanticAnalyzer | CheckerPluginInterface,
+    left: TypedDictType,
+    right: TypedDictType,
+) -> TypedDictType:
+    """Merge two TypedDictType type into one with anonymous fallback."""
+    return TypedDictType(
+        items={**left.items, **right.items},
+        required_keys={*left.required_keys, *right.required_keys},
+        readonly_keys={*left.readonly_keys, *right.readonly_keys},
+        fallback=_get_fallback_typeddict(api),
     )
 
 
