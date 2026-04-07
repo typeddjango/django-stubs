@@ -26,7 +26,7 @@ from mypy.semanal import SemanticAnalyzer
 from mypy.typeanal import TypeAnalyser
 from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, TypeVarType, get_proper_type
 from mypy.types import Type as MypyType
-from mypy.typevars import fill_typevars, fill_typevars_with_any
+from mypy.typevars import fill_typevars
 from typing_extensions import override
 
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
@@ -222,38 +222,26 @@ class AddAnnotateUtilities(ModelClassInitializer):
     @override
     def run(self) -> None:
         annotations = self.lookup_typeinfo_or_incomplete_defn_error("django_stubs_ext.Annotations")
-        exception_bases = {
-            model_exc_name: self.lookup_typeinfo_or_incomplete_defn_error(base_exc_name)
-            for model_exc_name, base_exc_name in [
-                ("DoesNotExist", fullnames.OBJECT_DOES_NOT_EXIST),
-                ("NotUpdated", fullnames.OBJECT_NOT_UPDATED),
-                ("MultipleObjectsReturned", fullnames.MULTIPLE_OBJECTS_RETURNED),
-            ]
-        }
-        annotated_model_name = self.model_classdef.info.name + "@AnnotatedWith"
-        annotated_model = self.lookup_typeinfo(self.model_classdef.info.module_name + "." + annotated_model_name)
-        if annotated_model is None:
-            model_type = fill_typevars_with_any(self.model_classdef.info)
-            assert isinstance(model_type, Instance)
-            annotations_type = fill_typevars(annotations)
-            assert isinstance(annotations_type, Instance)
-            annotated_model = self.add_new_class_for_current_module(
-                annotated_model_name, bases=[model_type, annotations_type]
-            )
-            annotated_model.defn.type_vars = annotations.defn.type_vars
-            annotated_model.add_type_vars()
-            helpers.mark_as_annotated_model(annotated_model)
-            if self.is_model_abstract:
-                # Below are abstract attributes, and in a stub file mypy requires
-                # explicit ABCMeta if not all abstract attributes are implemented i.e.
-                # class is kept abstract. So we add the attributes to get mypy off our
-                # back
-                for model_exc_name, base_exc_type in exception_bases.items():
-                    helpers.add_new_sym_for_info(
-                        annotated_model,
-                        model_exc_name,
-                        TypeType(Instance(base_exc_type, [])),
-                    )
+        annotated_model = helpers.get_or_create_annotated_type(self.api, self.model_classdef.info, annotations)
+        if self.is_model_abstract:
+            # Below are abstract attributes, and in a stub file mypy requires
+            # explicit ABCMeta if not all abstract attributes are implemented i.e.
+            # class is kept abstract. So we add the attributes to get mypy off our
+            # back
+            exception_bases = {
+                model_exc_name: self.lookup_typeinfo_or_incomplete_defn_error(base_exc_name)
+                for model_exc_name, base_exc_name in [
+                    ("DoesNotExist", fullnames.OBJECT_DOES_NOT_EXIST),
+                    ("NotUpdated", fullnames.OBJECT_NOT_UPDATED),
+                    ("MultipleObjectsReturned", fullnames.MULTIPLE_OBJECTS_RETURNED),
+                ]
+            }
+            for model_exc_name, base_exc_type in exception_bases.items():
+                helpers.add_new_sym_for_info(
+                    annotated_model,
+                    model_exc_name,
+                    TypeType(Instance(base_exc_type, [])),
+                )
 
 
 class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
@@ -1132,7 +1120,17 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
         return AnyType(TypeOfAny.from_omitted_generics) if is_with_annotations else ctx.type
     type_arg = get_proper_type(ctx.api.analyze_type(args[0]))
     if not isinstance(type_arg, Instance) or not helpers.is_model_type(type_arg.type):
-        return type_arg
+        if isinstance(type_arg, TypeVarType):
+            # When the first arg is a TypeVar bounded by a Model (e.g. WithAnnotations[_Model, BarDict]),
+            # use the upper bound to look up @AnnotatedWith. The method hook
+            # (merge_annotations_from_custom_method) will later replace it with the actual concrete model.
+            upper = get_proper_type(type_arg.upper_bound)
+            if isinstance(upper, Instance) and helpers.is_model_type(upper.type):
+                type_arg = upper
+            else:
+                return type_arg
+        else:
+            return type_arg
 
     fields_dict = None
     if len(args) > 1:
@@ -1173,6 +1171,13 @@ def get_annotated_type(
                 fields_dict = helpers.merge_typeddict(api, annotations, fields_dict)
     else:
         annotated_model = helpers.lookup_fully_qualified_typeinfo(api, model_type.type.fullname + "@AnnotatedWith")
+        if annotated_model is None and isinstance(api, SemanticAnalyzer):
+            # Create @AnnotatedWith lazily when it doesn't exist yet. This happens when
+            # WithAnnotations is used with a TypeVar whose upper bound is a model that
+            # hasn't been processed by AddAnnotateUtilities (e.g. the base Model class).
+            annotations_info = helpers.lookup_fully_qualified_typeinfo(api, ANNOTATIONS_FULLNAME)
+            if annotations_info is not None:
+                annotated_model = helpers.get_or_create_annotated_type(api, model_type.type, annotations_info)
 
     if annotated_model is None:
         return model_type

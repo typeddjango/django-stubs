@@ -54,6 +54,7 @@ from mypy.types import (
     get_proper_type,
 )
 from mypy.types import Type as MypyType
+from mypy.typevars import fill_typevars, fill_typevars_with_any
 from typing_extensions import Self
 
 from mypy_django_plugin.lib import fullnames
@@ -120,6 +121,25 @@ def mark_as_annotated_model(model: TypeInfo) -> None:
 
 def is_annotated_model(model: TypeInfo) -> bool:
     return get_django_metadata(model).get("is_annotated_model", False)
+
+
+def get_or_create_annotated_type(api: SemanticAnalyzer, model_info: TypeInfo, annotations_info: TypeInfo) -> TypeInfo:
+    """Look up or create the `Model@AnnotatedWith` synthetic class for *model_info*."""
+    annotated_model_name = model_info.name + "@AnnotatedWith"
+    annotated_model = lookup_fully_qualified_typeinfo(api, model_info.fullname + "@AnnotatedWith")
+    if annotated_model is None:
+        model_type = fill_typevars_with_any(model_info)
+        assert isinstance(model_type, Instance)
+        annotations_type = fill_typevars(annotations_info)
+        assert isinstance(annotations_type, Instance)
+        model_module = api.modules[model_info.module_name]
+        annotated_model = add_new_class_for_module(
+            model_module, name=annotated_model_name, bases=[model_type, annotations_type]
+        )
+        annotated_model.defn.type_vars = annotations_info.defn.type_vars
+        annotated_model.add_type_vars()
+        mark_as_annotated_model(annotated_model)
+    return annotated_model
 
 
 class IncompleteDefnException(Exception):

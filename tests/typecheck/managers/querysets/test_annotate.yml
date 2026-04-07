@@ -885,7 +885,7 @@
         _Model = TypeVar("_Model", bound=models.Model, covariant=True)
 
         class FooQuerySet(models.QuerySet[_Model]):
-            def with_bar(self) -> "FooQuerySet[WithAnnotations[FooModel, BarDict]]":
+            def with_bar(self) -> "FooQuerySet[WithAnnotations[_Model, BarDict]]":
                 return self.annotate(bar=models.Value("bar"))  # type: ignore[no-any-return]
 
             def with_baz(self) -> "FooQuerySet[WithAnnotations[FooModel, BazDict]]":
