@@ -4,6 +4,7 @@ from html.parser import HTMLParser
 from json import JSONEncoder
 from re import Pattern
 from typing import Any, overload
+
 from django.utils.functional import SimpleLazyObject, _StrOrPromise
 from django.utils.safestring import SafeData, SafeString
 from typing_extensions import deprecated, override
@@ -41,7 +42,9 @@ class MLStripper(HTMLParser):
 def strip_tags(value: str) -> str: ...
 def strip_spaces_between_tags(value: str) -> str: ...
 def smart_urlquote(url: str) -> str: ...
-def urlize(text: _StrOrPromise | SafeData, trim_url_limit: int | None = None, nofollow: bool = False, autoescape: bool = False) -> str: ...
+def urlize(
+    text: _StrOrPromise | SafeData, trim_url_limit: int | None = None, nofollow: bool = False, autoescape: bool = False
+) -> str: ...
 def avoid_wrapping(value: str) -> str: ...
 def html_safe(klass: type) -> type: ...
 
@@ -51,7 +54,7 @@ class CountsDict(dict[str, Any]):
 
 class Urlizer:
     trailing_punctuation_chars: str
-    wrapping_punctuation: list[tuple[str,str]] 
+    wrapping_punctuation: list[tuple[str, str]]
     word_split_re: Pattern[str] | SimpleLazyObject
     simple_url_re: Pattern[str] | SimpleLazyObject
     simple_url_2_re: Pattern[str] | SimpleLazyObject
