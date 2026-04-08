@@ -292,6 +292,41 @@ func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
 func(MyModel.objects.annotate(bar=Value("")).get(id=1))  # Error
 ```
 
+You can also use `WithAnnotations` in custom `QuerySet` methods by making the queryset generic over a
+model `TypeVar`. This way the return type stays accurate through chained calls and manager access:
+
+```python
+from typing import TypeVar, TypedDict
+from django.db import models
+from django.db.models import Manager
+from django_stubs_ext import WithAnnotations
+
+
+class SalesDict(TypedDict):
+    total_sales: int
+
+
+_Model = TypeVar("_Model", bound=models.Model, covariant=True)
+
+
+class ProductQuerySet(models.QuerySet[_Model]):
+    def with_sales(self) -> "ProductQuerySet[WithAnnotations[_Model, SalesDict]]":
+        return self.annotate(total_sales=models.Sum("order__amount"))
+
+
+ProductManager = Manager.from_queryset(ProductQuerySet)
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    objects = ProductManager()
+
+
+product = Product.objects.with_sales().get(id=1)
+product.total_sales  # OK, int
+product.name  # OK, str
+```
+
 ### Why am I getting incompatible argument type mentioning `_StrPromise`?
 
 The lazy translation functions of Django (such as `gettext_lazy`) return a `Promise` instead of `str`. These two types [cannot be used interchangeably](https://github.com/typeddjango/django-stubs/pull/1139#issuecomment-1232167698). The return type of these functions was therefore [changed](https://github.com/typeddjango/django-stubs/pull/689) to reflect that.
