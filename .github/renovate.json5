@@ -1,6 +1,8 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: ["config:best-practices"],
+  // Python versions in CI are managed manually (test-older-django pins 3.10)
+  ignoreDeps: ["python"],
   suppressNotifications: ["prEditedNotification"],
   mode: "full",
   // Wait 3 days before proposing updates to limit supply chain attack exposure
@@ -16,11 +18,6 @@
     {
       matchPackageNames: ["mypy"],
       rangeStrategy: "widen",
-    },
-    {
-      // NOTE: Keep `test-older-django` python version in sync
-      matchPackageNames: ["python"],
-      allowedVersions: "3.10",
     },
     {
       // Group upload/download artifact updates, the versions are dependent
