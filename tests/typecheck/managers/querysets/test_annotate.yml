@@ -799,7 +799,7 @@
 
     # Custom method without WithAnnotations: noop
     plain = FooModel.objects.active()
-    reveal_type(plain)  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel, myapp.models.FooModel]"
+    reveal_type(plain)  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel]"
 
     # Custom then .annotate() then custom: all three layers merge
     triple = FooModel.objects.with_bar().annotate(extra=F("id")).with_baz()
@@ -821,7 +821,7 @@
     - path: myapp/__init__.py
     - path: myapp/models.py
       content: |
-        from typing_extensions import TypedDict, Self
+        from typing_extensions import TypedDict, TypeVar, Self
         from django.db import models
         from django_stubs_ext import WithAnnotations
 
@@ -834,15 +834,17 @@
         class BarIntDict(TypedDict):
             bar: int
 
-        class FooQuerySet(models.QuerySet):
-            def with_bar(self) -> "FooQuerySet[WithAnnotations[FooModel, BarDict]]":
-                return self.annotate(bar=models.Value("x"))  # type: ignore[no-any-return]
+        _Model = TypeVar("_Model", bound=models.Model, covariant=True)
 
-            def with_baz(self) -> "FooQuerySet[WithAnnotations[FooModel, BazDict]]":
-                return self.annotate(baz=models.Value(1))  # type: ignore[no-any-return]
+        class FooQuerySet(models.QuerySet[_Model]):
+            def with_bar(self) -> "FooQuerySet[WithAnnotations[_Model, BarDict]]":
+                return self.annotate(bar=models.Value("x"))
 
-            def with_bar_int(self) -> "FooQuerySet[WithAnnotations[FooModel, BarIntDict]]":
-                return self.annotate(bar=models.Value(1))  # type: ignore[no-any-return]
+            def with_baz(self) -> "FooQuerySet[WithAnnotations[_Model, BazDict]]":
+                return self.annotate(baz=models.Value(1))
+
+            def with_bar_int(self) -> "FooQuerySet[WithAnnotations[_Model, BarIntDict]]":
+                return self.annotate(bar=models.Value(1))
 
             def active(self) -> Self:
                 return self.filter(active=True)
