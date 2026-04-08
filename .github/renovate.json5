@@ -32,5 +32,11 @@
       matchDatasources: ["github-runners"],
       enabled: false,
     },
+    {
+      // Django 6.0 dropped Python <3.12 support, keep the compat pin on 5.x
+      matchPackageNames: ["django"],
+      matchCurrentVersion: "/^5\\./",
+      allowedVersions: "<6.0.0",
+    },
   ],
 }
