@@ -4,7 +4,7 @@ from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING
 
 from django.contrib.admin.filters import FieldListFilter, ListFilter, SimpleListFilter, _ListFilterChoices
-from typing_extensions import assert_type
+from typing_extensions import assert_type, override
 
 if TYPE_CHECKING:
     from django.contrib.admin.views.main import ChangeList
@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 # This can be useful for user who customized the builtin admin template (`admin/filter.html`) with something
 # expecting a different type
 class MyListFilter(ListFilter):
+    @override
     def choices(self, changelist: ChangeList) -> Iterator[Mapping[str, object]]:
         yield {"label": "All items", "icon": "star", "count": 42, "active": True}
 
