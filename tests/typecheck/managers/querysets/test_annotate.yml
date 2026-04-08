@@ -886,10 +886,10 @@
 
         class FooQuerySet(models.QuerySet[_Model]):
             def with_bar(self) -> "FooQuerySet[WithAnnotations[_Model, BarDict]]":
-                return self.annotate(bar=models.Value("bar"))  # type: ignore[no-any-return]
+                return self.annotate(bar=models.Value("bar"))
 
-            def with_baz(self) -> "FooQuerySet[WithAnnotations[FooModel, BazDict]]":
-                return self.annotate(baz=models.Value("baz"))  # type: ignore[no-any-return]
+            def with_baz(self) -> "FooQuerySet[WithAnnotations[_Model, BazDict]]":
+                return self.annotate(baz=models.Value("baz"))
 
         FooManager = Manager.from_queryset(FooQuerySet)
 
