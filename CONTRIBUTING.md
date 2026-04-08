@@ -118,6 +118,16 @@ just stubtest --allowlist extra.txt
 
 If you get unexpected results, clear the mypy cache with `just clean`.
 
+### Debugging plugin code
+
+For yml tests, we use a dedicated [pytest plugin](https://github.com/typeddjango/pytest-mypy-plugins) that is by default
+running mypy in a subprocess, making it difficult to debug.
+To avoid that, run pytest with the `--mypy-same-process` flag.
+
+```shell
+pytest --mypy-same-process tests/typecheck/managers/querysets/test_annotate.yml
+```
+
 ### Testing stubs with `stubtest`
 
 Run `just stubtest` (or [`./scripts/stubtest.sh`](scripts/stubtest.sh) directly) to test that stubs and sources are in-line.
