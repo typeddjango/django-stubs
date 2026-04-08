@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import datetime
+
 from django import http
 from django.contrib import admin
 from django.contrib.admin.options import _DisplayT
-from django.contrib.admin.utils import flatten, flatten_fieldsets
+from django.contrib.admin.utils import build_q_object_from_lookup_parameters, flatten, flatten_fieldsets
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Q
 from django.db.models.functions import Upper
 from typing_extensions import assert_type
 
@@ -94,3 +96,16 @@ class PersonMixedOrderingAdmin(admin.ModelAdmin[Person]):
 
 class PersonFExpressionAdmin(admin.ModelAdmin[Person]):
     ordering = [F("birthday").desc(nulls_last=True)]
+
+
+# Values are not limited to list[str] — any iterable of objects is accepted
+assert_type(
+    build_q_object_from_lookup_parameters(
+        {
+            "a": ["str"],
+            "b": [datetime.datetime(2023, 1, 1)],
+            "c": [True],
+        }
+    ),
+    Q,
+)
