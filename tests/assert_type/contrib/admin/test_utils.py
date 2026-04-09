@@ -5,7 +5,12 @@ import datetime
 from django import http
 from django.contrib import admin
 from django.contrib.admin.options import _DisplayT
-from django.contrib.admin.utils import build_q_object_from_lookup_parameters, flatten, flatten_fieldsets, prepare_lookup_value
+from django.contrib.admin.utils import (
+    build_q_object_from_lookup_parameters,
+    flatten,
+    flatten_fieldsets,
+    prepare_lookup_value,
+)
 from django.db import models
 from django.db.models import F, Q
 from django.db.models.functions import Upper
