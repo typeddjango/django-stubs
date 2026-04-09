@@ -1,18 +1,14 @@
-from collections.abc import Callable
-from typing import Any, TypeVar
-
 from django.middleware.csrf import CsrfViewMiddleware
 
-csrf_protect: Callable[[_F], _F]
+from . import _ViewFuncT
+
+def csrf_protect(view_func: _ViewFuncT, /) -> _ViewFuncT: ...
 
 class _EnsureCsrfToken(CsrfViewMiddleware): ...
 
-requires_csrf_token: Callable[[_F], _F]
+def requires_csrf_token(view_func: _ViewFuncT, /) -> _ViewFuncT: ...
 
 class _EnsureCsrfCookie(CsrfViewMiddleware): ...
 
-ensure_csrf_cookie: Callable[[_F], _F]
-
-_F = TypeVar("_F", bound=Callable[..., Any])
-
-def csrf_exempt(view_func: _F) -> _F: ...
+def ensure_csrf_cookie(view_func: _ViewFuncT, /) -> _ViewFuncT: ...
+def csrf_exempt(view_func: _ViewFuncT, /) -> _ViewFuncT: ...
