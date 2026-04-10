@@ -1,5 +1,4 @@
 import datetime
-import sys
 from collections.abc import AsyncIterable, AsyncIterator, Iterable, Iterator, Mapping
 from http.cookies import SimpleCookie
 from io import BytesIO
@@ -8,12 +7,8 @@ from typing import Any, Literal, NoReturn, TypeVar, overload, type_check_only
 
 from django.utils.datastructures import CaseInsensitiveMapping, _PropertyDescriptor
 from django.utils.functional import _StrOrPromise, cached_property
-from typing_extensions import override
+from typing_extensions import override, Writer
 
-if sys.version_info >= (3, 14):
-    from io import Writer
-else:
-    from typing_extensions import Writer
 
 class BadHeaderError(ValueError): ...
 
@@ -27,7 +22,7 @@ class ResponseHeaders(CaseInsensitiveMapping[str]):
     def pop(self, key: str, default: _Z = ...) -> _Z | tuple[str, str]: ...
     def setdefault(self, key: str, value: str | bytes | int) -> None: ...
 
-class HttpResponseBase(Writer):
+class HttpResponseBase(Writer[str | bytes]):
     status_code: int
     streaming: bool
     cookies: SimpleCookie

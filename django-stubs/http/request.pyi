@@ -1,5 +1,4 @@
 import datetime
-import sys
 from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping, Sequence
 from re import Pattern
 from typing import Any, BinaryIO, Literal, NoReturn, Protocol, TypeAlias, TypeVar, overload, type_check_only
@@ -11,12 +10,8 @@ from django.core.files import uploadedfile, uploadhandler
 from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
 from django.utils.functional import cached_property
-from typing_extensions import Self, override
+from typing_extensions import Reader, Self, override
 
-if sys.version_info >= (3, 14):
-    from io import Reader
-else:
-    from typing_extensions import Reader
 
 RAISE_ERROR: object
 host_validation_re: Pattern[str]
@@ -48,7 +43,7 @@ class HttpHeaders(CaseInsensitiveMapping[str]):
     @classmethod
     def to_asgi_names(cls, headers: Mapping[str, Any]) -> dict[str, Any]: ...
 
-class HttpRequest(Reader):
+class HttpRequest(Reader[bytes]):
     GET: _ImmutableQueryDict
     POST: _ImmutableQueryDict
     COOKIES: dict[str, str]
