@@ -7,8 +7,7 @@ from typing import Any, Literal, NoReturn, TypeVar, overload, type_check_only
 
 from django.utils.datastructures import CaseInsensitiveMapping, _PropertyDescriptor
 from django.utils.functional import _StrOrPromise, cached_property
-from typing_extensions import override, Writer
-
+from typing_extensions import Writer, override
 
 class BadHeaderError(ValueError): ...
 

@@ -12,7 +12,6 @@ from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, M
 from django.utils.functional import cached_property
 from typing_extensions import Reader, Self, override
 
-
 RAISE_ERROR: object
 host_validation_re: Pattern[str]
 
