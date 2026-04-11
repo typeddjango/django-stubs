@@ -1,4 +1,5 @@
-from typing import Any, Mapping, TypeVar
+from collections.abc import Mapping
+from typing import Any, TypeVar
 
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import _User, _UserModel
@@ -31,7 +32,7 @@ class LoginView(RedirectURLMixin, FormView[_AuthForm]):
 class LogoutView(RedirectURLMixin, TemplateView):
     next_page: str | None
     redirect_field_name: str
-    extra_context: Mapping[str, Any] | None  
+    extra_context: Mapping[str, Any] | None
     @override
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
@@ -42,12 +43,12 @@ def redirect_to_login(
 ) -> HttpResponseRedirect: ...
 
 class PasswordContextMixin:
-    extra_context: Mapping[str, Any] | None  
+    extra_context: Mapping[str, Any] | None
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]: ...
 
 class PasswordResetView(PasswordContextMixin, FormView[PasswordResetForm]):
     email_template_name: str
-    extra_email_context: Mapping[str, Any] | None  
+    extra_email_context: Mapping[str, Any] | None
     form_class: type[PasswordResetForm]
     from_email: str | None
     html_email_template_name: str | None
@@ -58,7 +59,7 @@ class PasswordResetView(PasswordContextMixin, FormView[PasswordResetForm]):
 INTERNAL_RESET_SESSION_TOKEN: str
 
 class PasswordResetDoneView(PasswordContextMixin, TemplateView):
-    title: _StrOrPromise  
+    title: _StrOrPromise
 
 class PasswordResetConfirmView(PasswordContextMixin, FormView[SetPasswordForm]):
     form_class: type[SetPasswordForm]
@@ -79,4 +80,4 @@ class PasswordChangeView(PasswordContextMixin, FormView[PasswordChangeForm]):
     title: _StrOrPromise
 
 class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
-    title: _StrOrPromise  
+    title: _StrOrPromise
