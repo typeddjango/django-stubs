@@ -1,7 +1,6 @@
-import builtins
-import logging
-from collections.abc import Iterable
-from typing import Any, Generic, TypeVar
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from django import VERSION
 from django.contrib.admin import ModelAdmin
@@ -27,15 +26,16 @@ from django.db.models.query import BaseIterable, ModelIterable, Prefetch, QueryS
 from django.forms.formsets import BaseFormSet
 from django.forms.models import BaseModelForm, BaseModelFormSet, ModelChoiceField, ModelFormOptions
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
-from django.utils.functional import classproperty
+from django.utils.functional import LazyObject, classproperty
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
 from typing_extensions import override
 
-__all__ = ["monkeypatch"]
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
-logger = logging.getLogger(__name__)
+__all__ = ["monkeypatch"]
 
 _T = TypeVar("_T")
 _VersionSpec = tuple[int, int]
@@ -94,6 +94,7 @@ _need_generic: list[MPGeneric[Any]] = [
     MPGeneric(ForeignKey, (4, 1)),
     MPGeneric(RawQuerySet),
     MPGeneric(classproperty),
+    MPGeneric(LazyObject),
     MPGeneric(ConnectionProxy),
     MPGeneric(ModelFormOptions),
     MPGeneric(Options),
@@ -122,7 +123,7 @@ if VERSION >= (6, 0):
     )
 
 
-def monkeypatch(extra_classes: Iterable[type] | None = None, include_builtins: bool = True) -> None:
+def monkeypatch(extra_classes: Iterable[type] | None = None) -> None:
     """Monkey patch django as necessary to work properly with mypy."""
     # Add the __class_getitem__ dunder.
     suited_for_this_version = filter(
@@ -134,8 +135,3 @@ def monkeypatch(extra_classes: Iterable[type] | None = None, include_builtins: b
     if extra_classes:
         for cls in extra_classes:
             cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore[attr-defined]
-
-    # Add `reveal_type` and `reveal_locals` helpers if needed:
-    if include_builtins:
-        builtins.reveal_type = lambda obj, /: obj
-        builtins.reveal_locals = lambda: None
