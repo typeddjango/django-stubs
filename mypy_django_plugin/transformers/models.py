@@ -28,7 +28,7 @@ from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, 
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 from typing_extensions import override
-
+from mypy.subtypes import is_subtype
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
@@ -246,35 +246,30 @@ class AddAnnotateUtilities(ModelClassInitializer):
 
 class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
     """
-    Replaces
-        class MyModel(models.Model):
-            class Meta:
-                pass
-    with
-        class MyModel(models.Model):
-            class Meta(TypedModelMeta):
-                pass
-
-    to provide proper typing of attributes in Meta inner classes.
-
-    If TypedModelMeta is not available, fallback to Any as a base
-    to get around incompatible Meta inner classes for different models.
+    Handle Meta class transformation and validation.
     """
-
     @override
     def run(self) -> None:
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
             return None
+        
         meta_node.fallback_to_any = True
-
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
-        if typed_model_meta_info and not meta_node.has_base(fullnames.TYPED_MODEL_META_FULLNAME):
-            # Insert TypedModelMeta just before `object` to leverage mypy's class-body semantic analysis.
-            meta_node.mro.insert(-1, typed_model_meta_info)
+
+        if typed_model_meta_info:
+            # Sobolevn's Strategy: iterate and validate attributes.
+            for name, sym in meta_node.names.items():
+                if name in typed_model_meta_info.names:
+                    parent_sym = typed_model_meta_info.names[name]
+                    if parent_sym.type and sym.type:
+                        # Manual type validation against TypedModelMeta
+                        if not is_subtype(sym.type, parent_sym.type):
+                            self.ctx.api.fail(
+                                f'Incompatible type for "{name}" in Meta (expected "{parent_sym.type}", got "{sym.type}")',
+                                sym.node
+                            )
         return None
-
-
 class AddDefaultPrimaryKey(ModelClassInitializer):
     @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:

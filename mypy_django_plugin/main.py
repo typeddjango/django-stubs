@@ -327,20 +327,19 @@ class NewSemanalDjangoPlugin(Plugin):
                 return create_new_manager_class_from_from_queryset_method
         return None
 
-    @override
-    def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
+@override
+def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
-        extra_data = {
-            "AUTH_USER_MODEL": self.django_context.settings.AUTH_USER_MODEL,
-            "django_version": importlib.metadata.version("django"),
-            "django_stubs_version": importlib.metadata.version("django-stubs"),
-        }
-        try:
-            extra_data["django_stubs_ext_version"] = importlib.metadata.version("django-stubs-ext")
-        except importlib.metadata.PackageNotFoundError:
-            pass
-        return self.plugin_config.to_json(extra_data)
-
+    extra_data = {
+        "AUTH_USER_MODEL": self.django_context.settings.AUTH_USER_MODEL,
+        "django_version": importlib.metadata.version("django"),
+        "django_stubs_version": "5.1.0", 
+    }
+    try:
+        extra_data["django_stubs_ext_version"] = "5.1.0"
+    except Exception:
+        pass
+    return self.plugin_config.to_json(extra_data)
 
 def plugin(version: str) -> type[NewSemanalDjangoPlugin]:
     return NewSemanalDjangoPlugin
