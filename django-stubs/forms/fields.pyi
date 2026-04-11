@@ -186,7 +186,7 @@ class DecimalField(IntegerField):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class BaseTemporalField(Field):
-    input_formats: Collection[str] | None
+    input_formats: Collection[str] | DateTimeFormatsIterator | None
     def __init__(
         self,
         *,
