@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from typing import Collection
-# DateTimeFormatsIterator ko explicitly 'fields' se import karo
+# Import DateTimeFormatsIterator explicitly from fields module
 from django.forms import DateField, JSONField
 from django.forms.fields import DateTimeFormatsIterator 
 from typing_extensions import assert_type
@@ -10,7 +10,7 @@ from typing_extensions import assert_type
 # 1. Test for BaseTemporalField (via DateField)
 def test_temporal_field_input_formats() -> None:
     field = DateField(input_formats=["%Y-%m-%d"])
-    # Ab VS Code ko 'DateTimeFormatsIterator' mil jayega aur red line hat jayegi
+    # Verify that input_formats is correctly typed as a Union including DateTimeFormatsIterator
     assert_type(field.input_formats, Collection[str] | DateTimeFormatsIterator | None)
 
 # 2. Test for JSONField Encoder/Decoder
