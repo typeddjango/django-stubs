@@ -6,6 +6,7 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
 from mypy.checker import TypeChecker
+from mypy.maptype import map_instance_to_supertype
 from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF,
@@ -46,6 +47,7 @@ from mypy.types import (
     Instance,
     LiteralType,
     NoneTyp,
+    ProperType,
     TupleType,
     Type,
     TypedDictType,
@@ -431,6 +433,20 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
             descriptor_type = make_optional_type(descriptor_type)
         return descriptor_type
     return AnyType(TypeOfAny.explicit)
+
+
+class FieldTypeArgs(NamedTuple):
+    set: ProperType
+    get: ProperType
+
+
+def get_field_type_args(field_type: Instance) -> FieldTypeArgs | None:
+    """Extract (_ST, _GT) from a Field instance by mapping to the base Field class."""
+    base_field_info = next((base for base in field_type.type.mro if base.fullname == fullnames.FIELD_FULLNAME), None)
+    if base_field_info is None:
+        return None
+    mapped = map_instance_to_supertype(field_type, base_field_info)
+    return FieldTypeArgs(set=get_proper_type(mapped.args[0]), get=get_proper_type(mapped.args[1]))
 
 
 def get_field_lookup_exact_type(api: TypeChecker, field: Field[Any, Any]) -> MypyType:

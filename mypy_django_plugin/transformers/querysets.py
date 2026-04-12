@@ -15,7 +15,6 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.lookups import Transform
 from django.db.models.sql.query import Query
 from mypy.errorcodes import NO_REDEF
-from mypy.maptype import map_instance_to_supertype
 from mypy.nodes import (
     ARG_NAMED,
     ARG_NAMED_OPT,
@@ -279,15 +278,9 @@ def _resolve_output_field_type(expr_type: MypyType) -> MypyType | None:
     for arg in proper.args:
         arg_proper = get_proper_type(arg)
         if isinstance(arg_proper, Instance) and arg_proper.type.has_base(fullnames.FIELD_FULLNAME):
-            base_field_type = next(
-                (base for base in arg_proper.type.mro if base.fullname == fullnames.FIELD_FULLNAME), None
-            )
-            if base_field_type is not None:
-                mapped = map_instance_to_supertype(arg_proper, base_field_type)
-                if len(mapped.args) >= 2:
-                    get_type = get_proper_type(mapped.args[1])
-                    if not isinstance(get_type, AnyType):
-                        return get_type
+            type_args = helpers.get_field_type_args(arg_proper)
+            if type_args is not None and not isinstance(type_args.get, AnyType):
+                return type_args.get
 
     return None
 
