@@ -235,7 +235,7 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_type(outer_model_info):
-        return ctx.default_return_type
+        return set_descriptor_types_for_field(ctx)
 
     assert isinstance(outer_model_info, TypeInfo)
 

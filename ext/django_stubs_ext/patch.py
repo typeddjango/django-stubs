@@ -11,7 +11,7 @@ from django.contrib.sitemaps import Sitemap
 from django.contrib.syndication.views import Feed
 from django.core.files.utils import FileProxyMixin
 from django.core.paginator import Paginator
-from django.db.models.expressions import ExpressionWrapper
+from django.db.models.expressions import ExpressionWrapper, Subquery
 from django.db.models.fields import Field
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.related_descriptors import (
@@ -85,6 +85,7 @@ _need_generic: list[MPGeneric[Any]] = [
     MPGeneric(Lookup),
     MPGeneric(BaseConnectionHandler),
     MPGeneric(ExpressionWrapper),
+    MPGeneric(Subquery),
     MPGeneric(ReverseManyToOneDescriptor),
     MPGeneric(ModelIterable),
     # These types do have native `__class_getitem__` method since django 3.1:
