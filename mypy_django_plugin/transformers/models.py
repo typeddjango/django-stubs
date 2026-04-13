@@ -228,8 +228,8 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
             if "Meta" in self.model_classdef.info.names:
-                sym = self.model_classdef.info.names["Meta"]
-                if sym and isinstance(sym.node, TypeInfo):
+                sym = self.model_classdef.info.names.get("Meta")
+                if sym is not None and isinstance(sym.node, TypeInfo):
                     meta_node = sym.node
 
         if meta_node is None:
@@ -238,28 +238,27 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         # 2. Look up TypedModelMeta from django-stubs-ext
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
 
-        # If TypedModelMeta is not resolved, we fallback to Any to maintain compatibility
-        if not typed_model_meta_info:
-            meta_node.fallback_to_any = True
+        # If TypedModelMeta is not resolved, we stop validation to maintain stability
+        if typed_model_meta_info is None:
             return None
 
-        # 3. Validation Logic: Compare Meta attributes against TypedModelMeta
-        meta_node.fallback_to_any = False
-
+        # 3. Validation Logic
+        # We only iterate and validate. We don't touch meta_node.fallback_to_any
+        # to ensure we don't break custom/third-party Meta options.
         for name, sym in meta_node.names.items():
-            # Skip empty or uninitialized symbols to prevent internal errors
-            if not sym or not sym.node or not hasattr(sym, "type") or sym.type is None:
+            # Strict None checking for Mypy CI (truthy-bool errors)
+            if sym is None or sym.node is None or not hasattr(sym, "type") or sym.type is None:
                 continue
 
             # Only validate attributes defined in TypedModelMeta (e.g., verbose_name, db_table)
             if name in typed_model_meta_info.names:
-                parent_sym = typed_model_meta_info.names[name]
-                if parent_sym and parent_sym.type:
+                parent_sym = typed_model_meta_info.names.get(name)
+                if parent_sym is not None and parent_sym.type is not None:
                     actual_type = get_proper_type(sym.type)
                     expected_type = get_proper_type(parent_sym.type)
 
-                    if actual_type and expected_type:
-                        # Check if the attribute type matches the expected Django type
+                    # Final strict check to satisfy 'mypy-self-check'
+                    if actual_type is not None and expected_type is not None:
                         if not is_subtype(actual_type, expected_type):
                             self.api.fail(
                                 f'Incompatible type for "{name}" in Meta '
@@ -267,8 +266,6 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                                 sym.node,
                             )
 
-        # 4. Re-enable fallback for custom/third-party Meta options
-        meta_node.fallback_to_any = True
         return None
 
 
