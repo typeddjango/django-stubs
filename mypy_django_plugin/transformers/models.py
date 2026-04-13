@@ -243,29 +243,35 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
             return None
 
         # 3. Validation Logic
-        # We only iterate and validate. We don't touch meta_node.fallback_to_any
-        # to ensure we don't break custom/third-party Meta options.
         for name, sym in meta_node.names.items():
-            # Strict None checking for Mypy CI (truthy-bool errors)
-            if sym is None or sym.node is None or not hasattr(sym, "type") or sym.type is None:
+            # Strict safety checks to satisfy Mypy self-check [truthy-bool]
+            if sym is None or sym.node is None:
                 continue
 
-            # Only validate attributes defined in TypedModelMeta (e.g., verbose_name, db_table)
+            # Use getattr or check for type attribute safely
+            sym_type = getattr(sym, "type", None)
+            if sym_type is None:
+                continue
+
+            # Only validate attributes defined in TypedModelMeta
             if name in typed_model_meta_info.names:
                 parent_sym = typed_model_meta_info.names.get(name)
-                if parent_sym is not None and parent_sym.type is not None:
-                    actual_type = get_proper_type(sym.type)
-                    expected_type = get_proper_type(parent_sym.type)
 
-                    # Final strict check to satisfy 'mypy-self-check'
-                    if actual_type is not None and expected_type is not None:
-                        if not is_subtype(actual_type, expected_type):
-                            self.api.fail(
-                                f'Incompatible type for "{name}" in Meta '
-                                f'(expected "{expected_type}", got "{actual_type}")',
-                                sym.node,
-                            )
+                # Double check parent_sym and its type
+                if parent_sym is not None:
+                    parent_type = getattr(parent_sym, "type", None)
+                    if parent_type is not None:
+                        actual_type = get_proper_type(sym_type)
+                        expected_type = get_proper_type(parent_type)
 
+                        # Use explicit 'is not None' for everything
+                        if actual_type is not None and expected_type is not None:
+                            if not is_subtype(actual_type, expected_type):
+                                self.api.fail(
+                                    f'Incompatible type for "{name}" in Meta '
+                                    f'(expected "{expected_type}", got "{actual_type}")',
+                                    sym.node,
+                                )
         return None
 
 
