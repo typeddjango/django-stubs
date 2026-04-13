@@ -224,7 +224,6 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
 
     @override
     def run(self) -> None:
-        # 1. Get the Meta node safely
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
             if "Meta" in self.model_classdef.info.names:
@@ -235,16 +234,12 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         if meta_node is None:
             return None
 
-        # 2. Look up TypedModelMeta
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
         if typed_model_meta_info is None:
             return None
 
-        # 3. Validation Logic
         for name, sym in meta_node.names.items():
-            # 'sym.node' can be None, but 'sym' itself is usually not None here
-            # We only check sym.node for safety
-            if sym.node is None:
+            if sym.node is None or name.startswith("__"):
                 continue
 
             sym_type = getattr(sym, "type", None)
@@ -259,10 +254,13 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                         actual_type = get_proper_type(sym_type)
                         expected_type = get_proper_type(parent_type)
 
-                        # Only fail if they are definitely not compatible
+                        # Humne yahan check add kiya hai:
+                        # Agar type Any hai ya hum confirm nahi kar pa rahe, toh ignore karo.
+                        if actual_type is None or expected_type is None:
+                            continue
+
                         if not is_subtype(actual_type, expected_type):
-                            # Special case: allow str to pass for _StrPromise compatible fields
-                            # to avoid the mutable-override bug #2823
+                            # Validation fail, par sirf tab jab clear mismatch ho
                             self.api.fail(
                                 f'Incompatible type for "{name}" in Meta '
                                 f'(expected "{expected_type}", got "{actual_type}")',
