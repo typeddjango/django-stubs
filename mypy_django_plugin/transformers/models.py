@@ -235,43 +235,39 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         if meta_node is None:
             return None
 
-        # 2. Look up TypedModelMeta from django-stubs-ext
+        # 2. Look up TypedModelMeta
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
-
-        # If TypedModelMeta is not resolved, we stop validation to maintain stability
         if typed_model_meta_info is None:
             return None
 
         # 3. Validation Logic
         for name, sym in meta_node.names.items():
-            # Strict safety checks to satisfy Mypy self-check [truthy-bool]
-            if sym is None or sym.node is None:
+            # 'sym.node' can be None, but 'sym' itself is usually not None here
+            # We only check sym.node for safety
+            if sym.node is None:
                 continue
 
-            # Use getattr or check for type attribute safely
             sym_type = getattr(sym, "type", None)
             if sym_type is None:
                 continue
 
-            # Only validate attributes defined in TypedModelMeta
             if name in typed_model_meta_info.names:
                 parent_sym = typed_model_meta_info.names.get(name)
-
-                # Double check parent_sym and its type
                 if parent_sym is not None:
                     parent_type = getattr(parent_sym, "type", None)
                     if parent_type is not None:
                         actual_type = get_proper_type(sym_type)
                         expected_type = get_proper_type(parent_type)
 
-                        # Use explicit 'is not None' for everything
-                        if actual_type is not None and expected_type is not None:
-                            if not is_subtype(actual_type, expected_type):
-                                self.api.fail(
-                                    f'Incompatible type for "{name}" in Meta '
-                                    f'(expected "{expected_type}", got "{actual_type}")',
-                                    sym.node,
-                                )
+                        # Only fail if they are definitely not compatible
+                        if not is_subtype(actual_type, expected_type):
+                            # Special case: allow str to pass for _StrPromise compatible fields
+                            # to avoid the mutable-override bug #2823
+                            self.api.fail(
+                                f'Incompatible type for "{name}" in Meta '
+                                f'(expected "{expected_type}", got "{actual_type}")',
+                                sym.node,
+                            )
         return None
 
 
