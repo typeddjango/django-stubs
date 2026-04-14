@@ -224,51 +224,49 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
 
     @override
     def run(self) -> None:
-        # 1. Retrieve the Meta class node
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
+        if meta_node is None:
+            if "Meta" in self.model_classdef.info.names:
+                sym = self.model_classdef.info.names.get("Meta")
+                if sym is not None and isinstance(sym.node, TypeInfo):
+                    meta_node = sym.node
 
-        # Fallback if helper returns None
-        if meta_node is None and "Meta" in self.model_classdef.info.names:
-            sym = self.model_classdef.info.names.get("Meta")
-            if sym is not None and isinstance(sym.node, TypeInfo):
-                meta_node = sym.node
+        if meta_node is None:
+            return None
 
-        # 2. Look up the TypedModelMeta TypeInfo
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
+        if typed_model_meta_info is None:
+            return None
 
-        #   CRITICAL FIX: Wrap in IF block.
-        # DO NOT 'return None' early. Let the method reach the final 'return None'.
-        if (
-            meta_node is not None
-            and typed_model_meta_info is not None
-            and meta_node.has_base(fullnames.TYPED_MODEL_META_FULLNAME)
-        ):
-            # 3. Validation Logic
-            for name, sym in meta_node.names.items():
-                if sym.node is None or name.startswith("__"):
-                    continue
+        for name, sym in meta_node.names.items():
+            if sym.node is None or name.startswith("__"):
+                continue
 
-                sym_type = getattr(sym, "type", None)
-                if sym_type is None:
-                    continue
+            sym_type = getattr(sym, "type", None)
+            if sym_type is None:
+                continue
 
-                if name in typed_model_meta_info.names:
-                    parent_sym = typed_model_meta_info.names.get(name)
-                    if parent_sym is not None:
-                        parent_type = getattr(parent_sym, "type", None)
-                        if parent_type is not None:
-                            actual_type = get_proper_type(sym_type)
-                            expected_type = get_proper_type(parent_type)
+            if name in typed_model_meta_info.names:
+                parent_sym = typed_model_meta_info.names.get(name)
+                if parent_sym is not None:
+                    parent_type = getattr(parent_sym, "type", None)
+                    if parent_type is not None:
+                        actual_type = get_proper_type(sym_type)
+                        expected_type = get_proper_type(parent_type)
 
-                            if actual_type is not None and expected_type is not None:
-                                if not is_subtype(actual_type, expected_type):
-                                    self.api.fail(
-                                        f'Incompatible type for "{name}" in Meta '
-                                        f'(expected "{expected_type}", got "{actual_type}")',
-                                        sym.node,
-                                    )
+                        # Humne yahan check add kiya hai:
+                        # Agar type Any hai ya hum confirm nahi kar pa rahe, toh ignore karo.
+                        if actual_type is None or expected_type is None:
+                            continue
 
-        super().run()
+                        if not is_subtype(actual_type, expected_type):
+                            # Validation fail, par sirf tab jab clear mismatch ho
+                            self.api.fail(
+                                f'Incompatible type for "{name}" in Meta '
+                                f'(expected "{expected_type}", got "{actual_type}")',
+                                sym.node,
+                            )
+        return None
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
