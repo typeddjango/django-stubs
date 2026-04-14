@@ -259,7 +259,11 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                                             sym.node,
                                         )
 
-        super().run()
+        try:
+            if hasattr(ModelClassInitializer, "run"):
+                super().run()
+        except (AttributeError, TypeError):
+            pass
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
