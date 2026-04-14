@@ -53,7 +53,7 @@ from mypy_django_plugin.transformers.models import (
     set_auth_user_model_boolean_fields,
 )
 from mypy_django_plugin.transformers.request import check_querydict_is_mutable
-
+__all__ = ["plugin"]
 if TYPE_CHECKING:
     from collections.abc import Callable
 
