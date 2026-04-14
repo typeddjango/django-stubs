@@ -231,41 +231,34 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                 if sym is not None and isinstance(sym.node, TypeInfo):
                     meta_node = sym.node
 
-        if meta_node is None:
-            return None
-
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
-        if typed_model_meta_info is None:
-            return None
 
-        for name, sym in meta_node.names.items():
-            if sym.node is None or name.startswith("__"):
-                continue
+        if meta_node is not None and typed_model_meta_info is not None:
+            if meta_node.has_base(fullnames.TYPED_MODEL_META_FULLNAME):
+                for name, sym in meta_node.names.items():
+                    if sym.node is None or name.startswith("__"):
+                        continue
 
-            sym_type = getattr(sym, "type", None)
-            if sym_type is None:
-                continue
+                    sym_type = getattr(sym, "type", None)
+                    if sym_type is None:
+                        continue
 
-            if name in typed_model_meta_info.names:
-                parent_sym = typed_model_meta_info.names.get(name)
-                if parent_sym is not None:
-                    parent_type = getattr(parent_sym, "type", None)
-                    if parent_type is not None:
-                        actual_type = get_proper_type(sym_type)
-                        expected_type = get_proper_type(parent_type)
+                    if name in typed_model_meta_info.names:
+                        parent_sym = typed_model_meta_info.names.get(name)
+                        if parent_sym is not None:
+                            parent_type = getattr(parent_sym, "type", None)
+                            if parent_type is not None:
+                                actual_type = get_proper_type(sym_type)
+                                expected_type = get_proper_type(parent_type)
 
-                        # Humne yahan check add kiya hai:
-                        # Agar type Any hai ya hum confirm nahi kar pa rahe, toh ignore karo.
-                        if actual_type is None or expected_type is None:
-                            continue
+                                if actual_type is not None and expected_type is not None:
+                                    if not is_subtype(actual_type, expected_type):
+                                        self.api.fail(
+                                            f'Incompatible type for "{name}" in Meta '
+                                            f'(expected "{expected_type}", got "{actual_type}")',
+                                            sym.node,
+                                        )
 
-                        if not is_subtype(actual_type, expected_type):
-                            # Validation fail, par sirf tab jab clear mismatch ho
-                            self.api.fail(
-                                f'Incompatible type for "{name}" in Meta '
-                                f'(expected "{expected_type}", got "{actual_type}")',
-                                sym.node,
-                            )
         super().run()
 
 
