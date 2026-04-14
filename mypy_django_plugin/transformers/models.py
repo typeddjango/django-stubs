@@ -224,6 +224,7 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
 
     @override
     def run(self) -> None:
+        # 1. Retrieve the Meta class node for the current Model
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
             if "Meta" in self.model_classdef.info.names:
@@ -234,11 +235,19 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
         if meta_node is None:
             return None
 
+        # 2. Look up the TypedModelMeta TypeInfo to compare attributes
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
         if typed_model_meta_info is None:
             return None
 
+        # 3. Guard Clause: Only validate if the Meta class explicitly inherits from TypedModelMeta.
+        # This prevents regressions in standard Django models and core stubs.
+        if not meta_node.has_base(fullnames.TYPED_MODEL_META_FULLNAME):
+            return None
+
+        # 4. Iterate through Meta attributes and validate types against TypedModelMeta
         for name, sym in meta_node.names.items():
+            # Skip internal attributes or nodes that are not fully resolved
             if sym.node is None or name.startswith("__"):
                 continue
 
@@ -254,13 +263,12 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                         actual_type = get_proper_type(sym_type)
                         expected_type = get_proper_type(parent_type)
 
-                        # Humne yahan check add kiya hai:
-                        # Agar type Any hai ya hum confirm nahi kar pa rahe, toh ignore karo.
+                        # Skip validation if types cannot be properly resolved to avoid false positives
                         if actual_type is None or expected_type is None:
                             continue
 
+                        # Check if the defined type is a valid subtype of the expected TypedModelMeta type
                         if not is_subtype(actual_type, expected_type):
-                            # Validation fail, par sirf tab jab clear mismatch ho
                             self.api.fail(
                                 f'Incompatible type for "{name}" in Meta '
                                 f'(expected "{expected_type}", got "{actual_type}")',
