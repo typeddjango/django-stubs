@@ -103,7 +103,7 @@ class DjangoPluginConfig:
 
         if not isinstance(self.django_settings_module, str):
             # Refactored to f-string for better readability
-            toml_exit(f"invalid '{"django_settings_module"}': the setting must be a string")
+            toml_exit(f"invalid '{'django_settings_module'}': the setting must be a string")
 
         self.strict_settings = config.get("strict_settings", True)
         if not isinstance(self.strict_settings, bool):
