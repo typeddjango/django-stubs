@@ -224,46 +224,50 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
 
     @override
     def run(self) -> None:
-        """
-        Final Compatibility Version:
-        1. Fixes Matrix/Old Django tests (No modern pipe syntax).
-        2. Fixes Stubtest (super().run() at the end).
-        3. Fixes Self-check (Explicit None checks).
-        """
-        typed_meta_fullname = fullnames.TYPED_MODEL_META_FULLNAME
-        node_info = self.lookup_typeinfo(typed_meta_fullname)
+        # 1. Retrieve the Meta class node
+        meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
 
-        # Use simple checks for older Python versions in Matrix tests
-        if isinstance(node_info, TypeInfo):
-            meta_node = None
-            if "Meta" in self.model_classdef.info.names:
-                sym = self.model_classdef.info.names.get("Meta")
-                if sym is not None and isinstance(sym.node, TypeInfo):
-                    meta_node = sym.node
+        # Fallback if helper returns None
+        if meta_node is None and "Meta" in self.model_classdef.info.names:
+            sym = self.model_classdef.info.names.get("Meta")
+            if sym is not None and isinstance(sym.node, TypeInfo):
+                meta_node = sym.node
 
-            # Only validate if it's actually a TypedModelMeta
-            if meta_node is not None and meta_node.has_base(typed_meta_fullname):
-                for name, sym in meta_node.names.items():
-                    if sym.node is None or name.startswith("__") or name not in node_info.names:
-                        continue
+        # 2. Look up the TypedModelMeta TypeInfo
+        typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
 
-                    # Old-school type resolution to satisfy all environments
-                    raw_actual = getattr(sym, "type", None)
-                    actual_type = get_proper_type(raw_actual) if raw_actual is not None else None
+        #   CRITICAL FIX: Wrap in IF block.
+        # DO NOT 'return None' early. Let the method reach the final 'return None'.
+        if (
+            meta_node is not None
+            and typed_model_meta_info is not None
+            and meta_node.has_base(fullnames.TYPED_MODEL_META_FULLNAME)
+        ):
+            # 3. Validation Logic
+            for name, sym in meta_node.names.items():
+                if sym.node is None or name.startswith("__"):
+                    continue
 
-                    parent_sym = node_info.names.get(name)
-                    raw_expected = getattr(parent_sym, "type", None) if parent_sym is not None else None
-                    expected_type = get_proper_type(raw_expected) if raw_expected is not None else None
+                sym_type = getattr(sym, "type", None)
+                if sym_type is None:
+                    continue
 
-                    if actual_type is not None and expected_type is not None:
-                        if not is_subtype(actual_type, expected_type):
-                            self.api.fail(
-                                f'Incompatible type for "{name}" in Meta '
-                                f'(expected "{expected_type}", got "{actual_type}")',
-                                sym.node,
-                            )
+                if name in typed_model_meta_info.names:
+                    parent_sym = typed_model_meta_info.names.get(name)
+                    if parent_sym is not None:
+                        parent_type = getattr(parent_sym, "type", None)
+                        if parent_type is not None:
+                            actual_type = get_proper_type(sym_type)
+                            expected_type = get_proper_type(parent_type)
 
-        # CRITICAL: Always call super().run() to prevent Stubtest/Old Django failures
+                            if actual_type is not None and expected_type is not None:
+                                if not is_subtype(actual_type, expected_type):
+                                    self.api.fail(
+                                        f'Incompatible type for "{name}" in Meta '
+                                        f'(expected "{expected_type}", got "{actual_type}")',
+                                        sym.node,
+                                    )
+
         super().run()
 
 
