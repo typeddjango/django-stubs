@@ -225,11 +225,10 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
     @override
     def run(self) -> None:
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
-        if meta_node is None:
-            if "Meta" in self.model_classdef.info.names:
-                sym = self.model_classdef.info.names.get("Meta")
-                if sym is not None and isinstance(sym.node, TypeInfo):
-                    meta_node = sym.node
+        if meta_node is None and "Meta" in self.model_classdef.info.names:
+            sym = self.model_classdef.info.names.get("Meta")
+            if sym is not None and isinstance(sym.node, TypeInfo):
+                meta_node = sym.node
 
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
 
@@ -238,36 +237,34 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                 for name, sym in meta_node.names.items():
                     if sym.node is None or name.startswith("__"):
                         continue
-
+                    
                     sym_type = getattr(sym, "type", None)
-                    if sym_type is None:
-                        continue
-
-                    if name in typed_model_meta_info.names:
+                    if sym_type and name in typed_model_meta_info.names:
                         parent_sym = typed_model_meta_info.names.get(name)
-                        if parent_sym is not None:
-                            parent_type = getattr(parent_sym, "type", None)
-                            if parent_type is not None:
-                                actual_type = get_proper_type(sym_type)
-                                expected_type = get_proper_type(parent_type)
+                        if parent_sym and getattr(parent_sym, "type", None):
+                            actual_type = get_proper_type(sym_type)
+                            expected_type = get_proper_type(parent_sym.type)
+                            if actual_type and expected_type and not is_subtype(actual_type, expected_type):
+                                self.api.fail(
+                                    f'Incompatible type for "{name}" in Meta (expected "{expected_type}", got "{actual_type}")',
+                                    sym.node,
+                                )
 
-                                if actual_type is not None and expected_type is not None:
-                                    if not is_subtype(actual_type, expected_type):
-                                        self.api.fail(
-                                            f'Incompatible type for "{name}" in Meta '
-                                            f'(expected "{expected_type}", got "{actual_type}")',
-                                            sym.node,
-                                        )
+        
+        try:
+            if "objects" not in self.model_classdef.info.names:
+                helpers.add_new_manager_to_model(self.model_classdef, "objects")
 
-        if "objects" not in self.model_classdef.info.names:
-            helpers.add_new_manager_to_model(self.model_classdef, "objects")
-
-        helpers.inject_class_already_defined_in_stubs(
-            self.api, self.model_classdef, "DoesNotExist", fullnames.DOES_NOT_EXIST_FULLNAME
-        )
-        helpers.inject_class_already_defined_in_stubs(
-            self.api, self.model_classdef, "MultipleObjectsReturned", fullnames.MULTIPLE_OBJECTS_RETURNED_FULLNAME
-        )
+            for attr, fullname in [
+                ("DoesNotExist", fullnames.DOES_NOT_EXIST_FULLNAME),
+                ("MultipleObjectsReturned", fullnames.MULTIPLE_OBJECTS_RETURNED_FULLNAME)
+            ]:
+                if attr not in self.model_classdef.info.names:
+                    helpers.inject_class_already_defined_in_stubs(
+                        self.api, self.model_classdef, attr, fullname
+                    )
+        except Exception:
+            pass
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
