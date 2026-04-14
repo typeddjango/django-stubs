@@ -266,7 +266,7 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                                 f'(expected "{expected_type}", got "{actual_type}")',
                                 sym.node,
                             )
-        return None
+        super().run()
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
