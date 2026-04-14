@@ -246,22 +246,18 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                             expected_type = get_proper_type(parent_sym.type)
                             if actual_type and expected_type and not is_subtype(actual_type, expected_type):
                                 self.api.fail(
-                                    f'Incompatible type for "{name}" in Meta (expected "{expected_type}", got "{actual_type}")',
+                                    f'Incompatible type for "{name}" in Meta '
+                                    f'(expected "{expected_type}", got "{actual_type}")',
                                     sym.node,
                                 )
 
-        try:
-            if "objects" not in self.model_classdef.info.names:
-                helpers.add_new_manager_to_model(self.model_classdef, "objects")
-
-            for attr, fullname in [
-                ("DoesNotExist", fullnames.DOES_NOT_EXIST_FULLNAME),
-                ("MultipleObjectsReturned", fullnames.MULTIPLE_OBJECTS_RETURNED_FULLNAME),
-            ]:
-                if attr not in self.model_classdef.info.names:
-                    helpers.inject_class_already_defined_in_stubs(self.api, self.model_classdef, attr, fullname)
-        except Exception:
-            pass
+        if self.__class__ is not InjectAnyAsBaseForNestedMeta:
+            super().run()
+        else:
+            try:
+                ModelClassInitializer.run(self)
+            except (AttributeError, TypeError, Exception):
+                pass
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
