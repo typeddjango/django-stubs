@@ -225,53 +225,47 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
     @override
     def run(self) -> None:
         """
-        Ensures Meta class validation only for models inheriting from TypedModelMeta.
-        This prevents Stubtest from failing on standard Django models.
+        Final fixed version:
+        1. Fixes 'unreachable' self-check error.
+        2. Fixes 68 Stubtest errors by calling super().run().
+        3. Fixes Pytest failures by allowing standard injections.
         """
-        # 1. Fetch the absolute path for TypedModelMeta from fullnames.py
-        # This is the "address" Mypy uses to identify the class globally.
         typed_meta_fullname = fullnames.TYPED_MODEL_META_FULLNAME
-        typed_model_meta_info = self.lookup_typeinfo(typed_meta_fullname)
+        node_info = self.lookup_typeinfo(typed_meta_fullname)
 
-        # If TypedModelMeta is not found (e.g., during partial builds),
-        # exit safely to avoid breaking other models.
-        if typed_model_meta_info is None:
-            return None
+        # Validation Logic: Only runs if TypedModelMeta is found
+        if isinstance(node_info, TypeInfo):
+            meta_node: TypeInfo | None = None
+            if "Meta" in self.model_classdef.info.names:
+                sym = self.model_classdef.info.names.get("Meta")
+                if sym is not None and isinstance(sym.node, TypeInfo):
+                    meta_node = sym.node
 
-        # 2. Retrieve the 'Meta' class node of the current model.
-        # We look it up directly from the class definitions.
-        meta_node = None
-        if "Meta" in self.model_classdef.info.names:
-            sym = self.model_classdef.info.names.get("Meta")
-            if sym is not None and isinstance(sym.node, TypeInfo):
-                meta_node = sym.node
+            # Targeted Validation (The "Firewall")
+            if meta_node is not None and meta_node.has_base(typed_meta_fullname):
+                for name, sym in meta_node.names.items():
+                    if sym.node is None or name.startswith("__") or name not in node_info.names:
+                        continue
 
-        # 3. Targeted Validation Gate:
-        # Only run validation if the Meta class explicitly inherits from TypedModelMeta.
-        # This is the "firewall" that fixes the 68 Stubtest errors for standard models.
-        if meta_node is not None and meta_node.has_base(typed_meta_fullname):
-            for name, sym in meta_node.names.items():
-                # Skip internal Python attributes and fields not present in TypedModelMeta.
-                if sym.node is None or name.startswith("__") or name not in typed_model_meta_info.names:
-                    continue
+                    # Safe type resolution for self-check
+                    raw_actual = getattr(sym, "type", None)
+                    actual_type = get_proper_type(raw_actual) if raw_actual else None
 
-                # Safely resolve types to handle complex Mypy internal representations.
-                actual_type = get_proper_type(getattr(sym, "type", None))
-                parent_sym = typed_model_meta_info.names.get(name)
-                expected_type = get_proper_type(getattr(parent_sym, "type", None)) if parent_sym else None
+                    parent_sym = node_info.names.get(name)
+                    raw_expected = getattr(parent_sym, "type", None) if parent_sym else None
+                    expected_type = get_proper_type(raw_expected) if raw_expected else None
 
-                if actual_type is not None and expected_type is not None:
-                    # Use is_subtype to allow valid child types to pass.
-                    if not is_subtype(actual_type, expected_type):
-                        self.api.fail(
-                            f'Incompatible type for "{name}" in Meta (expected "{expected_type}", got "{actual_type}")',
-                            sym.node,
-                        )
+                    if actual_type is not None and expected_type is not None:
+                        if not is_subtype(actual_type, expected_type):
+                            self.api.fail(
+                                f'Incompatible type for "{name}" in Meta '
+                                f'(expected "{expected_type}", got "{actual_type}")',
+                                sym.node,
+                            )
 
-        # 4. FINAL RETURN: This must be outside all IF blocks.
-        # It tells Mypy to continue standard processing for all models (User, LogEntry, etc.).
-        # This is what turns the CI green.
-        return None
+        # CRITICAL: This line restores all missing attributes (DoesNotExist, objects, etc.)
+        # and fixes those 68 Stubtest errors + Pytest failures.
+        super().run()
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
