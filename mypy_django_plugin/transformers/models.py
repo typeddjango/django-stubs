@@ -259,11 +259,15 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
                                             sym.node,
                                         )
 
-        try:
-            if hasattr(ModelClassInitializer, "run"):
-                super().run()
-        except (AttributeError, TypeError):
-            pass
+        if "objects" not in self.model_classdef.info.names:
+            helpers.add_new_manager_to_model(self.model_classdef, "objects")
+
+        helpers.inject_class_already_defined_in_stubs(
+            self.api, self.model_classdef, "DoesNotExist", fullnames.DOES_NOT_EXIST_FULLNAME
+        )
+        helpers.inject_class_already_defined_in_stubs(
+            self.api, self.model_classdef, "MultipleObjectsReturned", fullnames.MULTIPLE_OBJECTS_RETURNED_FULLNAME
+        )
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
