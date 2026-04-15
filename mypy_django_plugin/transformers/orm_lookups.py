@@ -19,10 +19,11 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     if django_model is None:
         return ctx.default_return_type
 
-    # Expected formal arguments for filter methods are `*args` and `**kwargs`. We'll only typecheck
-    # `**kwargs`, which means that `arg_names[1]` is what we're interested in.
-    lookup_kwargs = ctx.arg_names[1] if len(ctx.arg_names) >= 2 else []
-    provided_lookup_types = ctx.arg_types[1] if len(ctx.arg_types) >= 2 else []
+    # We only typecheck the `**kwargs` formal parameter. Python's grammar guarantees
+    # `**kwargs` is the last formal parameter when present, which holds for every
+    # method this hook is registered for (`filter`, `get_or_create`, `update_or_create`, ...).
+    lookup_kwargs = ctx.arg_names[-1]
+    provided_lookup_types = ctx.arg_types[-1]
 
     for lookup_kwarg, provided_type in zip(lookup_kwargs, provided_lookup_types, strict=False):
         if lookup_kwarg is None:

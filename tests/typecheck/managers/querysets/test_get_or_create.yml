@@ -1,0 +1,34 @@
+-   case: get_or_create_typechecks_kwargs
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import MyModel
+
+        # Return type is preserved
+        reveal_type(MyModel.objects.get_or_create(num=1))  # N: Revealed type is "tuple[myapp.models.MyModel, bool]"
+
+        # Valid field kwarg and lookup expression
+        MyModel.objects.get_or_create(num=1)
+        MyModel.objects.get_or_create(num__gte=1)
+
+        # `defaults` alongside lookup kwargs
+        MyModel.objects.get_or_create(num=1, defaults={"num": 2})
+
+        # Unknown field is rejected
+        MyModel.objects.get_or_create(unknown_field=True)  # E: Cannot resolve keyword 'unknown_field' into field. Choices are: id, num  [misc]
+
+        # Invalid type for a known field is rejected
+        MyModel.objects.get_or_create(num=MyModel())  # E: Incompatible type for lookup 'num': (got "MyModel", expected "str | int")  [misc]
+
+        # Async variant shares the same validation
+        async def main() -> None:
+            await MyModel.objects.aget_or_create(num=1)
+            await MyModel.objects.aget_or_create(unknown_field=True)  # E: Cannot resolve keyword 'unknown_field' into field. Choices are: id, num  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    num = models.IntegerField()

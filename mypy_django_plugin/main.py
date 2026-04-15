@@ -175,6 +175,10 @@ class NewSemanalDjangoPlugin(Plugin):
             "filter": typecheck_filtering_method,
             "get": typecheck_filtering_method,
             "aget": typecheck_filtering_method,
+            "get_or_create": typecheck_filtering_method,
+            "aget_or_create": typecheck_filtering_method,
+            "update_or_create": typecheck_filtering_method,
+            "aupdate_or_create": typecheck_filtering_method,
             "exclude": typecheck_filtering_method,
             "prefetch_related": partial(
                 querysets.extract_prefetch_related_annotations, django_context=self.django_context
