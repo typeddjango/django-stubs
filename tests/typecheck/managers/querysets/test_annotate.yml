@@ -371,6 +371,19 @@
     qs.filter(xyz=1)
     qs.filter(annotate_wrong__gt=5)
 
+    # The `__in` lookup expects an iterable of the field type.
+    # Regression test for https://github.com/typeddjango/django-stubs/issue/xxxx
+    qs.filter(xyz__in=[1, 2, 3])
+    qs.filter(xyz__in=(1, 2, 3))
+    qs.filter(xyz__in=range(4))
+    qs.filter(xyz__in=123)
+    qs.filter(xyz__in=None)
+    qs.filter(xyz__in="abc")
+    qs.filter(xyz__in=(Blog(),))
+    qs.filter(xyz__in=[Blog()])  # Doesn't error because mypy sees the provided type as `list[Any]`.
+    blogs: list[Blog] = [Blog()]
+    qs.filter(xyz__in=blogs)  # But this does error as `blogs` is explicitly `list[Blog]`.
+
     qs2 = qs.alias(alias_entries=models.Count("entry"))
     qs2.filter(alias_entries__gt=5)
     qs2.filter(alias_wrong__gt=5, annotate_wrong__gt=5)
@@ -383,10 +396,20 @@
     )
   out: |
     main:6: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz  [misc]
-    main:10: error: Cannot resolve keyword 'alias_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
-    main:10: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
-    main:12: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
-    main:14: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
+    main:13: error: Incompatible type for lookup 'xyz__in': (got "int", expected "Iterable[int]")  [misc]
+    main:14: error: Incompatible type for lookup 'xyz__in': (got "None", expected "Iterable[int]")  [misc]
+    main:15: error: Incompatible type for lookup 'xyz__in': (got "str", expected "Iterable[int]")  [misc]
+    main:15: note: Following member(s) of "str" have conflicts:
+    main:15: note:     Expected:
+    main:15: note:         def __iter__(self) -> Iterator[int]
+    main:15: note:     Got:
+    main:15: note:         def __iter__(self) -> Iterator[str]
+    main:16: error: Incompatible type for lookup 'xyz__in': (got "tuple[Blog]", expected "Iterable[int]")  [misc]
+    main:19: error: Incompatible type for lookup 'xyz__in': (got "list[Blog]", expected "Iterable[int]")  [misc]
+    main:23: error: Cannot resolve keyword 'alias_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
+    main:23: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
+    main:25: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
+    main:27: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
   installed_apps:
     - myapp
   files:
