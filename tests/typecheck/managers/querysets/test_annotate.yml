@@ -686,6 +686,42 @@
                 class User(models.Model):
                     username = models.CharField(max_length=100)
 
+-   case: annotate_resolves_output_field_from_func_generic
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import User
+        from django.db.models import BinaryField
+        from django.db.models.functions import Substr, Left, Right
+
+        # Substr with explicit output_field=BinaryField() via variable
+        sub = Substr("username", 1, 100, output_field=BinaryField())
+        val = User.objects.annotate(preview=sub).get().preview
+        reveal_type(val)  # N: Revealed type is "bytes | memoryview[int]"
+
+        # Substr with explicit output_field=BinaryField() inlined
+        val2 = User.objects.annotate(preview=Substr("username", 1, 100, output_field=BinaryField())).get().preview
+        reveal_type(val2)  # N: Revealed type is "bytes | memoryview[int]"
+
+        # Left with explicit output_field=BinaryField()
+        left_expr = Left("username", 5, output_field=BinaryField())
+        left_val = User.objects.annotate(prefix=left_expr).get().prefix
+        reveal_type(left_val)  # N: Revealed type is "bytes | memoryview[int]"
+
+        # Right with explicit output_field=BinaryField()
+        right_expr = Right("username", 5, output_field=BinaryField())
+        right_val = User.objects.annotate(suffix=right_expr).get().suffix
+        reveal_type(right_val)  # N: Revealed type is "bytes | memoryview[int]"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+
 - case: test_values_and_values_list_on_with_annotations_queryset
   main: |
     from typing_extensions import TypedDict, reveal_type

@@ -244,16 +244,58 @@ def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
     return kwargs
 
 
+def reparameterize_func_output_field(ctx: FunctionContext) -> MypyType:
+    """Reparameterize Func[_OutputField] from the output_field argument.
+
+    When a generic Func subclass like Substr is nested directly inside a call with
+    **kwargs: Any (e.g., QuerySet.annotate()), mypy infers _OutputField=Any because
+    the target type is unconstrained. This hook corrects the return type by extracting
+    the actual output_field argument type.
+    """
+    default = get_proper_type(ctx.default_return_type)
+    if not isinstance(default, Instance) or not default.args:
+        return ctx.default_return_type
+
+    # Only act when the generic arg is Any (i.e., mypy didn't infer it)
+    if not isinstance(get_proper_type(default.args[0]), AnyType):
+        return ctx.default_return_type
+
+    # Use the output_field argument type to fill the generic param
+    output_field_type = helpers.get_call_argument_type_by_name(ctx, "output_field")
+    if output_field_type is not None:
+        field_type = get_proper_type(output_field_type)
+        if isinstance(field_type, Instance):
+            return default.copy_modified(args=[field_type])
+
+    return ctx.default_return_type
+
+
 def _resolve_output_field_type(expr_type: MypyType) -> MypyType | None:
     """Try to resolve the Python type for an expression's output_field.
 
-    Handles both ClassVar declarations (Var nodes) and @property/@cached_property
-    definitions (Decorator nodes). Returns None if the type can't be statically resolved.
+    Handles multiple resolution strategies, in order of priority:
+    1. Generic type args on the expression (e.g. Substr(output_field=BinaryField()) → bytes)
+    2. ClassVar output_field declarations (e.g. Count.output_field: ClassVar[IntegerField] → int)
+    3. @property/@cached_property output_field definitions (e.g. ArrayAgg → list[Any])
+
+    Generic args take priority so that expressions like Substr(output_field=BinaryField())
+    can override the default ClassVar[CharField] when a specific output field type is provided.
     """
     proper = get_proper_type(expr_type)
     if not isinstance(proper, Instance):
         return None
 
+    # First, check generic type args for Field subclasses.
+    # This supports the Generic[_OutputField] pattern (e.g., Subquery[IntegerField], Substr[BinaryField]).
+    # Generic args take priority over ClassVar so that explicit type params override defaults.
+    for arg in proper.args:
+        arg_proper = get_proper_type(arg)
+        if isinstance(arg_proper, Instance) and arg_proper.type.has_base(fullnames.FIELD_FULLNAME):
+            type_args = helpers.get_field_type_args(arg_proper)
+            if type_args is not None and not isinstance(type_args.get, AnyType):
+                return type_args.get
+
+    # Then check static output_field declarations (ClassVar or @property/@cached_property).
     output_field_sym = proper.type.get("output_field")
     if output_field_sym is None or output_field_sym.node is None:
         return None
@@ -272,15 +314,6 @@ def _resolve_output_field_type(expr_type: MypyType) -> MypyType | None:
         result = helpers.get_private_descriptor_type(field_type.type, "_pyi_private_get_type", is_nullable=False)
         if not isinstance(get_proper_type(result), AnyType):
             return result
-
-    # Fallback: extract _GT from generic type args that are Field subclasses.
-    # This preserves nullability from null=True (e.g., IntegerField(null=True) → int | None).
-    for arg in proper.args:
-        arg_proper = get_proper_type(arg)
-        if isinstance(arg_proper, Instance) and arg_proper.type.has_base(fullnames.FIELD_FULLNAME):
-            type_args = helpers.get_field_type_args(arg_proper)
-            if type_args is not None and not isinstance(type_args.get, AnyType):
-                return type_args.get
 
     return None
 

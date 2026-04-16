@@ -187,7 +187,7 @@ class OuterRef(F):
     def __init__(self, name: str | OuterRef) -> None: ...
     def relabeled_clone(self, relabels: Any) -> Self: ...
 
-class Func(SQLiteNumericMixin, Expression):
+class Func(SQLiteNumericMixin, Expression, Generic[_OutputField]):
     @cached_property
     @override
     def allowed_default(self) -> bool: ...  # type: ignore[override]
@@ -197,7 +197,7 @@ class Func(SQLiteNumericMixin, Expression):
     arity: int | None
     source_expressions: list[Expression]
     extra: dict[Any, Any]
-    def __init__(self, *expressions: Any, output_field: Field | None = None, **extra: Any) -> None: ...
+    def __init__(self, *expressions: Any, output_field: _OutputField | None = None, **extra: Any) -> None: ...
     @override
     def as_sql(
         self,
