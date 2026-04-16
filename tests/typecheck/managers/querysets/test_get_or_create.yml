@@ -32,3 +32,34 @@
                 from django.db import models
                 class MyModel(models.Model):
                     num = models.IntegerField()
+
+-   case: get_or_create_typechecks_defaults
+    main: |
+        from myapp.models import MyModel
+
+        # Unknown key in defaults is rejected
+        MyModel.objects.get_or_create(num=1, defaults={"unknown_field": True})  # E: Unexpected attribute "unknown_field" for model "MyModel"  [misc]
+
+        # Incompatible value type in defaults is rejected
+        MyModel.objects.get_or_create(num=1, defaults={"num": MyModel()})  # E: Incompatible type for "num" of "MyModel" (got "MyModel", expected "float | int | str | Combinable")  [misc]
+
+        # Valid defaults: no errors
+        MyModel.objects.get_or_create(num=1, defaults={"num": 2, "name": "hello"})
+
+        # Non-literal defaults variable is silently accepted (no false positives)
+        some_defaults: dict[str, object] = {"unknown_field": True}
+        MyModel.objects.get_or_create(num=1, defaults=some_defaults)
+
+        # Async variant shares the same validation
+        async def main() -> None:
+            await MyModel.objects.aget_or_create(num=1, defaults={"unknown_field": True})  # E: Unexpected attribute "unknown_field" for model "MyModel"  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    num = models.IntegerField()
+                    name = models.CharField(max_length=100)

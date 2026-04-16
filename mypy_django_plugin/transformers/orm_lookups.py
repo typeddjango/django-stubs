@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from mypy.nodes import DictExpr, StrExpr
 from mypy.types import AnyType, Instance, ProperType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
@@ -54,7 +55,55 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
             error_message=f"Incompatible type for lookup {lookup_kwarg!r}:",
         )
 
+    _typecheck_defaults_kwarg(ctx, django_model, django_context)
+
     return ctx.default_return_type
+
+
+def _typecheck_defaults_kwarg(
+    ctx: MethodContext, django_model: helpers.DjangoModel, django_context: DjangoContext
+) -> None:
+    """
+    Validate `defaults=` and `create_defaults=` dict literals passed to
+    `get_or_create` / `update_or_create` against the model's field setter
+    types. Only literal `DictExpr` arguments with string-literal keys are
+    checked; any other shape is silently skipped to avoid false positives.
+    """
+    defaults_positions = [
+        idx for idx, name in enumerate(ctx.callee_arg_names) if name in ("defaults", "create_defaults")
+    ]
+    if not defaults_positions:
+        return
+
+    api = helpers.get_typechecker_api(ctx)
+    expected_types = django_context.get_expected_types(api, django_model.cls, method="create")
+    model_name = django_model.cls.__name__
+
+    for idx in defaults_positions:
+        if not ctx.args[idx]:
+            continue
+        dict_expr = ctx.args[idx][0]
+        if not isinstance(dict_expr, DictExpr):
+            continue
+
+        for key_expr, value_expr in dict_expr.items:
+            if not isinstance(key_expr, StrExpr):
+                continue
+            key_name = key_expr.value
+            if key_name not in expected_types:
+                ctx.api.fail(
+                    f'Unexpected attribute "{key_name}" for model "{model_name}"',
+                    key_expr,
+                )
+                continue
+
+            actual_type = api.get_expression_type(value_expr)
+            helpers.check_types_compatible(
+                ctx,
+                expected_type=expected_types[key_name],
+                actual_type=actual_type,
+                error_message=f'Incompatible type for "{key_name}" of "{model_name}"',
+            )
 
 
 def resolve_combinable_type(combinable_type: Instance, django_context: DjangoContext) -> ProperType:
