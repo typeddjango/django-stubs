@@ -31,6 +31,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
     ct_field: str
     fk_field: str
     for_concrete_model: bool
+    column: None
     def __init__(
         self, ct_field: str = "content_type", fk_field: str = "object_id", for_concrete_model: bool = True
     ) -> None: ...
