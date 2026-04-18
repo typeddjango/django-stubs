@@ -39,7 +39,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
     @override
-    def get_attname_column(self) -> tuple[str, None]: ...  # type: ignore[override]
+    def get_attname_column(self) -> tuple[str, None]: ...
     @cached_property
     def ct_field_attname(self) -> str: ...
     @override
