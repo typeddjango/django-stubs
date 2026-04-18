@@ -14,7 +14,7 @@ from django.forms.forms import BaseForm
 from django.forms.widgets import Widget
 from django.utils.choices import CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
-from django.utils.functional import SimpleLazyObject, _StrOrPromise
+from django.utils.functional import _StrOrPromise
 from typing_extensions import Self, override
 
 # Problem: attribute `widget` is always of type `Widget` after field instantiation.
@@ -105,7 +105,7 @@ class IntegerField(Field):
     max_value: int | Callable[[], int] | None
     min_value: int | Callable[[], int] | None
     step_size: int | Callable[[], int] | None
-    re_decimal: Pattern[str] 
+    re_decimal: Pattern[str]
     def __init__(
         self,
         *,
