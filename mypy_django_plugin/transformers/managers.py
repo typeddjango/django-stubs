@@ -613,6 +613,10 @@ def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) 
     Note that this does not happen if mypy is run with disallow_any_generics = True,
     as not specifying the generic type is then considered an error.
     """
+    if ctx.api.options.disallow_any_generics:
+        # Let mypy's own "missing type arguments" error stand rather than silently reparametrize.
+        return
+
     class_info = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
     if class_info is None or class_info.node is None:
         return
@@ -626,7 +630,7 @@ def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) 
         (base for base in class_info.node.bases if base.type.has_base(base_class_fullname)),
         None,
     )
-    if parent_class is None or len(parent_class.args) < 1:
+    if parent_class is None or not parent_class.args:
         return
 
     model_param = get_proper_type(parent_class.args[0])
@@ -685,3 +689,21 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
     as not specifying the generic type is then considered an error.
     """
     reparametrize_generic_class(ctx, fullnames.BASE_MANAGER_CLASS_FULLNAME)
+
+
+def reparametrize_any_field_hook(ctx: ClassDefContext) -> None:
+    """
+    Add implicit generics to Field subclasses that omit the parent's TypeVars.
+
+    Eg.
+
+        class HTMLField(models.TextField): ...
+
+    is interpreted as:
+
+        class HTMLField(models.TextField[_ST_Text, _GT_Text]): ...
+
+    Without this, mypy treats `HTMLField` as non-Generic and the set/get args
+    assigned by the field function hook don't propagate through `__get__`.
+    """
+    reparametrize_generic_class(ctx, fullnames.FIELD_FULLNAME)

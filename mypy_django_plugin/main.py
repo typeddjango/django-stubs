@@ -42,6 +42,7 @@ from mypy_django_plugin.transformers.functional import resolve_str_promise_attri
 from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
+    reparametrize_any_field_hook,
     reparametrize_any_manager_hook,
     reparametrize_any_queryset_hook,
     resolve_manager_method,
@@ -250,6 +251,8 @@ class NewSemanalDjangoPlugin(Plugin):
             return reparametrize_any_manager_hook
         if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
             return reparametrize_any_queryset_hook
+        if info and info.has_base(fullnames.FIELD_FULLNAME):
+            return reparametrize_any_field_hook
         return None
 
     @override
