@@ -158,6 +158,9 @@ class NewSemanalDjangoPlugin(Plugin):
             if info.has_base(fullnames.PREFETCH_CLASS_FULLNAME):
                 return partial(querysets.specialize_prefetch_type, django_context=self.django_context)
 
+            if info.has_base(fullnames.FUNC_EXPRESSION_FULLNAME):
+                return querysets.reparameterize_func_output_field
+
         return None
 
     @cached_property
@@ -175,6 +178,10 @@ class NewSemanalDjangoPlugin(Plugin):
             "filter": typecheck_filtering_method,
             "get": typecheck_filtering_method,
             "aget": typecheck_filtering_method,
+            "get_or_create": typecheck_filtering_method,
+            "aget_or_create": typecheck_filtering_method,
+            "update_or_create": typecheck_filtering_method,
+            "aupdate_or_create": typecheck_filtering_method,
             "exclude": typecheck_filtering_method,
             "prefetch_related": partial(
                 querysets.extract_prefetch_related_annotations, django_context=self.django_context

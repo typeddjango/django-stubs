@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any, NamedTuple, cast
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
-from mypy.maptype import map_instance_to_supertype
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, UnionType, get_proper_type
 from mypy.types import Type as MypyType
@@ -156,15 +155,14 @@ def set_descriptor_types_for_field(
     )
 
     # reconcile set and get types with the base field class
-    base_field_type = next(base for base in default_return_type.type.mro if base.fullname == fullnames.FIELD_FULLNAME)
-    mapped_instance = map_instance_to_supertype(default_return_type, base_field_type)
-    mapped_set_type, mapped_get_type = tuple(get_proper_type(arg) for arg in mapped_instance.args)
+    mapped_types = helpers.get_field_type_args(default_return_type)
+    assert mapped_types is not None
 
-    # bail if either mapped_set_type or mapped_get_type have type Never
-    if not (isinstance(mapped_set_type, UninhabitedType) or isinstance(mapped_get_type, UninhabitedType)):
+    # bail if either mapped set or get type is Never
+    if not (isinstance(mapped_types.set, UninhabitedType) or isinstance(mapped_types.get, UninhabitedType)):
         # always replace set_type and get_type with (non-Any) mapped types
-        set_type = helpers.convert_any_to_type(mapped_set_type, set_type)
-        get_type = get_proper_type(helpers.convert_any_to_type(mapped_get_type, get_type))
+        set_type = helpers.convert_any_to_type(mapped_types.set, set_type)
+        get_type = get_proper_type(helpers.convert_any_to_type(mapped_types.get, get_type))
 
         # the get_type must be optional if the field is nullable
         if (is_get_nullable or is_nullable) and not (
@@ -235,7 +233,7 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_type(outer_model_info):
-        return ctx.default_return_type
+        return set_descriptor_types_for_field(ctx)
 
     assert isinstance(outer_model_info, TypeInfo)
 

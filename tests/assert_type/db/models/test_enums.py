@@ -169,7 +169,7 @@ assert_type(Vehicle.CAR.name, Literal["CAR"])
 assert_type(Vehicle.CAR.label, _StrOrPromise)  # ty: ignore[type-assertion-failure]
 assert_type(Vehicle.CAR.value, int)  # ty: ignore[type-assertion-failure]
 assert_type(Vehicle.CAR.do_not_call_in_templates, Literal[True])
-assert_type(Vehicle.__empty__, _StrPromise)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+assert_type(Vehicle.__empty__, _StrPromise)  # pyright: ignore[reportAssertTypeFailure]
 
 # Assertions for an text choices type that defines `__empty__` and uses plain strings for all labels.
 # Note: Suppress errors from pyright as the mypy plugin handles making types optional.
@@ -183,7 +183,7 @@ assert_type(Gender.MALE.name, Literal["MALE"])
 assert_type(Gender.MALE.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 assert_type(Gender.MALE.value, str)  # ty: ignore[type-assertion-failure]
 assert_type(Gender.MALE.do_not_call_in_templates, Literal[True])
-assert_type(Gender.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+assert_type(Gender.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]
 
 # Assertions for a text choices type that uses `enum.auto()`.
 # Note: Suppress errors from pyright as the mypy plugin narrows the type of labels if non-lazy.
@@ -223,7 +223,7 @@ assert_type(Constants.PI.name, Literal["PI"])
 assert_type(Constants.PI.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 assert_type(Constants.PI.value, float)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 assert_type(Constants.PI.do_not_call_in_templates, Literal[True])
-assert_type(Constants.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+assert_type(Constants.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]
 
 # Assertions for a choices type where `__empty__` is defined on a base class.
 # Note: Suppress errors from pyright as the mypy plugin handles making types optional.
@@ -245,7 +245,7 @@ assert_type(VoidChoices.ABYSS.value, int)  # type: ignore[assert-type]  # pyrigh
 assert_type(VoidChoices.ABYSS.value, Any)  # pyrefly: ignore[assert-type  # ty: ignore[type-assertion-failure]]
 
 assert_type(VoidChoices.ABYSS.do_not_call_in_templates, Literal[True])
-assert_type(VoidChoices.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+assert_type(VoidChoices.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]
 
 # Assertions for a choices type imported from another module to test the plugin resolves correctly.
 # Note: Suppress errors from pyright as the mypy plugin narrows the type of labels if non-lazy.

@@ -36,7 +36,7 @@ class FooBarConfig(AppConfig):
 # Pyright correctly picks up our fake '_Getter' descriptor on class level. But we
 # silence the pyright error since mypy doesn't follow along and the fake descriptor
 # is a stubs detail made to round other problems.
-assert_type(FooConfig.default_auto_field, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+assert_type(FooConfig.default_auto_field, str)  # pyright: ignore[reportAssertTypeFailure]
 assert_type(BarConfig("bar", None).default_auto_field, str)
 assert_type(BazConfig("baz", None).default_auto_field, str)
-assert_type(FooBarConfig("baz", None).default_auto_field, str)  # ty: ignore[type-assertion-failure]
+assert_type(FooBarConfig("baz", None).default_auto_field, str)
