@@ -105,7 +105,7 @@ class IntegerField(Field):
     max_value: int | Callable[[], int] | None
     min_value: int | Callable[[], int] | None
     step_size: int | Callable[[], int] | None
-    re_decimal: Pattern[str] | SimpleLazyObject[Pattern[str]]
+    re_decimal: Pattern[str] 
     def __init__(
         self,
         *,
