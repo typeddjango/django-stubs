@@ -172,3 +172,26 @@
 
         take_field(models.IntegerField(null=True))
         take_field(models.IntegerField(null=False))
+
+-   case: nullable_field_subclass_without_explicit_type_vars
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Article
+        reveal_type(Article().body)  # N: Revealed type is "str"
+        reveal_type(Article().body_nullable)  # N: Revealed type is "str | None"
+        reveal_type(Article().count_nullable)  # N: Revealed type is "int | None"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class HTMLField(models.TextField): ...
+                class IntWrap(models.IntegerField): ...
+
+                class Article(models.Model):
+                    body = HTMLField()
+                    body_nullable = HTMLField(null=True)
+                    count_nullable = IntWrap(null=True)
