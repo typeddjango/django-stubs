@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from mypy.nodes import DictExpr, StrExpr
+from mypy.nodes import ARG_NAMED, DictExpr, StrExpr
 from mypy.types import AnyType, Instance, ProperType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
@@ -81,6 +81,8 @@ def _typecheck_defaults_kwarg(
 
     for idx in defaults_positions:
         if not ctx.args[idx]:
+            continue
+        if ctx.arg_kinds[idx][0] != ARG_NAMED:
             continue
         dict_expr = ctx.args[idx][0]
         if not isinstance(dict_expr, DictExpr):

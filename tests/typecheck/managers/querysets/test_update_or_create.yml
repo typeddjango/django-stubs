@@ -60,6 +60,20 @@
             create_defaults={"unknown_in_create_defaults": True},  # E: Unexpected attribute "unknown_in_create_defaults" for model "MyModel"  [misc]
         )
 
+        # `**kwargs` variable unpacking is silently accepted
+        kwargs = {
+            "defaults": {"unknown_field": True},
+            "create_defaults": {"unknown_field": True},
+        }
+        MyModel.objects.update_or_create(num=1, **kwargs)
+
+        # `**dict_literal` unpacking is also silently accepted; only a direct
+        # `defaults=` / `create_defaults=` dict literal is validated.
+        MyModel.objects.update_or_create(
+            num=1,
+            **{"defaults": {"unknown_field": True}, "create_defaults": {"unknown_field": True}},
+        )
+
         # Async variant shares the same validation
         async def main() -> None:
             await MyModel.objects.aupdate_or_create(
