@@ -58,6 +58,11 @@
         # `defaults=` dict literal is validated.
         MyModel.objects.get_or_create(num=1, **{"defaults": {"unknown_field": True}})
 
+        # `**other_fields` inside a `defaults=` dict literal: literal keys are
+        # still validated, the unpacked portion is skipped.
+        other_fields = {"num": 2}
+        MyModel.objects.get_or_create(num=1, defaults={"unknown_field": True, **other_fields})  # E: Unexpected attribute "unknown_field" for model "MyModel"  [misc]
+
         # Async variant shares the same validation
         async def main() -> None:
             await MyModel.objects.aget_or_create(num=1, defaults={"unknown_field": True})  # E: Unexpected attribute "unknown_field" for model "MyModel"  [misc]
