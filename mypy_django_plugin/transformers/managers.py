@@ -633,11 +633,10 @@ def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) 
     if parent_class is None or not parent_class.args:
         return
 
-    model_param = get_proper_type(parent_class.args[0])
-    if not isinstance(model_param, AnyType) or model_param.type_of_any is not TypeOfAny.from_omitted_generics:
-        return
-
-    type_vars = tuple(parent_class.type.defn.type_vars)
+    type_vars = [
+        type_var.copy_modified(id=type_var.id, default=parent_type_var)
+        for type_var, parent_type_var in zip(parent_class.type.defn.type_vars, parent_class.args, strict=True)
+    ]
 
     # If we end up with placeholders we need to defer so the placeholders are
     # resolved in a future iteration
@@ -647,8 +646,8 @@ def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) 
         else:
             return
 
-    parent_class.args = type_vars
-    class_info.node.defn.type_vars = list(type_vars)
+    parent_class.args = tuple(type_vars)
+    class_info.node.defn.type_vars = type_vars
     class_info.node.add_type_vars()
 
 
