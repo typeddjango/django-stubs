@@ -1,6 +1,6 @@
 [project]
 name = "django-stubs"
-version = "6.0.2"
+version = "6.0.3"
 description = "Mypy stubs for Django"
 readme = "README.md"
 license = "MIT"
@@ -47,7 +47,7 @@ redis = ["redis", "types-redis"]
 tests = [
   # Dev tools:
   "pytest==9.0.3",
-  "pytest-mypy-plugins==4.0.1",
+  "pytest-mypy-plugins==4.0.2",
   "pytest-shard==0.1.2",
   "pytest-xdist==3.8.0",
   # Django deps:
@@ -65,10 +65,10 @@ pyright = [
   "pyright==1.1.408",
 ]
 pyrefly = [
-  "pyrefly==0.61.0",
+  "pyrefly==0.61.1",
 ]
 ty = [
-  "ty==0.0.30",
+  "ty==0.0.31",
   "psycopg2-binary"
 ]
 

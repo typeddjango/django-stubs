@@ -105,3 +105,93 @@
                 from django.db import models
                 class Inventory(models.Model):
                     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+
+-   case: nullable_subclass_inherits_null_overload
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Article
+
+        reveal_type(Article().body)            # N: Revealed type is "str"
+        reveal_type(Article().body_nullable)   # N: Revealed type is "str | None"
+        reveal_type(Article().count)           # N: Revealed type is "int"
+        reveal_type(Article().count_nullable)  # N: Revealed type is "int | None"
+    monkeypatch: true
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import TypeVar
+                from django.db import models
+
+                _ST = TypeVar("_ST", contravariant=True)
+                _GT = TypeVar("_GT", covariant=True)
+
+                class HtmlField(models.TextField[_ST, _GT]): ...
+                class IntWrap(models.IntegerField[_ST, _GT]): ...
+
+                class Article(models.Model):
+                    body = HtmlField()
+                    body_nullable = HtmlField(null=True)
+                    count = IntWrap()
+                    count_nullable = IntWrap(null=True)
+
+-   case: direct_field_null_true_does_not_trigger_nullability_check
+    main: |
+        from typing_extensions import reveal_type
+        from django.db import models
+        from django.db.models import OuterRef, Subquery
+        from myapp.models import Article
+
+        field = models.IntegerField(null=True)
+        reveal_type(field)  # N: Revealed type is "django.db.models.fields.IntegerField[float | int | str | django.db.models.expressions.Combinable | None, int | None]"
+        Article.objects.annotate(
+            other_id=Subquery(
+                Article.objects.filter(id=OuterRef("id")).values_list("id", flat=True)[:1],
+                output_field=models.IntegerField(null=True),
+            )
+        )
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Article(models.Model):
+                    pass
+
+-   case: field_null_true_expression_does_not_trigger_nullability_check
+    main: |
+        from typing_extensions import reveal_type
+        from django.db import models
+
+        def take_field(f: models.Field) -> None:
+            return None
+
+        take_field(models.IntegerField(null=True))
+        take_field(models.IntegerField(null=False))
+
+-   case: nullable_field_subclass_without_explicit_type_vars
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Article
+        reveal_type(Article().body)  # N: Revealed type is "str"
+        reveal_type(Article().body_nullable)  # N: Revealed type is "str | None"
+        reveal_type(Article().count_nullable)  # N: Revealed type is "int | None"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class HTMLField(models.TextField): ...
+                class IntWrap(models.IntegerField): ...
+
+                class Article(models.Model):
+                    body = HTMLField()
+                    body_nullable = HTMLField(null=True)
+                    count_nullable = IntWrap(null=True)

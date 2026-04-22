@@ -22,7 +22,7 @@
 
         reveal_type(user.my_custom_field_any1)  # N: Revealed type is "Any"
         reveal_type(user.my_custom_field_any2)  # N: Revealed type is "Any"
-        reveal_type(user.my_custom_field_any3)  # N: Revealed type is "Any"
+        reveal_type(user.my_custom_field_any3)  # N: Revealed type is "Any | None"
         reveal_type(user.my_custom_field_any4)  # N: Revealed type is "Any"
     monkeypatch: true
     installed_apps:
