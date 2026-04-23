@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Literal, TypeVar
+from typing import Any, ClassVar, Generic, Literal, TypeVar, overload
 
 from _typeshed import Unused
 from django.contrib.postgres import forms
@@ -27,11 +27,28 @@ class RangeOperators:
     NOT_GT: Literal["&<"]
     ADJACENT_TO: Literal["-|-"]
 
+# A TypeVar (Type Variable) acts as a placeholder to link
+# the input type (e.g., IntegerField) to the return type.
+_T = TypeVar("_T")
+
+# Descriptor class
+class _BaseFieldDescriptor(Generic[_T]):
+    """
+    Descriptor to handle Django's inconsistency where base_field
+    is a type on the class but an instance on the object.
+    """
+    @overload
+    def __get__(self, instance: None, owner: Any) -> type[_T]: ...
+    @overload
+    def __get__(self, instance: Any, owner: Any) -> _T: ...
+    def __get__(self, instance: Any, owner: Any) -> Any: ...
+
 _RangeT = TypeVar("_RangeT", bound=Range[Any])
 
 class RangeField(CheckPostgresInstalledMixin, models.Field[Any, _RangeT]):
     empty_strings_allowed: bool
-    base_field: models.Field
+    # Assigned to a descriptor instance to trigger __get__ logic
+    base_field = _BaseFieldDescriptor[models.Field]()
     range_type: type[_RangeT]
     def get_placeholder(self, value: Unused, compiler: Unused, connection: BaseDatabaseWrapper) -> str: ...
     @override
@@ -48,23 +65,23 @@ class ContinuousRangeField(RangeField[_RangeT]):
     def __init__(self, *args: Any, default_bounds: str = "[)", **kwargs: Any) -> None: ...
 
 class IntegerRangeField(RangeField[NumericRange]):
-    base_field: type[models.IntegerField]
+    base_field = _BaseFieldDescriptor[models.IntegerField]()
     form_field: type[forms.IntegerRangeField]
 
 class BigIntegerRangeField(RangeField[NumericRange]):
-    base_field: type[models.BigIntegerField]
+    base_field = _BaseFieldDescriptor[models.BigIntegerField]()
     form_field: type[forms.IntegerRangeField]
 
 class DecimalRangeField(ContinuousRangeField[NumericRange]):
-    base_field: type[models.DecimalField]
+    base_field = _BaseFieldDescriptor[models.DecimalField]()
     form_field: type[forms.DecimalRangeField]
 
 class DateTimeRangeField(ContinuousRangeField[DateTimeTZRange]):
-    base_field: type[models.DateTimeField]
+    base_field = _BaseFieldDescriptor[models.DateTimeField]()
     form_field: type[forms.DateTimeRangeField]
 
 class DateRangeField(RangeField[DateRange]):
-    base_field: type[models.DateField]
+    base_field = _BaseFieldDescriptor[models.DateField]()
     form_field: type[forms.DateRangeField]
 
 class DateTimeRangeContains(PostgresOperatorLookup): ...
