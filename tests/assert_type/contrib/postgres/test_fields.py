@@ -15,5 +15,3 @@ assert_type(int_field_instance.base_field, models.IntegerField[Any, Any])
 assert_type(DateRangeField.base_field, type[models.DateField[Any, Any]])
 date_field_instance = DateRangeField()
 assert_type(date_field_instance.base_field, models.DateField[Any, Any])
-
-
