@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Generic, Literal, TypeVar, overload
+from typing import Any, ClassVar, Generic, Literal, TypeVar, overload, type_check_only
 
 from _typeshed import Unused
 from django.contrib.postgres import forms
@@ -32,6 +32,7 @@ class RangeOperators:
 _T = TypeVar("_T")
 
 # Descriptor class
+@type_check_only
 class _BaseFieldDescriptor(Generic[_T]):
     """
     Descriptor to handle Django's inconsistency where base_field
