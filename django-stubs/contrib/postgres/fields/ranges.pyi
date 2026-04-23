@@ -31,7 +31,7 @@ _RangeT = TypeVar("_RangeT", bound=Range[Any])
 
 class RangeField(CheckPostgresInstalledMixin, models.Field[Any, _RangeT]):
     empty_strings_allowed: bool
-    base_field: type[models.Field]
+    base_field: models.Field
     range_type: type[_RangeT]
     def get_placeholder(self, value: Unused, compiler: Unused, connection: BaseDatabaseWrapper) -> str: ...
     @override
