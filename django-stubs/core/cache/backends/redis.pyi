@@ -52,3 +52,6 @@ class RedisCacheClient:
 
 class RedisCache(BaseCache):
     def __init__(self, server: str | list[str], params: dict[str, Any]) -> None: ...
+    # We need this, because it is the only way to get the Redis connection from cache:
+    @cached_property
+    def _cache(self) -> RedisCacheClient: ...
