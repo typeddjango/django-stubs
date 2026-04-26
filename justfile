@@ -16,7 +16,7 @@ lint:
 
 # Run all checks before submitting a PR
 [group('dev')]
-pre-mr-check: lint ty pyrefly mypy stubtest pyright ext-test test
+pre-mr-check: lint typecheck-all stubtest ext-test test
 
 # Remove mypy cache
 [group('dev')]
@@ -46,6 +46,10 @@ pyrefly:
 [group('typecheck')]
 ty:
     uv run ty check tests/assert_type
+
+# Run all typechecker on test cases
+[group('typecheck')]
+typecheck-all: pyrefly ty pyright mypy
 
 # Run pytest tests
 [group('test')]
