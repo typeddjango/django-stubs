@@ -6,8 +6,8 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
 from mypy.checker import TypeChecker
-from mypy.maptype import map_instance_to_supertype
 from mypy.checkmember import analyze_member_access as _mypy_analyze_member_access
+from mypy.maptype import map_instance_to_supertype
 from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF,
