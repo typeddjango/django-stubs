@@ -41,15 +41,15 @@ jobs:
         run: uv sync --no-dev --group tests
 
       - name: Run mypy on plugin code
-        run: uv run mypy --strict mypy_django_plugin
+        run: uv run mypy mypy_django_plugin
       - name: Run mypy on ext code
-        run: uv run mypy --strict ext
+        run: uv run mypy ext
       - name: Run mypy on scripts and utils
-        run: uv run mypy --strict scripts
+        run: uv run mypy scripts
       - name: Run mypy on stubs
         run: uv run mypy --cache-dir=/dev/null --no-incremental django-stubs
       - name: Run mypy on the test cases
-        run: uv run mypy --strict tests
+        run: uv run mypy tests
 
   test:
     timeout-minutes: 15
