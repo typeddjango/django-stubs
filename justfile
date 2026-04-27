@@ -26,11 +26,8 @@ clean:
 # Run mypy on plugin, ext, scripts, stubs and tests
 [group('typecheck')]
 mypy:
-    uv run mypy ext
-    uv run mypy scripts
-    uv run mypy mypy_django_plugin
+    uv run mypy ext scripts mypy_django_plugin tests
     uv run mypy --cache-dir=/dev/null --no-incremental django-stubs
-    uv run mypy tests
 
 # Run pyright on test cases
 [group('typecheck')]
