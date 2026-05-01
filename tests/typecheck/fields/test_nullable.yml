@@ -71,8 +71,13 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import Publisher, Book
-        reveal_type(Book().publisher)  # N: Revealed type is "myapp.models.Publisher | None"
-        Book().publisher = 11  # E: Incompatible types in assignment (expression has type "int", variable has type "Publisher | Combinable | None")  [assignment]
+        reveal_type(Book().publisher)
+        Book().publisher = 11
+    out: |
+        main:3: note: Revealed type is "myapp.models.Publisher | None"
+        main:4: error: No overload variant of "__set__" of "ForeignObject" matches argument types "Book", "int"  [call-overload]
+        main:4: note: Possible overload variants:
+        main:4: note:     def __set__(self, instance: Any, value: Publisher | Combinable | None) -> None
     installed_apps:
         - myapp
     files:
