@@ -1,11 +1,13 @@
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TypeVar
 
 from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Func, Transform
-from django.db.models.expressions import Combinable, Expression, Value, _OutputField
+from django.db.models.expressions import Combinable, Expression, Value
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from typing_extensions import override
+
+_SubstrOutputField = TypeVar("_SubstrOutputField", bound=models.Field, default=models.CharField)
 
 class MySQLSHA2Mixin:
     def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
@@ -36,14 +38,14 @@ class ConcatPair(Func):
 class Concat(Func):
     def __init__(self, *expressions: Any, **extra: Any) -> None: ...
 
-class Left(Func[_OutputField]):
+class Left(Func[_SubstrOutputField]):
     output_field: ClassVar[models.CharField]
     def __init__(
         self,
         expression: Combinable | str,
         length: Expression | int,
         *,
-        output_field: _OutputField | None = None,
+        output_field: _SubstrOutputField | None = None,
         **extra: Any,
     ) -> None: ...
     def get_substr(self) -> Substr: ...
@@ -79,7 +81,7 @@ class Replace(Func):
 class Reverse(Transform):
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
-class Right(Left[_OutputField]):
+class Right(Left[_SubstrOutputField]):
     @override
     def get_substr(self) -> Substr: ...
 
@@ -100,7 +102,7 @@ class StrIndex(Func):
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> _AsSqlType: ...
 
-class Substr(Func[_OutputField]):
+class Substr(Func[_SubstrOutputField]):
     output_field: ClassVar[models.CharField]
     def __init__(
         self,
@@ -108,7 +110,7 @@ class Substr(Func[_OutputField]):
         pos: Expression | int,
         length: Expression | int | None = None,
         *,
-        output_field: _OutputField | None = None,
+        output_field: _SubstrOutputField | None = None,
         **extra: Any,
     ) -> None: ...
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...

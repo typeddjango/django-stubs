@@ -16,7 +16,7 @@ from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import cached_property
 from typing_extensions import Never, Self, TypeVar, override
 
-_OutputField = TypeVar("_OutputField", bound=Field, default=Field)
+_OutputField = TypeVar("_OutputField", bound=Field, default=Field[Any, Any, Any])
 _Numeric: TypeAlias = float | Decimal
 _ExprListCompatible: TypeAlias = Sequence[BaseExpression | F | str] | BaseExpression | F | str
 

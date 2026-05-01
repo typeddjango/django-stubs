@@ -1,25 +1,20 @@
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from typing import Any, ClassVar
 
+from django.core import validators
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model, lookups
 from django.db.models.expressions import Expression
-from django.db.models.fields import TextField
+from django.db.models.fields import _GT, _NT, _ST, NOT_PROVIDED, Field, TextField, _ErrorMessagesMapping
+from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import FieldGetDbPrepValueMixin, PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
+from django.utils.choices import _ChoicesInput
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self, TypeVar, override
 
-from . import Field
-from .mixins import CheckFieldDefaultMixin
-
-# __set__ value type
-_ST = TypeVar("_ST", contravariant=True, default=Any)
-# __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=Any)
-
-class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT]):
+class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT, _NT]):
     encoder: type[json.JSONEncoder] | None
     decoder: type[json.JSONDecoder] | None
     def __init__(
@@ -28,7 +23,24 @@ class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         name: str | None = None,
         encoder: type[json.JSONEncoder] | None = None,
         decoder: type[json.JSONDecoder] | None = None,
-        **kwargs: Any,
+        *,
+        primary_key: bool = ...,
+        unique: bool = ...,
+        blank: bool = ...,
+        null: _NT = ...,
+        db_index: bool = ...,
+        default: Any = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
+        editable: bool = ...,
+        auto_created: bool = ...,
+        serialize: bool = ...,
+        choices: _ChoicesInput | None = ...,
+        help_text: _StrOrPromise = ...,
+        db_column: str | None = ...,
+        db_comment: str | None = ...,
+        db_tablespace: str | None = ...,
+        validators: Iterable[validators._ValidatorCallable] = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     def from_db_value(self, value: str | None, expression: Expression, connection: BaseDatabaseWrapper) -> Any: ...
     @override

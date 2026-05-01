@@ -68,7 +68,7 @@ class Options(Generic[_M]):
     required_db_vendor: str | None
     meta: type | None
     pk: Field
-    auto_field: AutoField | None
+    auto_field: AutoField[Any, Any, Any] | None
     abstract: bool
     managed: bool
     proxy: bool
