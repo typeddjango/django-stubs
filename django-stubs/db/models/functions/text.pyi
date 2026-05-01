@@ -1,11 +1,11 @@
-from typing import Any, ClassVar, TypeVar
+from typing import Any, ClassVar
 
 from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Func, Transform
 from django.db.models.expressions import Combinable, Expression, Value
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
-from typing_extensions import override
+from typing_extensions import TypeVar, override
 
 _SubstrOutputField = TypeVar("_SubstrOutputField", bound=models.Field, default=models.CharField)
 

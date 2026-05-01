@@ -12,7 +12,7 @@ from django.db.models.lookups import FieldGetDbPrepValueMixin, PostgresOperatorL
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.utils.choices import _ChoicesInput
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self, TypeVar, override
+from typing_extensions import Self, override
 
 class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT, _NT]):
     encoder: type[json.JSONEncoder] | None
