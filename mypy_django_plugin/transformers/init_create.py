@@ -43,7 +43,7 @@ def typecheck_model_method(
 ) -> None:
     """Type-checks positional and keyword arguments for Model methods like __init__(), create(), and acreate()."""
     typechecker_api = helpers.get_typechecker_api(ctx)
-    expected_types = django_context.get_expected_types(typechecker_api, model_cls, method=method)
+    expected_types = django_context.get_expected_types(typechecker_api, model_cls, ctx.context)
     expected_keys = [key for key in expected_types.keys() if key != "pk"]
 
     min_arg_count = helpers.get_min_argument_count(ctx)
