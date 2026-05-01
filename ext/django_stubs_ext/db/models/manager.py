@@ -12,7 +12,9 @@ if TYPE_CHECKING:
     from django.db.models.fields.related_descriptors import RelatedManager as RelatedManager
 
 else:
-    from typing import Protocol, TypeVar
+    from typing import Protocol
+
+    from typing_extensions import TypeVar
 
     _T = TypeVar("_T")
     _Through = TypeVar("_Through")

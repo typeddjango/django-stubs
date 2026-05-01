@@ -6,10 +6,9 @@ caused 'Must not defer during final iteration' crash in mypy.
 
 from __future__ import annotations
 
-from typing import TypeVar
-
 from django.db import models
 from django.db.models.query import QuerySet
+from typing_extensions import TypeVar
 
 T = TypeVar("T", bound="MyModel")
 

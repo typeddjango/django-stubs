@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.db import models
+from typing_extensions import TypeVar
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence

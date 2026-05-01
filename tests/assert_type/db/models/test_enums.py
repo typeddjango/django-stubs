@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal
 
 from django.db.models import Choices, IntegerChoices, Model, TextChoices
 from django.utils.functional import _StrOrPromise, _StrPromise
 from django.utils.translation import gettext_lazy as _
-from typing_extensions import assert_type, override
+from typing_extensions import TypeVar, assert_type, override
 
 # Choices in a separate model to test that the plugin resolves types correctly.
 from tests.assert_type.db.models import _enums as imported
@@ -96,7 +96,6 @@ class VoidChoices(BaseEmptyChoices):
 
 # Choice type that has been aliased to test that the plugin resolves types correctly.
 CompassPoint = imported.Direction
-
 
 # Choice type that has been aliased by type to test that the plugin resolves types correctly.
 Award: type[TextChoices] = Medal
@@ -310,7 +309,6 @@ assert_type([member.value for choices in x3 for member in choices], list[bytes |
 assert_type(  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     [member.value for choices in x3 for member in choices], list[Any]
 )
-
 
 # Assertions for choices objects defined and aliased in a model.
 assert_type(DeckModel.Suit.choices, list[tuple[int, _StrPromise]])  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]

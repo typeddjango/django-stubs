@@ -1,9 +1,10 @@
 from collections.abc import Callable, Collection, Iterable, Mapping, Sequence, Sized
-from typing import Any, TypeVar, overload
+from typing import Any, overload
 
 from django.template.base import FilterExpression, Parser
 from django.template.context import Context
 from django.utils.safestring import SafeString
+from typing_extensions import TypeVar
 
 from .base import Node, NodeList, Template
 

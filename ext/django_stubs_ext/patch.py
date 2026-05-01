@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic
 
 from django import VERSION
 from django.contrib.admin import ModelAdmin
@@ -30,7 +30,7 @@ from django.utils.functional import LazyObject, classproperty
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, FormMixin
 from django.views.generic.list import MultipleObjectMixin
-from typing_extensions import override
+from typing_extensions import TypeVar, override
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
