@@ -12,9 +12,9 @@ reversed_url = reverse("url")
 lazy_url = reverse_lazy("namespace:url")
 
 
-@user_passes_test(lambda user: user.is_active, login_url=reversed_url)
+@user_passes_test(lambda user: user.is_active, login_url=reversed_url)  # pyrefly: ignore[bad-argument-type]
 def my_view1(request: HttpRequest) -> HttpResponse: ...
 
 
-@user_passes_test(lambda user: user.is_active, login_url=lazy_url)
+@user_passes_test(lambda user: user.is_active, login_url=lazy_url)  # pyrefly: ignore[bad-argument-type]
 def my_view2(request: HttpRequest) -> HttpResponse: ...

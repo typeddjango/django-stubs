@@ -8,8 +8,8 @@ class Author(models.Model):
 
 
 class Book(models.Model):
-    author = models.ForeignKey(Author, on_delete=models.CASCADE, swappable=False)  # pyright: ignore[reportUnknownVariableType]
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, swappable=False)
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(Author, on_delete=models.CASCADE, swappable=False)  # pyright: ignore[reportUnknownVariableType]
+    user = models.OneToOneField(Author, on_delete=models.CASCADE, swappable=False)

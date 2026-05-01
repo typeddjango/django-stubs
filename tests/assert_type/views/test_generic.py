@@ -10,7 +10,8 @@ from django.views.generic.list import ListView
 from typing_extensions import assert_type
 
 
-class MyModel(models.Model): ...
+class MyModel(models.Model):
+    pass
 
 
 class MyDetailView(SingleObjectMixin[MyModel]): ...
