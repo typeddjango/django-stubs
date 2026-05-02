@@ -130,7 +130,7 @@ class DjangoContext:
                 yield field
 
     def get_field_lookup_exact_type(
-        self, api: TypeChecker, field: Field[Any, Any] | ForeignObjectRel, context: Context
+        self, api: TypeChecker, field: Field[Any, Any, Any] | ForeignObjectRel, context: Context
     ) -> MypyType:
         if isinstance(field, RelatedField | ForeignObjectRel):
             related_model_cls = self.get_field_related_model_cls(field)
