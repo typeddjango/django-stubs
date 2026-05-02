@@ -6,7 +6,7 @@
         reveal_type(MyModel.objects.example_list())  # N: Revealed type is "list[myapp.models.MyQuerySet[myapp.models.MyModel]]"
         reveal_type(MyModel.objects.example_simple().just_int())  # N: Revealed type is "int"
         reveal_type(MyModel.objects.example_dict())  # N: Revealed type is "dict[str, myapp.models.MyQuerySet[myapp.models.MyModel]]"
-        reveal_type(MyModelWithoutSelf.objects.method())  # N: Revealed type is "myapp.models.QuerySetWithoutSelf"
+        reveal_type(MyModelWithoutSelf.objects.method())  # N: Revealed type is "myapp.models.QuerySetWithoutSelf[myapp.models.MyModelWithoutSelf, myapp.models.MyModelWithoutSelf]"
 
     installed_apps:
         - myapp
@@ -129,8 +129,8 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects.custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet"
-        reveal_type(MyModel.objects.all().custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet"
+        reveal_type(MyModel.objects.custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.all().custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.returns_int_sequence())  # N: Revealed type is "typing.Sequence[int]"
     installed_apps:
         - myapp
@@ -156,8 +156,8 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel1, MyModel2
         kls: type[MyModel1 | MyModel2] = MyModel1
-        reveal_type(kls.objects.custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet1 | myapp.models.ModelQuerySet2"
-        reveal_type(kls.objects.all().custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet1 | myapp.models.ModelQuerySet2"
+        reveal_type(kls.objects.custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet1[myapp.models.MyModel1, myapp.models.MyModel1] | myapp.models.ModelQuerySet2[myapp.models.MyModel2, myapp.models.MyModel2]"
+        reveal_type(kls.objects.all().custom_queryset_method())  # N: Revealed type is "myapp.models.ModelQuerySet1[myapp.models.MyModel1, myapp.models.MyModel1] | myapp.models.ModelQuerySet2[myapp.models.MyModel2, myapp.models.MyModel2]"
         reveal_type(kls.objects.returns_thing())  # N: Revealed type is "int | str"
         reveal_type(kls.objects.get())  # N: Revealed type is "myapp.models.MyModel1 | myapp.models.MyModel2"
     installed_apps:
@@ -195,7 +195,7 @@
         from myapp.models import MyModel, MyModelManager
         reveal_type(MyModelManager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[Any]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
+        reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -217,7 +217,7 @@
         from myapp.models import MyModel, ManagerFromModelQuerySet
         reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[Any]"
         reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
-        reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
+        reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:
@@ -371,8 +371,8 @@
         from myapp.models import MyModel
         reveal_type(MyModel.objects_1)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.objects_2)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects_1.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
-        reveal_type(MyModel.objects_2.all())  # N: Revealed type is "myapp.models.ModelQuerySet"
+        reveal_type(MyModel.objects_1.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects_2.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
     installed_apps:
         - myapp
     files:

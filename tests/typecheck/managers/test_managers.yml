@@ -756,7 +756,7 @@
 
         reveal_type(MyModel.populated_manager_from_populated_queryset)  # N: Revealed type is "myapp.models.PopulatedManagerFromPopulatedQuerySet"
         reveal_type(MyModel.populated_manager_from_populated_queryset.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.populated_manager_from_populated_queryset.filter())  # N: Revealed type is "myapp.models.PopulatedQuerySet"
+        reveal_type(MyModel.populated_manager_from_populated_queryset.filter())  # N: Revealed type is "myapp.models.PopulatedQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
 
         reveal_type(MyModel.generic_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
         reveal_type(MyModel.generic_manager.get())  # N: Revealed type is "myapp.models.MyModel"
@@ -768,7 +768,7 @@
 
         reveal_type(MyModel.generic_manager_from_populated_queryset)  # N: Revealed type is "myapp.models.ManagerFromPopulatedQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.generic_manager_from_populated_queryset.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.generic_manager_from_populated_queryset.filter())  # N: Revealed type is "myapp.models.PopulatedQuerySet"
+        reveal_type(MyModel.generic_manager_from_populated_queryset.filter())  # N: Revealed type is "myapp.models.PopulatedQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
 
     installed_apps:
         - myapp

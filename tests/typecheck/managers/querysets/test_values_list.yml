@@ -287,7 +287,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import TransactionQuerySet
-        reveal_type(TransactionQuerySet())  # N: Revealed type is "myapp.models.TransactionQuerySet"
+        reveal_type(TransactionQuerySet())  # N: Revealed type is "myapp.models.TransactionQuerySet[myapp.models.Transaction, myapp.models.Transaction]"
         reveal_type(TransactionQuerySet().values())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Transaction, TypedDict({'id': int, 'total': int})]"
         reveal_type(TransactionQuerySet().values_list())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Transaction, tuple[int, int]]"
     installed_apps:

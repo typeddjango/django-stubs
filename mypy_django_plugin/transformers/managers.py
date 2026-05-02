@@ -606,9 +606,24 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     )
 
 
-def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) -> None:
+def _is_omitted_generic(arg: MypyType) -> bool:
+    """True if ``arg`` is the ``Any`` mypy substitutes for an unparametrized generic."""
+    proper_arg = get_proper_type(arg)
+    return isinstance(proper_arg, AnyType) and proper_arg.type_of_any is TypeOfAny.from_omitted_generics
+
+
+def reparametrize_generic_class(
+    ctx: ClassDefContext,
+    base_class_fullname: str,
+    *,
+    bind_explicit_args: bool = False,
+) -> None:
     """
     Add implicit generics to classes that are defined without generic.
+
+    When ``bind_explicit_args`` is True, also reparametrize partially or
+    fully-explicit parametrizations by binding each explicit arg as both
+    the bound and the PEP 696 default of a synthesized covariant TypeVar.
 
     Note that this does not happen if mypy is run with disallow_any_generics = True,
     as not specifying the generic type is then considered an error.
@@ -633,10 +648,31 @@ def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) 
     if parent_class is None or not parent_class.args:
         return
 
-    type_vars = [
-        type_var.copy_modified(id=type_var.id, default=parent_type_var)
-        for type_var, parent_type_var in zip(parent_class.type.defn.type_vars, parent_class.args, strict=True)
-    ]
+    # Bind explicit args only when the direct parent is the canonical base class
+    is_direct_parent = parent_class.type.fullname == base_class_fullname
+    if not (bind_explicit_args and is_direct_parent):
+        if not _is_omitted_generic(parent_class.args[0]):
+            return
+        type_vars = list(parent_class.type.defn.type_vars)
+    else:
+        type_vars = []
+        for type_var, parent_type_var in zip(parent_class.type.defn.type_vars, parent_class.args, strict=True):
+            if _is_omitted_generic(parent_type_var):
+                # Arg was omitted -- reuse the parent's TypeVar so its existing
+                # PEP 696 default (e.g. ``_Row = TypeVar(default=_Model)``) is preserved.
+                type_vars.append(type_var)
+            else:
+                # Arg was supplied explicitly -- synthesize a TypeVar bounded by the
+                # user's arg so the subclass stays effectively concrete in user-facing
+                # contexts (defaults + bound + covariance) while still being generic
+                # enough for the plugin to flow annotation row types through.
+                type_vars.append(
+                    type_var.copy_modified(
+                        id=type_var.id,
+                        upper_bound=parent_type_var,
+                        default=parent_type_var,
+                    )
+                )
 
     # If we end up with placeholders we need to defer so the placeholders are
     # resolved in a future iteration
@@ -654,6 +690,7 @@ def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) 
 def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
     """
     Add implicit generics to QuerySet subclasses that are defined without generic.
+    This is required for `.annotate` / `.values` call to update the typevars accordingly.
 
     Eg.
 
@@ -665,10 +702,20 @@ def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
         _Row = TypeVar('_Row', covariant=True, default=_Model)
         class MyQuerySet(models.QuerySet[_Model, _Row]): ...
 
+    And
+
+        class BookQuerySet(models.QuerySet["Book"]): ...
+
+    is interpreted as:
+
+        _Model = TypeVar('_Model', bound=Book, covariant=True, default=Book)
+        _Row = TypeVar('_Row', bound=Book, covariant=True, default=Book)
+        class BookQuerySet(models.QuerySet[_Model, _Row]): ...
+
     Note that this does not happen if mypy is run with disallow_any_generics = True,
     as not specifying the generic type is then considered an error.
     """
-    reparametrize_generic_class(ctx, fullnames.QUERYSET_CLASS_FULLNAME)
+    reparametrize_generic_class(ctx, fullnames.QUERYSET_CLASS_FULLNAME, bind_explicit_args=True)
 
 
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
