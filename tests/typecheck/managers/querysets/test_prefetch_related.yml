@@ -534,9 +534,10 @@
         -   path: myapp/models.py
             content: |
                 import typing
+                from typing_extensions import TypeVar
                 from django.db import models
 
-                T = typing.TypeVar("T", bound="models.Model")
+                T = TypeVar("T", bound="models.Model")
                 class BaseManager(models.Manager[T]): ...
 
                 class BaseObject(models.Model):
