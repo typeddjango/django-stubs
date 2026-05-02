@@ -122,7 +122,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar
+                from typing_extensions import TypeVar
                 from django.db import models
 
                 _ST = TypeVar("_ST", contravariant=True)

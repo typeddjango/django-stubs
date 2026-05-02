@@ -16,8 +16,7 @@
             content: |
                 from django.db import models
                 from django.db.models.manager import Manager
-                from typing import TypeVar
-                from typing_extensions import Self
+                from typing_extensions import Self, TypeVar
 
                 M = TypeVar("M", covariant=True, bound=models.Model)
 
@@ -87,7 +86,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar
+                from typing_extensions import TypeVar
                 from django.db import models
                 from django.db.models.manager import Manager
 
@@ -162,8 +161,9 @@
         -   path: myapp/__init__.py
         -   path: myapp/querysets.py
             content: |
-                from typing import TypeVar, TYPE_CHECKING
+                from typing import TYPE_CHECKING
 
+                from typing_extensions import TypeVar
                 from django.db import models
                 from django.db.models.manager import Manager
                 if TYPE_CHECKING:
@@ -199,8 +199,9 @@
         -   path: myapp/__init__.py
         -   path: myapp/querysets.py
             content: |
-                from typing import TypeVar, TYPE_CHECKING
+                from typing import TYPE_CHECKING
 
+                from typing_extensions import TypeVar
                 from django.db import models
                 from django.db.models.manager import Manager
                 if TYPE_CHECKING:
@@ -893,8 +894,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar, ClassVar
-                from typing_extensions import Self
+                from typing import ClassVar
+                from typing_extensions import Self, TypeVar
                 from django.db import models
                 from django.db.models.manager import Manager
 
@@ -954,8 +955,8 @@
 
 -   case: test_queryset_arg_as_unsupported_expressions
     main: |
-        from typing import Generic, TypeVar
-        from typing_extensions import TypeAlias, reveal_type
+        from typing import Generic
+        from typing_extensions import TypeAlias, TypeVar, reveal_type
         from django.db import models
         from django.db.models.manager import Manager
 
@@ -1019,7 +1020,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar
+                from typing_extensions import TypeVar
                 from django.db import models
                 from django.db.models.manager import Manager
 

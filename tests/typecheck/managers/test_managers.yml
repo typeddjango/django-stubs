@@ -44,8 +44,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Generic, TypeVar
-                from typing_extensions import reveal_type
+                from typing import Generic
+                from typing_extensions import TypeVar, reveal_type
                 from django.db import models
 
                 _T = TypeVar('_T', bound=models.Model)
@@ -71,8 +71,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Generic, TypeVar
-                from typing_extensions import reveal_type
+                from typing import Generic
+                from typing_extensions import TypeVar, reveal_type
                 from django.db import models
 
                 _T = TypeVar('_T', bound=models.Model)
@@ -97,7 +97,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar
+                from typing_extensions import TypeVar
                 from django.db import models
                 _T = TypeVar('_T', bound=models.Model)
                 class CustomManager(models.Manager[_T]):
@@ -116,7 +116,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar
+                from typing_extensions import TypeVar
                 from django.db import models
                 from django_stubs_ext.db.models import TypedModelMeta
 
@@ -259,7 +259,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Generic, TypeVar
+                from typing import Generic
+                from typing_extensions import TypeVar
                 from django.db import models
 
                 T1 = TypeVar("T1", bound="AbstractBase1")
@@ -646,8 +647,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import ClassVar, TypeVar
-                from typing_extensions import Self
+                from typing import ClassVar
+                from typing_extensions import Self, TypeVar
                 from django.db import models
 
                 T = TypeVar("T", bound="MyModel")
@@ -678,12 +679,13 @@
     out: |
         main:3: note: Revealed type is "myapp.models.MySubManager"
         main:4: note: Revealed type is "Any"
-        myapp/models:9: error: Missing type arguments for generic type "MyManager"  [type-arg]
+        myapp/models:10: error: Missing type arguments for generic type "MyManager"  [type-arg]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import ClassVar, TypeVar
+                from typing import ClassVar
+                from typing_extensions import TypeVar
                 from django.db import models
 
                 T = TypeVar("T", bound="MyModel")

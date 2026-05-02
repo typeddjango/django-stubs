@@ -128,8 +128,8 @@
 
                 from django.db.models import Model
                 from django.db.models.manager import Manager
-                from typing import ClassVar, Generic, TypeVar
-                from typing_extensions import Self
+                from typing import ClassVar, Generic
+                from typing_extensions import Self, TypeVar
 
                 M = TypeVar("M", bound=Model, covariant=True)
 

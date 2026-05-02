@@ -34,7 +34,8 @@
                 from django.db import models
                 from django.db.models import fields
 
-                from typing import Any, Generic, TypeVar
+                from typing import Any, Generic
+                from typing_extensions import TypeVar
 
                 _ST = TypeVar("_ST", contravariant=True)
                 _GT = TypeVar("_GT", covariant=True)

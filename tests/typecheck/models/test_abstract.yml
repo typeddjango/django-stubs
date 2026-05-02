@@ -81,7 +81,8 @@
 - case: test_abstract_model_type_cannot_be_used_as_runtime_arg
   main: |
       from myapp.models import Abstract, Concrete, LiteralAbstract
-      from typing import Generic, TypeVar, overload
+      from typing import Generic, overload
+      from typing_extensions import TypeVar
 
       Abstract()  # E: Cannot instantiate abstract class "Abstract" with abstract attributes "DoesNotExist", "MultipleObjectsReturned" and "NotUpdated"  [abstract]
       LiteralAbstract()  # E: Cannot instantiate abstract class "LiteralAbstract" with abstract attributes "DoesNotExist", "MultipleObjectsReturned" and "NotUpdated"  [abstract]
@@ -183,8 +184,8 @@
     -   path: myapp/__init__.py
     -   path: myapp/models.py
         content: |
-            from typing import Protocol, TypeVar
-            from typing_extensions import reveal_type
+            from typing import Protocol
+            from typing_extensions import TypeVar, reveal_type
             from django.db import models
             from django_stubs_ext.db.models import TypedModelMeta
 

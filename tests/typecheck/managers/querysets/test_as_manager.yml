@@ -15,8 +15,8 @@
         -   path: myapp/models.py
             content: |
                 from django.db import models
-                from typing import ClassVar, TypeVar
-                from typing_extensions import Self
+                from typing import ClassVar
+                from typing_extensions import Self, TypeVar
 
                 M = TypeVar("M", bound=models.Model, covariant=True)
 
@@ -69,7 +69,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar
+                from typing_extensions import TypeVar
                 from django.db import models
 
                 M = TypeVar("M", bound=models.Model, covariant=True)
@@ -262,9 +262,9 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-              from typing import Generic, TypeVar
+              from typing import Generic
               from django.db import models
-              from typing_extensions import Self, override as typing_override
+              from typing_extensions import Self, TypeVar, override as typing_override
 
               T = TypeVar("T", bound=models.Model)
               T_2 = TypeVar("T_2", bound=models.Model)
@@ -331,7 +331,8 @@
             content: |
                 from __future__ import annotations
                 from collections.abc import Collection
-                from typing import Generic, TypeVar
+                from typing import Generic
+                from typing_extensions import TypeVar
 
                 from django.db import models
 
