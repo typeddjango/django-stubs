@@ -9,6 +9,7 @@ from mypy.nodes import (
     Decorator,
     FuncBase,
     FuncDef,
+    IndexExpr,
     MemberExpr,
     Node,
     OverloadedFuncDef,
@@ -648,20 +649,22 @@ def reparametrize_generic_class(
     if parent_class is None or not parent_class.args:
         return
 
-    # # Skip when the user explicitly specified args (e.g. `Field[...]`).
-    # written_with_args = any(
-    #     isinstance(expr, IndexExpr) and isinstance(expr.base, RefExpr) and expr.base.node is parent_class.type
-    #     for expr in ctx.cls.base_type_exprs
-    # )
-    # if written_with_args:
-    #     return
-    # Bind explicit args only when the direct parent is the canonical base class
+    # Use the AST to detect whether the user wrote brackets after the parent
+    # (e.g. `models.TextField[...]`). We can't rely on `parent_class.args`
+    # because PEP 696 default substitution leaves no marker distinguishing
+    # "user supplied this arg" from "mypy filled it from the TypeVar's default".
+    written_with_args = any(
+        isinstance(expr, IndexExpr) and isinstance(expr.base, RefExpr) and expr.base.node is parent_class.type
+        for expr in ctx.cls.base_type_exprs
+    )
+
     is_direct_parent = parent_class.type.fullname == base_class_fullname
-    if not (bind_explicit_args and is_direct_parent):
-        if not _is_omitted_generic(parent_class.args[0]):
-            return
+    if not written_with_args:
+        # Bare class (e.g. ``class HTMLField(models.TextField): ...``): reuse
+        # parent's TypeVars so their PEP 696 defaults are preserved and per-
+        # instance inference (e.g. ``_NT`` for ``null=True``) still works.
         type_vars = list(parent_class.type.defn.type_vars)
-    else:
+    elif bind_explicit_args and is_direct_parent:
         type_vars = []
         for type_var, parent_type_var in zip(parent_class.type.defn.type_vars, parent_class.args, strict=True):
             if _is_omitted_generic(parent_type_var):
@@ -680,6 +683,10 @@ def reparametrize_generic_class(
                         default=parent_type_var,
                     )
                 )
+    else:
+        # User wrote explicit args (e.g. ``Field[...]``) and we don't want to
+        # bind them: respect their choice.
+        return
 
     # If we end up with placeholders we need to defer so the placeholders are
     # resolved in a future iteration
