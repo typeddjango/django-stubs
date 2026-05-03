@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Generic, Literal, overload
+from typing import Any, Generic, Literal, overload, type_check_only
 from uuid import UUID
 
 from django import forms
@@ -141,28 +141,35 @@ class ForeignObject(RelatedField[_ST, _GT, _NT]):
         db_comment: str | None = ...,
     ) -> None: ...
     @overload
+    @type_check_only
     @override
     def __set__(self: ForeignObject[Any, Any, Literal[False]], instance: Any, value: _ST | Combinable) -> None: ...
     @overload
+    @type_check_only
     def __set__(
         self: ForeignObject[Any, Any, Literal[True]], instance: Any, value: _ST | Combinable | None
     ) -> None: ...
     @overload
+    @type_check_only
     def __set__(self, instance: Any, value: _ST | Combinable) -> None: ...
     # class access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: None, owner: Any) -> ForwardManyToOneDescriptor[Self]: ...
     # non-null Model instance access
     @overload
+    @type_check_only
     @override
     def __get__(self: ForeignObject[Any, Any, Literal[False]], instance: Model, owner: Any) -> _GT: ...
     # nullable Model instance access
     @overload
+    @type_check_only
     @override
     def __get__(self: ForeignObject[Any, Any, Literal[True]], instance: Model, owner: Any) -> _GT | None: ...
     # non-Model instances
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
@@ -288,28 +295,35 @@ class OneToOneField(ForeignKey[_ST, _GT, _NT]):
         db_comment: str | None = ...,
     ) -> None: ...
     @overload
+    @type_check_only
     @override
     def __set__(self: OneToOneField[Any, Any, Literal[False]], instance: Any, value: _ST | Combinable) -> None: ...
     @overload
+    @type_check_only
     def __set__(
         self: OneToOneField[Any, Any, Literal[True]], instance: Any, value: _ST | Combinable | None
     ) -> None: ...
     @overload
+    @type_check_only
     def __set__(self, instance: Any, value: _ST | Combinable) -> None: ...
     # class access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: None, owner: Any) -> ForwardOneToOneDescriptor[Self]: ...
     # non-null Model instance access
     @overload
+    @type_check_only
     @override
     def __get__(self: OneToOneField[Any, Any, Literal[False]], instance: Model, owner: Any) -> _GT: ...
     # nullable Model instance access
     @overload
+    @type_check_only
     @override
     def __get__(self: OneToOneField[Any, Any, Literal[True]], instance: Model, owner: Any) -> _GT | None: ...
     # non-Model instances
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     @override

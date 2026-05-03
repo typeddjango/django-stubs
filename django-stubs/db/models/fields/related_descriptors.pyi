@@ -135,7 +135,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_To, _Through]):
 
     # 'field' here is 'rel.field'
     rel: ManyToManyRel  # type: ignore[assignment]
-    field: ManyToManyField[_To, _Through]  # type: ignore[assignment]
+    field: ManyToManyField[_To, _Through]
     reverse: bool
     def __init__(self, rel: ManyToManyRel, reverse: bool = False) -> None: ...
     @property
