@@ -9,7 +9,6 @@ from mypy.nodes import (
     Decorator,
     FuncBase,
     FuncDef,
-    IndexExpr,
     MemberExpr,
     Node,
     OverloadedFuncDef,
@@ -649,13 +648,13 @@ def reparametrize_generic_class(
     if parent_class is None or not parent_class.args:
         return
 
-    # Skip when the user explicitly specified args (e.g. `Field[...]`).
-    written_with_args = any(
-        isinstance(expr, IndexExpr) and isinstance(expr.base, RefExpr) and expr.base.node is parent_class.type
-        for expr in ctx.cls.base_type_exprs
-    )
-    if written_with_args:
-        return
+    # # Skip when the user explicitly specified args (e.g. `Field[...]`).
+    # written_with_args = any(
+    #     isinstance(expr, IndexExpr) and isinstance(expr.base, RefExpr) and expr.base.node is parent_class.type
+    #     for expr in ctx.cls.base_type_exprs
+    # )
+    # if written_with_args:
+    #     return
     # Bind explicit args only when the direct parent is the canonical base class
     is_direct_parent = parent_class.type.fullname == base_class_fullname
     if not (bind_explicit_args and is_direct_parent):

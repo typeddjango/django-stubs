@@ -94,6 +94,7 @@ def additional_typevar_field() -> None:
 
 
 def field_implicit_any() -> None:
+    # This is inferred as models.Field[Any, Any, Literal[False]]
     class FieldImplicitAny(models.Field): ...
 
     class MyModel(models.Model):
