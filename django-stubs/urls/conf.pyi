@@ -1,4 +1,4 @@
-from collections.abc import Callable, Coroutine, Sequence
+from collections.abc import Awaitable, Callable, Coroutine, Mapping, Sequence
 from types import ModuleType
 from typing import Any, TypeAlias, overload
 
@@ -9,6 +9,14 @@ from ..http.response import HttpResponseBase
 
 _URLConf: TypeAlias = str | ModuleType | Sequence[_AnyURL]
 _IncludedURLConf: TypeAlias = tuple[Sequence[URLResolver | URLPattern], str | None, str | None]
+_ASGIApp: TypeAlias = Callable[
+    [
+        Mapping[str, Any],
+        Callable[[], Awaitable[Mapping[str, Any]]],
+        Callable[[Mapping[str, Any]], Awaitable[None]],
+    ],
+    Coroutine[Any, Any, None],
+]
 
 def include(arg: _URLConf | tuple[_URLConf, str], namespace: str | None = None) -> _IncludedURLConf: ...
 
@@ -24,6 +32,13 @@ def path(
 def path(
     route: _StrOrPromise,
     view: Callable[..., Coroutine[Any, Any, HttpResponseBase]],
+    kwargs: dict[str, Any] | None = None,
+    name: str | None = None,
+) -> URLPattern: ...
+@overload
+def path(
+    route: _StrOrPromise,
+    view: _ASGIApp,
     kwargs: dict[str, Any] | None = None,
     name: str | None = None,
 ) -> URLPattern: ...
@@ -51,6 +66,13 @@ def re_path(
 def re_path(
     route: _StrOrPromise,
     view: Callable[..., Coroutine[Any, Any, HttpResponseBase]],
+    kwargs: dict[str, Any] | None = None,
+    name: str | None = None,
+) -> URLPattern: ...
+@overload
+def re_path(
+    route: _StrOrPromise,
+    view: _ASGIApp,
     kwargs: dict[str, Any] | None = None,
     name: str | None = None,
 ) -> URLPattern: ...
