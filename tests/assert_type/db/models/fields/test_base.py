@@ -80,6 +80,7 @@ class AllFields(models.Model):
     # JSON / FilePath
     payload = models.JSONField()
     null_payload = models.JSONField(null=True)
+    payload_with_db_default = models.JSONField(default=dict, db_default={})
     path = models.FilePathField()
     null_path = models.FilePathField(null=True)
 
@@ -143,6 +144,7 @@ assert_type(instance.null_blob, bytes | memoryview[int] | None)
 
 assert_type(instance.payload, Any)
 assert_type(instance.null_payload, Any | None)
+assert_type(instance.payload_with_db_default, Any)
 assert_type(instance.path, Any)
 assert_type(instance.null_path, Any | None)
 

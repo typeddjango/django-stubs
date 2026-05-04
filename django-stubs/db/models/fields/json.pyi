@@ -6,7 +6,7 @@ from django.core import validators
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model, lookups
 from django.db.models.expressions import Expression
-from django.db.models.fields import _NT, NOT_PROVIDED, Field, TextField, _ErrorMessagesMapping
+from django.db.models.fields import _NT, Field, TextField, _ErrorMessagesMapping
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import FieldGetDbPrepValueMixin, PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
@@ -33,7 +33,7 @@ class JSONField(CheckFieldDefaultMixin, Field[_ST_JSON, _GT_JSON, _NT]):
         null: _NT = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST_JSON = ...,
+        db_default: Any = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,
