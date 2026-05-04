@@ -13,6 +13,12 @@ T = TypeVar("T")
 class CustomFieldValue: ...
 
 
+# `bool` is not assignable to upper bound `Literal[False, True]` of type variable `_NT`
+# TODO: ty should reject that too
+class InvalidCustomField(models.Field[_ST, _GT, bool]):  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportInvalidTypeArguments] # type:ignore[type-var]
+    pass
+
+
 def custom_generic_field_override_typevar_defaults() -> None:
     class GenericField(models.Field[_ST, _GT, _NT]): ...
 
