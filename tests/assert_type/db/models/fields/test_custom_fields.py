@@ -15,7 +15,7 @@ class CustomFieldValue: ...
 
 # `bool` is not assignable to upper bound `Literal[False, True]` of type variable `_NT`
 # TODO: ty should reject that too
-class InvalidCustomField(models.Field[_ST, _GT, bool]):  # pyrefly: ignore[bad-specialization] # pyright: ignore[reportInvalidTypeArguments] # type:ignore[type-var]
+class InvalidCustomField(models.Field[_ST, _GT, bool]):  # type:ignore[type-var] # pyrefly: ignore[bad-specialization] # pyright: ignore[reportInvalidTypeArguments]
     pass
 
 
