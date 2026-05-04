@@ -6,15 +6,18 @@ from django.core import validators
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model, lookups
 from django.db.models.expressions import Expression
-from django.db.models.fields import _GT, _NT, _ST, NOT_PROVIDED, Field, TextField, _ErrorMessagesMapping
+from django.db.models.fields import _NT, NOT_PROVIDED, Field, TextField, _ErrorMessagesMapping
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import FieldGetDbPrepValueMixin, PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.utils.choices import _ChoicesInput
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self, override
+from typing_extensions import Self, TypeVar, override
 
-class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT, _NT]):
+_ST_JSON = TypeVar("_ST_JSON", contravariant=True, default=Any)
+_GT_JSON = TypeVar("_GT_JSON", covariant=True, default=Any)
+
+class JSONField(CheckFieldDefaultMixin, Field[_ST_JSON, _GT_JSON, _NT]):
     encoder: type[json.JSONEncoder] | None
     decoder: type[json.JSONDecoder] | None
     def __init__(
@@ -30,7 +33,7 @@ class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT, _NT]):
         null: _NT = ...,
         db_index: bool = ...,
         default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
+        db_default: type[NOT_PROVIDED] | Expression | _ST_JSON = ...,
         editable: bool = ...,
         auto_created: bool = ...,
         serialize: bool = ...,

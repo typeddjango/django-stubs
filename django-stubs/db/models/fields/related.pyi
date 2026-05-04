@@ -7,15 +7,7 @@ from django.core import validators  # due to weird mypy.stubtest error
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable, Expression
-from django.db.models.fields import (
-    _GT,
-    _NT,
-    NOT_PROVIDED,
-    Field,
-    _AllLimitChoicesTo,
-    _ErrorMessagesMapping,
-    _LimitChoicesTo,
-)
+from django.db.models.fields import _NT, NOT_PROVIDED, Field, _AllLimitChoicesTo, _ErrorMessagesMapping, _LimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForeignKeyDeferredAttribute, ManyRelatedManager
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
@@ -42,6 +34,8 @@ def lazy_related_operation(
 
 # __set__ value type
 _ST = TypeVar("_ST", contravariant=True, default=Any)
+# __get__ return type
+_GT = TypeVar("_GT", covariant=True, default=Any)
 
 class RelatedField(FieldCacheMixin, Field[_ST, _GT, _NT]):
     one_to_many: bool
