@@ -122,3 +122,17 @@ def field_explicit_any() -> None:
     instance = MyModel()
     assert_type(instance.field, Any)
     assert_type(instance.null_field, Any)
+
+
+def field_two_typevar_form_is_still_accepted() -> None:
+    class LegacyField(models.Field[CustomFieldValue | int, CustomFieldValue]): ...
+
+    class MyModel(models.Model):
+        field = LegacyField()
+        null_field = LegacyField(null=True)  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+
+    instance = MyModel()
+    assert_type(instance.field, CustomFieldValue)
+    assert_type(instance.null_field, CustomFieldValue | None)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    instance.field = CustomFieldValue()
+    instance.field = 12
