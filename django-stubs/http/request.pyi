@@ -50,7 +50,7 @@ class HttpRequest:
     FILES: MultiValueDict[str, uploadedfile.UploadedFile]
     path: str
     path_info: str
-    method: str | None
+    method: Literal["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] | None
     resolver_match: ResolverMatch | None
     content_type: str | None
     content_params: dict[str, str] | None
