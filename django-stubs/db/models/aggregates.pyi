@@ -21,7 +21,7 @@ class Aggregate(Func):
         distinct: bool = False,
         filter: Any | None = None,
         default: Any | None = None,
-        order_by: Sequence[_OrderByFieldName] | None = None,
+        order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
     @property

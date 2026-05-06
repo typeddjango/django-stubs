@@ -10,8 +10,8 @@ class OrderableAggMixin:
     def __init__(
         self,
         *expressions: BaseExpression | Combinable | str,
-        ordering: Sequence[_OrderByFieldName] = ...,
-        order_by: Sequence[_OrderByFieldName] = ...,
+        ordering: _OrderByFieldName | Sequence[_OrderByFieldName] = ...,
+        order_by: _OrderByFieldName | Sequence[_OrderByFieldName] = ...,
         **extra: Any,
     ) -> None: ...
     @override
