@@ -29,6 +29,24 @@ def lower2(value: str) -> str:
 assert_type(lower2("test"), str)
 
 
+# register.filter with all flags
+@register.filter(name="plain", is_safe=True, needs_autoescape=False, expects_localtime=False)
+def plain_filter(value: str) -> str:
+    return value
+
+
+assert_type(plain_filter("x"), str)
+
+
+# Negative: non-bool values for flag kwargs are rejected
+register.filter("bad_is_safe", is_safe="yes")  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[no-matching-overload]
+register.filter("bad_needs_autoescape", needs_autoescape="no")  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[no-matching-overload]
+register.filter("bad_expects_localtime", expects_localtime=None)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[no-matching-overload]
+
+# Negative: unknown kwargs are rejected
+register.filter("unknown_flag", safe=True)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[no-matching-overload]
+
+
 # register.simple_tag (bare)
 @register.simple_tag
 def current_time(format_string: str) -> str:
