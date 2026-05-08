@@ -210,3 +210,24 @@ def nullable_field_subclass_without_explicit_type_vars() -> None:
     assert_type(Article().body_nullable, str | None)  # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure] # pyright: ignore[reportAssertTypeFailure]
     assert_type(Article().count_nullable, int | None)  # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure] # pyright: ignore[reportAssertTypeFailure]
     assert_type(Article().slug_nullable, str | None)  # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure] # pyright: ignore[reportAssertTypeFailure]
+
+
+def test_custom_model_fields_override_init() -> None:
+    """
+    TODO: False positive ty/mypy
+    """
+    _ST_Int = TypeVar("_ST_Int", contravariant=True, default=float | int | str)
+    _GT_Int = TypeVar("_GT_Int", covariant=True, default=int)
+    _NT = TypeVar("_NT", Literal[True], Literal[False], default=Literal[False])
+
+    class MyIntegerField(models.IntegerField[_ST_Int, _GT_Int, _NT]):
+        def __init__(self, *args: Any, null: _NT = False, **kwargs: Any) -> None:  # type:ignore[assignment] # ty:ignore[invalid-parameter-default]
+            kwargs["null"] = null
+            super().__init__(*args, **kwargs)
+
+    class User(models.Model):
+        custom_int = MyIntegerField(null=False)
+        custom_int_nullable = MyIntegerField(null=True)
+
+    assert_type(User().custom_int, int)
+    assert_type(User().custom_int_nullable, int | None)

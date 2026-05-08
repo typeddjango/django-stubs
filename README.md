@@ -487,6 +487,34 @@ User().my_field = "12" # E: Incompatible types in assignment (expression has typ
 
 See mypy section on [generic classes subclasses](https://mypy.readthedocs.io/en/stable/generics.html#defining-subclasses-of-generic-classes).
 
+#### Overriding `__init__`
+
+If you override `__init__`, expose `null: _NT` in the signature so type
+checkers can track the `null=` flag — a plain `*args, **kwargs` passthrough
+loses it and `_NT` falls back to `Literal[False]`:
+
+```python
+from typing import Any, Literal
+from typing_extensions import TypeVar, assert_type
+from django.db import models
+
+_ST = TypeVar("_ST", contravariant=True, default=float | int | str)
+_GT = TypeVar("_GT", covariant=True, default=int)
+_NT = TypeVar("_NT", Literal[True], Literal[False], default=Literal[False])
+
+class MyIntegerField(models.IntegerField[_ST, _GT, _NT]):
+    def __init__(self, *args: Any, null: _NT = False, **kwargs: Any) -> None:  # type: ignore[assignment]
+        kwargs["null"] = null
+        super().__init__(*args, **kwargs)
+
+class User(models.Model):
+    custom_int = MyIntegerField(null=False)
+    custom_int_nullable = MyIntegerField(null=True)
+
+assert_type(User().custom_int, int)
+assert_type(User().custom_int_nullable, int | None)
+```
+
 ## Related projects
 
 - [`awesome-python-typing`](https://github.com/typeddjango/awesome-python-typing) - Awesome list of all typing-related things in Python.
