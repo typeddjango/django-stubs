@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, cast
 
-from django.db.models.fields.related import RelatedField
-from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.checkmember import analyze_member_access as _mypy_analyze_member_access
@@ -69,7 +67,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Mapping
 
     from django.db.models.base import Model
-    from django.db.models.fields import Field
 
     from mypy_django_plugin.django.context import DjangoContext
 
@@ -451,21 +448,6 @@ def get_field_type_args(field_type: Instance) -> FieldTypeArgs | None:
         return None
     mapped = map_instance_to_supertype(field_type, base_field_info)
     return FieldTypeArgs(set=get_proper_type(mapped.args[0]), get=get_proper_type(mapped.args[1]))
-
-
-def get_field_lookup_exact_type(api: TypeChecker, field: Field[Any, Any]) -> MypyType:
-    if isinstance(field, RelatedField | ForeignObjectRel):
-        # Not using field.related_model because that may have str value "self"
-        lookup_type_class = field.remote_field.model
-        rel_model_info = lookup_class_typeinfo(api, lookup_type_class)
-        if rel_model_info is None:
-            return AnyType(TypeOfAny.from_error)
-        return make_optional_type(Instance(rel_model_info, []))
-
-    field_info = lookup_class_typeinfo(api, field.__class__)
-    if field_info is None:
-        return AnyType(TypeOfAny.explicit)
-    return get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
 
 
 def get_nested_meta_node_for_current_class(info: TypeInfo) -> TypeInfo | None:
