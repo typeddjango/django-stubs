@@ -136,3 +136,27 @@ def field_two_typevar_form_is_still_accepted() -> None:
     assert_type(instance.null_field, CustomFieldValue | None)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     instance.field = CustomFieldValue()
     instance.field = 12
+
+
+def field_two_typevar_form_in_user_annotation() -> None:
+    # Legacy `field: Field[A, B] = CustomField()` annotations with a legacy `CustomField` (without `_NT`)
+    class CustomField(models.Field[CustomFieldValue | int, CustomFieldValue]): ...
+
+    class MyModel(models.Model):
+        field: models.Field[CustomFieldValue | int, CustomFieldValue] = CustomField()
+        implicit_null_field = CustomField(null=True)  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+        explicit_null_field: models.Field[CustomFieldValue | int, CustomFieldValue | None, Literal[True]] = CustomField(  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
+            null=True  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type] # ty: ignore[invalid-argument-type]
+        )
+        null_field: models.Field[CustomFieldValue | int, CustomFieldValue | None] = CustomField(null=True)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+
+    instance = MyModel()
+    assert_type(instance.field, CustomFieldValue)
+    assert_type(instance.null_field, CustomFieldValue | None)
+    assert_type(instance.implicit_null_field, CustomFieldValue | None)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.explicit_null_field, CustomFieldValue | None)  # pyrefly: ignore[assert-type]
+    instance.field = CustomFieldValue()
+    instance.field = 12
+    instance.field = "no"  # type: ignore[call-overload]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-assignment]  # pyright: ignore[reportAttributeAccessIssue]
+    instance.null_field = None  # type: ignore[call-overload]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-assignment]  # pyright: ignore[reportAttributeAccessIssue]
+    instance.null_field = CustomFieldValue()
