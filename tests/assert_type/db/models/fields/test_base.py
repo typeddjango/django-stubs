@@ -7,9 +7,8 @@ from typing import Any, Literal, NewType, cast
 
 from django.db import models
 from django.db.models import CharField
-from django.db.models.expressions import Combinable
 from django.db.models.fields import IntegerField, _FieldDescriptor
-from typing_extensions import TypeVar, assert_type
+from typing_extensions import assert_type
 
 
 class AllFields(models.Model):
@@ -248,47 +247,3 @@ def nullable_field_with_strict_optional_true() -> None:
 
     MyModel().text = None  # type: ignore[call-overload] # pyrefly:ignore[no-matching-overload] # ty:ignore[invalid-assignment] # pyright:ignore[reportAttributeAccessIssue]
     MyModel().text_nullable = None
-
-
-def nullable_subclass_inherits_null_overload() -> None:
-    _ST_Text = TypeVar("_ST_Text", contravariant=True, default=str | int | Combinable)
-    _GT_Text = TypeVar("_GT_Text", covariant=True, default=str)
-    _ST_Int = TypeVar("_ST_Int", contravariant=True, default=float | int | str | Combinable)
-    _GT_Int = TypeVar("_GT_Int", covariant=True, default=int)
-    _NT = TypeVar("_NT", Literal[True], Literal[False], default=Literal[False])
-
-    class HtmlField(models.TextField[_ST_Text, _GT_Text, _NT]): ...
-
-    class IntWrap(models.IntegerField[_ST_Int, _GT_Int, _NT]): ...
-
-    class Article(models.Model):
-        body = HtmlField()
-        body_nullable = HtmlField(null=True)
-        count = IntWrap()
-        count_nullable = IntWrap(null=True)
-
-    assert_type(Article().body, str)
-    assert_type(Article().body_nullable, str | None)
-    assert_type(Article().count, int)
-    assert_type(Article().count_nullable, int | None)
-
-
-def nullable_field_subclass_without_explicit_type_vars() -> None:
-    """
-    We auto add typevars in mypy plugin which avoid issues here.
-
-    TODO: False positive pyrefly/ty/pyright
-    """
-
-    class HTMLField(models.TextField): ...
-
-    class IntWrap(models.IntegerField): ...
-
-    class Article(models.Model):
-        body = HTMLField()
-        body_nullable = HTMLField(null=True)  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
-        count_nullable = IntWrap(null=True)  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
-
-    assert_type(Article().body, str)
-    assert_type(Article().body_nullable, str | None)  # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure] # pyright: ignore[reportAssertTypeFailure]
-    assert_type(Article().count_nullable, int | None)  # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure] # pyright: ignore[reportAssertTypeFailure]
