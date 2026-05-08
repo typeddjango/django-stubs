@@ -240,6 +240,7 @@ django.template.smartif.op
 # Field.__get__/__set__ are stub-only for the type checkers, they don't exist at runtime
 django.db.models.fields.Field.__get__
 django.db.models.fields.Field.__set__
+django.db.models.fields.files.FileField.__get__
 django.db.models.fields.related.ForeignObject.__get__
 django.db.models.fields.related.ForeignObject.__set__
 django.db.models.fields.related.ManyToManyField.__get__

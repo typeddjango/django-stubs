@@ -1,6 +1,6 @@
 import sys
 from collections.abc import Callable, Iterable
-from typing import Any, Protocol, type_check_only
+from typing import Any, Protocol, overload, type_check_only
 
 from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
@@ -8,7 +8,7 @@ from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
-from django.db.models.fields import _NT, _ST, NOT_PROVIDED, Field, _ErrorMessagesMapping
+from django.db.models.fields import _NT, _ST, NOT_PROVIDED, Field, _ErrorMessagesMapping, _FieldDescriptor
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData
 from django.utils._os import _PathCompatible
@@ -96,6 +96,23 @@ class FileField(Field[_ST, _GT_File, _NT]):
         validators: Iterable[validators._ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
+    # At runtime, FileDescriptor.__get__ ALWAYS returns a FieldFile even when the underlying database value is NULL.
+    # It wraps None in FieldFile(instance, field, name=None).
+    # class access
+    @overload
+    @type_check_only
+    @override
+    def __get__(self, instance: None, owner: Any) -> _FieldDescriptor[Self]: ...
+    # Model instance access — null=True does NOT add `| None`
+    @overload
+    @type_check_only
+    @override
+    def __get__(self, instance: Model, owner: Any) -> _GT_File: ...
+    # non-Model instances
+    @overload
+    @type_check_only
+    @override
+    def __get__(self, instance: Any, owner: Any) -> Self: ...
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
     def generate_filename(self, instance: Model | None, filename: _PathCompatible) -> str: ...
