@@ -152,14 +152,20 @@
                     username = models.CharField(max_length=100)
 
 
--   case: annotate_no_field_name
+-   case: annotate_positional_aggregate_uses_default_alias
     main: |
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models import Count
 
-        qs = User.objects.annotate(Count('id'))
-        reveal_type(qs) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User, myapp.models.User]"
+        # Positional Aggregate gets Django's default_alias: <field>__<name_lower>.
+        user = User.objects.annotate(Count('id')).get()
+        reveal_type(user.id__count)  # N: Revealed type is "int"
+
+        # Multiple positional aggregates produce multiple default aliases.
+        multi = User.objects.annotate(Count('id'), Count('username')).get()
+        reveal_type(multi.id__count)        # N: Revealed type is "int"
+        reveal_type(multi.username__count)  # N: Revealed type is "int"
 
     installed_apps:
         - myapp
@@ -181,8 +187,7 @@
 
         def animals_only(param: Animal) -> None:
             pass
-        # Make sure that the type is still checked when no annotation was produced
-        animals_only(annotated_user) # E: Argument 1 to "animals_only" has incompatible type "User"; expected "Animal"  [arg-type]
+        animals_only(annotated_user) # E: Argument 1 to "animals_only" has incompatible type "User@AnnotatedWith[TypedDict({'id__count': int})]"; expected "Animal"  [arg-type]
 
         def users_allowed(param: User) -> None:
             # But this function accepts only the original User type, so any attr access is not allowed within this function

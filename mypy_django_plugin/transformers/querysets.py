@@ -18,12 +18,14 @@ from mypy.errorcodes import NO_REDEF
 from mypy.nodes import (
     ARG_NAMED,
     ARG_NAMED_OPT,
+    ARG_POS,
     ARG_STAR,
     CallExpr,
     Decorator,
     Expression,
     ListExpr,
     SetExpr,
+    StrExpr,
     TupleExpr,
     Var,
 )
@@ -227,20 +229,48 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     return ret
 
 
+def _aggregate_default_alias(expr: Expression, expr_type: MypyType) -> str | None:
+    """Mirror `Aggregate.default_alias`: ``<source_expression>__<aggregate_name_lower>``.
+
+    Django generates a default alias only for aggregates with a single source
+    expression that has a `name`; complex expressions raise at runtime, so the
+    plugin matches that and returns ``None`` for anything else.
+
+    See https://docs.djangoproject.com/en/dev/topics/db/aggregation/#generating-aggregates-for-each-item-in-a-queryset
+    """
+    if not (
+        isinstance(expr, CallExpr)
+        and isinstance(proper := get_proper_type(expr_type), Instance)
+        and proper.type.has_base(fullnames.AGGREGATE_CLASS_FULLNAME)
+    ):
+        return None
+    source: Expression | None = None
+    for arg, kind in zip(expr.args, expr.arg_kinds, strict=False):
+        if kind != ARG_POS:
+            continue
+        if source is not None:
+            return None
+        source = arg
+    # TODO: consider switching to `helpers.resolve_string_attribute_value` once
+    # `gather_kwargs` threads `django_context` through — that would also handle
+    # `Count(NAME_CONST)` and `Count(settings.X)`.
+    if not isinstance(source, StrExpr):
+        return None
+    return f"{source.value}__{proper.type.name.lower()}"
+
+
 def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
-    num_args = len(ctx.arg_kinds)
-    kwargs = {}
+    kwargs: dict[str, MypyType] = {}
     named = (ARG_NAMED, ARG_NAMED_OPT)
-    for i in range(num_args):
-        if not ctx.arg_kinds[i]:
-            continue
-        if any(kind not in named for kind in ctx.arg_kinds[i]):
-            # Only named arguments supported
-            continue
-        for j in range(len(ctx.arg_names[i])):
-            name = ctx.arg_names[i][j]
-            assert name is not None
-            kwargs[name] = ctx.arg_types[i][j]
+    for slot in zip(ctx.arg_kinds, ctx.arg_types, ctx.arg_names, ctx.args, strict=False):
+        for kind, arg_type, name, arg in zip(*slot, strict=False):
+            if kind in named:
+                assert name is not None
+                kwargs[name] = arg_type
+            elif kind == ARG_POS:
+                alias = _aggregate_default_alias(arg, arg_type)
+                if alias is not None:
+                    kwargs[alias] = arg_type
     return kwargs
 
 
