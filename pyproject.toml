@@ -65,7 +65,7 @@ pyright = [
   "pyright==1.1.409",
 ]
 pyrefly = [
-  "pyrefly==0.63.1",
+  "pyrefly==0.64.0",
 ]
 ty = [
   "ty==0.0.34",
