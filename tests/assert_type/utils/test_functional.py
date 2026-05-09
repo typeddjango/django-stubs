@@ -41,7 +41,7 @@ class Quux(Foo):
 class Baz(Quux):
     @cached_property
     @override
-    def attr(self) -> list[str]: ...  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]
+    def attr(self) -> list[str]: ...  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
 
 
 # str promise proxy
