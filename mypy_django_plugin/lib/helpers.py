@@ -606,8 +606,8 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: Django
     if isinstance(attr_expr, MemberExpr):
         member_name = attr_expr.name
         if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == "django.conf.settings":
-            if hasattr(django_context.settings, member_name):
-                return getattr(django_context.settings, member_name)  # type: ignore[no-any-return]
+            if django_context.has_setting(member_name):
+                return django_context.get_setting(member_name)  # type: ignore[no-any-return]
     return None
 
 
@@ -736,7 +736,7 @@ def get_model_from_expression(
         and isinstance(expr.expr, NameExpr)
         and f"{expr.expr.fullname}.{expr.name}" == fullnames.AUTH_USER_MODEL_FULLNAME
     ):
-        lazy_reference = django_context.settings.AUTH_USER_MODEL
+        lazy_reference = django_context.auth_user_model_label
 
     if lazy_reference is not None:
         model_info = resolve_lazy_reference(lazy_reference, api=api, django_context=django_context, ctx=expr)

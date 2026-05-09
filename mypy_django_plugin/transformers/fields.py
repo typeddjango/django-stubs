@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
-from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
@@ -42,10 +41,7 @@ def _get_current_field_from_assignment(
     if model_cls is None:
         return None
 
-    try:
-        return model_cls._meta.get_field(field_name)
-    except FieldDoesNotExist:
-        return None
+    return django_context.get_field_on_model(model_cls, field_name)
 
 
 def reparametrize_related_field_type(related_field_type: Instance, set_type: MypyType, get_type: MypyType) -> Instance:
@@ -72,11 +68,11 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
 
     # self reference with abstract=True on the model where ForeignKey is defined
     current_model_cls = current_field.model
-    if current_model_cls._meta.abstract and current_model_cls == related_model_cls:
+    if django_context.is_model_abstract(current_model_cls) and current_model_cls == related_model_cls:
         # for all derived non-abstract classes, set variable with this name to
         # __get__/__set__ of ForeignKey of derived model
         for model_cls in django_context.all_registered_model_classes:
-            if issubclass(model_cls, current_model_cls) and not model_cls._meta.abstract:
+            if issubclass(model_cls, current_model_cls) and not django_context.is_model_abstract(model_cls):
                 derived_model_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), model_cls)
                 if derived_model_info is not None:
                     fk_ref_type = Instance(derived_model_info, [])
@@ -87,8 +83,8 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
 
     related_model = related_model_cls
     related_model_to_set = related_model_cls
-    if related_model_to_set._meta.proxy_for_model is not None:
-        related_model_to_set = related_model_to_set._meta.proxy_for_model
+    if (proxy_target := django_context.get_proxy_target(related_model_to_set)) is not None:
+        related_model_to_set = proxy_target
 
     typechecker_api = helpers.get_typechecker_api(ctx)
 

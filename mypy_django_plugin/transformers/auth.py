@@ -30,7 +30,7 @@ def get_user_model(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> My
     if not django_context.is_contrib_auth_installed:
         return _get_abstract_base_user(ctx.api.api)
 
-    auth_user_model = django_context.settings.AUTH_USER_MODEL
+    auth_user_model = django_context.auth_user_model_label
     model_info = helpers.resolve_lazy_reference(
         auth_user_model, api=ctx.api.api, django_context=django_context, ctx=ctx.context
     )

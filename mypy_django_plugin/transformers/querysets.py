@@ -794,7 +794,7 @@ def check_valid_prefetch_related_lookup(
 ) -> bool:
     """Check if a lookup string resolve to something that can be prefetched"""
     current_model_cls = django_model.cls
-    contenttypes_installed = django_context.apps_registry.is_installed("django.contrib.contenttypes")
+    contenttypes_installed = django_context.is_app_installed("django.contrib.contenttypes")
     for through_attr in lookup.split(LOOKUP_SEP):
         rel_obj_descriptor = getattr(current_model_cls, through_attr, None)
         if rel_obj_descriptor is None:
@@ -973,15 +973,22 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
 
 
 def _try_get_field(
-    ctx: MethodContext, model_cls: type[Model], field_name: str, *, resolve_pk: bool = False
+    ctx: MethodContext,
+    django_context: DjangoContext,
+    model_cls: type[Model],
+    field_name: str,
+    *,
+    resolve_pk: bool = False,
 ) -> _AnyField | None:
-    opts = model_cls._meta
-    resolved_name = opts.pk.name if resolve_pk and field_name == "pk" else field_name
-    try:
-        return opts.get_field(resolved_name)
-    except FieldDoesNotExist as e:
-        ctx.api.fail(str(e), ctx.context)
-        return None
+    if resolve_pk and field_name == "pk":
+        pk = django_context.get_pk_field_or_none(model_cls)
+        resolved_name = pk.name if pk is not None else field_name
+    else:
+        resolved_name = field_name
+    field = django_context.get_field_on_model(model_cls, resolved_name)
+    if field is None:
+        ctx.api.fail(f"{model_cls.__name__} has no field named {resolved_name!r}", ctx.context)
+    return field
 
 
 def _check_field_concrete(ctx: MethodContext, field: _AnyField, field_name: str, method: str) -> bool:
@@ -993,6 +1000,7 @@ def _check_field_concrete(ctx: MethodContext, field: _AnyField, field_name: str,
 
 def _check_field_not_pk(
     ctx: MethodContext,
+    django_context: DjangoContext,
     model_cls: type[Model],
     field: _AnyField,
     field_name: str,
@@ -1000,10 +1008,9 @@ def _check_field_not_pk(
     *,
     attr_name: str | None = None,
 ) -> bool:
-    opts = model_cls._meta
-    all_pk_fields = set(getattr(opts, "pk_fields", [opts.pk]))
-    for parent in getattr(opts, "all_parents", opts.get_parent_list()):
-        all_pk_fields.update(getattr(parent._meta, "pk_fields", [parent._meta.pk]))
+    all_pk_fields: set[_AnyField] = set(django_context.get_pk_fields(model_cls))
+    for parent in django_context.get_model_parents(model_cls):
+        all_pk_fields.update(django_context.get_pk_fields(parent))
     if field in all_pk_fields:
         param_str = f' in "{attr_name}="' if attr_name else ""
         ctx.api.fail(f'"{method}()" does not support primary key fields{param_str}. Got "{field_name}"', ctx.context)
@@ -1036,19 +1043,12 @@ def _extract_field_names_from_varargs(ctx: MethodContext) -> list[str]:
     ]
 
 
-def _get_select_related_field_choices(model_cls: type[Model]) -> set[str]:
+def _get_select_related_field_choices(django_context: DjangoContext, model_cls: type[Model]) -> set[str]:
     """
     Get valid field choices for select_related lookups.
     Based on Django's SQLCompiler.get_related_selections._get_field_choices method.
     """
-    opts = model_cls._meta
-
-    # Direct relation fields (forward relations)
-    direct_choices = (f.name for f in opts.fields if f.is_relation)
-
-    # Reverse relation fields (backward relations with unique=True)
-    reverse_choices = (f.field.related_query_name() for f in opts.related_objects if f.field.unique)
-    return {*direct_choices, *reverse_choices}
+    return set(django_context.iter_select_related_choices(model_cls))
 
 
 def _validate_select_related_lookup(
@@ -1068,7 +1068,7 @@ def _validate_select_related_lookup(
     lookup_parts = lookup.split(LOOKUP_SEP)
     observed_model = model_cls
     for i, part in enumerate(lookup_parts):
-        valid_choices = _get_select_related_field_choices(observed_model)
+        valid_choices = _get_select_related_field_choices(django_context, observed_model)
 
         if part not in valid_choices:
             ctx.api.fail(
@@ -1106,12 +1106,18 @@ def validate_select_related(ctx: MethodContext, django_context: DjangoContext) -
 
 
 def _validate_bulk_update_field(
-    ctx: MethodContext, model_cls: type[Model], field_name: str, method: str, *, attr_name: str | None = None
+    ctx: MethodContext,
+    django_context: DjangoContext,
+    model_cls: type[Model],
+    field_name: str,
+    method: str,
+    *,
+    attr_name: str | None = None,
 ) -> bool:
     return (
-        (field := _try_get_field(ctx, model_cls, field_name)) is not None
+        (field := _try_get_field(ctx, django_context, model_cls, field_name)) is not None
         and _check_field_concrete(ctx, field, field_name, method)
-        and _check_field_not_pk(ctx, model_cls, field, field_name, method, attr_name=attr_name)
+        and _check_field_not_pk(ctx, django_context, model_cls, field, field_name, method, attr_name=attr_name)
     )
 
 
@@ -1137,17 +1143,17 @@ def validate_bulk_update(
         return ctx.default_return_type
 
     for field_name in field_names:
-        _validate_bulk_update_field(ctx, django_model.cls, field_name, method)
+        _validate_bulk_update_field(ctx, django_context, django_model.cls, field_name, method)
 
     return ctx.default_return_type
 
 
 def _validate_bulk_create_unique_field(
-    ctx: MethodContext, model_cls: type[Model], field_name: str, method: str
+    ctx: MethodContext, django_context: DjangoContext, model_cls: type[Model], field_name: str, method: str
 ) -> bool:
-    return (field := _try_get_field(ctx, model_cls, field_name, resolve_pk=True)) is not None and _check_field_concrete(
-        ctx, field, field_name, method
-    )
+    return (
+        field := _try_get_field(ctx, django_context, model_cls, field_name, resolve_pk=True)
+    ) is not None and _check_field_concrete(ctx, field, field_name, method)
 
 
 def validate_bulk_create(
@@ -1164,26 +1170,30 @@ def validate_bulk_create(
     update_field_names = _extract_field_names_from_collection(ctx, django_context, arg_index=4)
     if update_field_names is not None:
         for field_name in update_field_names:
-            _validate_bulk_update_field(ctx, django_model.cls, field_name, method, attr_name="update_fields")
+            _validate_bulk_update_field(
+                ctx, django_context, django_model.cls, field_name, method, attr_name="update_fields"
+            )
 
     unique_field_names = _extract_field_names_from_collection(ctx, django_context, arg_index=5)
     if unique_field_names is not None:
         for field_name in unique_field_names:
-            _validate_bulk_create_unique_field(ctx, django_model.cls, field_name, method)
+            _validate_bulk_create_unique_field(ctx, django_context, django_model.cls, field_name, method)
 
     return ctx.default_return_type
 
 
-def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str]) -> None:
+def _validate_order_by_lookup(
+    ctx: MethodContext, django_context: DjangoContext, model_cls: type[Model], parts: list[str]
+) -> None:
     if len(parts) == 1 and parts[0] == "?":
         return
 
     # Abstract models don't have a pk field, skip validation
-    if model_cls._meta.abstract:
+    if django_context.is_model_abstract(model_cls):
         return
 
     try:
-        _, final_field, _, remainder = Query(model_cls).names_to_path(parts, model_cls._meta)
+        final_field, remainder = django_context.resolve_names_to_path(model_cls, parts)
     except FieldError as exc:
         ctx.api.fail(exc.args[0], ctx.context)
         return
@@ -1213,7 +1223,7 @@ def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> Mypy
         if selected_fields is not None and parts[0] in selected_fields:
             # Skip validation for fields selected via values()/values_list()
             continue
-        _validate_order_by_lookup(ctx, django_model.cls, parts)
+        _validate_order_by_lookup(ctx, django_context, django_model.cls, parts)
 
     return ctx.default_return_type
 

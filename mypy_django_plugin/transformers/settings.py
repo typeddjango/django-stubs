@@ -42,7 +42,7 @@ def get_type_of_settings_attribute(
     # If it does, we just return `Any`, not to raise any false-positives.
     # But, we cannot reconstruct the exact runtime type.
     # See https://github.com/typeddjango/django-stubs/pull/1163
-    if not plugin_config.strict_settings and hasattr(django_context.settings, setting_name):
+    if not plugin_config.strict_settings and django_context.has_setting(setting_name):
         return AnyType(TypeOfAny.implementation_artifact)
 
     ctx.api.fail(f"'Settings' object has no attribute {setting_name!r}", ctx.context)
