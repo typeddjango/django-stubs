@@ -29,7 +29,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 659a7789596d520c849e9c96525119e9fbaa731f  # frozen: 0.11.8
+    rev: 92791afd0b37b081bdc48d250ecc6aed11b6beac  # frozen: 0.11.13
     hooks:
       - id: uv-lock
 
