@@ -428,7 +428,7 @@
         - myapp
     main: |
         from django.contrib.contenttypes.prefetch import GenericPrefetch
-        from myapp.models import Bookmark, Animal, TaggedItem
+        from myapp.models import Bookmark, Animal, TaggedItem, Dog, Cat
         from typing_extensions import reveal_type
 
         # Basic GenericPrefetch usage
@@ -436,6 +436,17 @@
             "content_object", [Bookmark.objects.all(), Animal.objects.only("name")]
         )
         reveal_type(prefetch)  # N: Revealed type is "django.contrib.contenttypes.prefetch.GenericPrefetch[Literal['content_object'], list[django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model]], str]"
+
+        # GenericPrefetch usage with custom querysets
+        prefetch_custom = GenericPrefetch(
+            "content_object", [Dog.objects.all(), Cat.objects.all()]
+        )
+        reveal_type(prefetch_custom)  # N: Revealed type is "django.contrib.contenttypes.prefetch.GenericPrefetch[Literal['content_object'], list[myapp.models.CustomQuerySet[django.db.models.base.Model, django.db.models.base.Model]], str]"
+
+        prefetch_custom_mixed = GenericPrefetch(
+            "content_object", [Bookmark.objects.all(), Animal.objects.only("name"), Dog.objects.all(), Cat.objects.all()]
+        )
+        reveal_type(prefetch_custom_mixed)  # N: Revealed type is "django.contrib.contenttypes.prefetch.GenericPrefetch[Literal['content_object'], list[django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model]], str]"
 
         # Using GenericPrefetch with prefetch_related
         qs = TaggedItem.objects.prefetch_related(prefetch).all()
@@ -476,6 +487,17 @@
 
                 class Animal(models.Model):
                     name = models.CharField(max_length=100)
+
+                class CustomQuerySet(models.QuerySet):
+                    pass
+
+                CustomManager = models.Manager.from_queryset(CustomQuerySet)
+
+                class Dog(models.Model):
+                    objects = CustomManager()
+
+                class Cat(models.Model):
+                    objects = CustomManager()
 
                 class TaggedItem(models.Model):
                     tag = models.CharField(max_length=100)
