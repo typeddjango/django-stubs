@@ -1012,3 +1012,16 @@
 
         class FooModel(models.Model):
             objects = FooManager()
+
+- case: values_then_annotate_on_generic_queryset_typevar
+  main: |
+    from typing import Any
+    from typing_extensions import reveal_type, TypeVar
+    from django.db import models
+
+    _Model = TypeVar("_Model", bound=models.Model)
+
+    def latest_max(qs: models.QuerySet[_Model]) -> dict[str, Any] | None:
+        annotated = qs.values("id").annotate(foo=models.Max("id"))
+        reveal_type(annotated)  # N: Revealed type is "django.db.models.query.QuerySet[django.db.models.base.Model, dict[str, Any]]"
+        return annotated.first()
