@@ -1,0 +1,58 @@
+- case: valid_functional_registration
+  main: |
+    from django.contrib import admin
+    from django.contrib.admin import ModelAdmin
+    from django.db import models
+
+    class MyModel(models.Model):
+        pass
+
+    class MyModelAdmin(ModelAdmin[MyModel]):
+        pass
+
+    admin.site.register(MyModel, MyModelAdmin)
+
+
+- case: invalid_functional_registration
+  main: |
+    from django.contrib import admin
+    from django.contrib.admin import ModelAdmin
+    from django.db import models
+
+    class MyModel(models.Model):
+        pass
+
+    class AnotherModel(models.Model):
+        pass
+
+    class MyModelAdmin(ModelAdmin[MyModel]):
+        pass
+
+    admin.site.register(AnotherModel, MyModelAdmin)  # E: Cannot infer value of type parameter "_ModelT" of "register" of "AdminSite"  [misc]
+
+
+- case: decorator_registration
+  main: |
+    from django.contrib import admin
+    from django.contrib.admin import ModelAdmin
+    from django.db import models
+
+    class MyModel(models.Model):
+        pass
+
+    @admin.register(MyModel)
+    class MyModelAdmin(ModelAdmin[MyModel]):
+        pass
+
+
+- case: invalid_decorator_registration
+  main: |
+    from django.contrib import admin
+    from django.db import models
+
+    class MyModel(models.Model):
+        pass
+
+    @admin.register(MyModel)
+    class NotAnAdmin:  # E: Value of type variable "_ModelAdmin" of function cannot be "NotAnAdmin"  [type-var]
+        pass

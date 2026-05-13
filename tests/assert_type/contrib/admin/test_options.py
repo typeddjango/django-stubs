@@ -101,9 +101,6 @@ class FullModelAdmin(admin.ModelAdmin[FullAdminModel]):
         self.message_user(request, _("Error message"), messages.ERROR)
 
 
-admin.site.register(FullAdminModel, FullModelAdmin)
-
-
 # This admin is here to make sure we're not running into a mypy issue which is
 # worked around using a somewhat complicated _ListOrTuple union type. Once the
 # issue is solved upstream this test should pass even with the workaround
