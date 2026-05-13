@@ -362,6 +362,33 @@
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100)
 
+-   case: annotate_then_values_list_flat_slice_preserves_row_type
+    main: |
+        from typing import Iterable
+        from typing_extensions import reveal_type
+        from myapp.models import Blog
+        from django.db.models import F
+
+        qs = Blog.objects.annotate(a=F("id")).values_list("id", flat=True)
+        reveal_type(qs)  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], int]"
+        reveal_type(qs[:])  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], int]"
+
+        def get_blog_ids() -> Iterable[int]:
+            return Blog.objects.annotate(a=F("id")).values_list("id", flat=True)[:]
+
+        # Also preserve non-flat tuple row types and TypedDict row types from values().
+        reveal_type(Blog.objects.annotate(a=F("id")).values_list("id", "text")[:])  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], tuple[int, str]]"
+        reveal_type(Blog.objects.annotate(a=F("id")).values("id")[:])  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], TypedDict({'id': int})]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Blog(models.Model):
+                    text = models.CharField(max_length=100)
+
 - case: test_annotate_with_filter
   main: |
     from django.db import models

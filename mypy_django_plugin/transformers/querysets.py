@@ -505,7 +505,16 @@ def merge_annotations_from_custom_method(ctx: MethodContext, django_context: Dja
 
     api = helpers.get_typechecker_api(ctx)
     annotated_type = get_annotated_type(api, django_model.typ, fields_dict=new_td)
-    return default_return_type.copy_modified(args=[annotated_type, annotated_type])
+    new_args: list[MypyType] = [annotated_type]
+    if len(default_return_type.args) > 1:
+        original_row = get_proper_type(default_return_type.args[1])
+        if isinstance(original_row, Instance) and helpers.is_model_type(original_row.type):
+            new_args.append(annotated_type)
+        else:
+            new_args.append(default_return_type.args[1])
+    else:
+        new_args.append(annotated_type)
+    return default_return_type.copy_modified(args=new_args)
 
 
 def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> list[str] | None:
