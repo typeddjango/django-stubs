@@ -18,7 +18,8 @@
 
         def check_user(user: MyUser | AnonymousUser) -> bool: return True
         @user_passes_test(check_user)
-        def view(request: HttpRequest) -> HttpResponse: ...
+        def view(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
         AUTH_USER_MODEL = "myapp.MyUser"
@@ -50,7 +51,8 @@
 
         def check_user(user: User | AnonymousUser) -> bool: return True
         @user_passes_test(check_user)
-        def view(request: HttpRequest) -> HttpResponse: ...
+        def view(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
     files:
@@ -82,7 +84,8 @@
 
         def check_user(user: AbstractBaseUser | AnonymousUser) -> bool: return True
         @user_passes_test(check_user)
-        def view(request: HttpRequest) -> HttpResponse: ...
+        def view(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "myapp")
     files:

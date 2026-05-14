@@ -30,8 +30,12 @@ assert_type(path("login/", LoginView.as_view(), name="login1"), URLPattern)
 assert_type(path(_("login/"), LoginView.as_view(), name="login2"), URLPattern)
 
 
-def v1() -> HttpResponse: ...
-async def v2() -> HttpResponse: ...
+def v1() -> HttpResponse:
+    raise NotImplementedError
+
+
+async def v2() -> HttpResponse:
+    raise NotImplementedError
 
 
 assert_type(path("v1/", v1), URLPattern)
@@ -58,7 +62,8 @@ assert_type(static("/media/"), list[URLPattern])
 assert_type(static("/media/", document_root="/tmp/media"), list[URLPattern])
 
 
-def custom_serve(request: object, path: str) -> HttpResponse: ...
+def custom_serve(request: object, path: str) -> HttpResponse:
+    raise NotImplementedError
 
 
 assert_type(static("/media/", view=custom_serve), list[URLPattern])

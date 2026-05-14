@@ -14,7 +14,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
-from django.db.models.lookups import Exact
+from django.db.models.lookups import Exact, In
 from django.db.models.sql.query import Query
 from mypy.typeanal import make_optional_type
 from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UnionType, get_proper_type
@@ -198,8 +198,10 @@ class DjangoContext:
             if isinstance(field, Field):
                 field_name = getattr(field, "attname", field.name)
                 # Can not determine target_field for recursive relationship when model is abstract
-                if field.related_model == "self" and model_cls._meta.abstract:
-                    continue
+                # We add type ignores here because the plugin might have to check bogus code instantiating
+                # recursive abstract model and we need to not crash and gracefully exit.
+                if field.related_model == "self" and model_cls._meta.abstract:  # type: ignore[comparison-overlap, unreachable]
+                    continue  # type: ignore[unreachable]
 
                 expected_types[field_name] = helpers.get_field_set_type_from_model_type_info(
                     api, context, model_info, field_name
@@ -395,19 +397,21 @@ class DjangoContext:
             return None
 
         lookup_base_field, *annotation_lookup_parts = lookup.split(LOOKUP_SEP)
+        annotation_type = model_instance.extra_attrs.attrs.get(lookup_base_field)
 
-        if lookup_base_field not in model_instance.extra_attrs.attrs:
-            return None
+        if not annotation_lookup_parts:
+            return annotation_type
 
-        if annotation_lookup_parts:
-            lookup_cls = Field().get_lookup(annotation_lookup_parts[-1])
-            if lookup_cls is not None:
-                lookup_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls)
-                if lookup_type is not None:
-                    return lookup_type
+        lookup_cls = Field().get_lookup(annotation_lookup_parts[-1])
 
-        # No lookup suffix or Field-dependent lookup: fall back to annotation type
-        return model_instance.extra_attrs.attrs[lookup_base_field]
+        if lookup_cls is None:
+            return annotation_type
+
+        if annotation_type is not None and issubclass(lookup_cls, In):
+            return ctx.api.named_generic_type("typing.Iterable", [annotation_type])
+
+        lookup_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls)
+        return annotation_type if lookup_type is None else lookup_type
 
     def resolve_lookup_expected_type(
         self, ctx: MethodContext, model_cls: type[Model], lookup: str, model_instance: Instance
@@ -444,8 +448,12 @@ class DjangoContext:
                 # unknown lookup
                 return AnyType(TypeOfAny.explicit)
 
-        if lookup_cls is None or isinstance(lookup_cls, Exact):
+        if lookup_cls is None or issubclass(lookup_cls, Exact):
             return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field, ctx.context)
+
+        if issubclass(lookup_cls, In):
+            exact_type = self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field, ctx.context)
+            return ctx.api.named_generic_type("typing.Iterable", [exact_type])
 
         resolved_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls, field)
         if resolved_type is not None:

@@ -20,7 +20,7 @@
     main: |
         from myapp.models import MyUser
         def func(i: int) -> MyUser:
-            pass
+            raise NotImplementedError
         func("hello")  # E: Argument 1 to "func" has incompatible type "str"; expected "int"  [arg-type]
     installed_apps:
         - myapp

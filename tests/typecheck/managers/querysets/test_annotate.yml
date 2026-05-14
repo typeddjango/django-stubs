@@ -27,7 +27,8 @@
         func2(unannotated_user)
         func2(annotated_user)
 
-        def func3(user: WithAnnotations) -> None: ...
+        def func3(user: WithAnnotations) -> None:
+            raise NotImplementedError
 
         # With no arguments to 'WithAnnotations' it should become 'Any'
         reveal_type(func3)  # N: Revealed type is "def (user: Any)"
@@ -152,14 +153,20 @@
                     username = models.CharField(max_length=100)
 
 
--   case: annotate_no_field_name
+-   case: annotate_positional_aggregate_uses_default_alias
     main: |
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models import Count
 
-        qs = User.objects.annotate(Count('id'))
-        reveal_type(qs) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User, myapp.models.User]"
+        # Positional Aggregate gets Django's default_alias: <field>__<name_lower>.
+        user = User.objects.annotate(Count('id')).get()
+        reveal_type(user.id__count)  # N: Revealed type is "int"
+
+        # Multiple positional aggregates produce multiple default aliases.
+        multi = User.objects.annotate(Count('id'), Count('username')).get()
+        reveal_type(multi.id__count)        # N: Revealed type is "int"
+        reveal_type(multi.username__count)  # N: Revealed type is "int"
 
     installed_apps:
         - myapp
@@ -180,9 +187,8 @@
         annotated_user = qs.get()
 
         def animals_only(param: Animal) -> None:
-            pass
-        # Make sure that the type is still checked when no annotation was produced
-        animals_only(annotated_user) # E: Argument 1 to "animals_only" has incompatible type "User"; expected "Animal"  [arg-type]
+            raise NotImplementedError
+        animals_only(annotated_user) # E: Argument 1 to "animals_only" has incompatible type "User@AnnotatedWith[TypedDict({'id__count': int})]"; expected "Animal"  [arg-type]
 
         def users_allowed(param: User) -> None:
             # But this function accepts only the original User type, so any attr access is not allowed within this function
@@ -357,6 +363,33 @@
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100)
 
+-   case: annotate_then_values_list_flat_slice_preserves_row_type
+    main: |
+        from typing import Iterable
+        from typing_extensions import reveal_type
+        from myapp.models import Blog
+        from django.db.models import F
+
+        qs = Blog.objects.annotate(a=F("id")).values_list("id", flat=True)
+        reveal_type(qs)  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], int]"
+        reveal_type(qs[:])  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], int]"
+
+        def get_blog_ids() -> Iterable[int]:
+            return Blog.objects.annotate(a=F("id")).values_list("id", flat=True)[:]
+
+        # Also preserve non-flat tuple row types and TypedDict row types from values().
+        reveal_type(Blog.objects.annotate(a=F("id")).values_list("id", "text")[:])  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], tuple[int, str]]"
+        reveal_type(Blog.objects.annotate(a=F("id")).values("id")[:])  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], TypedDict({'id': int})]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Blog(models.Model):
+                    text = models.CharField(max_length=100)
+
 - case: test_annotate_with_filter
   main: |
     from django.db import models
@@ -365,6 +398,19 @@
     qs = Blog.objects.annotate(xyz=models.Count("entry"))
     qs.filter(xyz=1)
     qs.filter(annotate_wrong__gt=5)
+
+    # The `__in` lookup expects an iterable of the field type.
+    # Regression test for https://github.com/typeddjango/django-stubs/issue/xxxx
+    qs.filter(xyz__in=[1, 2, 3])
+    qs.filter(xyz__in=(1, 2, 3))
+    qs.filter(xyz__in=range(4))
+    qs.filter(xyz__in=123)
+    qs.filter(xyz__in=None)
+    qs.filter(xyz__in="abc")
+    qs.filter(xyz__in=(Blog(),))
+    qs.filter(xyz__in=[Blog()])  # Doesn't error because mypy sees the provided type as `list[Any]`.
+    blogs: list[Blog] = [Blog()]
+    qs.filter(xyz__in=blogs)  # But this does error as `blogs` is explicitly `list[Blog]`.
 
     qs2 = qs.alias(alias_entries=models.Count("entry"))
     qs2.filter(alias_entries__gt=5)
@@ -378,10 +424,20 @@
     )
   out: |
     main:6: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz  [misc]
-    main:10: error: Cannot resolve keyword 'alias_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
-    main:10: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
-    main:12: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
-    main:14: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
+    main:13: error: Incompatible type for lookup 'xyz__in': (got "int", expected "Iterable[int]")  [misc]
+    main:14: error: Incompatible type for lookup 'xyz__in': (got "None", expected "Iterable[int]")  [misc]
+    main:15: error: Incompatible type for lookup 'xyz__in': (got "str", expected "Iterable[int]")  [misc]
+    main:15: note: Following member(s) of "str" have conflicts:
+    main:15: note:     Expected:
+    main:15: note:         def __iter__(self) -> Iterator[int]
+    main:15: note:     Got:
+    main:15: note:         def __iter__(self) -> Iterator[str]
+    main:16: error: Incompatible type for lookup 'xyz__in': (got "tuple[Blog]", expected "Iterable[int]")  [misc]
+    main:19: error: Incompatible type for lookup 'xyz__in': (got "list[Blog]", expected "Iterable[int]")  [misc]
+    main:23: error: Cannot resolve keyword 'alias_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
+    main:23: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
+    main:25: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
+    main:27: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
   installed_apps:
     - myapp
   files:
@@ -736,7 +792,7 @@
     AnnotatedModel = WithAnnotations[MyModel, MyAnnotations]
 
     def get_qs() -> QuerySet[AnnotatedModel]:
-        ...
+        raise NotImplementedError
 
     qs = get_qs()
 
@@ -1008,3 +1064,16 @@
 
         class FooModel(models.Model):
             objects = FooManager()
+
+- case: values_then_annotate_on_generic_queryset_typevar
+  main: |
+    from typing import Any
+    from typing_extensions import reveal_type, TypeVar
+    from django.db import models
+
+    _Model = TypeVar("_Model", bound=models.Model)
+
+    def latest_max(qs: models.QuerySet[_Model]) -> dict[str, Any] | None:
+        annotated = qs.values("id").annotate(foo=models.Max("id"))
+        reveal_type(annotated)  # N: Revealed type is "django.db.models.query.QuerySet[django.db.models.base.Model, dict[str, Any]]"
+        return annotated.first()

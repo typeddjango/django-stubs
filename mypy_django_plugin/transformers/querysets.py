@@ -18,12 +18,14 @@ from mypy.errorcodes import NO_REDEF
 from mypy.nodes import (
     ARG_NAMED,
     ARG_NAMED_OPT,
+    ARG_POS,
     ARG_STAR,
     CallExpr,
     Decorator,
     Expression,
     ListExpr,
     SetExpr,
+    StrExpr,
     TupleExpr,
     Var,
 )
@@ -225,20 +227,48 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
     return ret
 
 
+def _aggregate_default_alias(expr: Expression, expr_type: MypyType) -> str | None:
+    """Mirror `Aggregate.default_alias`: ``<source_expression>__<aggregate_name_lower>``.
+
+    Django generates a default alias only for aggregates with a single source
+    expression that has a `name`; complex expressions raise at runtime, so the
+    plugin matches that and returns ``None`` for anything else.
+
+    See https://docs.djangoproject.com/en/dev/topics/db/aggregation/#generating-aggregates-for-each-item-in-a-queryset
+    """
+    if not (
+        isinstance(expr, CallExpr)
+        and isinstance(proper := get_proper_type(expr_type), Instance)
+        and proper.type.has_base(fullnames.AGGREGATE_CLASS_FULLNAME)
+    ):
+        return None
+    source: Expression | None = None
+    for arg, kind in zip(expr.args, expr.arg_kinds, strict=False):
+        if kind != ARG_POS:
+            continue
+        if source is not None:
+            return None
+        source = arg
+    # TODO: consider switching to `helpers.resolve_string_attribute_value` once
+    # `gather_kwargs` threads `django_context` through — that would also handle
+    # `Count(NAME_CONST)` and `Count(settings.X)`.
+    if not isinstance(source, StrExpr):
+        return None
+    return f"{source.value}__{proper.type.name.lower()}"
+
+
 def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
-    num_args = len(ctx.arg_kinds)
-    kwargs = {}
+    kwargs: dict[str, MypyType] = {}
     named = (ARG_NAMED, ARG_NAMED_OPT)
-    for i in range(num_args):
-        if not ctx.arg_kinds[i]:
-            continue
-        if any(kind not in named for kind in ctx.arg_kinds[i]):
-            # Only named arguments supported
-            continue
-        for j in range(len(ctx.arg_names[i])):
-            name = ctx.arg_names[i][j]
-            assert name is not None
-            kwargs[name] = ctx.arg_types[i][j]
+    for slot in zip(ctx.arg_kinds, ctx.arg_types, ctx.arg_names, ctx.args, strict=False):
+        for kind, arg_type, name, arg in zip(*slot, strict=False):
+            if kind in named:
+                assert name is not None
+                kwargs[name] = arg_type
+            elif kind == ARG_POS:
+                alias = _aggregate_default_alias(arg, arg_type)
+                if alias is not None:
+                    kwargs[alias] = arg_type
     return kwargs
 
 
@@ -379,6 +409,31 @@ def _extract_model_type_var_upper_bound(ctx: MethodContext) -> Instance | None:
     return None
 
 
+def _resolve_annotate_row_type(
+    api: TypeChecker,
+    default_return_type: Instance,
+    annotated_model: ProperType,
+    expression_types: dict[str, MypyType],
+) -> MypyType:
+    if len(default_return_type.args) <= 1:
+        return annotated_model
+    original_row_type = get_proper_type(default_return_type.args[1])
+    if isinstance(original_row_type, TypedDictType):
+        return api.named_generic_type(
+            "builtins.dict",
+            [api.named_generic_type("builtins.str", []), AnyType(TypeOfAny.from_omitted_generics)],
+        )
+    if isinstance(original_row_type, TupleType):
+        if original_row_type.partial_fallback.type.has_base("typing.NamedTuple"):
+            # Rebuild the NamedTuple with existing fields + annotation fields.
+            annotation_fields = {name: AnyType(TypeOfAny.from_omitted_generics) for name in expression_types}
+            return helpers.extend_oneoff_named_tuple(api, "Row", original_row_type, annotation_fields)
+        return api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.from_omitted_generics)])
+    if isinstance(original_row_type, Instance) and helpers.is_model_type(original_row_type.type):
+        return annotated_model
+    return original_row_type
+
+
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
@@ -395,7 +450,8 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
                 if expression_types:
                     fields_dict = helpers.make_typeddict(api, expression_types)
                     upper_annotated = get_annotated_type(api, upper_bound, fields_dict=fields_dict)
-                    return default_return_type.copy_modified(args=[upper_annotated, upper_annotated])
+                    row_type = _resolve_annotate_row_type(api, default_return_type, upper_annotated, expression_types)
+                    return default_return_type.copy_modified(args=[upper_annotated, row_type])
         return AnyType(TypeOfAny.from_omitted_generics)
 
     default_return_type = get_proper_type(ctx.default_return_type)
@@ -423,25 +479,7 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
         fields_dict = helpers.make_typeddict(api, all_fields)
         annotated_type = get_annotated_type(api, django_model.typ, fields_dict=fields_dict)
 
-    row_type: MypyType
-    if len(default_return_type.args) > 1:
-        original_row_type = get_proper_type(default_return_type.args[1])
-        row_type = original_row_type
-        if isinstance(original_row_type, TypedDictType):
-            row_type = api.named_generic_type(
-                "builtins.dict", [api.named_generic_type("builtins.str", []), AnyType(TypeOfAny.from_omitted_generics)]
-            )
-        elif isinstance(original_row_type, TupleType):
-            if original_row_type.partial_fallback.type.has_base("typing.NamedTuple"):
-                # Rebuild the NamedTuple with existing fields + annotation fields.
-                annotation_fields = {name: AnyType(TypeOfAny.from_omitted_generics) for name in expression_types}
-                row_type = helpers.extend_oneoff_named_tuple(api, "Row", original_row_type, annotation_fields)
-            else:
-                row_type = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.from_omitted_generics)])
-        elif isinstance(original_row_type, Instance) and helpers.is_model_type(original_row_type.type):
-            row_type = annotated_type
-    else:
-        row_type = annotated_type
+    row_type = _resolve_annotate_row_type(api, default_return_type, annotated_type, expression_types)
     return default_return_type.copy_modified(args=[annotated_type, row_type])
 
 
@@ -468,7 +506,16 @@ def merge_annotations_from_custom_method(ctx: MethodContext, django_context: Dja
 
     api = helpers.get_typechecker_api(ctx)
     annotated_type = get_annotated_type(api, django_model.typ, fields_dict=new_td)
-    return default_return_type.copy_modified(args=[annotated_type, annotated_type])
+    new_args: list[MypyType] = [annotated_type]
+    if len(default_return_type.args) > 1:
+        original_row = get_proper_type(default_return_type.args[1])
+        if isinstance(original_row, Instance) and helpers.is_model_type(original_row.type):
+            new_args.append(annotated_type)
+        else:
+            new_args.append(default_return_type.args[1])
+    else:
+        new_args.append(annotated_type)
+    return default_return_type.copy_modified(args=new_args)
 
 
 def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> list[str] | None:

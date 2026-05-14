@@ -148,7 +148,7 @@
 
                 class UserManager(models.Manager['MyUser']):
                     def get_or_404(self) -> 'MyUser':
-                        pass
+                        raise NotImplementedError
 
                 class MyUser(models.Model):
                     objects = UserManager()
@@ -424,9 +424,9 @@
                 from django.db import models
                 class MyManager(models.Manager):
                     def get_instance(self) -> int:
-                        pass
+                        raise NotImplementedError
                     def get_instance_untyped(self, name: str):  # type: ignore[no-untyped-def]
-                        pass
+                        raise NotImplementedError
                 class User(models.Model):
                     objects = MyManager()
                 class ChildUser(models.Model):
@@ -722,7 +722,7 @@
                 class MyModel(models.Model):
                     class MyManager(models.Manager):
                         def get_instance(self) -> int:
-                            pass
+                            raise NotImplementedError
                     objects = MyManager()
 
 -   case: test_typechecks_filter_methods_of_queryset_type

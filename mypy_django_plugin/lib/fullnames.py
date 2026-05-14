@@ -58,6 +58,7 @@ QUERYDICT_CLASS_FULLNAME = "django.http.request.QueryDict"
 COMBINABLE_EXPRESSION_FULLNAME = "django.db.models.expressions.Combinable"
 F_EXPRESSION_FULLNAME = "django.db.models.expressions.F"
 FUNC_EXPRESSION_FULLNAME = "django.db.models.expressions.Func"
+AGGREGATE_CLASS_FULLNAME = "django.db.models.aggregates.Aggregate"
 
 ANY_ATTR_ALLOWED_CLASS_FULLNAME = "django_stubs_ext.AnyAttrAllowed"
 TYPED_MODEL_META_FULLNAME = "django_stubs_ext.db.models.TypedModelMeta"
