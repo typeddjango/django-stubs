@@ -24,7 +24,7 @@
     main: |
         from myapp.models import A, B, C
         def service(a: A) -> int:
-            pass
+            raise NotImplementedError
         b_instance = B()
         service(b_instance)  # E: Argument 1 to "service" has incompatible type "B"; expected "A"  [arg-type]
         a_instance = A()
@@ -42,7 +42,6 @@
                     pass
                 class B(models.Model):
                     b_attr = 1
-                    pass
                 class C(A):
                     pass
 
@@ -64,7 +63,6 @@
                 from django.db import models
                 class B(models.Model):
                     b_attr = 1
-                    pass
 
 
 -   case: fields_recognized_if_base_model_is_subclass_of_models_model

@@ -14,10 +14,12 @@ if TYPE_CHECKING:
 # cached_property: class vs instance attributes
 class Foo:
     @cached_property
-    def attr(self) -> list[str]: ...
+    def attr(self) -> list[str]:
+        raise NotImplementedError
 
     @cached_property  # type: ignore[misc]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
-    def attr2(self, arg2: str) -> list[str]: ...
+    def attr2(self, arg2: str) -> list[str]:
+        raise NotImplementedError
 
 
 f = Foo()
@@ -29,7 +31,8 @@ f.attr.func  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAcce
 class Bar(Foo):
     @property
     @override
-    def attr(self) -> list[str]: ...  # pyright: ignore[reportIncompatibleVariableOverride]
+    def attr(self) -> list[str]:  # pyright: ignore[reportIncompatibleVariableOverride]
+        raise NotImplementedError
 
 
 # May be overridden by ClassVar
@@ -41,7 +44,8 @@ class Quux(Foo):
 class Baz(Quux):
     @cached_property
     @override
-    def attr(self) -> list[str]: ...  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
+    def attr(self) -> list[str]:  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
+        raise NotImplementedError
 
 
 # str promise proxy
@@ -63,10 +67,12 @@ def test_str_or_promise(f2: StrOrPromise) -> None:
     assert_type("asd" + f2, str)
 
 
-def foo(content: str) -> None: ...
+def foo(content: str) -> None:
+    raise NotImplementedError
 
 
-def bar(content: Promise) -> None: ...
+def bar(content: Promise) -> None:
+    raise NotImplementedError
 
 
 foo(s)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
@@ -82,7 +88,8 @@ assert_type(copy.deepcopy(lazy_user), SimpleLazyObject[User])
 
 class Bam:
     @classproperty
-    def attr(cls: Any) -> str: ...
+    def attr(cls: Any) -> str:
+        raise NotImplementedError
 
 
 assert_type(Bam.attr, str)

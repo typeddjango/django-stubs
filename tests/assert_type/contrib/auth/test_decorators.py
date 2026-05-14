@@ -13,8 +13,10 @@ lazy_url = reverse_lazy("namespace:url")
 
 
 @user_passes_test(lambda user: user.is_active, login_url=reversed_url)
-def my_view1(request: HttpRequest) -> HttpResponse: ...
+def my_view1(request: HttpRequest) -> HttpResponse:
+    raise NotImplementedError
 
 
 @user_passes_test(lambda user: user.is_active, login_url=lazy_url)
-def my_view2(request: HttpRequest) -> HttpResponse: ...
+def my_view2(request: HttpRequest) -> HttpResponse:
+    raise NotImplementedError

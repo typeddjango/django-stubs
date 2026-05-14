@@ -35,7 +35,8 @@ assert_type(func2(1), list[object])
 
 # non_atomic_requests bare preserves function type
 @non_atomic_requests
-def view_func(request: HttpRequest) -> HttpResponse: ...
+def view_func(request: HttpRequest) -> HttpResponse:
+    raise NotImplementedError
 
 
 assert_type(view_func(HttpRequest()), HttpResponse)
@@ -43,7 +44,8 @@ assert_type(view_func(HttpRequest()), HttpResponse)
 
 # non_atomic_requests with extra args
 @non_atomic_requests
-def view_func2(request: HttpRequest, arg: str) -> HttpResponse: ...
+def view_func2(request: HttpRequest, arg: str) -> HttpResponse:
+    raise NotImplementedError
 
 
 assert_type(view_func2(HttpRequest(), "test"), HttpResponse)

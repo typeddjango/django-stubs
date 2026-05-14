@@ -12,7 +12,7 @@
 
             @override
             def get_queryset(self) -> QuerySet[MyModel]:
-                ...
+                raise NotImplementedError
     custom_settings: |
         INSTALLED_APPS = ('myapp',)
     files:
@@ -38,7 +38,7 @@
 
             @override
             def get_queryset(self) -> QuerySet[MyModel]:
-                ...
+                raise NotImplementedError
     custom_settings: |
         INSTALLED_APPS = ('myapp',)
     files:

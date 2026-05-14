@@ -786,7 +786,7 @@
                 from django.db.models.manager import Manager
                 class TransactionQuerySet(models.QuerySet):
                     def custom(self) -> None:
-                        pass
+                        raise NotImplementedError
 
                 def TransactionManager() -> Manager:
                     return Manager.from_queryset(TransactionQuerySet)()
@@ -887,13 +887,13 @@
                     pass
                 class OrderManager(models.Manager):
                     def manager_method(self) -> int:
-                        pass
+                        raise NotImplementedError
                 class Order(models.Model):
                     objects = OrderManager()
                     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='orders')
                 class ProductQueryset(models.QuerySet):
                     def queryset_method(self) -> int:
-                        pass
+                        raise NotImplementedError
                 ProductManager = models.Manager.from_queryset(ProductQueryset)
                 class Product(models.Model):
                     objects = ProductManager()
@@ -1144,7 +1144,8 @@
                     explicit_descriptor: ClassVar[ReverseManyToOneDescriptor["MyModel"]]
 
                 class CustomManager(models.Manager["MyModel"]):
-                    def custom_method(self) -> int: ...
+                    def custom_method(self) -> int:
+                        raise NotImplementedError
 
                 class MyModel(models.Model):
                     rel = models.ForeignKey(
@@ -1640,7 +1641,8 @@
                     authors = models.ManyToManyField(Author)
 
                 class OtherQuerySet(models.QuerySet["Other"]):
-                    def custom(self) -> Self: ...
+                    def custom(self) -> Self:
+                        raise NotImplementedError
 
                 OtherManager = models.Manager.from_queryset(OtherQuerySet)
                 class Other(models.Model):

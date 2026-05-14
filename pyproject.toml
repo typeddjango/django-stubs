@@ -129,9 +129,6 @@ error-on-warning = true
 # Respect only `# ty: ignore` (ignore `# type: ignore`)
 respect-type-ignore-comments = false
 
-[tool.ty.rules]
-empty-body = "ignore"
-
 [tool.codespell]
 ignore-words-list = "aadd,acount,asend,indentity,nam"
 

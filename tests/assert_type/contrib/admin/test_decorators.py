@@ -12,22 +12,27 @@ if TYPE_CHECKING:
 
 class DisplayModel(models.Model):
     @admin.display
-    def display_bare(self) -> str: ...
+    def display_bare(self) -> str:
+        raise NotImplementedError
 
     @admin.display(ordering="field", description="Something", empty_value="...")
-    def display_fancy(self) -> bool: ...
+    def display_fancy(self) -> bool:
+        raise NotImplementedError
 
     @property
     @admin.display
-    def display_property(self) -> str: ...
+    def display_property(self) -> str:
+        raise NotImplementedError
 
 
 @admin.display
-def freestanding_display_bare(obj: DisplayModel) -> str: ...
+def freestanding_display_bare(obj: DisplayModel) -> str:
+    raise NotImplementedError
 
 
 @admin.display(boolean=True)
-def freestanding_display_fancy(obj: DisplayModel) -> bool: ...
+def freestanding_display_fancy(obj: DisplayModel) -> bool:
+    raise NotImplementedError
 
 
 @admin.register(DisplayModel, DisplayModel, site=None)
@@ -43,10 +48,12 @@ class DisplayModelAdmin(admin.ModelAdmin[DisplayModel]):
     ]
 
     @admin.display
-    def admin_display_bare(self, obj: DisplayModel) -> str: ...
+    def admin_display_bare(self, obj: DisplayModel) -> str:
+        raise NotImplementedError
 
     @admin.display(boolean=True, ordering="field", description="Something")
-    def admin_display_fancy(self, obj: DisplayModel) -> bool: ...
+    def admin_display_fancy(self, obj: DisplayModel) -> bool:
+        raise NotImplementedError
 
 
 # 'boolean' and 'empty_value' are mutually exclusive arguments
@@ -84,25 +91,29 @@ class ActionModel(models.Model): ...
 @admin.action
 def freestanding_action_bare(
     modeladmin: ActionModelAdmin, request: HttpRequest, queryset: QuerySet[ActionModel]
-) -> None: ...
+) -> None:
+    raise NotImplementedError
 
 
 @admin.action(description="Some text here", permissions=["test"])
 def freestanding_action_fancy(
     modeladmin: ActionModelAdmin, request: HttpRequest, queryset: QuerySet[ActionModel]
-) -> None: ...
+) -> None:
+    raise NotImplementedError
 
 
 @admin.action
 def freestanding_action_http_response(
     modeladmin: ActionModelAdmin, request: HttpRequest, queryset: QuerySet[ActionModel]
-) -> HttpResponse: ...
+) -> HttpResponse:
+    raise NotImplementedError
 
 
 @admin.action
 def freestanding_action_file_response(
     modeladmin: ActionModelAdmin, request: HttpRequest, queryset: QuerySet[ActionModel]
-) -> FileResponse: ...
+) -> FileResponse:
+    raise NotImplementedError
 
 
 @admin.register(ActionModel)
@@ -117,13 +128,17 @@ class ActionModelAdmin(admin.ModelAdmin[ActionModel]):
     ]
 
     @admin.action
-    def method_action_bare(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> None: ...
+    def method_action_bare(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> None:
+        raise NotImplementedError
 
     @admin.action(description="Some text here", permissions=["test"])
-    def method_action_fancy(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> None: ...
+    def method_action_fancy(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> None:
+        raise NotImplementedError
 
     @admin.action(description="Some text here", permissions=["test"])
-    def method_action_http_response(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> HttpResponse: ...
+    def method_action_http_response(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> HttpResponse:
+        raise NotImplementedError
 
     @admin.action(description="Some text here", permissions=["test"])
-    def method_action_file_response(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> FileResponse: ...
+    def method_action_file_response(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> FileResponse:
+        raise NotImplementedError

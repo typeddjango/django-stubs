@@ -266,15 +266,19 @@
                     tags = models.ManyToManyField(to=Tag, related_name="articles", blank=True)
 
                     @property
-                    def my_property(self) -> int: ...
+                    def my_property(self) -> int:
+                        raise NotImplementedError
 
-                    def my_method(self) -> int: ...
+                    def my_method(self) -> int:
+                        raise NotImplementedError
 
                     @staticmethod
-                    def my_staticmethod() -> int: ...
+                    def my_staticmethod() -> int:
+                        raise NotImplementedError
 
                     @classmethod
-                    def my_classmethod(cls) -> int:  ...
+                    def my_classmethod(cls) -> int:
+                        raise NotImplementedError
 
 -   case: raw_queryset_prefetch_related_signatures
     main: |
