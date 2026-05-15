@@ -154,7 +154,7 @@ def field_two_typevar_form_in_user_annotation() -> None:
     assert_type(instance.field, CustomFieldValue)
     assert_type(instance.null_field, CustomFieldValue | None)
     assert_type(instance.implicit_null_field, CustomFieldValue | None)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.explicit_null_field, CustomFieldValue | None)  # pyrefly: ignore[assert-type]
+    assert_type(instance.explicit_null_field, CustomFieldValue | None)
     instance.field = CustomFieldValue()
     instance.field = 12
     instance.field = "no"  # type: ignore[call-overload]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-assignment]  # pyright: ignore[reportAttributeAccessIssue]

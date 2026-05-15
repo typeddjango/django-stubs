@@ -33,6 +33,6 @@ def array_field_base_field_parsed_into_generic_typevar() -> None:
         members_as_text = ArrayField(base_field=models.CharField(max_length=255))
 
     my_model = MyModel(untyped=[], members=[1, 2], members_as_text=["A", "B"])
-    assert_type(my_model.untyped, list[Any])  # False positive -> # pyrefly: ignore[assert-type]
+    assert_type(my_model.untyped, list[Any])
     assert_type(my_model.members, list[int])  # False positive -> # pyrefly: ignore[assert-type]
     assert_type(my_model.members_as_text, list[str])  # False positive -> # pyrefly: ignore[assert-type]

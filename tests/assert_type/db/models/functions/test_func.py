@@ -21,29 +21,23 @@ def func_resolve_output_field() -> None:
     bin_right = Right("username", 5, output_field=BinaryField())
     str_right = Right("username", 5)  # Default to `CharField` per `Right.output_field`
 
-    assert_type(  # False positive -> # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure]
+    assert_type(  # False positive -> # ty: ignore[type-assertion-failure]
         bin_sub,
         Substr[BinaryField[bytes | bytearray | memoryview[int], bytes | memoryview[int], Literal[False]]],
     )
-    assert_type(  # False positive -> # pyrefly: ignore[type-assertion-failure]
-        str_sub, Substr[CharField[str | int, str, Literal[False]]]
-    )
+    assert_type(str_sub, Substr[CharField[str | int, str, Literal[False]]])
 
-    assert_type(  # False positive -> # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure]
+    assert_type(  # False positive -> # ty: ignore[type-assertion-failure]
         bin_left,
         Left[BinaryField[bytes | bytearray | memoryview[int], bytes | memoryview[int], Literal[False]]],
     )
-    assert_type(  # False positive -> # pyrefly: ignore[type-assertion-failure]
-        str_left, Left[CharField[str | int, str, Literal[False]]]
-    )
+    assert_type(str_left, Left[CharField[str | int, str, Literal[False]]])
 
-    assert_type(  # False positive -> # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure]
+    assert_type(  # False positive -> # ty: ignore[type-assertion-failure]
         bin_right,
         Right[BinaryField[bytes | bytearray | memoryview[int], bytes | memoryview[int], Literal[False]]],
     )
-    assert_type(  # False positive -> # pyrefly: ignore[type-assertion-failure]
-        str_right, Right[CharField[str | int, str, Literal[False]]]
-    )
+    assert_type(str_right, Right[CharField[str | int, str, Literal[False]]])
 
     expect_func_binary(bin_sub)  # False positive -> # ty: ignore[invalid-argument-type]
     expect_func_binary(str_sub)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]

@@ -17,5 +17,5 @@ class Profile(models.Model):
 
 
 def test_related() -> None:
-    assert_type(Book().author, Author)  # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure] # pyright: ignore[reportAssertTypeFailure]
-    assert_type(Profile().user, Author)  # pyrefly: ignore[assert-type] # ty: ignore[type-assertion-failure] # pyright: ignore[reportAssertTypeFailure]
+    assert_type(Book().author, Author)  # ty: ignore[type-assertion-failure] # pyright: ignore[reportAssertTypeFailure]
+    assert_type(Profile().user, Author)  # ty: ignore[type-assertion-failure] # pyright: ignore[reportAssertTypeFailure]
