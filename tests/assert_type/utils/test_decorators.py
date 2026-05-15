@@ -18,17 +18,13 @@ from typing_extensions import assert_type, override
 if TYPE_CHECKING:
     from django.http.request import HttpRequest
 
-decorator = decorator_from_middleware(
-    CacheMiddleware  # pyrefly: ignore[bad-argument-type]
-)
+decorator = decorator_from_middleware(CacheMiddleware)
 assert_type(
     decorator,
     Callable[[Callable[..., HttpResponseBase]], Callable[..., HttpResponseBase]],
 )
 
-factory = decorator_from_middleware_with_args(
-    CacheMiddleware  # pyrefly: ignore[bad-argument-type]
-)
+factory = decorator_from_middleware_with_args(CacheMiddleware)
 assert_type(
     factory,
     Callable[..., Callable[[Callable[..., HttpResponseBase]], Callable[..., HttpResponseBase]]],

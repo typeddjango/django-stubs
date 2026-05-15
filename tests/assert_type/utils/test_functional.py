@@ -17,7 +17,7 @@ class Foo:
     def attr(self) -> list[str]:
         raise NotImplementedError
 
-    @cached_property  # type: ignore[misc]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+    @cached_property  # type: ignore[misc]  # pyright: ignore[reportArgumentType]  # ty: ignore[invalid-argument-type]
     def attr2(self, arg2: str) -> list[str]:
         raise NotImplementedError
 
@@ -58,7 +58,7 @@ assert_type(s + "bar", str)
 assert_type("foo" + s, str)
 assert_type(s % "asd", str)
 
-s.nonsense  # type: ignore[attr-defined]  # pyrefly: ignore[no-attribute]
+s.nonsense  # type: ignore[attr-defined]
 
 
 def test_str_or_promise(f2: StrOrPromise) -> None:
