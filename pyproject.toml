@@ -66,6 +66,7 @@ pyright = [
 ]
 pyrefly = [
   "pyrefly==1.0.0",
+  "psycopg2-binary"
 ]
 ty = [
   "ty==0.0.35",

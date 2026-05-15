@@ -320,6 +320,7 @@ dev = [
     { name = "ty" },
 ]
 pyrefly = [
+    { name = "psycopg2-binary" },
     { name = "pyrefly" },
 ]
 pyright = [
@@ -377,7 +378,10 @@ dev = [
     { name = "pyyaml", specifier = "==6.0.3" },
     { name = "ty", specifier = "==0.0.35" },
 ]
-pyrefly = [{ name = "pyrefly", specifier = "==1.0.0" }]
+pyrefly = [
+    { name = "psycopg2-binary" },
+    { name = "pyrefly", specifier = "==1.0.0" },
+]
 pyright = [{ name = "pyright", specifier = "==1.1.409" }]
 tests = [
     { name = "django", marker = "python_full_version < '3.12'", specifier = "==5.2.14" },
