@@ -8,7 +8,7 @@ from django.db.models.expressions import BaseExpression, Combinable
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeVar
 
-_ModelT = TypeVar("_ModelT", bound=Model)
+_ModelAdmin = TypeVar("_ModelAdmin", bound=ModelAdmin[Any])
 _F = TypeVar("_F", bound=Callable[..., Any])
 
 @overload
@@ -61,5 +61,5 @@ def display(
     empty_value: str | None = ...,
 ) -> Callable[[_F], _F]: ...
 def register(
-    *models: type[_ModelT], site: AdminSite | None = ...
-) -> Callable[[type[ModelAdmin[_ModelT]]], type[ModelAdmin[_ModelT]]]: ...
+    *models: type[Model], site: AdminSite | None = ...
+) -> Callable[[type[_ModelAdmin]], type[_ModelAdmin]]: ...

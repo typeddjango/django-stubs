@@ -129,11 +129,11 @@ class ActionModelAdmin(admin.ModelAdmin[ActionModel]):
     def method_action_file_response(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> FileResponse: ...
 
 
-@admin.register(ActionModel)  # type: ignore[arg-type]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]  # pyright:ignore[reportArgumentType]
+@admin.register(ActionModel)
 class WrongModelAdmin(admin.ModelAdmin[DisplayModel]):
     pass
 
 
-@admin.register(ActionModel)  # type: ignore[arg-type]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]  # pyright:ignore[reportArgumentType]
-class UnrelatedClass:
+@admin.register(ActionModel)  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]  # pyright: ignore[reportArgumentType, reportUntypedClassDecorator]
+class UnrelatedClass:  # type: ignore[type-var]
     pass
