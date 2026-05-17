@@ -21,12 +21,16 @@
                 M = TypeVar("M", bound=models.Model, covariant=True)
 
                 class BaseQuerySet(models.QuerySet[M]):
-                    def example_dict(self) -> dict[str, Self]: ...
+                    def example_dict(self) -> dict[str, Self]:
+                        raise NotImplementedError
 
                 class MyQuerySet(BaseQuerySet[M]):
-                    def example_simple(self) -> Self: ...
-                    def example_list(self) -> list[Self]: ...
-                    def just_int(self) -> int: ...
+                    def example_simple(self) -> Self:
+                        raise NotImplementedError
+                    def example_list(self) -> list[Self]:
+                        raise NotImplementedError
+                    def just_int(self) -> int:
+                        raise NotImplementedError
 
                 class MyModel(models.Model):
                     objects = MyQuerySet.as_manager()
@@ -270,32 +274,46 @@
               T_2 = TypeVar("T_2", bound=models.Model)
 
               class SomeMixin:
-                  def example_mixin(self, a: T) -> T: ...
+                  def example_mixin(self, a: T) -> T:
+                      raise NotImplementedError
 
               class OtherMixin(models.QuerySet[T]):
-                  def example_other_mixin(self) -> T: ...
-                  def example_union(self) -> T | list[T]: ...
+                  def example_other_mixin(self) -> T:
+                      raise NotImplementedError
+                  def example_union(self) -> T | list[T]:
+                      raise NotImplementedError
 
               class _MyModelQuerySet(OtherMixin[T], models.QuerySet[T], Generic[T]):
-                  def example(self) -> T: ...
-                  def override(self) -> T: ...
-                  def override2(self) -> T: ...
-                  def dummy_override(self) -> int: ...
-                  def test_sub_self(self) -> Self: ...
+                  def example(self) -> T:
+                      raise NotImplementedError
+                  def override(self) -> T:
+                      raise NotImplementedError
+                  def override2(self) -> T:
+                      raise NotImplementedError
+                  def dummy_override(self) -> int:
+                      raise NotImplementedError
+                  def test_sub_self(self) -> Self:
+                      raise NotImplementedError
 
               class _MyModelQuerySet2(SomeMixin, _MyModelQuerySet[T_2]):
-                  def example_2(self) -> T_2: ...
+                  def example_2(self) -> T_2:
+                      raise NotImplementedError
                   @typing_override
-                  def override(self) -> T_2: ...
+                  def override(self) -> T_2:
+                      raise NotImplementedError
                   @typing_override
-                  def override2(self) -> T_2: ...
+                  def override2(self) -> T_2:
+                      raise NotImplementedError
                   @typing_override
-                  def dummy_override(self) -> T_2: ...  # type: ignore[override]
-                  def test_self(self) -> Self: ...
+                  def dummy_override(self) -> T_2:  # type: ignore[override]
+                      raise NotImplementedError
+                  def test_self(self) -> Self:
+                      raise NotImplementedError
 
               class MyModelQuerySet(_MyModelQuerySet2["MyModel"]):
                   @typing_override
-                  def override(self) -> "MyModel": ...
+                  def override(self) -> "MyModel":
+                      raise NotImplementedError
 
               class MyModel(models.Model):
                   objects = MyModelQuerySet.as_manager()
@@ -343,20 +361,34 @@
 
                 class BaseQuerySet(models.QuerySet[_CTE], Generic[_CTE]):
 
-                    def example(self) -> _CTE: ...
-                    def example_list(self) -> list[_CTE]: ...
-                    def example_type(self) -> type[_CTE]: ...
-                    def example_tuple_simple(self) -> tuple[_CTE]: ...
-                    def example_tuple_list(self) -> tuple[_CTE, ...]: ...
-                    def example_tuple_double(self) -> tuple[int, _CTE]: ...
-                    def example_class(self) -> Example[_CTE]: ...
-                    def example_type_class(self) -> type[Example[_CTE]]: ...
-                    def example_collection(self) -> Collection[_CTE]: ...
-                    def example_set(self) -> set[_CTE]: ...
-                    def example_dict(self) -> dict[str, _CTE]: ...
-                    def example_list_dict(self) -> list[dict[str, _CTE]]: ...
-                    def example_t(self, a: T) -> T: ...
-                    def example_arg(self, a: _CTE, b: str) -> _CTE: ...
+                    def example(self) -> _CTE:
+                        raise NotImplementedError
+                    def example_list(self) -> list[_CTE]:
+                        raise NotImplementedError
+                    def example_type(self) -> type[_CTE]:
+                        raise NotImplementedError
+                    def example_tuple_simple(self) -> tuple[_CTE]:
+                        raise NotImplementedError
+                    def example_tuple_list(self) -> tuple[_CTE, ...]:
+                        raise NotImplementedError
+                    def example_tuple_double(self) -> tuple[int, _CTE]:
+                        raise NotImplementedError
+                    def example_class(self) -> Example[_CTE]:
+                        raise NotImplementedError
+                    def example_type_class(self) -> type[Example[_CTE]]:
+                        raise NotImplementedError
+                    def example_collection(self) -> Collection[_CTE]:
+                        raise NotImplementedError
+                    def example_set(self) -> set[_CTE]:
+                        raise NotImplementedError
+                    def example_dict(self) -> dict[str, _CTE]:
+                        raise NotImplementedError
+                    def example_list_dict(self) -> list[dict[str, _CTE]]:
+                        raise NotImplementedError
+                    def example_t(self, a: T) -> T:
+                        raise NotImplementedError
+                    def example_arg(self, a: _CTE, b: str) -> _CTE:
+                        raise NotImplementedError
 
 
                 class MyModelQuerySet(BaseQuerySet["MyModel"]):

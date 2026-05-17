@@ -227,8 +227,10 @@ class DjangoContext:
             if isinstance(field, Field):
                 field_name = getattr(field, "attname", field.name)
                 # Can not determine target_field for recursive relationship when model is abstract
-                if field.related_model == "self" and model_cls._meta.abstract:
-                    continue
+                # We add type ignores here because the plugin might have to check bogus code instantiating
+                # recursive abstract model and we need to not crash and gracefully exit.
+                if field.related_model == "self" and model_cls._meta.abstract:  # type: ignore[comparison-overlap, unreachable]
+                    continue  # type: ignore[unreachable]
                 # Try to retrieve set type from a model's TypeInfo object and fallback to retrieving it manually
                 # from django-stubs own declaration. This is to align with the setter types declared for
                 # assignment.

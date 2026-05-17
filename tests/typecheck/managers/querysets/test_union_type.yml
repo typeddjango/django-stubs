@@ -22,7 +22,7 @@
 
                 class MyQuerySet(models.QuerySet):
                     def my_method(self) -> MyQuerySet:
-                      pass
+                      raise NotImplementedError
 
                 UserManager = models.Manager.from_queryset(MyQuerySet)
                 class User(models.Model):

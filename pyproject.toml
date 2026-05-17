@@ -66,9 +66,10 @@ pyright = [
 ]
 pyrefly = [
   "pyrefly==1.0.0",
+  "psycopg2-binary"
 ]
 ty = [
-  "ty==0.0.34",
+  "ty==0.0.35",
   "psycopg2-binary"
 ]
 
@@ -121,6 +122,8 @@ reportMissingModuleSource = "none"
 [tool.pyrefly]
 # Respect only `# pyrefly: ignore` (ignore `# type: ignore`)
 enabled-ignores = ["pyrefly"]
+[tool.pyrefly.errors]
+unused-ignore = true
 
 [tool.ty.terminal]
 error-on-warning = true
@@ -128,9 +131,6 @@ error-on-warning = true
 [tool.ty.analysis]
 # Respect only `# ty: ignore` (ignore `# type: ignore`)
 respect-type-ignore-comments = false
-
-[tool.ty.rules]
-empty-body = "ignore"
 
 [tool.codespell]
 ignore-words-list = "aadd,acount,asend,indentity,nam"

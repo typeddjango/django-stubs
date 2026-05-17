@@ -27,7 +27,8 @@
         func2(unannotated_user)
         func2(annotated_user)
 
-        def func3(user: WithAnnotations) -> None: ...
+        def func3(user: WithAnnotations) -> None:
+            raise NotImplementedError
 
         # With no arguments to 'WithAnnotations' it should become 'Any'
         reveal_type(func3)  # N: Revealed type is "def (user: Any)"
@@ -186,7 +187,7 @@
         annotated_user = qs.get()
 
         def animals_only(param: Animal) -> None:
-            pass
+            raise NotImplementedError
         animals_only(annotated_user) # E: Argument 1 to "animals_only" has incompatible type "User@AnnotatedWith[TypedDict({'id__count': int})]"; expected "Animal"  [arg-type]
 
         def users_allowed(param: User) -> None:
@@ -790,7 +791,7 @@
     AnnotatedModel = WithAnnotations[MyModel, MyAnnotations]
 
     def get_qs() -> QuerySet[AnnotatedModel]:
-        ...
+        raise NotImplementedError
 
     qs = get_qs()
 

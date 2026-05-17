@@ -10,33 +10,39 @@
         # Bare:
 
         @login_required
-        def view_func1(request: HttpRequest) -> HttpResponse: ...
+        def view_func1(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func1)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 
         @login_required
-        async def view_func2(request: HttpRequest) -> HttpResponse: ...
+        async def view_func2(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func2)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
 
         # Fancy:
 
         @login_required(redirect_field_name='a', login_url='b')
-        def view_func3(request: WSGIRequest, arg: str) -> HttpResponse: ...
+        def view_func3(request: WSGIRequest, arg: str) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func3)  # N: Revealed type is "def (request: django.core.handlers.wsgi.WSGIRequest, arg: str) -> django.http.response.HttpResponse"
 
         @login_required(redirect_field_name='a', login_url='b')
-        async def view_func4(request: ASGIRequest, arg: str) -> HttpResponse: ...
+        async def view_func4(request: ASGIRequest, arg: str) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func4)  # N: Revealed type is "def (request: django.core.handlers.asgi.ASGIRequest, arg: str) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
 
         # This is non-conventional usage, but covered in Django tests, so we allow it.
 
-        def view_func5(request: HttpRequest) -> HttpResponse: ...
+        def view_func5(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
         wrapped_view = login_required(view_func5, redirect_field_name='a', login_url='b')
         reveal_type(wrapped_view)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 
         # Wrong:
 
         @login_required()  # E: Value of type variable "_VIEW" of function cannot be "Callable[[Any], str]"  [type-var]
-        def view_func6(request: Any) -> str: ...
+        def view_func6(request: Any) -> str:
+            raise NotImplementedError
 
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "myapp")
@@ -61,15 +67,18 @@
         from django.http import HttpRequest, HttpResponse
 
         @login_required
-        def view_func1(request: HttpRequest) -> HttpResponse: ...
+        def view_func1(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func1)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 
         @login_required
-        async def view_func2(request: HttpRequest) -> HttpResponse: ...
+        async def view_func2(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func2)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
 
         @login_required()  # E: Value of type variable "_VIEW" of function cannot be "Callable[[Any], str]"  [type-var]
-        def view_func3(request: Any) -> str: ...
+        def view_func3(request: Any) -> str:
+            raise NotImplementedError
 
 
 -   case: user_passes_test
@@ -79,20 +88,24 @@
         from django.http import HttpRequest, HttpResponse
 
         @user_passes_test(lambda u: u.is_authenticated and u.is_active)
-        def view_func1(request: HttpRequest) -> HttpResponse: ...
+        def view_func1(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func1)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 
         @user_passes_test(lambda u: u.get_username().startswith('super'))
-        async def view_func2(request: HttpRequest) -> HttpResponse: ...
+        async def view_func2(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func2)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
 
         # Wrong:
 
         @user_passes_test  # E: Argument 1 to "user_passes_test" has incompatible type "Callable[[HttpRequest], HttpResponse]"; expected "Callable[[User | AnonymousUser], bool]"  [arg-type]
-        def view_func3(request: HttpRequest) -> HttpResponse: ...
+        def view_func3(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
 
         @user_passes_test(lambda u: u.get_username().startswith('super'))  # E: Value of type variable "_VIEW" of function cannot be "Callable[[str], str]"  [type-var]
-        def view_func4(request: str) -> str: ...
+        def view_func4(request: str) -> str:
+            raise NotImplementedError
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth")
 
@@ -104,19 +117,23 @@
         from django.http import HttpRequest, HttpResponse
 
         @permission_required('polls.can_vote')
-        def view_func1(request: HttpRequest) -> HttpResponse: ...
+        def view_func1(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func1)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> django.http.response.HttpResponse"
 
         @permission_required(['polls.can_vote', 'polls.can_close'], login_url='/abc')
-        async def view_func2(request: HttpRequest) -> HttpResponse: ...
+        async def view_func2(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
         reveal_type(view_func2)  # N: Revealed type is "def (request: django.http.request.HttpRequest) -> typing.Coroutine[Any, Any, django.http.response.HttpResponse]"
 
         # Wrong:
 
         @permission_required('polls.can_vote')  # E: Value of type variable "_VIEW" of function cannot be "Callable[[Any], str]"  [type-var]
-        def view_func3(request: Any) -> str: ...
+        def view_func3(request: Any) -> str:
+            raise NotImplementedError
 
         @permission_required  # E: Argument 1 to "permission_required" has incompatible type "Callable[[HttpRequest], HttpResponse]"; expected "Iterable[str] | str"  [arg-type]
-        def view_func4(request: HttpRequest) -> HttpResponse: ...
+        def view_func4(request: HttpRequest) -> HttpResponse:
+            raise NotImplementedError
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth")

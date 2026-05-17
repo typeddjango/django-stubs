@@ -21,15 +21,20 @@
                 M = TypeVar("M", covariant=True, bound=models.Model)
 
                 class CustomManager(Manager[M]):
-                    def test_custom_manager(self) -> Self: ...
+                    def test_custom_manager(self) -> Self:
+                        raise NotImplementedError
 
                 class BaseQuerySet(models.QuerySet[M]):
-                    def example_dict(self) -> dict[str, Self]: ...
+                    def example_dict(self) -> dict[str, Self]:
+                        raise NotImplementedError
 
                 class MyQuerySet(BaseQuerySet[M]):
-                    def example_simple(self) -> Self: ...
-                    def example_list(self) -> list[Self]: ...
-                    def just_int(self) -> int: ...
+                    def example_simple(self) -> Self:
+                        raise NotImplementedError
+                    def example_list(self) -> list[Self]:
+                        raise NotImplementedError
+                    def just_int(self) -> int:
+                        raise NotImplementedError
 
                 NewManager = CustomManager.from_queryset(MyQuerySet)
 
@@ -173,7 +178,8 @@
 
                 class _MyModelQuerySet(models.QuerySet[_CTE]):
 
-                    def example(self) -> _CTE: ...
+                    def example(self) -> _CTE:
+                        raise NotImplementedError
 
                 class MyModelQuerySet(_MyModelQuerySet["MyModel"]): ...
 
@@ -211,7 +217,8 @@
 
                 class _MyModelQuerySet(models.QuerySet[_CTE]):
 
-                    def example(self) -> _CTE: ...
+                    def example(self) -> _CTE:
+                        raise NotImplementedError
 
                 class MyModelQuerySet(_MyModelQuerySet["MyModel"]):
                     ...
@@ -555,10 +562,12 @@
                         return 'hello'
 
                     @overload
-                    def overloaded_method(self, arg: int) -> int: ...
+                    def overloaded_method(self, arg: int) -> int:
+                        raise NotImplementedError
 
                     @overload
-                    def overloaded_method(self, arg: str) -> str: ...
+                    def overloaded_method(self, arg: str) -> str:
+                        raise NotImplementedError
 
                     def overloaded_method(self, arg: int | str) -> int | str:
                         return arg
@@ -622,7 +631,7 @@
 
                 class MyQuerySet(models.QuerySet["MyModel"]):
                     def custom(self) -> "MyQuerySet":
-                        pass
+                        raise NotImplementedError
 
                 class MyModel(models.Model):
                     objects = MyManager.from_queryset(MyQuerySet)()
@@ -649,7 +658,7 @@
 
                 class BaseQuerySet(models.QuerySet["BaseModel"]):
                     def custom(self) -> "BaseQuerySet":
-                        pass
+                        raise NotImplementedError
 
                 class BaseModel(models.Model):
                     objects = BaseManager.from_queryset(BaseQuerySet)()
