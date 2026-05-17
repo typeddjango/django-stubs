@@ -149,6 +149,6 @@ class WrongModelAdmin(admin.ModelAdmin[DisplayModel]):
     pass
 
 
-@admin.register(ActionModel)  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]  # pyright: ignore[reportArgumentType, reportUntypedClassDecorator]
+@admin.register(ActionModel)  # ty: ignore[invalid-argument-type]  # pyright: ignore[reportArgumentType, reportUntypedClassDecorator]
 class UnrelatedClass:  # type: ignore[type-var]
     pass
