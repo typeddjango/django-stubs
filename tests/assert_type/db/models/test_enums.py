@@ -241,7 +241,7 @@ assert_type(VoidChoices.ABYSS.name, Literal["ABYSS"])
 assert_type(VoidChoices.ABYSS.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 
 assert_type(VoidChoices.ABYSS.value, int)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(VoidChoices.ABYSS.value, Any)  # pyrefly: ignore[assert-type  # ty: ignore[type-assertion-failure]]
+assert_type(VoidChoices.ABYSS.value, Any)
 
 assert_type(VoidChoices.ABYSS.do_not_call_in_templates, Literal[True])
 assert_type(VoidChoices.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]
@@ -306,7 +306,7 @@ assert_type(  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failur
 )
 
 assert_type([member.value for choices in x3 for member in choices], list[bytes | float])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+assert_type(  # pyrefly: ignore[assert-type]
     [member.value for choices in x3 for member in choices], list[Any]
 )
 
