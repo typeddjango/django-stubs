@@ -144,6 +144,8 @@ class ActionModelAdmin(admin.ModelAdmin[ActionModel]):
         raise NotImplementedError
 
 
+# This is actually wrong: @admin.register(ActionModel) should use ActionModel as the type parameter,
+# not DisplayModel. However, we don't have a way to represent this error in the type system yet.
 @admin.register(ActionModel)
 class WrongModelAdmin(admin.ModelAdmin[DisplayModel]):
     pass
