@@ -17,7 +17,7 @@ repos:
         args: [--fix=lf]
       - id: check-case-conflict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 5e2fb545eba1ea9dc051f6f962d52fe8f76a9794  # frozen: v0.15.13
+    rev: 0c7b6c989466a93942def1f84baf36ddfcd60c83  # frozen: v0.15.14
     hooks:
       - id: ruff-check
         args: ["--fix", "--exit-non-zero-on-fix"]
@@ -29,7 +29,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: ae1ad165e7cbd3806258775dcc5b25da4da6f493  # frozen: 0.11.14
+    rev: f19149a31a5aad375f89df042b796688201d6840  # frozen: 0.11.16
     hooks:
       - id: uv-lock
 
