@@ -142,3 +142,15 @@ class ActionModelAdmin(admin.ModelAdmin[ActionModel]):
     @admin.action(description="Some text here", permissions=["test"])
     def method_action_file_response(self, request: HttpRequest, queryset: QuerySet[ActionModel]) -> FileResponse:
         raise NotImplementedError
+
+
+# This is actually wrong: @admin.register(ActionModel) should use ActionModel as the type parameter,
+# not DisplayModel. However, we don't have a way to represent this error in the type system yet.
+@admin.register(ActionModel)
+class WrongModelAdmin(admin.ModelAdmin[DisplayModel]):
+    pass
+
+
+@admin.register(ActionModel)  # ty: ignore[invalid-argument-type]  # pyright: ignore[reportArgumentType, reportUntypedClassDecorator]
+class UnrelatedClass:  # type: ignore[type-var]
+    pass
