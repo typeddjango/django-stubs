@@ -58,6 +58,7 @@ from .fetch_modes import FETCH_ONE as FETCH_ONE
 from .fetch_modes import FETCH_PEERS as FETCH_PEERS
 from .fetch_modes import FETCH_RAISE as FETCH_RAISE
 from .fields import BLANK_CHOICE_DASH as BLANK_CHOICE_DASH
+from .fields import BLANK_CHOICE_LABEL as BLANK_CHOICE_LABEL
 from .fields import NOT_PROVIDED as NOT_PROVIDED
 from .fields import AutoField as AutoField
 from .fields import BigAutoField as BigAutoField
@@ -116,6 +117,7 @@ from .query_utils import Q as Q
 
 __all__ = [
     "BLANK_CHOICE_DASH",
+    "BLANK_CHOICE_LABEL",
     "CASCADE",
     "DB_CASCADE",
     "DB_SET_DEFAULT",

@@ -16,6 +16,7 @@ from django.db.models import *
 
 __all__ = [
     "BLANK_CHOICE_DASH",
+    "BLANK_CHOICE_LABEL",
     "CASCADE",
     "DB_CASCADE",
     "DB_SET_DEFAULT",

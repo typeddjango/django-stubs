@@ -24,7 +24,10 @@ from typing_extensions import Self, TypeVar, override
 class Empty: ...
 class NOT_PROVIDED: ...
 
+# RemovedInDjango70Warning
 BLANK_CHOICE_DASH: list[tuple[str, str]]
+
+BLANK_CHOICE_LABEL: _StrOrPromise
 
 _ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
 _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
@@ -241,7 +244,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def get_choices(
         self,
         include_blank: bool = True,
-        blank_choice: _ChoicesList = ...,
+        blank_choice: _ChoicesList | None = None,
         limit_choices_to: _LimitChoicesTo | None = None,
         ordering: Sequence[_OrderByFieldName] = (),
     ) -> BlankChoiceIterator | _ChoicesList: ...
@@ -657,7 +660,7 @@ class FilePathField(Field[_ST, _GT]):
 
 class BinaryField(Field[_ST, _GT]):
     _pyi_private_get_type: bytes | memoryview
-    def get_placeholder(self, value: Any, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> str: ...
+    def get_placeholder_sql(self, value: Any, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
 class DurationField(Field[_ST, _GT]):
     _pyi_private_get_type: timedelta
@@ -669,6 +672,7 @@ class AutoFieldMixin:
     def deconstruct(self) -> tuple[str, str, Sequence[Any], dict[str, Any]]: ...
     def validate(self, value: Any, model_instance: Model | None) -> None: ...
     def get_db_prep_value(self, value: Any, connection: BaseDatabaseWrapper, prepared: bool = False) -> Any: ...
+    def get_db_prep_save(self, value: Any, connection: BaseDatabaseWrapper) -> Any: ...
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...
     def formfield(self, **kwargs: Any) -> None: ...
 
@@ -684,6 +688,7 @@ class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...  # type: 
 
 __all__ = [
     "BLANK_CHOICE_DASH",
+    "BLANK_CHOICE_LABEL",
     "NOT_PROVIDED",
     "AutoField",
     "BigAutoField",

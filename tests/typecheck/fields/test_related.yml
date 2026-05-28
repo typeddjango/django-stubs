@@ -1182,7 +1182,7 @@
         from myapp.models import MyModel, Other
         reveal_type(MyModel.first.RelatedObjectDoesNotExist)
         reveal_type(Other.mymodel)
-        reveal_type(Other.mymodel.get_queryset())
+        reveal_type(Other.mymodel.get_queryset(instance=MyModel()))
         reveal_type(Other.mymodel.RelatedObjectDoesNotExist)
         reveal_type(Other.has_explicit_name.RelatedObjectDoesNotExist)
         try:
