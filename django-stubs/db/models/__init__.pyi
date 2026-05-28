@@ -5,6 +5,9 @@ from . import signals as signals
 from .aggregates import Aggregate as Aggregate
 from .aggregates import AnyValue as AnyValue
 from .aggregates import Avg as Avg
+from .aggregates import BitAnd as BitAnd
+from .aggregates import BitOr as BitOr
+from .aggregates import BitXor as BitXor
 from .aggregates import Count as Count
 from .aggregates import Max as Max
 from .aggregates import Min as Min
@@ -123,6 +126,9 @@ __all__ = [
     "BigAutoField",
     "BigIntegerField",
     "BinaryField",
+    "BitAnd",
+    "BitOr",
+    "BitXor",
     "BooleanField",
     "Case",
     "CharField",

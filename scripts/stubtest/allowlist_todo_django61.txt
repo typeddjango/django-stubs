@@ -1,7 +1,4 @@
 django.contrib.gis.db.models.BLANK_CHOICE_LABEL
-django.contrib.gis.db.models.BitAnd
-django.contrib.gis.db.models.BitOr
-django.contrib.gis.db.models.BitXor
 django.contrib.gis.db.models.DB_CASCADE
 django.contrib.gis.db.models.DB_SET_DEFAULT
 django.contrib.gis.db.models.DB_SET_NULL
@@ -11,9 +8,6 @@ django.contrib.gis.db.models.JSONNull
 django.contrib.gis.db.models.RAISE
 django.contrib.gis.db.models.__all__
 django.db.models.BLANK_CHOICE_LABEL
-django.db.models.BitAnd
-django.db.models.BitOr
-django.db.models.BitXor
 django.db.models.DB_CASCADE
 django.db.models.DB_SET_DEFAULT
 django.db.models.DB_SET_NULL
@@ -22,10 +16,6 @@ django.db.models.FETCH_PEERS
 django.db.models.JSONNull
 django.db.models.RAISE
 django.db.models.__all__
-django.db.models.aggregates.BitAnd
-django.db.models.aggregates.BitOr
-django.db.models.aggregates.BitXor
-django.db.models.aggregates.__all__
 django.db.models.base.Model.from_db
 django.db.models.base.ModelState.__del__
 django.db.models.base.ModelState.fetch_mode
