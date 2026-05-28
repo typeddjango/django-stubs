@@ -1,14 +1,7 @@
 django.contrib.gis.db.models.BLANK_CHOICE_LABEL
-django.contrib.gis.db.models.FETCH_ONE
-django.contrib.gis.db.models.FETCH_PEERS
-django.contrib.gis.db.models.RAISE
 django.contrib.gis.db.models.__all__
 django.db.models.BLANK_CHOICE_LABEL
-django.db.models.FETCH_ONE
-django.db.models.FETCH_PEERS
-django.db.models.RAISE
 django.db.models.__all__
-django.db.models.fetch_modes
 django.db.models.fields.AutoFieldMixin.get_db_prep_save
 django.db.models.fields.BLANK_CHOICE_LABEL
 django.db.models.fields.BinaryField.get_placeholder

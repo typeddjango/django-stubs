@@ -54,6 +54,9 @@ from .expressions import When as When
 from .expressions import Window as Window
 from .expressions import WindowFrame as WindowFrame
 from .expressions import WindowFrameExclusion as WindowFrameExclusion
+from .fetch_modes import FETCH_ONE as FETCH_ONE
+from .fetch_modes import FETCH_PEERS as FETCH_PEERS
+from .fetch_modes import FETCH_RAISE as FETCH_RAISE
 from .fields import BLANK_CHOICE_DASH as BLANK_CHOICE_DASH
 from .fields import NOT_PROVIDED as NOT_PROVIDED
 from .fields import AutoField as AutoField
@@ -119,6 +122,9 @@ __all__ = [
     "DB_SET_NULL",
     "DEFERRED",
     "DO_NOTHING",
+    "FETCH_ONE",
+    "FETCH_PEERS",
+    "FETCH_RAISE",
     "NOT_PROVIDED",
     "PROTECT",
     "RESTRICT",

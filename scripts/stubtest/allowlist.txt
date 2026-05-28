@@ -302,3 +302,14 @@ django.utils.functional.LazyObject.__str__
 # Method removed from base class accidentally at end of deprecation period was restored after Django 6.1rc1.
 # See https://github.com/django/django/pull/21685 for details.
 django.contrib.staticfiles.finders.BaseFinder.find
+
+# Fetch mode `RAISE` was renamed to `FETCH_RAISE` after Django 6.1rc1.
+# See https://github.com/django/django/pull/21696 for details.
+django.contrib.gis.db.models.__all__
+django.contrib.gis.db.models.RAISE
+django.db.models.__all__
+django.db.models.RAISE
+django.db.models.fetch_modes.FETCH_RAISE
+django.db.models.fetch_modes.FetchRaise
+django.db.models.fetch_modes.RAISE
+django.db.models.fetch_modes.Raise
