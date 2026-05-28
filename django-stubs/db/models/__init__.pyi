@@ -22,6 +22,9 @@ from .constraints import CheckConstraint as CheckConstraint
 from .constraints import Deferrable as Deferrable
 from .constraints import UniqueConstraint as UniqueConstraint
 from .deletion import CASCADE as CASCADE
+from .deletion import DB_CASCADE as DB_CASCADE
+from .deletion import DB_SET_DEFAULT as DB_SET_DEFAULT
+from .deletion import DB_SET_NULL as DB_SET_NULL
 from .deletion import DO_NOTHING as DO_NOTHING
 from .deletion import PROTECT as PROTECT
 from .deletion import RESTRICT as RESTRICT
@@ -110,6 +113,9 @@ from .query_utils import Q as Q
 __all__ = [
     "BLANK_CHOICE_DASH",
     "CASCADE",
+    "DB_CASCADE",
+    "DB_SET_DEFAULT",
+    "DB_SET_NULL",
     "DEFERRED",
     "DO_NOTHING",
     "NOT_PROVIDED",
