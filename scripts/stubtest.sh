@@ -22,5 +22,6 @@ stubtest django \
     --mypy-config-file mypy.ini \
     --allowlist scripts/stubtest/allowlist.txt \
     --allowlist scripts/stubtest/allowlist_todo.txt \
+    --allowlist scripts/stubtest/allowlist_todo_django61.txt \
     $VERSION_SPECIFIC_ALLOWLIST \
     "$@"
