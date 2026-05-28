@@ -1,8 +1,3 @@
-django.contrib.contenttypes.fields.GenericForeignKey.__get__
-django.contrib.contenttypes.fields.GenericForeignKey.__set__
-django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
-django.contrib.contenttypes.fields.GenericForeignKeyDescriptor
-django.contrib.contenttypes.management.commands.remove_stale_contenttypes.NoFastDeleteCollector
 django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.supports_bbcontains_lookup
 django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.supports_contained_lookup
 django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.supports_dwithin_lookup
