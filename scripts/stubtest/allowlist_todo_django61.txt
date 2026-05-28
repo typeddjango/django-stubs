@@ -1,12 +1,3 @@
-django.contrib.auth.acheck_password_with_timing_attack_mitigation
-django.contrib.auth.check_password_with_timing_attack_mitigation
-django.contrib.auth.management.commands.createsuperuser.Command.natural_key_defined
-django.contrib.auth.management.rename_permissions_after_model_rename
-django.contrib.auth.middleware.RemoteUserMiddleware.aclean_username
-django.contrib.auth.middleware.RemoteUserMiddleware.get_username
-django.contrib.auth.models.Permission.user_perm_str
-django.contrib.auth.views.RedirectURLMixin.get_redirect_url
-django.contrib.auth.views.RedirectURLMixin.get_success_url_allowed_hosts
 django.contrib.contenttypes.fields.GenericForeignKey.__get__
 django.contrib.contenttypes.fields.GenericForeignKey.__set__
 django.contrib.contenttypes.fields.GenericForeignKey.get_prefetch_querysets
