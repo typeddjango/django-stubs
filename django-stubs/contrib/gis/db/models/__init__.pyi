@@ -81,6 +81,7 @@ __all__ = [
     "IntegerChoices",
     "IntegerField",
     "JSONField",
+    "JSONNull",
     "LineStringField",
     "Lookup",
     "MakeLine",

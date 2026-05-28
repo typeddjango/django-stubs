@@ -43,6 +43,7 @@ from .expressions import ExpressionList as ExpressionList
 from .expressions import ExpressionWrapper as ExpressionWrapper
 from .expressions import F as F
 from .expressions import Func as Func
+from .expressions import JSONNull as JSONNull
 from .expressions import OrderBy as OrderBy
 from .expressions import OuterRef as OuterRef
 from .expressions import RowRange as RowRange
@@ -172,6 +173,7 @@ __all__ = [
     "IntegerChoices",
     "IntegerField",
     "JSONField",
+    "JSONNull",
     "Lookup",
     "Manager",
     "ManyToManyField",
