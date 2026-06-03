@@ -10,14 +10,6 @@ django.contrib.gis.db.models.FETCH_PEERS
 django.contrib.gis.db.models.JSONNull
 django.contrib.gis.db.models.RAISE
 django.contrib.gis.db.models.__all__
-django.contrib.postgres.aggregates.general.BitAnd.__init__
-django.contrib.postgres.aggregates.general.BitOr.__init__
-django.contrib.postgres.aggregates.general.BitXor.__init__
-django.contrib.postgres.aggregates.mixins.OrderableAggMixin.__init__
-django.contrib.postgres.fields.array.ArrayField.get_placeholder
-django.contrib.postgres.fields.array.ArrayField.get_placeholder_sql
-django.contrib.postgres.fields.ranges.RangeField.get_placeholder
-django.contrib.postgres.fields.ranges.RangeField.get_placeholder_sql
 django.contrib.sessions.backends.base.SessionBase.__bool__
 django.contrib.staticfiles.finders.AppDirectoriesFinder.find
 django.contrib.staticfiles.finders.BaseFinder.find

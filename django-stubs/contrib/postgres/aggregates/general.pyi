@@ -28,9 +28,17 @@ class ArrayAgg(OrderableAggMixin, Aggregate):
     @override
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
-class BitAnd(Aggregate): ...
-class BitOr(Aggregate): ...
-class BitXor(Aggregate): ...
+class BitAnd(Aggregate):
+    @override
+    def __init__(self, expression: Any, **extra: Any) -> None: ...
+
+class BitOr(Aggregate):
+    @override
+    def __init__(self, expression: Any, **extra: Any) -> None: ...
+
+class BitXor(Aggregate):
+    @override
+    def __init__(self, expression: Any, **extra: Any) -> None: ...
 
 class BoolAnd(Aggregate):
     output_field: ClassVar[BooleanField[Any, Any]]
