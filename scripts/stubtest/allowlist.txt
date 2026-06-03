@@ -297,3 +297,7 @@ django.utils.functional.LazyObject.__hash__
 django.utils.functional.LazyObject.__iter__
 django.utils.functional.LazyObject.__len__
 django.utils.functional.LazyObject.__str__
+
+# Method removed from base class accidentally at end of deprecation period was restored after Django 6.1rc1.
+# See https://github.com/django/django/pull/21685 for details.
+django.contrib.staticfiles.finders.BaseFinder.find

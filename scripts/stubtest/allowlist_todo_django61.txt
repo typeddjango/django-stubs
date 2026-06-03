@@ -10,14 +10,6 @@ django.contrib.gis.db.models.FETCH_PEERS
 django.contrib.gis.db.models.JSONNull
 django.contrib.gis.db.models.RAISE
 django.contrib.gis.db.models.__all__
-django.contrib.staticfiles.finders.AppDirectoriesFinder.find
-django.contrib.staticfiles.finders.BaseFinder.find
-django.contrib.staticfiles.finders.BaseStorageFinder.find
-django.contrib.staticfiles.finders.FileSystemFinder.find
-django.contrib.staticfiles.finders.find
-django.contrib.staticfiles.storage.HashedFilesMixin.get_ignored_blocks
-django.contrib.staticfiles.storage.HashedFilesMixin.is_in_ignored_block
-django.contrib.staticfiles.storage.HashedFilesMixin.url_converter
 django.core.checks.mail
 django.core.checks.registry.Tags.mail
 django.core.checks.security.base.W027
