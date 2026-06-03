@@ -10,12 +10,6 @@ django.contrib.gis.db.models.FETCH_PEERS
 django.contrib.gis.db.models.JSONNull
 django.contrib.gis.db.models.RAISE
 django.contrib.gis.db.models.__all__
-django.core.serializers.pyyaml.DjangoSafeDumper.represent_ordered_dict
-django.core.serializers.pyyaml.DjangoSafeDumper.represent_time
-django.core.serializers.xml_serializer.check_element_type
-django.core.serializers.xml_serializer.fast_cache_clearing
-django.core.serializers.xml_serializer.getChildrenByTagName
-django.core.serializers.xml_serializer.getInnerTextList
 django.core.signing.base64_hmac
 django.db.backends.base.creation.BaseDatabaseCreation.destroy_test_db_connection_close_method
 django.db.backends.base.features.BaseDatabaseFeatures.disallowed_simple_test_case_connection_methods
