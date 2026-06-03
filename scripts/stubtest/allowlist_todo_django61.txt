@@ -10,7 +10,6 @@ django.contrib.gis.db.models.FETCH_PEERS
 django.contrib.gis.db.models.JSONNull
 django.contrib.gis.db.models.RAISE
 django.contrib.gis.db.models.__all__
-django.core.signing.base64_hmac
 django.db.backends.base.creation.BaseDatabaseCreation.destroy_test_db_connection_close_method
 django.db.backends.base.features.BaseDatabaseFeatures.disallowed_simple_test_case_connection_methods
 django.db.backends.base.features.BaseDatabaseFeatures.has_native_boolean_field
