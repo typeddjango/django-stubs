@@ -10,7 +10,6 @@ django.contrib.gis.db.models.FETCH_PEERS
 django.contrib.gis.db.models.JSONNull
 django.contrib.gis.db.models.RAISE
 django.contrib.gis.db.models.__all__
-django.contrib.sessions.backends.base.SessionBase.__bool__
 django.contrib.staticfiles.finders.AppDirectoriesFinder.find
 django.contrib.staticfiles.finders.BaseFinder.find
 django.contrib.staticfiles.finders.BaseStorageFinder.find
