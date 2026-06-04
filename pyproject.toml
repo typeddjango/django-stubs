@@ -62,7 +62,7 @@ tests = [
   "django-stubs[compatible-mypy,oracle,redis]",
 ]
 pyright = [
-  "pyright==1.1.409",
+  "pyright==1.1.410",
 ]
 pyrefly = [
   "pyrefly==1.0.0",
