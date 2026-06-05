@@ -177,7 +177,7 @@ class InlineParentModel(models.Model):
 
 
 class InlineChildModel(models.Model):
-    parent = models.ForeignKey(InlineParentModel, on_delete=models.CASCADE)  # pyright: ignore[reportUnknownVariableType]
+    parent = models.ForeignKey(InlineParentModel, on_delete=models.CASCADE)
 
 
 class ParentObjInline(admin.StackedInline[InlineChildModel, InlineParentModel]):
