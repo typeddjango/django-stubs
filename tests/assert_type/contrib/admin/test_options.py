@@ -7,12 +7,12 @@ from django.contrib.admin.sites import AdminSite
 from django.core.paginator import Paginator
 from django.db import models
 from django.forms import ModelForm, Textarea
+from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 from typing_extensions import override
 
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
-    from django.http.request import HttpRequest
 
 
 # "Happy path" test for model admin, trying to cover as many valid
@@ -57,7 +57,7 @@ class FullModelAdmin(admin.ModelAdmin[FullAdminModel]):
     readonly_fields = ("date_modified",)
     ordering = ("-pk", "date_modified")
     sortable_by = ["pk"]
-    view_on_site = True  # pyright: ignore[reportAssignmentType, reportIncompatibleMethodOverride]
+    view_on_site = True
     show_full_result_count = False
 
     # ModelAdmin
@@ -101,6 +101,14 @@ class FullModelAdmin(admin.ModelAdmin[FullAdminModel]):
         self.message_user(request, _("Error message"), messages.ERROR)
 
 
+class AnotherModel(models.Model):
+    pass
+
+
+admin.site.register(FullAdminModel, FullModelAdmin)
+admin.site.register(AnotherModel, FullModelAdmin)  # type: ignore[misc] # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type] # pyright:ignore[reportArgumentType]
+
+
 # This admin is here to make sure we're not running into a mypy issue which is
 # worked around using a somewhat complicated _ListOrTuple union type. Once the
 # issue is solved upstream this test should pass even with the workaround
@@ -119,7 +127,7 @@ class FieldsetWorkaroundAdmin(admin.ModelAdmin[Any]):
 
 class ViewOnSiteCallableAdmin(admin.ModelAdmin[Any]):
     @override
-    def view_on_site(self, obj: ViewOnSiteCallableAdmin) -> str:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def view_on_site(self, obj: ViewOnSiteCallableAdmin) -> str:  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override-mutable-attribute]
         return "http://example.org"
 
 
@@ -162,3 +170,29 @@ class InvalidGenericModel(models.Model):
 
 class InvalidGenericModelAdmin(admin.ModelAdmin[InvalidGenericModel]):
     model = int  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
+
+
+class InlineParentModel(models.Model):
+    pass
+
+
+class InlineChildModel(models.Model):
+    parent = models.ForeignKey(InlineParentModel, on_delete=models.CASCADE)  # pyright: ignore[reportUnknownVariableType]
+
+
+class ParentObjInline(admin.StackedInline[InlineChildModel, InlineParentModel]):
+    model = InlineChildModel
+
+    @override
+    def get_readonly_fields(
+        self, request: HttpRequest, obj: InlineParentModel | None = None
+    ) -> list[str] | tuple[str, ...]:
+        return super().get_readonly_fields(request, obj)
+
+
+# Passing wrong types to inline methods that expect parent objects
+inline_req = HttpRequest()
+inline_instance = ParentObjInline(InlineParentModel, admin.AdminSite())
+inline_instance.get_fields(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+inline_instance.get_inlines(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType, reportUnknownMemberType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+inline_instance.get_readonly_fields(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
