@@ -69,7 +69,7 @@ pyrefly = [
   "psycopg2-binary"
 ]
 ty = [
-  "ty==0.0.42",
+  "ty==0.0.43",
   "psycopg2-binary"
 ]
 
