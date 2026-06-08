@@ -571,7 +571,29 @@ class DjangoContext:
             return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
 
         if issubclass(lookup_cls, In):
-            exact_type = self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            api = helpers.get_typechecker_api(ctx)
+            exact_type = self.get_field_lookup_exact_type(api, field)
+            transform_parts = lookup_parts[:-1]
+            transformed_field = field
+            for transform_name in transform_parts:
+                if not isinstance(transformed_field, Field):
+                    break
+
+                transform_cls = transformed_field.get_transform(transform_name)
+                output_field = getattr(transform_cls, "output_field", None)
+                if not isinstance(output_field, Field):
+                    break
+
+                transformed_field = output_field
+            else:
+                if transform_parts:
+                    field_info = helpers.lookup_class_typeinfo(api, transformed_field.__class__)
+                    if field_info is None:
+                        exact_type = AnyType(TypeOfAny.explicit)
+                    else:
+                        exact_type = helpers.get_private_descriptor_type(
+                            field_info, "_pyi_private_get_type", is_nullable=transformed_field.null
+                        )
             return ctx.api.named_generic_type("typing.Iterable", [exact_type])
 
         resolved_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls, field)
