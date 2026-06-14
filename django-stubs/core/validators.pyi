@@ -1,7 +1,7 @@
 from collections.abc import Callable, Collection, Sequence, Sized
 from decimal import Decimal
 from re import Pattern, RegexFlag
-from typing import Any, TypeAlias
+from typing import Any, TypeAlias, TypeVar
 
 from django.core.files.base import File
 from django.utils.deconstruct import _Deconstructible
@@ -12,7 +12,9 @@ EMPTY_VALUES: Any
 
 _Regex: TypeAlias = str | Pattern[str]
 
-_ValidatorCallable: TypeAlias = Callable[[Any], None]  # noqa: PYI047
+_VT = TypeVar("_VT", contravariant=True)
+
+_ValidatorCallable: TypeAlias = Callable[[_VT], None]  # noqa: PYI047
 
 class RegexValidator(_Deconstructible):
     regex: _Regex  # Pattern[str] on instance, but may be str on class definition

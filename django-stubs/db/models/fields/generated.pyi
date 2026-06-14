@@ -42,7 +42,7 @@ class GeneratedField(models.Field[Any, Any]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable[Any]] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         **kwargs: Any,
     ) -> None: ...

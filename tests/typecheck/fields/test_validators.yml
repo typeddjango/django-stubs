@@ -1,0 +1,46 @@
+-   case: model_field_validators_follow_get_type_and_support_subclassing
+    main: |
+        from datetime import date
+        from decimal import Decimal
+        from typing import NewType
+        from uuid import UUID
+
+        from django.db import models
+        from django.db.models.expressions import Combinable
+        from typing_extensions import reveal_type
+
+        SlugValue = NewType("SlugValue", str)
+
+        class CustomSlugField(models.SlugField[SlugValue | str | int | Combinable, SlugValue]):
+            ...
+
+        def validate_slug(value: str) -> None: ...
+        def validate_price(value: Decimal) -> None: ...
+        def validate_published_on(value: date) -> None: ...
+        def validate_identifier(value: UUID) -> None: ...
+        def validate_ip(value: str) -> None: ...
+        def validate_custom_slug(value: SlugValue) -> None: ...
+        def validate_int(value: int) -> None: ...
+        def validate_date(value: date) -> None: ...
+        def validate_uuid(value: UUID) -> None: ...
+
+        class Article(models.Model):
+            slug = models.SlugField(validators=[validate_slug])
+            price = models.DecimalField(max_digits=8, decimal_places=2, validators=[validate_price])
+            published_on = models.DateField(validators=[validate_published_on])
+            identifier = models.UUIDField(validators=[validate_identifier])
+            ip_address = models.GenericIPAddressField(validators=[validate_ip])
+            custom_slug = CustomSlugField(validators=[validate_custom_slug])
+
+            bad_slug = models.SlugField(validators=[validate_int])  # E: List item 0 has incompatible type "Callable[[int], None]"; expected "Callable[[str], None]"  [list-item]
+            bad_published_on = models.DateField(validators=[validate_int])  # E: List item 0 has incompatible type "Callable[[int], None]"; expected "Callable[[date], None]"  [list-item]
+            bad_identifier = models.UUIDField(validators=[validate_date])  # E: List item 0 has incompatible type "Callable[[date], None]"; expected "Callable[[UUID], None]"  [list-item]
+            bad_ip_address = models.GenericIPAddressField(validators=[validate_uuid])  # E: List item 0 has incompatible type "Callable[[UUID], None]"; expected "Callable[[str], None]"  [list-item]
+            bad_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[validate_uuid])  # E: List item 0 has incompatible type "Callable[[UUID], None]"; expected "Callable[[Decimal], None]"  [list-item]
+
+        reveal_type(Article().slug)  # N: Revealed type is "builtins.str"
+        reveal_type(Article().price)  # N: Revealed type is "decimal.Decimal"
+        reveal_type(Article().published_on)  # N: Revealed type is "datetime.date"
+        reveal_type(Article().identifier)  # N: Revealed type is "uuid.UUID"
+        reveal_type(Article().ip_address)  # N: Revealed type is "builtins.str"
+        reveal_type(Article().custom_slug)  # N: Revealed type is "main.SlugValue"

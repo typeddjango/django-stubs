@@ -90,7 +90,7 @@ class FileField(Field[Any, Any]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[validators._ValidatorCallable[Any]] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     # class access
