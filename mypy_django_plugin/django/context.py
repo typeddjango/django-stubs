@@ -116,14 +116,117 @@ class DjangoContext:
         self.django_settings_module = django_settings_module
 
         apps, settings = initialize_django(self.django_settings_module)
-        self.apps_registry = apps
-        self.settings = settings
+        self._apps_registry = apps
+        self._settings = settings
+
+    # ---- Registry wrappers ----
+
+    def get_model_class_by_label(self, label: str) -> type[Model] | None:
+        try:
+            return self._apps_registry.get_model(label)
+        except LookupError:
+            return None
+
+    def is_app_installed(self, dotted_or_label: str) -> bool:
+        return self._apps_registry.is_installed(dotted_or_label)
+
+    # ---- Settings wrappers ----
+
+    def get_setting(self, name: str, default: Any = None) -> Any:
+        return getattr(self._settings, name, default)
+
+    def has_setting(self, name: str) -> bool:
+        return hasattr(self._settings, name)
+
+    @cached_property
+    def auth_user_model_label(self) -> str:
+        return self._settings.AUTH_USER_MODEL
+
+    @cached_property
+    def default_auto_field_path(self) -> str:
+        return self._settings.DEFAULT_AUTO_FIELD
+
+    # ---- Single-model meta wrappers ----
+
+    def get_field_on_model(self, model_cls: type[Model], field_name: str) -> Field[Any, Any] | ForeignObjectRel | None:
+        try:
+            return model_cls._meta.get_field(field_name)
+        except FieldDoesNotExist:
+            return None
+
+    def is_model_abstract(self, model_cls: type[Model]) -> bool:
+        return model_cls._meta.abstract
+
+    def get_proxy_target(self, model_cls: type[Model]) -> type[Model] | None:
+        return model_cls._meta.proxy_for_model
+
+    def get_auto_field(self, model_cls: type[Model]) -> Field[Any, Any] | None:
+        return model_cls._meta.auto_field
+
+    def get_pk_field_or_none(self, model_cls: type[Model]) -> Field[Any, Any] | None:
+        # Non-raising parallel of `get_primary_key_field`.
+        return model_cls._meta.pk
+
+    def get_pk_fields(self, model_cls: type[Model]) -> tuple[Field[Any, Any], ...]:
+        # Composite-PK ready (Django 5.2+); falls back to the single PK on older Django.
+        pk_fields = getattr(model_cls._meta, "pk_fields", None)
+        if pk_fields is not None:
+            return tuple(pk_fields)
+        pk = self.get_pk_field_or_none(model_cls)
+        return (pk,) if pk is not None else ()
+
+    def get_model_parents(self, model_cls: type[Model]) -> Sequence[type[Model]]:
+        # Wraps `_meta.all_parents` (Django 5.2+) / `_meta.get_parent_list()` for older Django.
+        opts = model_cls._meta
+        parents = getattr(opts, "all_parents", None)
+        if parents is not None:
+            return list(parents)
+        return opts.get_parent_list()
+
+    def iter_reverse_relations(self, model_cls: type[Model]) -> Iterator[ForeignObjectRel]:
+        # Public-API equivalent of `_meta.related_objects` (private API).
+        # Matches `include_hidden=True` to preserve behaviour for hidden M2M etc.
+        for field in model_cls._meta.get_fields(include_hidden=True):
+            if isinstance(field, ForeignObjectRel):
+                yield field
+
+    # ---- Manager wrappers ----
+
+    def iter_managers(self, model_cls: type[Model]) -> Iterator[tuple[str, models.Manager[Any]]]:
+        yield from model_cls._meta.managers_map.items()
+
+    def get_default_manager_class(self, model_cls: type[Model]) -> type[models.Manager[Any]]:
+        return model_cls._meta.default_manager.__class__  # type: ignore[return-value]
+
+    # ---- Query helpers ----
+
+    def resolve_names_to_path(self, model_cls: type[Model], parts: Sequence[str]) -> tuple[_AnyField, Sequence[str]]:
+        """Wrap `Query(model).names_to_path(parts, _meta)` so callers don't touch `_meta`.
+
+        Returns `(final_field, remainder)`. Raises Django's `FieldError` for the caller
+        to translate into a user-facing diagnostic.
+        """
+        _, final_field, _, remainder = Query(model_cls).names_to_path(parts, model_cls._meta)
+        return final_field, remainder
+
+    def iter_select_related_choices(self, model_cls: type[Model]) -> Iterator[str]:
+        """Names valid for `QuerySet.select_related(...)` on this model.
+
+        Mirrors Django's `SQLCompiler.get_related_selections._get_field_choices`:
+        forward FK/O2O field names plus reverse-unique relation query names.
+        """
+        for field in model_cls._meta.fields:
+            if field.is_relation:
+                yield field.name
+        for rel in model_cls._meta.related_objects:
+            if rel.field.unique:
+                yield rel.field.related_query_name()
 
     @cached_property
     def model_modules(self) -> dict[str, dict[str, type[Model]]]:
         """All modules that contain Django models."""
         modules: dict[str, dict[str, type[Model]]] = defaultdict(dict)
-        for concrete_model_cls in self.apps_registry.get_models(include_auto_created=True, include_swapped=True):
+        for concrete_model_cls in self._apps_registry.get_models(include_auto_created=True, include_swapped=True):
             modules[concrete_model_cls.__module__][concrete_model_cls.__name__] = concrete_model_cls
             # collect abstract=True models
             for model_cls in concrete_model_cls.mro()[1:]:
@@ -197,7 +300,7 @@ class DjangoContext:
         raise ValueError("No primary key defined")
 
     def get_expected_types(self, api: TypeChecker, model_cls: type[Model], *, method: str) -> dict[str, MypyType]:
-        contenttypes_in_apps = self.apps_registry.is_installed("django.contrib.contenttypes")
+        contenttypes_in_apps = self._apps_registry.is_installed("django.contrib.contenttypes")
 
         expected_types = {}
         # add pk if not abstract=True
@@ -274,7 +377,7 @@ class DjangoContext:
 
     @cached_property
     def all_registered_model_classes(self) -> set[type[models.Model]]:
-        model_classes = self.apps_registry.get_models()
+        model_classes = self._apps_registry.get_models()
 
         all_model_bases = set()
         for model_cls in model_classes:
@@ -389,7 +492,7 @@ class DjangoContext:
                     raise UnregisteredModelError
             else:
                 try:
-                    related_model_cls = self.apps_registry.get_model(related_model_cls)
+                    related_model_cls = self._apps_registry.get_model(related_model_cls)
                 except LookupError as e:
                     raise UnregisteredModelError from e
 
@@ -585,4 +688,4 @@ class DjangoContext:
 
     @cached_property
     def is_contrib_auth_installed(self) -> bool:
-        return "django.contrib.auth" in self.settings.INSTALLED_APPS
+        return "django.contrib.auth" in self._settings.INSTALLED_APPS

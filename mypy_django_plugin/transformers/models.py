@@ -278,7 +278,7 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
 class AddDefaultPrimaryKey(ModelClassInitializer):
     @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
-        auto_field = model_cls._meta.auto_field
+        auto_field = self.django_context.get_auto_field(model_cls)
         if auto_field:
             self.create_autofield(
                 auto_field=auto_field,
@@ -309,8 +309,8 @@ class AddPrimaryKeyAlias(AddDefaultPrimaryKey):
     @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         # We also need to override existing `pk` definition from `stubs`:
-        auto_field = model_cls._meta.pk
-        if auto_field is not None:  # type: ignore[comparison-overlap]
+        auto_field = self.django_context.get_pk_field_or_none(model_cls)
+        if auto_field is not None:
             self.create_autofield(
                 auto_field=auto_field,
                 dest_name="pk",
@@ -336,7 +336,7 @@ class AddRelatedModelsId(ModelClassInitializer):
                 self.add_new_var_to_model_class(field.attname, AnyType(TypeOfAny.explicit))
                 continue
 
-            if related_model_cls._meta.abstract:
+            if self.django_context.is_model_abstract(related_model_cls):
                 continue
 
             rel_target_field = self.django_context.get_related_target_field(related_model_cls, field)
@@ -383,7 +383,7 @@ class AddManagers(ModelClassInitializer):
         manager_info: TypeInfo | None
 
         incomplete_manager_defs = set()
-        for manager_name, manager in model_cls._meta.managers_map.items():
+        for manager_name, manager in self.django_context.iter_managers(model_cls):
             manager_node = self.model_classdef.info.get(manager_name)
             manager_fullname = helpers.get_class_fullname(manager.__class__)
             manager_info = self.lookup_manager(manager_fullname, manager)
@@ -483,7 +483,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
         if "_default_manager" in self.model_classdef.info.names:
             return None
 
-        default_manager_cls = model_cls._meta.default_manager.__class__
+        default_manager_cls = self.django_context.get_default_manager_class(model_cls)
         default_manager_fullname = helpers.get_class_fullname(default_manager_cls)
 
         try:
@@ -767,7 +767,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
 
     @cached_property
     def default_pk_instance(self) -> Instance:
-        default_pk_field = self.lookup_typeinfo(self.django_context.settings.DEFAULT_AUTO_FIELD)
+        default_pk_field = self.lookup_typeinfo(self.django_context.default_auto_field_path)
         if default_pk_field is None:
             raise helpers.IncompleteDefnException()
         return Instance(
