@@ -38,7 +38,7 @@ from mypy.plugin import (
     MethodContext,
 )
 from mypy.semanal import SemanticAnalyzer
-from mypy.typeanal import make_optional_type
+from mypy.typeanal import fix_instance, make_optional_type
 from mypy.types import (
     AnyType,
     CallableType,
@@ -436,6 +436,27 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
     return AnyType(TypeOfAny.explicit)
 
 
+def fill_field_defaults(
+    field_info: TypeInfo,
+    api: TypeChecker | SemanticAnalyzer,
+    *,
+    is_set_nullable: bool = False,
+) -> Instance:
+    """Build an Instance of `field_info` with PEP 696 TypeVar defaults applied."""
+    inst = Instance(field_info, ())
+    fix_instance(
+        inst,
+        api.fail,
+        api.note,
+        disallow_any=False,
+        options=api.options,
+        use_generic_error=True,
+    )
+    if is_set_nullable and inst.args:
+        inst = inst.copy_modified(args=[make_optional_type(inst.args[0]), *inst.args[1:]])
+    return inst
+
+
 class FieldTypeArgs(NamedTuple):
     set: ProperType
     get: ProperType
@@ -560,6 +581,26 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
         return referred_to_type
 
     return typ
+
+
+def reparametrize_field_type(
+    field_type: Instance, set_type: MypyType, get_type: MypyType, *, is_nullable: bool | None = None
+) -> Instance:
+    """Replace the set/get type args of a Field Instance, preserving any additional args.
+
+    Uses `convert_any_to_type` to substitute `Any` placeholders in the existing args;
+    the ``_NT`` nullability flag (``args[2]``) is updated when *is_nullable* is given.
+    """
+    trailing = list(field_type.args[2:])
+    nt_proper = get_proper_type(trailing[0]) if trailing else None
+    if is_nullable is not None and isinstance(nt_proper, LiteralType):
+        trailing[0] = LiteralType(value=is_nullable, fallback=nt_proper.fallback)
+    args = [
+        convert_any_to_type(field_type.args[0], set_type),
+        convert_any_to_type(field_type.args[1], get_type),
+        *trailing,
+    ]
+    return field_type.copy_modified(args=args)
 
 
 def _get_fallback_typeddict(api: SemanticAnalyzer | CheckerPluginInterface) -> Instance:
@@ -787,6 +828,7 @@ def analyze_member_access(
     is_operator: bool,
     original_type: MypyType,
     chk: TypeChecker,
+    suppress_errors: bool = False,
 ) -> MypyType:
     # TODO: [mypy 1.16+] Remove this workaround for passing `msg` to `analyze_member_access()`.
     extra: dict[str, Any] = {}
@@ -801,5 +843,69 @@ def analyze_member_access(
         is_operator=is_operator,
         original_type=original_type,
         chk=chk,
+        suppress_errors=suppress_errors,
         **extra,
     )
+
+
+def _resolve_field_descriptor_type(
+    api: TypeChecker, info: TypeInfo | None, field_name: str, context: Context, *, is_lvalue: bool
+) -> ProperType:
+    if info is None:
+        return AnyType(TypeOfAny.from_error)
+    instance = Instance(info, [])
+    return get_proper_type(
+        analyze_member_access(
+            name=field_name,
+            typ=instance,
+            context=context,
+            is_lvalue=is_lvalue,
+            is_super=False,
+            is_operator=False,
+            original_type=instance,
+            chk=api,
+            suppress_errors=True,
+        )
+    )
+
+
+def get_field_set_type_from_model_type_info(
+    api: TypeChecker, context: Context, info: TypeInfo | None, field_name: str
+) -> ProperType:
+    """Resolve `<model>.<field_name> = ...` rvalue type via Field's `__set__` overloads.
+
+    For `name = CharField()` -> `str | int | Combinable`.
+    For `name = CharField(null=True)` -> `str | int | Combinable | None`.
+    """
+    return _resolve_field_descriptor_type(api, info, field_name, context, is_lvalue=True)
+
+
+def get_field_get_type_from_model_type_info(
+    api: TypeChecker, context: Context, info: TypeInfo | None, field_name: str
+) -> ProperType:
+    """Resolve `<model_instance>.<field_name>` read type via Field's `__get__` overloads.
+
+    For `name = CharField()` -> `str`.
+    For `name = CharField(null=True)` -> `str | None`.
+    """
+    return _resolve_field_descriptor_type(api, info, field_name, context, is_lvalue=False)
+
+
+def get_field_type_from_model_type_info(
+    api: TypeChecker, context: Context, model_info: TypeInfo, field_name: str
+) -> Instance | None:
+    """Resolve `<model>.<field_name>`'s full Field descriptor type with set/get args filled in.
+
+    For `name = CharField()` -> `CharField[str | int | Combinable, str, Literal[False]]`.
+    For `name = CharField(null=True)` -> `CharField[str | int | Combinable | None, str | None, Literal[True]]`.
+    """
+    if (
+        (field_sym_node := model_info.get(field_name)) is None
+        or not isinstance(field_type := get_proper_type(field_sym_node.type), Instance)
+        or len(field_type.args) < 2
+    ):
+        return None
+
+    resolved_get_type = get_field_get_type_from_model_type_info(api, context, model_info, field_name)
+    resolved_set_type = get_field_set_type_from_model_type_info(api, context, model_info, field_name)
+    return field_type.copy_modified(args=[resolved_set_type, resolved_get_type, *field_type.args[2:]])

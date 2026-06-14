@@ -106,15 +106,13 @@ def get_field_type_from_lookup(
 
     if lookup_field is None:
         return AnyType(TypeOfAny.implementation_artifact)
-    if (isinstance(lookup_field, RelatedField) and lookup_field.column == lookup) or isinstance(
-        lookup_field, ForeignObjectRel
-    ):
+    if isinstance(lookup_field, RelatedField) or isinstance(lookup_field, ForeignObjectRel):
         model_cls = django_context.get_field_related_model_cls(lookup_field)
         lookup_field = django_context.get_primary_key_field(model_cls)
 
     api = helpers.get_typechecker_api(ctx)
     model_info = helpers.lookup_class_typeinfo(api, model_cls)
-    return django_context.get_field_get_type(api, model_info, lookup_field, method=method)
+    return helpers.get_field_get_type_from_model_type_info(api, ctx.context, model_info, lookup_field.attname)
 
 
 def get_values_list_row_type(
@@ -143,8 +141,8 @@ def get_values_list_row_type(
         if named:
             column_types: dict[str, MypyType] = {}
             for field in django_context.get_model_fields(model_cls):
-                column_type = django_context.get_field_get_type(
-                    typechecker_api, model_info, field, method="values_list"
+                column_type = helpers.get_field_get_type_from_model_type_info(
+                    typechecker_api, ctx.context, model_info, field.attname
                 )
                 column_types[field.attname] = column_type
             column_types.update(annotation_types)
@@ -291,11 +289,14 @@ def reparameterize_func_output_field(ctx: FunctionContext) -> MypyType:
         return ctx.default_return_type
 
     # Use the output_field argument type to fill the generic param
-    output_field_type = helpers.get_call_argument_type_by_name(ctx, "output_field")
-    if output_field_type is not None:
-        field_type = get_proper_type(output_field_type)
-        if isinstance(field_type, Instance):
-            return default.copy_modified(args=[field_type])
+    output_field_type = get_proper_type(helpers.get_call_argument_type_by_name(ctx, "output_field"))
+    if output_field_type is not None and isinstance(output_field_type, Instance):
+        output_field_type = (
+            helpers.fill_field_defaults(output_field_type.type, helpers.get_typechecker_api(ctx))
+            if all(isinstance(get_proper_type(arg), AnyType) for arg in output_field_type.args)
+            else output_field_type
+        )
+        return default.copy_modified(args=[output_field_type])
 
     return ctx.default_return_type
 
@@ -340,10 +341,10 @@ def _resolve_output_field_type(expr_type: MypyType) -> MypyType | None:
         if isinstance(func_type, CallableType):
             field_type = get_proper_type(func_type.ret_type)
 
-    if isinstance(field_type, Instance):
-        result = helpers.get_private_descriptor_type(field_type.type, "_pyi_private_get_type", is_nullable=False)
-        if not isinstance(get_proper_type(result), AnyType):
-            return result
+    if isinstance(field_type, Instance) and field_type.type.has_base(fullnames.FIELD_FULLNAME):
+        type_args = helpers.get_field_type_args(field_type)
+        if type_args is not None and not isinstance(type_args.get, AnyType):
+            return type_args.get
 
     return None
 

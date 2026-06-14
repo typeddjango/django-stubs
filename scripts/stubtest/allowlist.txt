@@ -237,14 +237,15 @@ django.urls.resolvers.ResolverMatch.__iter__
 django.template.smartif.key
 django.template.smartif.op
 
-# Field.__get__/__set__ are stub-only for the mypy plugin, they don't exist at runtime
+# Field.__get__/__set__ are stub-only for the type checkers, they don't exist at runtime
 django.db.models.fields.Field.__get__
 django.db.models.fields.Field.__set__
 django.db.models.fields.files.FileField.__get__
-django.db.models.fields.files.ImageField.__get__
 django.db.models.fields.related.ForeignObject.__get__
+django.db.models.fields.related.ForeignObject.__set__
 django.db.models.fields.related.ManyToManyField.__get__
 django.db.models.fields.related.OneToOneField.__get__
+django.db.models.fields.related.OneToOneField.__set__
 
 # These are dynamically added at runtime with loose types
 django.utils.functional.LazyObject.__bool__

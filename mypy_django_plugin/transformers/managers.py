@@ -9,6 +9,7 @@ from mypy.nodes import (
     Decorator,
     FuncBase,
     FuncDef,
+    IndexExpr,
     MemberExpr,
     Node,
     OverloadedFuncDef,
@@ -16,6 +17,7 @@ from mypy.nodes import (
     RefExpr,
     StrExpr,
     SymbolTableNode,
+    TupleExpr,
     TypeInfo,
 )
 from mypy.plugins.common import add_method_to_class
@@ -606,10 +608,25 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     )
 
 
-def _is_omitted_generic(arg: MypyType) -> bool:
-    """True if ``arg`` is the ``Any`` mypy substitutes for an unparametrized generic."""
-    proper_arg = get_proper_type(arg)
-    return isinstance(proper_arg, AnyType) and proper_arg.type_of_any is TypeOfAny.from_omitted_generics
+def _count_user_supplied_type_args(ctx: ClassDefContext, parent_type: TypeInfo) -> int:
+    """Count type args the user actually wrote at ``parent_type``'s bracket position.
+
+    We can't infer this from the parent ``Instance.args`` because mypy's PEP 696
+    default substitution leaves no marker distinguishing user-supplied slots from bdefaulted ones.
+    """
+    base_index_expr = next(
+        (
+            expr
+            for expr in ctx.cls.base_type_exprs
+            if isinstance(expr, IndexExpr) and isinstance(expr.base, RefExpr) and expr.base.node is parent_type
+        ),
+        None,
+    )
+    if base_index_expr is None:
+        return 0
+    if isinstance(base_index_expr.index, TupleExpr):
+        return len(base_index_expr.index.items)
+    return 1
 
 
 def reparametrize_generic_class(
@@ -648,31 +665,27 @@ def reparametrize_generic_class(
     if parent_class is None or not parent_class.args:
         return
 
-    # Bind explicit args only when the direct parent is the canonical base class
-    is_direct_parent = parent_class.type.fullname == base_class_fullname
-    if not (bind_explicit_args and is_direct_parent):
-        if not _is_omitted_generic(parent_class.args[0]):
+    parent_type_vars = list(parent_class.type.defn.type_vars)
+    num_type_arg_supplied = _count_user_supplied_type_args(ctx, parent_class.type)
+
+    if bind_explicit_args and num_type_arg_supplied > 0:
+        if parent_class.type.fullname != base_class_fullname:
+            # User wrote `[...]` on a non-direct parent. For ex `HtmlField(TextField[...])`
             return
-        type_vars = list(parent_class.type.defn.type_vars)
+
+        # Synthesize a TypeVar reusing parent bound and default.
+        type_vars = [
+            type_var.copy_modified(id=type_var.id, upper_bound=parent_type_var, default=parent_type_var)
+            for type_var, parent_type_var in zip(parent_type_vars, parent_class.args, strict=True)
+        ]
+        new_parent_args: list[MypyType] = list(type_vars)
+    elif num_type_arg_supplied < len(parent_type_vars):
+        # Bare class or partial parametrization: reuse parent's trailing TypeVar(s) to keep the subclass generic.
+        type_vars = parent_type_vars[num_type_arg_supplied:]
+        new_parent_args = list(parent_class.args[:num_type_arg_supplied]) + list(type_vars)
     else:
-        type_vars = []
-        for type_var, parent_type_var in zip(parent_class.type.defn.type_vars, parent_class.args, strict=True):
-            if _is_omitted_generic(parent_type_var):
-                # Arg was omitted -- reuse the parent's TypeVar so its existing
-                # PEP 696 default (e.g. ``_Row = TypeVar(default=_Model)``) is preserved.
-                type_vars.append(type_var)
-            else:
-                # Arg was supplied explicitly -- synthesize a TypeVar bounded by the
-                # user's arg so the subclass stays effectively concrete in user-facing
-                # contexts (defaults + bound + covariance) while still being generic
-                # enough for the plugin to flow annotation row types through.
-                type_vars.append(
-                    type_var.copy_modified(
-                        id=type_var.id,
-                        upper_bound=parent_type_var,
-                        default=parent_type_var,
-                    )
-                )
+        # User wrote a full parametrization; respect it.
+        return
 
     # If we end up with placeholders we need to defer so the placeholders are
     # resolved in a future iteration
@@ -682,7 +695,7 @@ def reparametrize_generic_class(
         else:
             return
 
-    parent_class.args = tuple(type_vars)
+    parent_class.args = tuple(new_parent_args)
     class_info.node.defn.type_vars = type_vars
     class_info.node.add_type_vars()
 
