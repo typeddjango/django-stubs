@@ -1,4 +1,5 @@
 import datetime
+import json
 from collections.abc import Callable, Collection, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
@@ -104,7 +105,7 @@ class IntegerField(Field):
     max_value: int | Callable[[], int] | None
     min_value: int | Callable[[], int] | None
     step_size: int | Callable[[], int] | None
-    re_decimal: Any
+    re_decimal: Pattern[str]
     def __init__(
         self,
         *,
@@ -185,11 +186,11 @@ class DecimalField(IntegerField):
     def widget_attrs(self, widget: Widget) -> dict[str, Any]: ...
 
 class BaseTemporalField(Field):
-    input_formats: Any
+    input_formats: Collection[str] | DateTimeFormatsIterator | None
     def __init__(
         self,
         *,
-        input_formats: Any | None = None,
+        input_formats: Collection[str] | DateTimeFormatsIterator | None = None,
         required: bool = ...,
         widget: Widget | type[Widget] | None = ...,
         label: _StrOrPromise | None = ...,
@@ -618,9 +619,14 @@ class JSONString(str): ...
 class JSONField(CharField):
     default_error_messages: ClassVar[_ErrorMessagesDict]
     widget: _ClassLevelWidgetT
-    encoder: Any
-    decoder: Any
-    def __init__(self, encoder: Any | None = None, decoder: Any | None = None, **kwargs: Any) -> None: ...
+    encoder: type[json.JSONEncoder] | None
+    decoder: type[json.JSONDecoder] | None
+    def __init__(
+        self,
+        encoder: type[json.JSONEncoder] | None = None,
+        decoder: type[json.JSONDecoder] | None = None,
+        **kwargs: Any,
+    ) -> None: ...
     @override
     def to_python(self, value: Any) -> Any: ...
     @override
