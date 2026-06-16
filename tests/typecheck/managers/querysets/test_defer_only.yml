@@ -218,6 +218,32 @@
                     tags = models.ManyToManyField(Tag)
 
 
+-   case: only_pk_on_abstract_model_no_crash
+    installed_apps:
+        - myapp
+    main: |
+        from django.db.models import QuerySet
+        from myapp.models import AbstractArticle
+        from typing import reveal_type
+
+        def test(qs: QuerySet[AbstractArticle]) -> None:
+            reveal_type(qs.only("pk"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.AbstractArticle, myapp.models.AbstractArticle]"
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class AbstractArticle(models.Model):
+                    title = models.CharField(max_length=200)
+
+                    class Meta:
+                        abstract = True
+
+                class Article(AbstractArticle):
+                    pass
+
+
 -   case: only_invalid_fields
     installed_apps:
         - myapp
