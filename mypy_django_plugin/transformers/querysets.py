@@ -1238,6 +1238,11 @@ def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> Mypy
 def _validate_defer_only_fields(
     ctx: MethodContext, model_cls: type[Model], field_names: list[str], *, is_defer: bool
 ) -> None:
+    if not is_defer and model_cls._meta.abstract:
+        # Abstract models do not have a primary key field, but Query.add_immediate_loading()
+        # assumes that one exists when resolving the "pk" alias.
+        field_names = [field_name for field_name in field_names if field_name != "pk"]
+
     query = Query(model_cls)
     query.add_deferred_loading(field_names) if is_defer else query.add_immediate_loading(field_names)
 
