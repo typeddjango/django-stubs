@@ -224,7 +224,7 @@
     main: |
         from django.db.models import QuerySet
         from myapp.models import AbstractArticle
-        from typing import reveal_type
+        from typing_extensions import reveal_type
 
         def test(qs: QuerySet[AbstractArticle]) -> None:
             reveal_type(qs.only("pk"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.AbstractArticle, myapp.models.AbstractArticle]"
