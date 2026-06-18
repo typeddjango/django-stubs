@@ -28,7 +28,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST,
     default_error_messages: ClassVar[_ErrorMessagesDict]
     base_field: Field
     size: int | None
-    default_validators: Sequence[_ValidatorCallable]
+    default_validators: Sequence[_ValidatorCallable[_GT]]
     from_db_value: Any
     def __init__(
         self,
@@ -56,7 +56,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST,
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable[_GT]] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @override

@@ -48,7 +48,7 @@ class CompositePrimaryKey(Field[Any, Any]):
         db_column: None = None,
         db_tablespace: str | None = None,
         auto_created: bool = False,
-        validators: Iterable[validators._ValidatorCallable] = (),
+        validators: Iterable[validators._ValidatorCallable[Any]] = (),
         error_messages: Mapping[str, _StrOrPromise] | None = None,
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] = ...,

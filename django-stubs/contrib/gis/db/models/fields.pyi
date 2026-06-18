@@ -66,7 +66,7 @@ class BaseSpatialField(Field[_ST, _GT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable[_GT]] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @override
@@ -115,7 +115,7 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable[_GT]] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @override

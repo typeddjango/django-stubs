@@ -73,7 +73,7 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
         db_column: str | None = ...,
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[validators._ValidatorCallable[_GT]] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         db_comment: str | None = ...,
     ) -> None: ...
@@ -130,7 +130,7 @@ class ForeignObject(RelatedField[_ST, _GT]):
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[validators._ValidatorCallable[_GT]] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         db_comment: str | None = ...,
     ) -> None: ...
@@ -216,7 +216,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[validators._ValidatorCallable[_GT]] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         db_comment: str | None = ...,
     ) -> None: ...
@@ -270,7 +270,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[validators._ValidatorCallable[_GT]] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         db_comment: str | None = ...,
     ) -> None: ...
