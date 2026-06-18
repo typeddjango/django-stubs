@@ -144,7 +144,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     empty_values: Sequence[Any]
     creation_counter: int
     auto_creation_counter: int
-    default_validators: Sequence[validators._ValidatorCallable]
+    default_validators: list[validators._ValidatorCallable]
     default_error_messages: ClassVar[_ErrorMessagesDict]
     hidden: bool
     system_check_removed_details: Any | None
