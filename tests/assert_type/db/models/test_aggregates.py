@@ -1,7 +1,22 @@
 from __future__ import annotations
 
-from django.db.models import Count, F, Q, StdDev, StringAgg, Variance
+from typing import cast
+
+from django.db.models import (
+    BooleanField,
+    Count,
+    Exists,
+    ExpressionWrapper,
+    F,
+    Model,
+    Q,
+    QuerySet,
+    StdDev,
+    StringAgg,
+    Variance,
+)
 from django.db.models.aggregates import Aggregate
+from django.db.models.lookups import GreaterThan
 
 Aggregate("title", order_by="title")
 Aggregate("title", order_by="-title")
@@ -11,9 +26,14 @@ Aggregate("title", order_by=["-title", F("title")])
 Aggregate("title", order_by=("-title", F("title").desc()))
 Aggregate("title", order_by=None)
 
+queryset = cast("QuerySet[Model]", object())
+
 # Count: filter is positional-or-keyword (unique to Count)
 Count("id", distinct=True)
 Count("id", filter=Q(active=True))
+Count("id", filter=Exists(queryset))
+Count("id", filter=GreaterThan(F("id"), 0))
+Count("id", filter=ExpressionWrapper(Exists(queryset), output_field=BooleanField()))
 Count("id", Q(active=True))  # filter as positional
 Count(123)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
 Count("id", filter="active")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
