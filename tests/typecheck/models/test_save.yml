@@ -1,0 +1,99 @@
+-   case: save_update_fields_valid
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article
+
+        article = Article()
+
+        # Concrete fields accepted as list, tuple and set literals
+        article.save(update_fields=["title"])
+        article.save(update_fields=("title", "content"))
+        article.save(update_fields={"title", "content", "published"})
+
+        # Foreign keys accepted both by field name and by attname
+        article.save(update_fields=["author", "author_id"])
+
+        # Empty collection, None and an absent argument are all valid no-ops
+        article.save(update_fields=[])
+        article.save(update_fields=None)
+        article.save()
+
+        # Non-literal collections cannot be checked statically (bad name not flagged)
+        fields = ["nonexistent"]
+        article.save(update_fields=fields)
+
+        # asave is checked the same way
+        async def test_async_save() -> None:
+            await Article().asave(update_fields=["title", "author_id"])
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Category(models.Model):
+                    name = models.CharField(max_length=100)
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    content = models.TextField()
+                    published = models.BooleanField(default=False)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField(Tag)
+
+
+-   case: save_update_fields_invalid
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article, Author
+        from typing import Literal
+
+        article = Article()
+
+        # Unknown field name
+        article.save(update_fields=["nonexistent"])  # E: Article has no field named 'nonexistent'  [misc]
+
+        # Primary key is not an updatable field
+        article.save(update_fields=["id"])  # E: "save()" does not support primary key fields. Got "id"  [misc]
+
+        # ManyToMany is not a concrete field
+        article.save(update_fields={"tags"})  # E: "save()" can only be used with concrete fields. Got "tags"  [misc]
+
+        # Every invalid field in a collection is reported
+        article.save(update_fields=["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
+
+        # Literal-typed values are resolved and checked
+        pk_field: Literal["id"] = "id"
+        article.save(update_fields=[pk_field])  # E: "save()" does not support primary key fields. Got "id"  [misc]
+
+        # The model is resolved from the instance, so the message names the right model
+        Author().save(update_fields=["invalid"])  # E: Author has no field named 'invalid'  [misc]
+
+        # asave is checked too, reporting its own name
+        async def test_async_save_invalid() -> None:
+            await Article().asave(update_fields=["id"])  # E: "asave()" does not support primary key fields. Got "id"  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Author(models.Model):
+                    name = models.CharField(max_length=100)
+
+                class Tag(models.Model):
+                    name = models.CharField(max_length=50)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    tags = models.ManyToManyField(Tag)
