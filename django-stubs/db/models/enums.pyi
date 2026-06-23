@@ -56,9 +56,14 @@ class _IntegerChoicesType(ChoicesType):
     @override
     def values(self) -> list[int]: ...
 
-_IC = TypeVar("_IC", bound=IntegerChoices)
-
+# In reality, the `__init__` overloads provided below should also support
+# all the arguments of `int.__new__`/`str.__new__` (e.g. `base`, `encoding`).
+# They are omitted on purpose to avoid having convoluted stubs for these enums:
 class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesType):  # type: ignore[misc]
+    @overload
+    def __init__(self, x: ConvertibleToInt) -> None: ...
+    @overload
+    def __init__(self, x: ConvertibleToInt, label: _StrOrPromise) -> None: ...
     @enum_property
     @override
     def value(self) -> int: ...
@@ -74,6 +79,10 @@ class _TextChoicesType(ChoicesType):
     def values(self) -> list[str]: ...
 
 class TextChoices(Choices, StrEnum, metaclass=_TextChoicesType):  # type: ignore[misc]
+    @overload
+    def __init__(self, object: str) -> None: ...
+    @overload
+    def __init__(self, object: str, label: _StrOrPromise) -> None: ...
     @enum_property
     @override
     def value(self) -> str: ...
