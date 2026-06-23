@@ -35,6 +35,7 @@ from mypy_django_plugin.transformers import (
     meta,
     orm_lookups,
     querysets,
+    save,
     settings,
 )
 from mypy_django_plugin.transformers.auth import get_user_model
@@ -237,6 +238,9 @@ class NewSemanalDjangoPlugin(Plugin):
             info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]
         ):
             return self.manager_and_queryset_method_hooks[method_name]
+
+        if method_name in ("save", "asave") and helpers.is_model_type(info):
+            return partial(save.validate_save_update_fields, django_context=self.django_context, method=method_name)
 
         if method_name == "get_field" and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
             return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
