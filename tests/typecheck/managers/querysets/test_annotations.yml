@@ -1,0 +1,54 @@
+- case: various_annotations
+  installed_apps:
+    - myapp
+  main: |
+    from myapp.models import Tag
+    from django_stubs_ext import WithAnnotations
+    from django.db.models import F, QuerySet
+    from typing_extensions import Literal, TypedDict, reveal_type
+    from django_stubs_ext import WithAnnotations
+
+    class MyDict(TypedDict):
+      foo: str
+
+    def get_prefetch() -> QuerySet[WithAnnotations[Tag, MyDict]]:
+      return Tag.objects.annotate(foo=F("id"))
+
+  files:
+      -   path: myapp/__init__.py
+      -   path: myapp/query.py
+          content: |
+            from django.db import models
+            from django.db.models import F
+
+            from django.db.models import F, QuerySet
+            from django_stubs_ext import WithAnnotations
+
+            from typing import TYPE_CHECKING, TypedDict, reveal_type
+
+            if TYPE_CHECKING:
+              from myapp.models import Tag
+
+            class AnnWithFoo(TypedDict):
+              foo: str
+
+            type WithFoo[M: models.Model] = WithAnnotations[M, AnnWithFoo]
+
+            class TagQuerySet[M: models.Model, R: models.Model](models.QuerySet[M, R]):
+              def annotate_with_foo(self: "TagQuerySet[M, R]") -> "TagQuerySet[WithFoo[M], WithFoo[R]]":
+                annotated = self.annotate(foo=F("id"))
+                return annotated
+      -   path: myapp/models.py
+          content: |
+              from django.db import models
+              from myapp.query import TagQuerySet
+
+              class Tag(models.Model):
+                name = models.CharField(max_length=10)
+
+                objects = TagQuerySet.as_manager()
+
+                def get_foo(self) -> str:
+                  return Tag.objects.annotate_with_foo().filter(id=self.id).get().foo
+              class Article(models.Model):
+                  tags = models.ManyToManyField(to=Tag, related_name="articles", blank=True)
