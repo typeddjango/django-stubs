@@ -104,13 +104,12 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # for `get_user_model()`
         if file.fullname == "django.contrib.auth" or file.fullname in {"django.http", "django.http.request"}:
-            auth_user_model_name = self.django_context.settings.AUTH_USER_MODEL
-            try:
-                auth_user_module = self.django_context.apps_registry.get_model(auth_user_model_name).__module__
-            except LookupError:
+            auth_user_model_name = self.django_context.auth_user_model_label
+            auth_user_model = self.django_context.get_model_class_by_label(auth_user_model_name)
+            if auth_user_model is None:
                 # get_user_model() model app is not installed
                 return []
-            return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
+            return [self._new_dependency(auth_user_model.__module__), self._new_dependency("django_stubs_ext")]
 
         # ensure that all mentions to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
@@ -122,8 +121,8 @@ class NewSemanalDjangoPlugin(Plugin):
             for field in itertools.chain(
                 # forward relations
                 self.django_context.get_model_related_fields(model_class),
-                # reverse relations - `related_objects` is private API (according to docstring)
-                model_class._meta.related_objects,
+                # reverse relations
+                self.django_context.iter_reverse_relations(model_class),
             ):
                 try:
                     related_model_cls = self.django_context.get_field_related_model_cls(field)  # type: ignore[arg-type]
@@ -349,7 +348,7 @@ class NewSemanalDjangoPlugin(Plugin):
     def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
         extra_data = {
-            "AUTH_USER_MODEL": self.django_context.settings.AUTH_USER_MODEL,
+            "AUTH_USER_MODEL": self.django_context.auth_user_model_label,
             "django_version": importlib.metadata.version("django"),
             "django_stubs_version": importlib.metadata.version("django-stubs"),
         }
