@@ -1,6 +1,6 @@
 import enum
 import sys
-from typing import Any, Literal, overload, type_check_only, TypeVar
+from typing import Any, Literal, TypeVar, overload, type_check_only
 
 from _typeshed import ConvertibleToInt
 from django.utils.functional import _StrOrPromise
@@ -55,7 +55,6 @@ class _IntegerChoicesType(ChoicesType):
     @property
     @override
     def values(self) -> list[int]: ...
-
 
 _IC = TypeVar("_IC", bound=IntegerChoices)
 
