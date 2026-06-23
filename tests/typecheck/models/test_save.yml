@@ -68,12 +68,21 @@
         # ManyToMany is not a concrete field
         article.save(update_fields={"tags"})  # E: "save()" can only be used with concrete fields. Got "tags"  [misc]
 
+        # Related lookups are not field names
+        article.save(update_fields=["author__name"])  # E: Article has no field named 'author__name'  [misc]
+
         # Every invalid field in a collection is reported
         article.save(update_fields=["nonexistent1", "nonexistent2"])  # E: Article has no field named 'nonexistent1'  [misc] # E: Article has no field named 'nonexistent2'  [misc]
 
         # Literal-typed values are resolved and checked
         pk_field: Literal["id"] = "id"
         article.save(update_fields=[pk_field])  # E: "save()" does not support primary key fields. Got "id"  [misc]
+
+        # Non-field attributes are not model fields
+        article.save(update_fields=["get_display_title"])  # E: Article has no field named 'get_display_title'  [misc]
+        article.save(update_fields=["is_recent"])  # E: Article has no field named 'is_recent'  [misc]
+        article.save(update_fields=["CATEGORY"])  # E: Article has no field named 'CATEGORY'  [misc]
+        article.save(update_fields=["extra_objects"])  # E: Article has no field named 'extra_objects'  [misc]
 
         # The model is resolved from the instance, so the message names the right model
         Author().save(update_fields=["invalid"])  # E: Author has no field named 'invalid'  [misc]
@@ -85,6 +94,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
+                from typing import ClassVar
+
                 from django.db import models
 
                 class Author(models.Model):
@@ -97,3 +108,13 @@
                     title = models.CharField(max_length=200)
                     author = models.ForeignKey(Author, on_delete=models.CASCADE)
                     tags = models.ManyToManyField(Tag)
+
+                    CATEGORY: ClassVar[str] = "news"
+                    extra_objects = models.Manager()
+
+                    def get_display_title(self) -> str:
+                        return self.title
+
+                    @property
+                    def is_recent(self) -> bool:
+                        return True
