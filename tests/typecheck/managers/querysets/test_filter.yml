@@ -87,6 +87,7 @@
 
 -   case: valid_filter_with_lookup
     main: |
+        from datetime import date
         from myapp.models import User
 
         # Simple lookups which expect the same type.
@@ -105,6 +106,16 @@
         User.objects.filter(age__in=[User()])  # Doesn't error because mypy sees the provided type as `list[Any]`.
         users: list[User] = [User()]
         User.objects.filter(age__in=users)  # E: Incompatible type for lookup 'age__in': (got "list[User]", expected "Iterable[str | int]")  [misc]
+
+        year: int = 2026
+        years: list[int] = [2025, 2026]
+        invalid_years: list[str] = ["a"]
+        dates: list[date] = [date(2026, 1, 1)]
+        User.objects.filter(start_date__year=year)
+        User.objects.filter(start_date__in=dates)
+        User.objects.filter(start_date__year__in=years)
+        User.objects.filter(start_date__year__in=123)  # E: Incompatible type for lookup 'start_date__year__in': (got "int", expected "Iterable[int]")  [misc]
+        User.objects.filter(start_date__year__in=invalid_years)  # E: Incompatible type for lookup 'start_date__year__in': (got "list[str]", expected "Iterable[int]")  [misc]
     installed_apps:
         - myapp
     files:
@@ -115,6 +126,7 @@
                 class User(models.Model):
                     username = models.CharField(max_length=100)
                     age = models.IntegerField()
+                    start_date = models.DateField()
 
 
 -   case: invalid_filter_with_lookup
