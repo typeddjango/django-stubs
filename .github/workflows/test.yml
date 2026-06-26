@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - name: Cache apt packages
-        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8  # v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
           path: /var/cache/apt/archives
           key: apt-gdal-${{ runner.os }}
@@ -94,7 +94,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - name: Cache apt packages
-        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8  # v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
           path: /var/cache/apt/archives
           key: apt-gdal-${{ runner.os }}
@@ -130,7 +130,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - name: Cache apt packages
-        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8  # v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
           path: /var/cache/apt/archives
           key: apt-gdal-${{ runner.os }}
