@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.urls import register_converter
 from django.urls.converters import IntConverter
 

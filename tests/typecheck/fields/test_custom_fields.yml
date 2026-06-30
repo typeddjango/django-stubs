@@ -3,26 +3,26 @@
         from typing_extensions import reveal_type
         from myapp.models import User, CustomFieldValue
         user = User()
-        reveal_type(user.id)  # N: Revealed type is "builtins.int"
+        reveal_type(user.id)  # N: Revealed type is "int"
         reveal_type(user.my_custom_field1)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field2)  # N: Revealed type is "myapp.models.CustomFieldValue"
-        reveal_type(user.my_custom_field3)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field3)  # N: Revealed type is "bool"
         reveal_type(user.my_custom_field4)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field5)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field6)  # N: Revealed type is "myapp.models.CustomFieldValue"
-        reveal_type(user.my_custom_field7)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field7)  # N: Revealed type is "bool"
         reveal_type(user.my_custom_field8)  # N: Revealed type is "myapp.models.CustomFieldValue"
         reveal_type(user.my_custom_field9)  # N: Revealed type is "myapp.models.CustomFieldValue"
-        reveal_type(user.my_custom_field10)  # N: Revealed type is "builtins.bool"
-        reveal_type(user.my_custom_field11)  # N: Revealed type is "builtins.bool"
+        reveal_type(user.my_custom_field10)  # N: Revealed type is "bool"
+        reveal_type(user.my_custom_field11)  # N: Revealed type is "bool"
         reveal_type(user.my_custom_field12)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
         reveal_type(user.my_custom_field13)  # N: Revealed type is "myapp.models.CustomFieldValue | None"
-        reveal_type(user.my_custom_field14)  # N: Revealed type is "builtins.bool | None"
+        reveal_type(user.my_custom_field14)  # N: Revealed type is "bool | None"
         reveal_type(user.my_custom_field15)  # N: Revealed type is "None"
 
         reveal_type(user.my_custom_field_any1)  # N: Revealed type is "Any"
         reveal_type(user.my_custom_field_any2)  # N: Revealed type is "Any"
-        reveal_type(user.my_custom_field_any3)  # N: Revealed type is "Any"
+        reveal_type(user.my_custom_field_any3)  # N: Revealed type is "Any | None"
         reveal_type(user.my_custom_field_any4)  # N: Revealed type is "Any"
     monkeypatch: true
     installed_apps:
@@ -34,7 +34,8 @@
                 from django.db import models
                 from django.db.models import fields
 
-                from typing import Any, Generic, TypeVar
+                from typing import Any, Generic
+                from typing_extensions import TypeVar
 
                 _ST = TypeVar("_ST", contravariant=True)
                 _GT = TypeVar("_GT", covariant=True)

@@ -1,0 +1,22 @@
+-   case: aggregate_filter_accepts_exists_expression
+    main: |
+        from django.db.models import Count, Exists, OuterRef
+        from myapp.models import Blog, Entry
+
+        Blog.objects.aggregate(
+            entry_count=Count("id", filter=Exists(Entry.objects.filter(blog_id=OuterRef("id")))),
+        )
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Blog(models.Model):
+                    name = models.CharField(max_length=100)
+
+                class Entry(models.Model):
+                    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)

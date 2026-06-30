@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .aliases import FieldOpts as FieldOpts
 from .aliases import FieldsetSpec as FieldsetSpec
 from .aliases import QuerySetAny as QuerySetAny

@@ -1,13 +1,20 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from mypy.nodes import TypeInfo
-from mypy.plugin import AnalyzeTypeContext
 from mypy.semanal import SemanticAnalyzer
 from mypy.typeanal import TypeAnalyser
 from mypy.types import PlaceholderType, ProperType
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars_with_any
 
-from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.lib import fullnames, helpers
+
+if TYPE_CHECKING:
+    from mypy.plugin import AnalyzeTypeContext
+
+    from mypy_django_plugin.django.context import DjangoContext
 
 
 def _get_abstract_base_user(api: SemanticAnalyzer) -> ProperType:

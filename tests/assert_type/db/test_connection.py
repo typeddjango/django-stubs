@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db import connection, connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper
@@ -8,7 +10,7 @@ with connection.cursor() as cursor:
     cursor.execute("SELECT %s", [123])
 
 # psycopg2 composable SQL
-from psycopg2.sql import SQL, Identifier  # type: ignore[import-untyped] # pyrefly: ignore[missing-import]
+from psycopg2.sql import SQL, Identifier  # type: ignore[import-untyped]
 
 with connection.cursor() as cursor:
     cursor.execute(SQL("INSERT INTO {} VALUES (%s)").format(Identifier("my_table")), [123])

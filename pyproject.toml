@@ -1,6 +1,6 @@
 [project]
 name = "django-stubs"
-version = "6.0.1"
+version = "6.0.6"
 description = "Mypy stubs for Django"
 readme = "README.md"
 license = "MIT"
@@ -31,7 +31,7 @@ classifiers = [
 ]
 dependencies = [
   "django",
-  "django-stubs-ext>=6.0.1",
+  "django-stubs-ext>=6.0.2",
   "tomli; python_version < '3.11'",
   # Types:
   "types-pyyaml",
@@ -39,36 +39,37 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-compatible-mypy = ["mypy>=1.13,<1.20"]
+compatible-mypy = ["mypy>=1.13,<2.2"]
 oracle = ["oracledb"]
 redis = ["redis", "types-redis"]
 
 [dependency-groups]
 tests = [
   # Dev tools:
-  "pytest==9.0.2",
-  "pytest-mypy-plugins==4.0.0",
+  "pytest==9.1.1",
+  "pytest-mypy-plugins==4.0.3",
   "pytest-shard==0.1.2",
   "pytest-xdist==3.8.0",
   # Django deps:
-  "django==5.2.12; python_version < '3.12'",
-  "django==6.0.3; python_version >= '3.12'",
+  "django==5.2.15; python_version < '3.12'",
+  "django==6.0.6; python_version >= '3.12'",
   "mysqlclient==2.2.8",
-  "psycopg[binary]==3.3.3",
-  "psycopg2-binary==2.9.11",
+  "psycopg[binary]==3.3.4",
+  "psycopg2-binary==2.9.12",
   "jinja2==3.1.6",
   "pyyaml==6.0.3",
   # typing:
   "django-stubs[compatible-mypy,oracle,redis]",
 ]
 pyright = [
-  "pyright==1.1.408",
+  "pyright==1.1.411",
 ]
 pyrefly = [
-  "pyrefly==0.58.0",
+  "pyrefly==1.1.1",
+  "psycopg2-binary"
 ]
 ty = [
-  "ty==0.0.26",
+  "ty==0.0.55",
   "psycopg2-binary"
 ]
 
@@ -98,6 +99,38 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-name = ["django-stubs", "mypy_django_plugin"]
 module-root = ""
+
+[tool.pyright]
+include = ["tests/assert_type/"]
+typeCheckingMode = "strict"
+# Extra strict settings
+reportImplicitStringConcatenation = "error"
+reportUninitializedInstanceVariable = "error"
+reportUnnecessaryTypeIgnoreComment = "error"
+# Don't use '# type: ignore' to suppress with pyright
+enableTypeIgnoreComments = false
+# If a test case uses this anti-pattern, there's likely a reason and annoying to `type: ignore`.
+# Let Ruff flag it (B006)
+reportCallInDefaultInitializer = "none"
+# Too strict and not needed for type testing
+reportMissingSuperCall = "none"
+# Stubs are allowed to use private variables. We may want to test those.
+reportPrivateUsage = "none"
+# Stubs don't need the actual modules to be installed
+reportMissingModuleSource = "none"
+
+[tool.pyrefly]
+# Respect only `# pyrefly: ignore` (ignore `# type: ignore`)
+enabled-ignores = ["pyrefly"]
+[tool.pyrefly.errors]
+unused-ignore = true
+
+[tool.ty.terminal]
+error-on-warning = true
+
+[tool.ty.analysis]
+# Respect only `# ty: ignore` (ignore `# type: ignore`)
+respect-type-ignore-comments = false
 
 [tool.codespell]
 ignore-words-list = "aadd,acount,asend,indentity,nam"
@@ -159,7 +192,9 @@ ignore = [
 "_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead. If you type a metaclass, add a noqa"
 "typing.assert_type".msg = "Only available in Python 3.11 and above. Use `typing_extensions.assert_type` instead."
 "typing.Self".msg = "Only available in Python 3.11 and above. Use `typing_extensions.Self` instead."
+"typing.TypeVar".msg = "Only support the `default` parameter in Python 3.13 and above. Use `typing_extensions.TypeVar` instead."
 
 [tool.ruff.lint.isort]
 known-first-party = ["django_stubs_ext", "mypy_django_plugin"]
+required-imports = ["from __future__ import annotations"]
 split-on-trailing-comma = false

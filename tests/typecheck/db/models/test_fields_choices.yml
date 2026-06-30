@@ -29,10 +29,9 @@
 - case: db_models_valid_choices
   main: |
     from collections.abc import Callable, Mapping, Sequence
-    from typing import TypeVar
 
     from django.db import models
-    from typing_extensions import assert_type
+    from typing_extensions import TypeVar, assert_type
 
     _T = TypeVar("_T")
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy

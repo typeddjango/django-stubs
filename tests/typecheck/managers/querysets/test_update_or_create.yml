@@ -1,0 +1,92 @@
+-   case: update_or_create_typechecks_kwargs
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import MyModel
+
+        # Return type is preserved
+        reveal_type(MyModel.objects.update_or_create(num=1))  # N: Revealed type is "tuple[myapp.models.MyModel, bool]"
+
+        # Valid field kwarg, lookup expression, defaults and create_defaults
+        MyModel.objects.update_or_create(num=1)
+        MyModel.objects.update_or_create(num__gte=1)
+        MyModel.objects.update_or_create(num=1, defaults={"num": 2}, create_defaults={"num": 3})
+
+        # Unknown field is rejected
+        MyModel.objects.update_or_create(unknown_field=True)  # E: Cannot resolve keyword 'unknown_field' into field. Choices are: id, num  [misc]
+
+        # Invalid type for a known field is rejected
+        MyModel.objects.update_or_create(num=MyModel())  # E: Incompatible type for lookup 'num': (got "MyModel", expected "str | int")  [misc]
+
+        # Async variant shares the same validation
+        async def main() -> None:
+            await MyModel.objects.aupdate_or_create(num=1)
+            await MyModel.objects.aupdate_or_create(unknown_field=True)  # E: Cannot resolve keyword 'unknown_field' into field. Choices are: id, num  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    num = models.IntegerField()
+
+-   case: update_or_create_typechecks_defaults
+    main: |
+        from myapp.models import MyModel
+
+        # Unknown key in defaults is rejected
+        MyModel.objects.update_or_create(num=1, defaults={"unknown_field": True})  # E: Unexpected attribute "unknown_field" for model "MyModel"  [misc]
+
+        # Incompatible value type in defaults is rejected
+        MyModel.objects.update_or_create(num=1, defaults={"num": MyModel()})  # E: Incompatible type for "num" of "MyModel" (got "MyModel", expected "float | int | str | Combinable")  [misc]
+
+        # Valid defaults: no errors
+        MyModel.objects.update_or_create(num=1, defaults={"num": 2, "name": "hello"})
+
+        # Unknown key in create_defaults is rejected
+        MyModel.objects.update_or_create(num=1, create_defaults={"unknown_field": True})  # E: Unexpected attribute "unknown_field" for model "MyModel"  [misc]
+
+        # Incompatible value type in create_defaults is rejected
+        MyModel.objects.update_or_create(num=1, create_defaults={"num": MyModel()})  # E: Incompatible type for "num" of "MyModel" (got "MyModel", expected "float | int | str | Combinable")  [misc]
+
+        # Valid create_defaults: no errors
+        MyModel.objects.update_or_create(num=1, create_defaults={"num": 3, "name": "hi"})
+
+        # Both defaults and create_defaults validated in a single call
+        MyModel.objects.update_or_create(
+            num=1,
+            defaults={"unknown_in_defaults": True},  # E: Unexpected attribute "unknown_in_defaults" for model "MyModel"  [misc]
+            create_defaults={"unknown_in_create_defaults": True},  # E: Unexpected attribute "unknown_in_create_defaults" for model "MyModel"  [misc]
+        )
+
+        # `**kwargs` variable unpacking is silently accepted
+        kwargs = {
+            "defaults": {"unknown_field": True},
+            "create_defaults": {"unknown_field": True},
+        }
+        MyModel.objects.update_or_create(num=1, **kwargs)
+
+        # `**dict_literal` unpacking is also silently accepted; only a direct
+        # `defaults=` / `create_defaults=` dict literal is validated.
+        MyModel.objects.update_or_create(
+            num=1,
+            **{"defaults": {"unknown_field": True}, "create_defaults": {"unknown_field": True}},
+        )
+
+        # Async variant shares the same validation
+        async def main() -> None:
+            await MyModel.objects.aupdate_or_create(
+                num=1,
+                defaults={"unknown_field": True},  # E: Unexpected attribute "unknown_field" for model "MyModel"  [misc]
+            )
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    num = models.IntegerField()
+                    name = models.CharField(max_length=100)

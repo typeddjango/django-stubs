@@ -1,11 +1,11 @@
 import sys
 from collections.abc import Callable, Iterable
-from typing import Any, Protocol, TypeVar, overload, type_check_only
+from typing import Any, Protocol, overload, type_check_only
 
-from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
+from django.core.validators import _ValidatorCallable
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
 from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping
@@ -14,7 +14,7 @@ from django.db.models.utils import AltersData
 from django.utils._os import _PathCompatible
 from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
-from typing_extensions import Self, override
+from typing_extensions import Self, TypeVar, override
 
 class FieldFile(File, AltersData):
     instance: Model
@@ -90,7 +90,7 @@ class FileField(Field[Any, Any]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     # class access

@@ -48,6 +48,11 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs   | Mypy version | Django version | Django partial support | Python version |
 |----------------|--------------|----------------|------------------------|----------------|
+| 6.0.6          | 1.13 - 2.1   | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
+| 6.0.5          | 1.13 - 2.1   | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
+| 6.0.4          | 1.13 - 2.0   | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
+| 6.0.3          | 1.13 - 1.20  | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
+| 6.0.2          | 1.13 - 1.20  | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
 | 6.0.1          | 1.13 - 1.19  | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
 | 6.0.0          | 1.13 - 1.19  | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
 | 5.2.9          | 1.13 - 1.19  | 5.2            | 5.1, 5.0               | 3.10 - 3.13    |
@@ -209,13 +214,7 @@ This happens because these Django classes do not support [`__class_getitem__`](h
 
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?
 
-Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/stable/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type
-
-```python
-Union[User, AnonymousUser]
-```
-
-where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
+Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/stable/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type `User | AnonymousUser` where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
 
 If you want a `HttpRequest` that you can type-annotate with where you know that the user is authenticated you can subclass the normal `HttpRequest` class like so:
 
@@ -297,6 +296,41 @@ func(MyModel.objects.annotate(foo=Value("")).get(id=1))  # OK
 func(MyModel.objects.annotate(bar=Value("")).get(id=1))  # Error
 ```
 
+You can also use `WithAnnotations` in custom `QuerySet` methods by making the queryset generic over a
+model `TypeVar`. This way the return type stays accurate through chained calls and manager access:
+
+```python
+from typing import TypeVar, TypedDict
+from django.db import models
+from django.db.models import Manager
+from django_stubs_ext import WithAnnotations
+
+
+class SalesDict(TypedDict):
+    total_sales: int
+
+
+_Model = TypeVar("_Model", bound=models.Model, covariant=True)
+
+
+class ProductQuerySet(models.QuerySet[_Model]):
+    def with_sales(self) -> "ProductQuerySet[WithAnnotations[_Model, SalesDict]]":
+        return self.annotate(total_sales=models.Sum("order__amount"))
+
+
+ProductManager = Manager.from_queryset(ProductQuerySet)
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    objects = ProductManager()
+
+
+product = Product.objects.with_sales().get(id=1)
+product.total_sales  # OK, int
+product.name  # OK, str
+```
+
 ### Why am I getting incompatible argument type mentioning `_StrPromise`?
 
 The lazy translation functions of Django (such as `gettext_lazy`) return a `Promise` instead of `str`. These two types [cannot be used interchangeably](https://github.com/typeddjango/django-stubs/pull/1139#issuecomment-1232167698). The return type of these functions was therefore [changed](https://github.com/typeddjango/django-stubs/pull/689) to reflect that.
@@ -345,6 +379,8 @@ strict_settings = false
 And then:
 
 ```python
+from typing import reveal_type
+
 # Works:
 reveal_type(settings.EXISTS_AT_RUNTIME)  # N: Any
 

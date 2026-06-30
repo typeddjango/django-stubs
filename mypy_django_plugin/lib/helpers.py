@@ -1,11 +1,11 @@
-from collections.abc import Iterable, Iterator
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, cast
 
-from django.db.models.base import Model
-from django.db.models.fields.related import RelatedField
-from django.db.models.fields.reverse_related import ForeignObjectRel
 from mypy import checker
 from mypy.checker import TypeChecker
+from mypy.checkmember import analyze_member_access as _mypy_analyze_member_access
+from mypy.maptype import map_instance_to_supertype
 from mypy.mro import calculate_mro
 from mypy.nodes import (
     GDEF,
@@ -46,6 +46,7 @@ from mypy.types import (
     Instance,
     LiteralType,
     NoneTyp,
+    ProperType,
     TupleType,
     Type,
     TypedDictType,
@@ -54,12 +55,18 @@ from mypy.types import (
     get_proper_type,
 )
 from mypy.types import Type as MypyType
+from mypy.typevars import fill_typevars, fill_typevars_with_any
+from mypy.version import __version__ as mypy_version
 from typing_extensions import Self
 
 from mypy_django_plugin.lib import fullnames
 
+mypy_version_info = tuple(map(int, mypy_version.partition("+")[0].split(".")))
+
 if TYPE_CHECKING:
-    from django.db.models.fields import Field
+    from collections.abc import Iterable, Iterator, Mapping
+
+    from django.db.models.base import Model
 
     from mypy_django_plugin.django.context import DjangoContext
 
@@ -117,6 +124,25 @@ def mark_as_annotated_model(model: TypeInfo) -> None:
 
 def is_annotated_model(model: TypeInfo) -> bool:
     return get_django_metadata(model).get("is_annotated_model", False)
+
+
+def get_or_create_annotated_type(api: SemanticAnalyzer, model_info: TypeInfo, annotations_info: TypeInfo) -> TypeInfo:
+    """Look up or create the `Model@AnnotatedWith` synthetic class for *model_info*."""
+    annotated_model_name = model_info.name + "@AnnotatedWith"
+    annotated_model = lookup_fully_qualified_typeinfo(api, model_info.fullname + "@AnnotatedWith")
+    if annotated_model is None:
+        model_type = fill_typevars_with_any(model_info)
+        assert isinstance(model_type, Instance)
+        annotations_type = fill_typevars(annotations_info)
+        assert isinstance(annotations_type, Instance)
+        model_module = api.modules[model_info.module_name]
+        annotated_model = add_new_class_for_module(
+            model_module, name=annotated_model_name, bases=[model_type, annotations_type]
+        )
+        annotated_model.defn.type_vars = annotations_info.defn.type_vars
+        annotated_model.add_type_vars()
+        mark_as_annotated_model(annotated_model)
+    return annotated_model
 
 
 class IncompleteDefnException(Exception):
@@ -211,7 +237,7 @@ class DjangoModel(NamedTuple):
         return self.typ.type
 
     @classmethod
-    def from_model_type(cls, model_type: Instance, django_context: "DjangoContext") -> Self | None:
+    def from_model_type(cls, model_type: Instance, django_context: DjangoContext) -> Self | None:
         model_info = model_type.type
         is_annotated = is_annotated_model(model_info)
 
@@ -226,7 +252,7 @@ class DjangoModel(NamedTuple):
         return cls(cls=model_cls, typ=model_type, is_annotated=is_annotated)
 
 
-def extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) -> Instance | None:
+def extract_model_type_from_queryset(queryset_type: Instance) -> Instance | None:
     """Extract the django model `Instance` associated to a queryset `Instance`"""
     for base_type in [queryset_type, *queryset_type.type.bases]:
         if (
@@ -249,13 +275,12 @@ def extract_model_type_from_queryset(queryset_type: Instance, api: TypeChecker) 
 
 def get_model_info_from_qs_ctx(
     ctx: MethodContext,
-    django_context: "DjangoContext",
+    django_context: DjangoContext,
 ) -> DjangoModel | None:
     """
     Extract DjangoModel details from a queryset/manager `MethodContext`
     """
-    api = get_typechecker_api(ctx)
-    if not (isinstance(ctx.type, Instance) and (model_type := extract_model_type_from_queryset(ctx.type, api))):
+    if not (isinstance(ctx.type, Instance) and (model_type := extract_model_type_from_queryset(ctx.type))):
         return None
 
     return DjangoModel.from_model_type(model_type, django_context)
@@ -411,19 +436,18 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
     return AnyType(TypeOfAny.explicit)
 
 
-def get_field_lookup_exact_type(api: TypeChecker, field: "Field[Any, Any]") -> MypyType:
-    if isinstance(field, RelatedField | ForeignObjectRel):
-        # Not using field.related_model because that may have str value "self"
-        lookup_type_class = field.remote_field.model
-        rel_model_info = lookup_class_typeinfo(api, lookup_type_class)
-        if rel_model_info is None:
-            return AnyType(TypeOfAny.from_error)
-        return make_optional_type(Instance(rel_model_info, []))
+class FieldTypeArgs(NamedTuple):
+    set: ProperType
+    get: ProperType
 
-    field_info = lookup_class_typeinfo(api, field.__class__)
-    if field_info is None:
-        return AnyType(TypeOfAny.explicit)
-    return get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
+
+def get_field_type_args(field_type: Instance) -> FieldTypeArgs | None:
+    """Extract (_ST, _GT) from a Field instance by mapping to the base Field class."""
+    base_field_info = next((base for base in field_type.type.mro if base.fullname == fullnames.FIELD_FULLNAME), None)
+    if base_field_info is None:
+        return None
+    mapped = map_instance_to_supertype(field_type, base_field_info)
+    return FieldTypeArgs(set=get_proper_type(mapped.args[0]), get=get_proper_type(mapped.args[1]))
 
 
 def get_nested_meta_node_for_current_class(info: TypeInfo) -> TypeInfo | None:
@@ -487,7 +511,7 @@ def get_current_module(api: TypeChecker) -> MypyFile:
 
 
 def make_oneoff_named_tuple(
-    api: TypeChecker, name: str, fields: "dict[str, MypyType]", extra_bases: list[Instance] | None = None
+    api: TypeChecker, name: str, fields: dict[str, MypyType], extra_bases: list[Instance] | None = None
 ) -> TupleType:
     current_module = get_current_module(api)
     if extra_bases is None:
@@ -498,7 +522,18 @@ def make_oneoff_named_tuple(
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 
 
-def make_tuple(api: "TypeChecker", fields: list[MypyType]) -> TupleType:
+def extend_oneoff_named_tuple(
+    api: TypeChecker, name: str, original: TupleType, extra_fields: Mapping[str, MypyType]
+) -> TupleType:
+    existing_fields = {
+        field_name: sym.node.type or AnyType(TypeOfAny.special_form)
+        for field_name, sym in original.partial_fallback.type.names.items()
+        if sym.plugin_generated and isinstance(sym.node, Var)
+    }
+    return make_oneoff_named_tuple(api, name, {**existing_fields, **extra_fields})
+
+
+def make_tuple(api: TypeChecker, fields: list[MypyType]) -> TupleType:
     # fallback for tuples is any builtins.tuple instance
     fallback = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.special_form)])
     return TupleType(fields, fallback=fallback)
@@ -527,25 +562,40 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
     return typ
 
 
+def _get_fallback_typeddict(api: SemanticAnalyzer | CheckerPluginInterface) -> Instance:
+    if isinstance(api, CheckerPluginInterface):
+        return api.named_generic_type("typing._TypedDict", [])
+    return api.named_type("typing._TypedDict", [])
+
+
 def make_typeddict(
     api: SemanticAnalyzer | CheckerPluginInterface,
     fields: dict[str, MypyType],
-    required_keys: set[str],
-    readonly_keys: set[str],
 ) -> TypedDictType:
-    if isinstance(api, CheckerPluginInterface):
-        fallback_type = api.named_generic_type("typing._TypedDict", [])
-    else:
-        fallback_type = api.named_type("typing._TypedDict", [])
+    """Create a TypedDict from a python dict of field names and types."""
     return TypedDictType(
-        fields,
-        required_keys=required_keys,
-        readonly_keys=readonly_keys,
-        fallback=fallback_type,
+        items=fields,
+        required_keys=set(fields.keys()),
+        readonly_keys=set(),
+        fallback=_get_fallback_typeddict(api),
     )
 
 
-def resolve_string_attribute_value(attr_expr: Expression, django_context: "DjangoContext") -> str | None:
+def merge_typeddict(
+    api: SemanticAnalyzer | CheckerPluginInterface,
+    left: TypedDictType,
+    right: TypedDictType,
+) -> TypedDictType:
+    """Merge two TypedDictType type into one with anonymous fallback."""
+    return TypedDictType(
+        items={**left.items, **right.items},
+        required_keys={*left.required_keys, *right.required_keys},
+        readonly_keys={*left.readonly_keys, *right.readonly_keys},
+        fallback=_get_fallback_typeddict(api),
+    )
+
+
+def resolve_string_attribute_value(attr_expr: Expression, django_context: DjangoContext) -> str | None:
     if isinstance(attr_expr, StrExpr):
         return attr_expr.value
 
@@ -630,7 +680,7 @@ def is_abstract_model(model: TypeInfo) -> bool:
 
 
 def resolve_lazy_reference(
-    reference: str, *, api: TypeChecker | SemanticAnalyzer, django_context: "DjangoContext", ctx: Context
+    reference: str, *, api: TypeChecker | SemanticAnalyzer, django_context: DjangoContext, ctx: Context
 ) -> TypeInfo | None:
     """
     Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a
@@ -665,7 +715,7 @@ def get_model_from_expression(
     *,
     self_model: TypeInfo,
     api: TypeChecker | SemanticAnalyzer,
-    django_context: "DjangoContext",
+    django_context: DjangoContext,
 ) -> Instance | None:
     """
     Attempts to resolve an expression to a 'TypeInfo' instance. Any lazy reference
@@ -724,4 +774,32 @@ def merge_extra_attrs(
         attrs=new_attrs or {},
         immutable=new_immutable,
         mod_name=None,
+    )
+
+
+def analyze_member_access(
+    name: str,
+    typ: MypyType,
+    context: Context,
+    *,
+    is_lvalue: bool,
+    is_super: bool,
+    is_operator: bool,
+    original_type: MypyType,
+    chk: TypeChecker,
+) -> MypyType:
+    # TODO: [mypy 1.16+] Remove this workaround for passing `msg` to `analyze_member_access()`.
+    extra: dict[str, Any] = {}
+    if mypy_version_info < (1, 16):
+        extra["msg"] = chk.msg
+    return _mypy_analyze_member_access(
+        name,
+        typ,
+        context,
+        is_lvalue=is_lvalue,
+        is_super=is_super,
+        is_operator=is_operator,
+        original_type=original_type,
+        chk=chk,
+        **extra,
     )

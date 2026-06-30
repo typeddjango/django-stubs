@@ -1,7 +1,7 @@
-from collections.abc import Sequence
+from __future__ import annotations
 
-from django.contrib.auth.models import AnonymousUser
-from django.db.models import Model
+from typing import TYPE_CHECKING
+
 from django.db.models.query import (
     QuerySet,
     RawQuerySet,
@@ -9,6 +9,12 @@ from django.db.models.query import (
     prefetch_related_objects,  # pyright: ignore[reportUnknownVariableType]
 )
 from typing_extensions import assert_type
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from django.contrib.auth.models import AnonymousUser
+    from django.db.models import Model
 
 models_list: list[Model] = []
 prefetch_related_objects(models_list, "pk")

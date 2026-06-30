@@ -1,7 +1,9 @@
 from collections.abc import Callable
-from typing import TypeVar, overload
+from typing import Any, overload
 
-_C = TypeVar("_C", bound=Callable)
+from typing_extensions import TypeVar
+
+_C = TypeVar("_C", bound=Callable[..., Any])
 
 @overload
 def async_unsafe(message: str) -> Callable[[_C], _C]: ...

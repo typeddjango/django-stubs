@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+import datetime
+
 from django import http
 from django.contrib import admin
 from django.contrib.admin.options import _DisplayT
-from django.contrib.admin.utils import flatten, flatten_fieldsets
+from django.contrib.admin.utils import (
+    build_q_object_from_lookup_parameters,
+    flatten,
+    flatten_fieldsets,
+    prepare_lookup_value,
+)
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Q
 from django.db.models.functions import Upper
 from typing_extensions import assert_type
 
@@ -62,11 +69,11 @@ person_tuple_admin = PersonTupleAdmin(Person, admin_site)
 person_fieldset_list_admin = PersonFieldsetListAdmin(Person, admin_site)
 person_fieldset_tuple_admin = PersonFieldsetTupleAdmin(Person, admin_site)
 
-# For some reason, pyright cannot see that these are not `None`.
-assert person_list_admin.fields is not None
-assert person_tuple_admin.fields is not None
-assert person_fieldset_list_admin.fieldsets is not None
-assert person_fieldset_tuple_admin.fieldsets is not None
+# For some reason, pyright cannot see that these are not `None` so we need to ignore these for mypy.
+assert person_list_admin.fields is not None  # type: ignore[comparison-overlap]
+assert person_tuple_admin.fields is not None  # type: ignore[comparison-overlap]
+assert person_fieldset_list_admin.fieldsets is not None  # type: ignore[comparison-overlap]
+assert person_fieldset_tuple_admin.fieldsets is not None  # type: ignore[comparison-overlap]
 
 assert_type(flatten(person_list_admin.fields), list[str])  # ty: ignore[no-matching-overload,type-assertion-failure]
 assert_type(flatten(person_list_admin.get_fields(request)), list[str])
@@ -94,3 +101,28 @@ class PersonMixedOrderingAdmin(admin.ModelAdmin[Person]):
 
 class PersonFExpressionAdmin(admin.ModelAdmin[Person]):
     ordering = [F("birthday").desc(nulls_last=True)]
+
+
+# prepare_lookup_value: list[str] input recurses on each element,
+# returning list[str] (pass-through) or list[bool] (__isnull keys)
+assert_type(prepare_lookup_value("field", ["a", "b"]), list[str] | list[bool])
+
+# str input: split (__in) -> list[str], bool (__isnull), or str (pass-through)
+assert_type(prepare_lookup_value("field", "value"), str | bool | list[str])
+
+# Non-str, non-list values pass through unchanged (e.g. datetime from date_hierarchy
+# in ChangeList.get_filters)
+assert_type(prepare_lookup_value("field", datetime.datetime.now()), datetime.datetime)
+
+
+# Values are not limited to list[str] — any iterable of objects is accepted
+assert_type(
+    build_q_object_from_lookup_parameters(
+        {
+            "a": ["str"],
+            "b": [datetime.datetime(2023, 1, 1)],
+            "c": [True],
+        }
+    ),
+    Q,
+)

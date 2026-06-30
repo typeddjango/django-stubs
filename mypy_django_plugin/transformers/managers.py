@@ -1,6 +1,7 @@
-from typing import Final
+from __future__ import annotations
 
-from mypy.checker import TypeChecker
+from typing import TYPE_CHECKING, Final
+
 from mypy.copytype import copy_type
 from mypy.nodes import (
     GDEF,
@@ -17,9 +18,7 @@ from mypy.nodes import (
     SymbolTableNode,
     TypeInfo,
 )
-from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
 from mypy.plugins.common import add_method_to_class
-from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.subtypes import find_member
 from mypy.types import (
@@ -40,6 +39,11 @@ from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.lib import fullnames, helpers
+
+if TYPE_CHECKING:
+    from mypy.checker import TypeChecker
+    from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
+    from mypy.semanal import SemanticAnalyzer
 
 MANAGER_METHODS_RETURNING_QUERYSET: Final = frozenset(
     (
@@ -136,7 +140,6 @@ def _process_dynamic_method(
     # used by the typing stubs.
     if method_name in MANAGER_METHODS_RETURNING_QUERYSET:
         ret_type = queryset_instance
-        variables = ()
     args_types = method_type.arg_types[1:]
     if _has_compatible_type_vars(base_that_has_method):
         typed_var = manager_instance.args or queryset_info.bases[0].args
@@ -154,6 +157,10 @@ def _process_dynamic_method(
     if base_that_has_method.self_type:
         # Manages -> Self returns
         ret_type = _replace_type_var(ret_type, base_that_has_method.self_type.fullname, queryset_instance)
+        # The `self` argument is also stripped (lines below), so its `Self` type variable
+        # has no binding site and should be removed. Other method-level type variables
+        # (e.g. _LookupT in prefetch_related) are preserved for call-site inference.
+        variables = tuple(v for v in variables if v.id != base_that_has_method.self_type.id)
 
     # Drop any 'self' argument as our manager is already initialized
     return method_type.copy_modified(
@@ -377,7 +384,7 @@ def create_manager_info_from_from_queryset_call(
         return None
 
     base_manager_info, queryset_info = call_expr.callee.expr.node, call_expr.args[0].node
-    if queryset_info.fullname is None:
+    if queryset_info.fullname is None:  # type: ignore[comparison-overlap]
         # In some cases, due to the way the semantic analyzer works, only
         # passed_queryset.name is available. But it should be analyzed again,
         # so this isn't a problem.
@@ -599,13 +606,32 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     )
 
 
-def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) -> None:
+def _is_omitted_generic(arg: MypyType) -> bool:
+    """True if ``arg`` is the ``Any`` mypy substitutes for an unparametrized generic."""
+    proper_arg = get_proper_type(arg)
+    return isinstance(proper_arg, AnyType) and proper_arg.type_of_any is TypeOfAny.from_omitted_generics
+
+
+def reparametrize_generic_class(
+    ctx: ClassDefContext,
+    base_class_fullname: str,
+    *,
+    bind_explicit_args: bool = False,
+) -> None:
     """
     Add implicit generics to classes that are defined without generic.
+
+    When ``bind_explicit_args`` is True, also reparametrize partially or
+    fully-explicit parametrizations by binding each explicit arg as both
+    the bound and the PEP 696 default of a synthesized covariant TypeVar.
 
     Note that this does not happen if mypy is run with disallow_any_generics = True,
     as not specifying the generic type is then considered an error.
     """
+    if ctx.api.options.disallow_any_generics:
+        # Let mypy's own "missing type arguments" error stand rather than silently reparametrize.
+        return
+
     class_info = ctx.api.lookup_fully_qualified_or_none(ctx.cls.fullname)
     if class_info is None or class_info.node is None:
         return
@@ -619,14 +645,34 @@ def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) 
         (base for base in class_info.node.bases if base.type.has_base(base_class_fullname)),
         None,
     )
-    if parent_class is None or len(parent_class.args) < 1:
+    if parent_class is None or not parent_class.args:
         return
 
-    model_param = get_proper_type(parent_class.args[0])
-    if not isinstance(model_param, AnyType) or model_param.type_of_any is not TypeOfAny.from_omitted_generics:
-        return
-
-    type_vars = tuple(parent_class.type.defn.type_vars)
+    # Bind explicit args only when the direct parent is the canonical base class
+    is_direct_parent = parent_class.type.fullname == base_class_fullname
+    if not (bind_explicit_args and is_direct_parent):
+        if not _is_omitted_generic(parent_class.args[0]):
+            return
+        type_vars = list(parent_class.type.defn.type_vars)
+    else:
+        type_vars = []
+        for type_var, parent_type_var in zip(parent_class.type.defn.type_vars, parent_class.args, strict=True):
+            if _is_omitted_generic(parent_type_var):
+                # Arg was omitted -- reuse the parent's TypeVar so its existing
+                # PEP 696 default (e.g. ``_Row = TypeVar(default=_Model)``) is preserved.
+                type_vars.append(type_var)
+            else:
+                # Arg was supplied explicitly -- synthesize a TypeVar bounded by the
+                # user's arg so the subclass stays effectively concrete in user-facing
+                # contexts (defaults + bound + covariance) while still being generic
+                # enough for the plugin to flow annotation row types through.
+                type_vars.append(
+                    type_var.copy_modified(
+                        id=type_var.id,
+                        upper_bound=parent_type_var,
+                        default=parent_type_var,
+                    )
+                )
 
     # If we end up with placeholders we need to defer so the placeholders are
     # resolved in a future iteration
@@ -636,14 +682,15 @@ def reparametrize_generic_class(ctx: ClassDefContext, base_class_fullname: str) 
         else:
             return
 
-    parent_class.args = type_vars
-    class_info.node.defn.type_vars = list(type_vars)
+    parent_class.args = tuple(type_vars)
+    class_info.node.defn.type_vars = type_vars
     class_info.node.add_type_vars()
 
 
 def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
     """
     Add implicit generics to QuerySet subclasses that are defined without generic.
+    This is required for `.annotate` / `.values` call to update the typevars accordingly.
 
     Eg.
 
@@ -655,10 +702,20 @@ def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
         _Row = TypeVar('_Row', covariant=True, default=_Model)
         class MyQuerySet(models.QuerySet[_Model, _Row]): ...
 
+    And
+
+        class BookQuerySet(models.QuerySet["Book"]): ...
+
+    is interpreted as:
+
+        _Model = TypeVar('_Model', bound=Book, covariant=True, default=Book)
+        _Row = TypeVar('_Row', bound=Book, covariant=True, default=Book)
+        class BookQuerySet(models.QuerySet[_Model, _Row]): ...
+
     Note that this does not happen if mypy is run with disallow_any_generics = True,
     as not specifying the generic type is then considered an error.
     """
-    reparametrize_generic_class(ctx, fullnames.QUERYSET_CLASS_FULLNAME)
+    reparametrize_generic_class(ctx, fullnames.QUERYSET_CLASS_FULLNAME, bind_explicit_args=True)
 
 
 def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
@@ -678,3 +735,21 @@ def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
     as not specifying the generic type is then considered an error.
     """
     reparametrize_generic_class(ctx, fullnames.BASE_MANAGER_CLASS_FULLNAME)
+
+
+def reparametrize_any_field_hook(ctx: ClassDefContext) -> None:
+    """
+    Add implicit generics to Field subclasses that omit the parent's TypeVars.
+
+    Eg.
+
+        class HTMLField(models.TextField): ...
+
+    is interpreted as:
+
+        class HTMLField(models.TextField[_ST_Text, _GT_Text]): ...
+
+    Without this, mypy treats `HTMLField` as non-Generic and the set/get args
+    assigned by the field function hook don't propagate through `__get__`.
+    """
+    reparametrize_generic_class(ctx, fullnames.FIELD_FULLNAME)

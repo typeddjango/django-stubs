@@ -26,8 +26,6 @@ django.tasks.default_task_backend
 # path/re_path are actually functools.partial objects at runtime, but stubs type them as functions
 django.urls.conf.path
 django.urls.conf.re_path
-django.urls.path
-django.urls.re_path
 
 # '<Model>_RelatedManager' entries are plugin generated and these subclasses only exist
 # _locally/dynamically_ runtime -- Created via
@@ -73,8 +71,6 @@ django.contrib.admin.utils.UNQUOTE_RE
 django.contrib.gis.geometry.hex_regex
 django.contrib.gis.geometry.json_regex
 django.contrib.gis.geometry.wkt_regex
-django.contrib.gis.geos.hex_regex
-django.contrib.gis.geos.wkt_regex
 django.contrib.postgres.search.multiple_spaces_re
 django.contrib.postgres.search.spec_chars_re
 django.core.cache.backends.base.memcached_error_chars_re
@@ -86,7 +82,6 @@ django.core.validators.slug_unicode_re
 django.core.validators.URLValidator.regex
 django.core.management.commands.makemessages.plural_forms_re
 django.core.management.commands.runserver.naiveip_re
-django.db.models.functions.Collate.collation_re
 django.db.models.functions.comparison.Collate.collation_re
 django.http.request.host_validation_re
 django.middleware.csrf.invalid_token_chars_re
@@ -164,39 +159,21 @@ django.core.management.color.Style.SQL_TABLE
 django.core.management.color.Style.SUCCESS
 django.core.management.color.Style.WARNING
 
-# We re-export `functools.cached_property` which has different semantics
-django.utils.functional.cached_property.__class_getitem__
-django.utils.functional.cached_property.__set__
-django.utils.functional.cached_property.name
 
 # Custom __str__ that we don't want to overcomplicate:
 django.forms.utils.RenderableMixin.__str__
 django.forms.utils.RenderableMixin.__html__
 
 # Dynamically added in ManyToManyField.contribute_to_class()
-django.db.models.ManyToManyField.m2m_db_table
 django.db.models.fields.related.ManyToManyField.m2m_db_table
-django.contrib.gis.db.models.ManyToManyField.m2m_db_table
 
 # Dynamically added in ManyToManyField.contribute_to_related_class()
-django.db.models.ManyToManyField.m2m_column_name
-django.db.models.ManyToManyField.m2m_field_name
-django.db.models.ManyToManyField.m2m_reverse_field_name
-django.db.models.ManyToManyField.m2m_reverse_name
-django.db.models.ManyToManyField.m2m_reverse_target_field_name
-django.db.models.ManyToManyField.m2m_target_field_name
 django.db.models.fields.related.ManyToManyField.m2m_column_name
 django.db.models.fields.related.ManyToManyField.m2m_field_name
 django.db.models.fields.related.ManyToManyField.m2m_reverse_field_name
 django.db.models.fields.related.ManyToManyField.m2m_reverse_name
 django.db.models.fields.related.ManyToManyField.m2m_reverse_target_field_name
 django.db.models.fields.related.ManyToManyField.m2m_target_field_name
-django.contrib.gis.db.models.ManyToManyField.m2m_column_name
-django.contrib.gis.db.models.ManyToManyField.m2m_field_name
-django.contrib.gis.db.models.ManyToManyField.m2m_reverse_field_name
-django.contrib.gis.db.models.ManyToManyField.m2m_reverse_name
-django.contrib.gis.db.models.ManyToManyField.m2m_reverse_target_field_name
-django.contrib.gis.db.models.ManyToManyField.m2m_target_field_name
 
 # Defined inside a signature (using the walrus operator)
 django.core.management.utils.sentinel
@@ -233,12 +210,8 @@ django.db.migrations.operations.base.OperationCategory.__new__
 
 # These are dynamically added when using `save(commit=False)`
 # See https://docs.djangoproject.com/en/stable/topics/forms/modelforms/#the-save-method
-django.forms.BaseModelForm.save_m2m
-django.forms.BaseModelFormSet.save_m2m
 django.forms.models.BaseModelForm.save_m2m
 django.forms.models.BaseModelFormSet.save_m2m
-django.contrib.gis.forms.BaseModelForm.save_m2m
-django.contrib.gis.forms.BaseModelFormSet.save_m2m
 
 # Dynamically generated in https://github.com/django/django/blob/0ee06c04e0256094270db3ffe8b5dafa6a8457a3/django/core/mail/backends/locmem.py#L24
 django.core.mail.outbox
@@ -248,19 +221,16 @@ django.contrib.gis.db.backends.base.features.BaseSpatialFeatures.unsupported_geo
 
 # We declare more strict types for this in stubs to avoid RuntimeErrors.
 # Django uses a `*args` parameter but crash if it contains more than 1 element.
-django.http.QueryDict.pop
 django.http.request.QueryDict.pop
 
 # The `task` decorator supports both `@task` and `@task(...)` forms. Stubs use
 # overloads to type each case separately, so `function` doesn't accept `None`.
-django.tasks.task
 django.tasks.base.task
 
 # Django incorrectly uses a signature of `(cls, **kwargs)` when it should be `(cls, *args, **kwargs)`.
 django.test.selenium.SeleniumTestCase.__init_subclass__
 
 # mypy does not understand __getitem__ unpacking python/mypy#2220
-django.urls.ResolverMatch.__iter__
 django.urls.resolvers.ResolverMatch.__iter__
 
 # Loop leak variables - values depend on dict iteration order, not public API
@@ -268,20 +238,6 @@ django.template.smartif.key
 django.template.smartif.op
 
 # Field.__get__/__set__ are stub-only for the mypy plugin, they don't exist at runtime
-django.contrib.gis.db.models.Field.__get__
-django.contrib.gis.db.models.Field.__set__
-django.contrib.gis.db.models.FileField.__get__
-django.contrib.gis.db.models.ForeignObject.__get__
-django.contrib.gis.db.models.ImageField.__get__
-django.contrib.gis.db.models.ManyToManyField.__get__
-django.contrib.gis.db.models.OneToOneField.__get__
-django.db.models.Field.__get__
-django.db.models.Field.__set__
-django.db.models.FileField.__get__
-django.db.models.ForeignObject.__get__
-django.db.models.ImageField.__get__
-django.db.models.ManyToManyField.__get__
-django.db.models.OneToOneField.__get__
 django.db.models.fields.Field.__get__
 django.db.models.fields.Field.__set__
 django.db.models.fields.files.FileField.__get__

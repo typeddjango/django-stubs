@@ -29,11 +29,11 @@ jobs:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -41,15 +41,15 @@ jobs:
         run: uv sync --no-dev --group tests
 
       - name: Run mypy on plugin code
-        run: uv run mypy --strict mypy_django_plugin
+        run: uv run mypy mypy_django_plugin
       - name: Run mypy on ext code
-        run: uv run mypy --strict ext
+        run: uv run mypy ext
       - name: Run mypy on scripts and utils
-        run: uv run mypy --strict scripts
+        run: uv run mypy scripts
       - name: Run mypy on stubs
         run: uv run mypy --cache-dir=/dev/null --no-incremental django-stubs
       - name: Run mypy on the test cases
-        run: uv run mypy --strict tests
+        run: uv run mypy tests
 
   test:
     timeout-minutes: 15
@@ -60,15 +60,20 @@ jobs:
         shard: [0, 1, 2, 3]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
+      - name: Cache apt packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
+        with:
+          path: /var/cache/apt/archives
+          key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install binutils libproj-dev gdal-bin
+          sudo apt-get update || true
+          sudo apt-get install -y --no-install-recommends libgdal-dev libproj-dev
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -87,17 +92,21 @@ jobs:
         shard: [0, 1, 2, 3]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
+      - name: Cache apt packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
+        with:
+          path: /var/cache/apt/archives
+          key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install binutils libproj-dev gdal-bin
+          sudo apt-get update || true
+          sudo apt-get install -y --no-install-recommends libgdal-dev libproj-dev
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
-          # NOTE: Keep renovate.json python "allowedVersions" in sync
           python-version: '3.10'
 
       - name: Install dependencies
@@ -116,18 +125,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.12', '3.13'] # FIXME: solve issues & add '3.14' too
+        python-version: ['3.12', '3.13', '3.14']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
+      - name: Cache apt packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
+        with:
+          path: /var/cache/apt/archives
+          key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install binutils libproj-dev gdal-bin
+          sudo apt-get update || true
+          sudo apt-get install -y --no-install-recommends libgdal-dev libproj-dev
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -145,11 +159,11 @@ jobs:
         python-version: ['3.12']  # TODO: enable on other versions
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -160,17 +174,10 @@ jobs:
       - name: Add venv to path
         run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
 
-      - name: Run pyright on the stubs
-        uses: jakebailey/pyright-action@v3
-        with:
-          version: PATH
-          annotate: false
-        continue-on-error: true  # TODO: remove this part
       - name: Run pyright on the test cases
-        uses: jakebailey/pyright-action@v3
+        uses: jakebailey/pyright-action@8ec14b5cfe41f26e5f41686a31eb6012758217ef  # v3
         with:
           version: PATH
-          project: ./pyrightconfig.testcases.json
 
   run-pyrefly:
     timeout-minutes: 10
@@ -180,11 +187,11 @@ jobs:
         python-version: ['3.12']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -205,11 +212,11 @@ jobs:
         python-version: ['3.12']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -236,15 +243,11 @@ jobs:
           - python-version: '3.13'
             django-version: '6.0'
     steps:
-      - uses: actions/checkout@v6
-      - name: Setup system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install binutils libproj-dev gdal-bin
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -257,11 +260,11 @@ jobs:
   build-and-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
         with:
           fetch-tags: true
       - name: Install uv & Python
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
         with:
           python-version: "3.13"
       - name: Ensure uv.lock is up to date

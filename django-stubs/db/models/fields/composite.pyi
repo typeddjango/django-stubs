@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Iterator, Mapping
 from typing import Any, Literal
 
-from django.core import validators  # due to weird mypy.stubtest error
+from django.core.validators import _ValidatorCallable
 from django.db.models import NOT_PROVIDED, Field
 from django.db.models.base import Model
 from django.db.models.fields.reverse_related import ForeignObjectRel
@@ -24,6 +24,7 @@ class CompositeAttribute:
 class CompositePrimaryKey(Field[Any, Any]):
     field_names: tuple[str]
     descriptor_class: type[CompositeAttribute]
+    column: None
     def __init__(
         self,
         *args: str,
@@ -47,7 +48,7 @@ class CompositePrimaryKey(Field[Any, Any]):
         db_column: None = None,
         db_tablespace: str | None = None,
         auto_created: bool = False,
-        validators: Iterable[validators._ValidatorCallable] = (),
+        validators: Iterable[_ValidatorCallable] = (),
         error_messages: Mapping[str, _StrOrPromise] | None = None,
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] = ...,
@@ -62,5 +63,7 @@ class CompositePrimaryKey(Field[Any, Any]):
     def __len__(self) -> int: ...
     @override
     def get_pk_value_on_save(self, instance: Model) -> tuple: ...  # actual type is tuple of field.value_from_object
+    @override
+    def get_attname_column(self) -> tuple[str, None]: ...
 
 def unnest(fields: Iterable[Field[Any, Any]]) -> list[Field[Any, Any]]: ...

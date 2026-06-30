@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import ClassVar
 
 from django.db import models
@@ -6,7 +8,7 @@ from typing_extensions import assert_type
 
 
 class Other(models.Model):
-    explicit_descriptor: ClassVar[ReverseManyToOneDescriptor["MyModel"]]
+    explicit_descriptor: ClassVar[ReverseManyToOneDescriptor[MyModel]]
 
 
 class MyModel(models.Model):

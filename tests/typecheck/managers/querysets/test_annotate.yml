@@ -27,7 +27,8 @@
         func2(unannotated_user)
         func2(annotated_user)
 
-        def func3(user: WithAnnotations) -> None: ...
+        def func3(user: WithAnnotations) -> None:
+            raise NotImplementedError
 
         # With no arguments to 'WithAnnotations' it should become 'Any'
         reveal_type(func3)  # N: Revealed type is "def (user: Any)"
@@ -139,7 +140,7 @@
         reveal_type(annotated) # N: Revealed type is "myapp.models.User@AnnotatedWith[TypedDict({'foo': Any})]"
         reveal_type(annotated.foo) # N: Revealed type is "Any"
         print(annotated.bar) # E: "User@AnnotatedWith[TypedDict({'foo': Any})]" has no attribute "bar"  [attr-defined]
-        reveal_type(annotated.username) # N: Revealed type is "builtins.str"
+        reveal_type(annotated.username) # N: Revealed type is "str"
 
     installed_apps:
         - myapp
@@ -152,14 +153,20 @@
                     username = models.CharField(max_length=100)
 
 
--   case: annotate_no_field_name
+-   case: annotate_positional_aggregate_uses_default_alias
     main: |
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models import Count
 
-        qs = User.objects.annotate(Count('id'))
-        reveal_type(qs) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User, myapp.models.User]"
+        # Positional Aggregate gets Django's default_alias: <field>__<name_lower>.
+        user = User.objects.annotate(Count('id')).get()
+        reveal_type(user.id__count)  # N: Revealed type is "int"
+
+        # Multiple positional aggregates produce multiple default aliases.
+        multi = User.objects.annotate(Count('id'), Count('username')).get()
+        reveal_type(multi.id__count)        # N: Revealed type is "int"
+        reveal_type(multi.username__count)  # N: Revealed type is "int"
 
     installed_apps:
         - myapp
@@ -180,9 +187,8 @@
         annotated_user = qs.get()
 
         def animals_only(param: Animal) -> None:
-            pass
-        # Make sure that the type is still checked when no annotation was produced
-        animals_only(annotated_user) # E: Argument 1 to "animals_only" has incompatible type "User"; expected "Animal"  [arg-type]
+            raise NotImplementedError
+        animals_only(annotated_user) # E: Argument 1 to "animals_only" has incompatible type "User@AnnotatedWith[TypedDict({'id__count': int})]"; expected "Animal"  [arg-type]
 
         def users_allowed(param: User) -> None:
             # But this function accepts only the original User type, so any attr access is not allowed within this function
@@ -215,7 +221,7 @@
         reveal_type(annotated) # N: Revealed type is "myapp.models.User@AnnotatedWith[TypedDict({'foo': Any, 'bar': Any})]"
         reveal_type(annotated.foo) # N: Revealed type is "Any"
         reveal_type(annotated.bar) # N: Revealed type is "Any"
-        reveal_type(annotated.username) # N: Revealed type is "builtins.str"
+        reveal_type(annotated.username) # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -246,7 +252,7 @@
           return qs.annotate(bar=F('id')) # E: Incompatible return value type (got "QuerySet[User@AnnotatedWith[TypedDict({'bar': Any})], User@AnnotatedWith[TypedDict({'bar': Any})]]", expected "QuerySet[User@AnnotatedWith[FooDict], User@AnnotatedWith[FooDict]]")  [return-value]
 
         qs = add_annotation(qs)
-        reveal_type(qs.get().foo)  # N: Revealed type is "builtins.str"
+        reveal_type(qs.get().foo)  # N: Revealed type is "str"
         qs.get().bar # E: "User@AnnotatedWith[FooDict]" has no attribute "bar"  [attr-defined]
 
     installed_apps:
@@ -287,30 +293,27 @@
 
         values_list_named = Blog.objects.annotate(foo=F('id'), bar=F('isad')).values_list('foo', 'text', named=True).get()
         # We have to assume we don't know any of the tuple member types.
-        reveal_type(values_list_named)  # N: Revealed type is "tuple[Any, builtins.str, fallback=main.Row]"
+        reveal_type(values_list_named)  # N: Revealed type is "tuple[Any, str, fallback=main.Row]"
         values_list_named.unknown # E: "Row" has no attribute "unknown"  [attr-defined]
         reveal_type(values_list_named.foo) # N: Revealed type is "Any"
-        reveal_type(values_list_named.text) # N: Revealed type is "builtins.str"
+        reveal_type(values_list_named.text) # N: Revealed type is "str"
 
         values_list_flat_known = Blog.objects.annotate(foo=F('id')).values_list('text', flat=True).get()
         # Even though it's annotated, we still know the lookup's type.
-        reveal_type(values_list_flat_known)  # N: Revealed type is "builtins.str"
+        reveal_type(values_list_flat_known)  # N: Revealed type is "str"
         values_list_flat_unknown = Blog.objects.annotate(foo=F('id')).values_list('foo', flat=True).get()
         # We don't know the type of an unknown lookup
         reveal_type(values_list_flat_unknown)  # N: Revealed type is "Any"
 
-        values_no_params = Blog.objects.annotate(foo=F('id')).values().get()
-        reveal_type(values_no_params)  # N: Revealed type is "builtins.dict[builtins.str, Any]"
-
         values_list_no_params = Blog.objects.annotate(foo=F('id')).values_list().get()
-        reveal_type(values_list_no_params)  # N: Revealed type is "builtins.tuple[Any, ...]"
+        reveal_type(values_list_no_params)  # N: Revealed type is "tuple[Any, ...]"
 
         values_list_flat_no_params = Blog.objects.annotate(foo=F('id')).values_list(flat=True).get()
-        reveal_type(values_list_flat_no_params)  # N: Revealed type is "builtins.int"
+        reveal_type(values_list_flat_no_params)  # N: Revealed type is "int"
 
         values_list_named_no_params = Blog.objects.annotate(foo=F('id')).values_list(named=True).get()
         reveal_type(values_list_named_no_params.foo) # N: Revealed type is "Any"
-        reveal_type(values_list_named_no_params.text) # N: Revealed type is "builtins.str"
+        reveal_type(values_list_named_no_params.text) # N: Revealed type is "str"
 
         # .values/.values_list BEFORE .annotate
 
@@ -322,34 +325,32 @@
         # It's possible to provide more precise types than than this, but without inspecting the
         # arguments to .annotate, these are the best types we can infer.
         qs1 = Blog.objects.values('text').annotate(foo=F('id'))
-        reveal_type(qs1) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], builtins.dict[builtins.str, Any]]"
+        reveal_type(qs1) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], dict[str, Any]]"
         qs2 = Blog.objects.values_list('text').annotate(foo=F('id'))
-        reveal_type(qs2) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], builtins.tuple[Any, ...]]"
+        reveal_type(qs2) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], tuple[Any, ...]]"
         qs3 = Blog.objects.values_list('text', named=True).annotate(foo=F('id'))
-        # TODO: Would be nice to infer a NamedTuple which contains the field 'text' (str) + any number of other fields.
-        #  The reason it would have to appear to have any other fields is that annotate could potentially be called with
-        #  arbitrary parameters such that we wouldn't know how many extra fields there might be.
-        #  But it's not trivial to make such a NamedTuple, partly because since it is also an ordinary tuple, it would
-        #  have to have an arbitrary length, but still have certain fields at certain indices with specific types.
-        #  For now, Any :)
-        reveal_type(qs3) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], Any]"
+        reveal_type(qs3) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], tuple[str, Any, fallback=main.Row3]]"
+        qs3_chained = Blog.objects.values_list('text', named=True).annotate(foo=F('id')).annotate(bar=F('num_posts'))
+        qs3_chained_row = qs3_chained.get()
+        reveal_type(qs3_chained_row.text) # N: Revealed type is "str"
+        reveal_type(qs3_chained_row.foo) # N: Revealed type is "Any"
+        reveal_type(qs3_chained_row.bar) # N: Revealed type is "Any"
         qs4 = Blog.objects.values_list('text', flat=True).annotate(foo=F('id'))
-        reveal_type(qs4) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], builtins.str]"
+        reveal_type(qs4) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], str]"
 
 
         before_values_no_params = Blog.objects.values().annotate(foo=F('id')).get()
-        reveal_type(before_values_no_params)  # N: Revealed type is "builtins.dict[builtins.str, Any]"
+        reveal_type(before_values_no_params)  # N: Revealed type is "dict[str, Any]"
 
         before_values_list_no_params = Blog.objects.values_list().annotate(foo=F('id')).get()
-        reveal_type(before_values_list_no_params)  # N: Revealed type is "builtins.tuple[Any, ...]"
+        reveal_type(before_values_list_no_params)  # N: Revealed type is "tuple[Any, ...]"
 
         before_values_list_flat_no_params = Blog.objects.values_list(flat=True).annotate(foo=F('id')).get()
-        reveal_type(before_values_list_flat_no_params)  # N: Revealed type is "builtins.int"
+        reveal_type(before_values_list_flat_no_params)  # N: Revealed type is "int"
 
         before_values_list_named_no_params = Blog.objects.values_list(named=True).annotate(foo=F('id')).get()
         reveal_type(before_values_list_named_no_params.foo) # N: Revealed type is "Any"
-        # TODO: Would be nice to infer builtins.str:
-        reveal_type(before_values_list_named_no_params.text) # N: Revealed type is "Any"
+        reveal_type(before_values_list_named_no_params.text) # N: Revealed type is "str"
 
     installed_apps:
         - myapp
@@ -362,6 +363,33 @@
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100)
 
+-   case: annotate_then_values_list_flat_slice_preserves_row_type
+    main: |
+        from typing import Iterable
+        from typing_extensions import reveal_type
+        from myapp.models import Blog
+        from django.db.models import F
+
+        qs = Blog.objects.annotate(a=F("id")).values_list("id", flat=True)
+        reveal_type(qs)  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], int]"
+        reveal_type(qs[:])  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], int]"
+
+        def get_blog_ids() -> Iterable[int]:
+            return Blog.objects.annotate(a=F("id")).values_list("id", flat=True)[:]
+
+        # Also preserve non-flat tuple row types and TypedDict row types from values().
+        reveal_type(Blog.objects.annotate(a=F("id")).values_list("id", "text")[:])  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], tuple[int, str]]"
+        reveal_type(Blog.objects.annotate(a=F("id")).values("id")[:])  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'a': Any})], TypedDict({'id': int})]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Blog(models.Model):
+                    text = models.CharField(max_length=100)
+
 - case: test_annotate_with_filter
   main: |
     from django.db import models
@@ -370,6 +398,19 @@
     qs = Blog.objects.annotate(xyz=models.Count("entry"))
     qs.filter(xyz=1)
     qs.filter(annotate_wrong__gt=5)
+
+    # The `__in` lookup expects an iterable of the field type.
+    # Regression test for https://github.com/typeddjango/django-stubs/issue/xxxx
+    qs.filter(xyz__in=[1, 2, 3])
+    qs.filter(xyz__in=(1, 2, 3))
+    qs.filter(xyz__in=range(4))
+    qs.filter(xyz__in=123)
+    qs.filter(xyz__in=None)
+    qs.filter(xyz__in="abc")
+    qs.filter(xyz__in=(Blog(),))
+    qs.filter(xyz__in=[Blog()])  # Doesn't error because mypy sees the provided type as `list[Any]`.
+    blogs: list[Blog] = [Blog()]
+    qs.filter(xyz__in=blogs)  # But this does error as `blogs` is explicitly `list[Blog]`.
 
     qs2 = qs.alias(alias_entries=models.Count("entry"))
     qs2.filter(alias_entries__gt=5)
@@ -383,10 +424,20 @@
     )
   out: |
     main:6: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz  [misc]
-    main:10: error: Cannot resolve keyword 'alias_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
-    main:10: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
-    main:12: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
-    main:14: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
+    main:13: error: Incompatible type for lookup 'xyz__in': (got "int", expected "Iterable[int]")  [misc]
+    main:14: error: Incompatible type for lookup 'xyz__in': (got "None", expected "Iterable[int]")  [misc]
+    main:15: error: Incompatible type for lookup 'xyz__in': (got "str", expected "Iterable[int]")  [misc]
+    main:15: note: Following member(s) of "str" have conflicts:
+    main:15: note:     Expected:
+    main:15: note:         def __iter__(self) -> Iterator[int]
+    main:15: note:     Got:
+    main:15: note:         def __iter__(self) -> Iterator[str]
+    main:16: error: Incompatible type for lookup 'xyz__in': (got "tuple[Blog]", expected "Iterable[int]")  [misc]
+    main:19: error: Incompatible type for lookup 'xyz__in': (got "list[Blog]", expected "Iterable[int]")  [misc]
+    main:23: error: Cannot resolve keyword 'alias_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
+    main:23: error: Cannot resolve keyword 'annotate_wrong' into field. Choices are: entry, id, xyz, alias_entries  [misc]
+    main:25: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
+    main:27: error: Cannot resolve keyword 'xyz' into field. Choices are: entry, id  [misc]
   installed_apps:
     - myapp
   files:
@@ -561,7 +612,7 @@
 
     qs = MyModel.objects.all().annotate(num_items=Count("id"))
     obj = qs.get()
-    reveal_type(obj.num_items)  # N: Revealed type is "builtins.int"
+    reveal_type(obj.num_items)  # N: Revealed type is "int"
     obj.nonexistent  # E: "MyModel@AnnotatedWith[TypedDict({'num_items': int})]" has no attribute "nonexistent"  [attr-defined]
 
     # Custom queryset methods remain available after annotate
@@ -594,15 +645,15 @@
 
         # Count has output_field: ClassVar[IntegerField] → int
         user_count = User.objects.annotate(user_count=Count('id')).get().user_count
-        reveal_type(user_count) # N: Revealed type is "builtins.int"
+        reveal_type(user_count) # N: Revealed type is "int"
 
         # Exists has output_field: ClassVar[BooleanField] → bool
         has_users = User.objects.annotate(has_users=Exists(User.objects.filter(pk=OuterRef('pk')))).get().has_users
-        reveal_type(has_users) # N: Revealed type is "builtins.bool"
+        reveal_type(has_users) # N: Revealed type is "bool"
 
         # Length has output_field: ClassVar[IntegerField] → int
         name_len = User.objects.annotate(name_len=Length('username')).get().name_len
-        reveal_type(name_len) # N: Revealed type is "builtins.int"
+        reveal_type(name_len) # N: Revealed type is "int"
 
         # Now has output_field: ClassVar[DateTimeField] → datetime
         current_time = User.objects.annotate(current_time=Now()).get().current_time
@@ -610,7 +661,7 @@
 
         # Right (inherits from Left) has output_field: ClassVar[CharField] → str
         suffix = User.objects.annotate(suffix=Right('username', 3)).get().suffix
-        reveal_type(suffix) # N: Revealed type is "builtins.str"
+        reveal_type(suffix) # N: Revealed type is "str"
 
         # TruncDate has output_field: ClassVar[DateField] → date
         created_date = User.objects.annotate(created_date=TruncDate('created_at')).get().created_date
@@ -640,11 +691,11 @@
 
         # ArrayAgg has output_field as @property → ArrayField → list[Any]
         usernames = User.objects.annotate(usernames=ArrayAgg('username')).get().usernames
-        reveal_type(usernames) # N: Revealed type is "builtins.list[Any]"
+        reveal_type(usernames) # N: Revealed type is "list[Any]"
 
         # ArraySubquery has output_field as @cached_property → ArrayField → list[Any]
         sub_ids = User.objects.annotate(sub_ids=ArraySubquery(User.objects.values('id'))).get().sub_ids
-        reveal_type(sub_ids) # N: Revealed type is "builtins.list[Any]"
+        reveal_type(sub_ids) # N: Revealed type is "list[Any]"
 
     installed_apps:
         - myapp
@@ -655,3 +706,373 @@
                 from django.db import models
                 class User(models.Model):
                     username = models.CharField(max_length=100)
+
+-   case: annotate_resolves_output_field_from_subquery_generic
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import User
+        from django.db.models import Subquery, OuterRef, IntegerField, CharField, Exists
+
+        # Subquery with explicit output_field=IntegerField() → int
+        int_subquery = Subquery(User.objects.filter(pk=OuterRef('pk')).values('id')[:1], output_field=IntegerField())
+        val_int = User.objects.annotate(val=int_subquery).get().val
+        reveal_type(val_int)  # N: Revealed type is "int"
+
+        # Subquery with explicit output_field=CharField() → str
+        char_subquery = Subquery(User.objects.filter(pk=OuterRef('pk')).values('username')[:1], output_field=CharField())
+        val_str = User.objects.annotate(val=char_subquery).get().val
+        reveal_type(val_str)  # N: Revealed type is "str"
+
+        # Subquery with nullable output_field → int | None
+        nullable_sub = Subquery(User.objects.filter(pk=OuterRef('pk')).values('id')[:1], output_field=IntegerField(null=True))
+        val_nullable = User.objects.annotate(val=nullable_sub).get().val
+        reveal_type(val_nullable)  # N: Revealed type is "int | None"
+
+        # Subquery without output_field → Any
+        plain_subquery = Subquery(User.objects.filter(pk=OuterRef('pk')).values('id')[:1])
+        val_any = User.objects.annotate(val=plain_subquery).get().val
+        reveal_type(val_any)  # N: Revealed type is "Any"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+
+-   case: annotate_resolves_output_field_from_func_generic
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import User
+        from django.db.models import BinaryField
+        from django.db.models.functions import Substr, Left, Right
+
+        # Substr with explicit output_field=BinaryField() via variable
+        sub = Substr("username", 1, 100, output_field=BinaryField())
+        val = User.objects.annotate(preview=sub).get().preview
+        reveal_type(val)  # N: Revealed type is "bytes | memoryview[int]"
+
+        # Substr with explicit output_field=BinaryField() inlined
+        val2 = User.objects.annotate(preview=Substr("username", 1, 100, output_field=BinaryField())).get().preview
+        reveal_type(val2)  # N: Revealed type is "bytes | memoryview[int]"
+
+        # Left with explicit output_field=BinaryField()
+        left_expr = Left("username", 5, output_field=BinaryField())
+        left_val = User.objects.annotate(prefix=left_expr).get().prefix
+        reveal_type(left_val)  # N: Revealed type is "bytes | memoryview[int]"
+
+        # Right with explicit output_field=BinaryField()
+        right_expr = Right("username", 5, output_field=BinaryField())
+        right_val = User.objects.annotate(suffix=right_expr).get().suffix
+        reveal_type(right_val)  # N: Revealed type is "bytes | memoryview[int]"
+
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    username = models.CharField(max_length=100)
+
+- case: test_values_and_values_list_on_with_annotations_queryset
+  main: |
+    from typing_extensions import TypedDict, reveal_type
+    from django.db.models import QuerySet
+    from django_stubs_ext import WithAnnotations
+    from myapp.models import MyModel
+
+    class MyAnnotations(TypedDict):
+        extra_id: int | None
+
+    AnnotatedModel = WithAnnotations[MyModel, MyAnnotations]
+
+    def get_qs() -> QuerySet[AnnotatedModel]:
+        raise NotImplementedError
+
+    qs = get_qs()
+
+    # .values() with annotation field should produce a TypedDict
+    values_result = qs.values("extra_id").get()
+    reveal_type(values_result)  # N: Revealed type is "TypedDict({'extra_id': int | None})"
+
+    # .values() with model field should still work
+    model_field_values = qs.values("name").get()
+    reveal_type(model_field_values)  # N: Revealed type is "TypedDict({'name': str})"
+
+    # .values() with both model and annotation fields
+    mixed_values = qs.values("name", "extra_id").get()
+    reveal_type(mixed_values)  # N: Revealed type is "TypedDict({'name': str, 'extra_id': int | None})"
+
+    # .values() with no params on annotated queryset includes model + annotation fields
+    bare_values = qs.values().get()
+    reveal_type(bare_values)  # N: Revealed type is "TypedDict({'id': int, 'name': str, 'extra_id': int | None})"
+
+    # .values_list() with annotation field should resolve its type
+    vl_annotation = qs.values_list("extra_id").get()
+    reveal_type(vl_annotation)  # N: Revealed type is "tuple[int | None]"
+
+    # .values_list() with model field should still work
+    vl_model = qs.values_list("name").get()
+    reveal_type(vl_model)  # N: Revealed type is "tuple[str]"
+
+    # .values_list() with both model and annotation fields
+    vl_mixed = qs.values_list("name", "extra_id").get()
+    reveal_type(vl_mixed)  # N: Revealed type is "tuple[str, int | None]"
+
+    # .values_list(flat=True) with annotation field
+    vl_flat = qs.values_list("extra_id", flat=True).get()
+    reveal_type(vl_flat)  # N: Revealed type is "int | None"
+
+    # .values_list(named=True) with annotation field
+    vl_named = qs.values_list("name", "extra_id", named=True).get()
+    reveal_type(vl_named.name)  # N: Revealed type is "str"
+    reveal_type(vl_named.extra_id)  # N: Revealed type is "int | None"
+
+    # .values_list(named=True) with no params merges model + annotation fields
+    vl_named_bare = qs.values_list(named=True).get()
+    reveal_type(vl_named_bare.name)  # N: Revealed type is "str"
+    reveal_type(vl_named_bare.extra_id)  # N: Revealed type is "int | None"
+
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class MyModel(models.Model):
+            name = models.CharField(max_length=100)
+
+# Regression test from https://github.com/typeddjango/django-stubs/issues/1049
+- case: custom_queryset_with_annotations_issue_1049
+  main: |
+    from typing_extensions import reveal_type
+    from myapp.models import Accommodation, SomeQuerySet
+    from django.db.models import Value
+
+    queryset = SomeQuerySet().annotate(hello=Value(True)).filter(is_on_shelf=True).annotate(hi=Value(False))
+    reveal_type(queryset)  # N: Revealed type is "myapp.models.SomeQuerySet[myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})], myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})]]"
+    reveal_type(queryset.first())  # N: Revealed type is "myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})] | None"
+    reveal_type(queryset.get(pk=1))  # N: Revealed type is "myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})]"
+    reveal_type(queryset[0])  # N: Revealed type is "myapp.models.Accommodation@AnnotatedWith[TypedDict({'hello': Any, 'hi': Any})]"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class Accommodation(models.Model):
+            is_on_shelf = models.BooleanField()
+
+        class SomeQuerySet(models.QuerySet["Accommodation"]):
+            pass
+
+- case: annotate_does_not_leak_across_functions
+  main: |
+    from typing_extensions import reveal_type
+    from myapp.models import consume
+    reveal_type(consume())  # N: Revealed type is "myapp.models.Book | None"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from typing_extensions import reveal_type
+
+        from django.db import models
+        from django.db.models import F
+
+
+        class BookQuerySet(models.QuerySet["Book"]):
+            pass
+
+
+        class Book(models.Model):
+            name = models.CharField(max_length=100)
+            author = models.CharField(max_length=100)
+
+            objects = models.Manager.from_queryset(BookQuerySet)()
+
+        def leak() -> None:
+            Book.objects.annotate(dupe_author=F("name"))
+
+        def consume() -> "Book | None":
+            book: Book | None = None
+            if True:
+                book = Book.objects.filter(name="foo").first()
+                reveal_type(book)  # N: Revealed type is "myapp.models.Book | None"
+            if not book:
+                book = Book(name="foo", author="bar")
+            return book
+
+- case: custom_queryset_method_with_annotations
+  main: |
+    from typing_extensions import reveal_type
+    from myapp.models import FooModel
+    from django.db.models.expressions import F
+
+    # Simple method
+    qs = FooModel.objects.with_bar()
+    reveal_type(qs)  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})], myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})]]"
+    obj = qs.get()
+    reveal_type(obj.bar)  # N: Revealed type is "str"
+    reveal_type(obj.name)  # N: Revealed type is "str"
+    obj.nonexistent  # E: "FooModel@AnnotatedWith[BarDict]" has no attribute "nonexistent"  [attr-defined]
+
+    # Chained methods
+    qs2 = FooModel.objects.with_bar().with_baz()
+    reveal_type(qs2)  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel@AnnotatedWith[TypedDict({'bar': str, 'baz': int})], myapp.models.FooModel@AnnotatedWith[TypedDict({'bar': str, 'baz': int})]]"
+    obj2 = qs2[0]
+    reveal_type(obj2.bar)  # N: Revealed type is "str"
+    reveal_type(obj2.baz)  # N: Revealed type is "int"
+    reveal_type(obj2.name)  # N: Revealed type is "str"
+
+    # Chained with regular methods
+    filtered = FooModel.objects.with_bar().filter(name="x")
+    maybe = filtered.first()
+    reveal_type(maybe)  # N: Revealed type is "myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})] | None"
+    if maybe:
+        reveal_type(maybe.bar)  # N: Revealed type is "str"
+        reveal_type(maybe.name)  # N: Revealed type is "str"
+
+    # Built-in .annotate() then custom method
+    mixed = FooModel.objects.annotate(extra=F("id")).with_bar()
+    mixed_obj = mixed.get()
+    reveal_type(mixed_obj.extra)  # N: Revealed type is "Any"
+    reveal_type(mixed_obj.bar)  # N: Revealed type is "str"
+
+    # Instance extraction propagate annotations correctly
+    qs3 = FooModel.objects.with_bar()
+    reveal_type(qs3.get().bar)  # N: Revealed type is "str"
+    reveal_type(qs3[0].bar)  # N: Revealed type is "str"
+    first = qs3.first()
+    if first:
+        reveal_type(first.bar)  # N: Revealed type is "str"
+    for item in qs3:
+        reveal_type(item.bar)  # N: Revealed type is "str"
+        break
+
+    # later annotation overrides
+    collision = FooModel.objects.with_bar().with_bar_int()
+    reveal_type(collision.get().bar)  # N: Revealed type is "int"
+
+    # Custom method without WithAnnotations: noop
+    plain = FooModel.objects.active()
+    reveal_type(plain)  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel]"
+
+    # Custom then .annotate() then custom: all three layers merge
+    triple = FooModel.objects.with_bar().annotate(extra=F("id")).with_baz()
+    triple_obj = triple.get()
+    reveal_type(triple_obj.bar)  # N: Revealed type is "str"
+    reveal_type(triple_obj.extra)  # N: Revealed type is "Any"
+    reveal_type(triple_obj.baz)  # N: Revealed type is "int"
+
+    # Works on queryset too
+    triple = FooModel.objects.all().with_bar().annotate(extra=F("id")).with_baz()
+    triple_obj = triple.get()
+    reveal_type(triple_obj.bar)  # N: Revealed type is "str"
+    reveal_type(triple_obj.extra)  # N: Revealed type is "Any"
+    reveal_type(triple_obj.baz)  # N: Revealed type is "int"
+
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from typing_extensions import TypedDict, TypeVar, Self
+        from django.db import models
+        from django_stubs_ext import WithAnnotations
+
+        class BarDict(TypedDict):
+            bar: str
+
+        class BazDict(TypedDict):
+            baz: int
+
+        class BarIntDict(TypedDict):
+            bar: int
+
+        _Model = TypeVar("_Model", bound=models.Model, covariant=True)
+
+        class FooQuerySet(models.QuerySet[_Model]):
+            def with_bar(self) -> "FooQuerySet[WithAnnotations[_Model, BarDict]]":
+                return self.annotate(bar=models.Value("x"))
+
+            def with_baz(self) -> "FooQuerySet[WithAnnotations[_Model, BazDict]]":
+                return self.annotate(baz=models.Value(1))
+
+            def with_bar_int(self) -> "FooQuerySet[WithAnnotations[_Model, BarIntDict]]":
+                return self.annotate(bar=models.Value(1))
+
+            def active(self) -> Self:
+                return self.filter(active=True)
+
+        FooManager = models.Manager.from_queryset(FooQuerySet)
+
+        class FooModel(models.Model):
+            name = models.CharField(max_length=100)
+            objects = FooManager()
+
+# Regression test from https://github.com/typeddjango/django-stubs/issues/2681#issuecomment-3610917062
+- case: custom_queryset_with_annotations_issue_2681_comment
+  main: |
+    from typing_extensions import reveal_type
+    from myapp.models import FooModel
+
+    reveal_type(FooModel.objects.with_bar())  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})], myapp.models.FooModel@AnnotatedWith[TypedDict(myapp.models.BarDict, {'bar': str})]]"
+    reveal_type(FooModel.objects.with_bar().with_baz())  # N: Revealed type is "myapp.models.FooQuerySet[myapp.models.FooModel@AnnotatedWith[TypedDict({'bar': str, 'baz': str})], myapp.models.FooModel@AnnotatedWith[TypedDict({'bar': str, 'baz': str})]]"
+
+    obj = FooModel.objects.with_bar().with_baz().get()
+    reveal_type(obj.bar)  # N: Revealed type is "str"
+    reveal_type(obj.baz)  # N: Revealed type is "str"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from typing_extensions import TypedDict, TypeVar
+        from django.db import models
+        from django.db.models import Manager
+        from django_stubs_ext import WithAnnotations
+
+        class BarDict(TypedDict):
+            bar: str
+
+        class BazDict(TypedDict):
+            baz: str
+
+        _Model = TypeVar("_Model", bound=models.Model, covariant=True)
+
+        class FooQuerySet(models.QuerySet[_Model]):
+            def with_bar(self) -> "FooQuerySet[WithAnnotations[_Model, BarDict]]":
+                return self.annotate(bar=models.Value("bar"))
+
+            def with_baz(self) -> "FooQuerySet[WithAnnotations[_Model, BazDict]]":
+                return self.annotate(baz=models.Value("baz"))
+
+        FooManager = Manager.from_queryset(FooQuerySet)
+
+        class FooModel(models.Model):
+            objects = FooManager()
+
+- case: values_then_annotate_on_generic_queryset_typevar
+  main: |
+    from typing import Any
+    from typing_extensions import reveal_type, TypeVar
+    from django.db import models
+
+    _Model = TypeVar("_Model", bound=models.Model)
+
+    def latest_max(qs: models.QuerySet[_Model]) -> dict[str, Any] | None:
+        annotated = qs.values("id").annotate(foo=models.Max("id"))
+        reveal_type(annotated)  # N: Revealed type is "django.db.models.query.QuerySet[django.db.models.base.Model, dict[str, Any]]"
+        return annotated.first()

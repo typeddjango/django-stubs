@@ -1,8 +1,14 @@
-from mypy.plugin import MethodContext
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from mypy.types import Instance, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.lib import fullnames, helpers
+
+if TYPE_CHECKING:
+    from mypy.plugin import MethodContext
 
 
 def get_model_of_related_manager(ctx: MethodContext) -> Instance | None:

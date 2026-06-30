@@ -33,51 +33,128 @@ As a first step you will need to fork this repository and clone your fork locall
 In order to be able to continuously sync your fork with the origin repository's master branch, you will need to set up an upstream master.
 To do so follow this [official github guide](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 
+### System Dependencies
+
+The test suite requires some system libraries that Django itself treats as optional.
+This project depends on `mysqlclient`, which needs MySQL/MariaDB C client libraries to build.
+Install them for your platform following the
+[mysqlclient install guide](https://github.com/PyMySQL/mysqlclient#install).
+For Debian/Ubuntu, the [django-docker-box packages list](https://github.com/django/django-docker-box/blob/main/packages.txt)
+is also a useful reference.
+
+**GDAL and GEOS** are needed to pass all tests (2 GIS-related tests require them).
+See the Django documentation on
+[installing geospatial libraries](https://docs.djangoproject.com/en/stable/ref/contrib/gis/install/geolibs/).
+If you're not working on GIS-related stubs, you can skip GDAL/GEOS —
+the 2 failing tests won't affect other contributions.
+
+> **macOS Note:** Homebrew installs GDAL/GEOS to `/opt/homebrew` (Apple Silicon) or `/usr/local` (Intel),
+> which are not in the default library search path. The GIS tests may fail unless you create symlinks:
+>
+> ```bash
+> sudo mkdir -p /usr/local/lib
+> sudo ln -s /opt/homebrew/opt/gdal/lib/libgdal.dylib /usr/local/lib/libgdal.dylib
+> sudo ln -s /opt/homebrew/opt/geos/lib/libgeos_c.dylib /usr/local/lib/libgeos_c.dylib
+> ```
+
 ### Dependency Setup
 
 We use [uv](https://github.com/astral-sh/uv) to manage our dev dependencies.
 To install it, see their [installation guide](https://docs.astral.sh/uv/getting-started/installation/)
 
-Once it's done, simply run the following command to automatically setup a virtual environment and install dev dependencies:
+We use [just](https://github.com/casey/just) as a command runner. Install it with:
+
+```bash
+uv tool install rust-just
+```
+
+Then bootstrap your environment (installs pre-commit hooks and syncs dependencies):
+
+```bash
+just bootstrap
+```
+
+<details>
+<summary>Manual setup (without <code>just</code>)</summary>
 
 ```bash
 uv sync
 source .venv/bin/activate
+pre-commit install --install-hooks
 ```
-
-Finally, install the pre-commit hooks:
-
-```bash
-pre-commit install
-```
+</details>
 
 ### Testing and Linting
 
-We use `mypy`, `pytest`, `ruff`, and `black` for quality control. `ruff` and `black` are executed using pre-commit when you make a commit.
-To ensure there are not formatting or typing issues in the entire repository you can run:
+Running `just` at the root of the repository lists all available recipes:
 
-```bash
-pre-commit run --all-files
+```
+$ just
+Available recipes:
+    [dev]
+    bootstrap      # Bootstrap dev environment: install pre-commit hooks and sync dependencies
+    lint           # Run pre-commit hooks on all files
+    pre-mr-check   # Run all checks before submitting a PR
+    clean          # Remove mypy cache
+
+    [typecheck]
+    mypy           # Run mypy on plugin, ext, scripts, stubs and tests
+    pyright        # Run pyright on test cases
+    pyrefly        # Run pyrefly on test cases
+    ty             # Run ty on test cases
+
+    [test]
+    test +args     # Run pytest on specific files or with custom args (no xdist)
+    all-test       # Run full pytest test suite with parallel workers
+    stubtest *args # Run stubtest to check stubs match runtime
+    ext-test       # Run django-stubs-ext tests
+
+    [build]
+    build          # Build all packages
+    lock-check     # Check that uv.lock is up to date
 ```
 
-NOTE: This command will not only lint but also modify files - so make sure to commit whatever changes you've made before hand.
-You can also run pre-commit per file or for a specific path, simply replace "--all-files" with a target (see [this guide](https://codeburst.io/tool-your-django-project-pre-commit-hooks-e1799d84551f) for more info).
-
-To execute the unit tests, simply run:
+Before submitting a PR, run all checks at once:
 
 ```bash
-pytest -n auto
+just pre-mr-check
 ```
 
-If you get some unexpected results or want to be sure that tests run is not affected by previous one, remove `mypy` cache:
+Or run individual checks:
 
 ```bash
-rm -r .mypy_cache
+just lint          # pre-commit hooks (ruff, codespell, ...)
+just mypy          # mypy on plugin, ext, scripts, stubs and tests
+just test tests/test_xyz.yml  # run specific tests (no xdist)
+just all-test      # full pytest suite (parallel)
+just stubtest      # stubtest: check stubs match runtime
+just pyright       # pyright on test cases
+just ty            # ty on test cases
+just pyrefly       # pyrefly on test cases
+```
+
+Extra arguments can be passed to `test` and `stubtest`:
+
+```bash
+just test tests -k test_name
+just stubtest --allowlist extra.txt
+```
+
+If you get unexpected results, clear the mypy cache with `just clean`.
+
+### Debugging plugin code
+
+For yml tests, we use a dedicated [pytest plugin](https://github.com/typeddjango/pytest-mypy-plugins) that is by default
+running mypy in a subprocess, making it difficult to debug.
+To avoid that, run pytest with the `--mypy-same-process` flag.
+
+```shell
+pytest --mypy-same-process tests/typecheck/managers/querysets/test_annotate.yml
 ```
 
 ### Testing stubs with `stubtest`
 
-Run [`./scripts/stubtest.sh`](scripts/stubtest.sh) to test that stubs and sources are in-line.
+Run `just stubtest` (or [`./scripts/stubtest.sh`](scripts/stubtest.sh) directly) to test that stubs and sources are in-line.
 
 We have some special files to allow errors:
 

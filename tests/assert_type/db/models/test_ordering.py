@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.auth.models import User
 from django.db.models import F, OrderBy
 from django.db.models.sql.query import Query

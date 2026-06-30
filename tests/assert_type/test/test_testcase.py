@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.core.handlers.wsgi import WSGIRequest
 from django.test.client import Client
 from django.test.testcases import TestCase

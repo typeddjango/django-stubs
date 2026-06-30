@@ -1,7 +1,11 @@
-from typing import ClassVar
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import migrations
-from django.db.migrations.operations.base import Operation
+
+if TYPE_CHECKING:
+    from django.db.migrations.operations.base import Operation
 
 
 class ExplicitMigration(migrations.Migration):
@@ -11,8 +15,8 @@ class ExplicitMigration(migrations.Migration):
 
 # Non-ClassVar annotations are incorrect
 class ExplicitIncorrectMigration(migrations.Migration):
-    operations: list[Operation] = []  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]
-    initial: bool = True  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]
+    operations: list[Operation] = []  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
+    initial: bool = True  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
 
 
 class ImplicitMigration(migrations.Migration):

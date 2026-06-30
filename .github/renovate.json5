@@ -1,0 +1,42 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:best-practices"],
+  // Python versions in CI are managed manually (test-older-django pins 3.10)
+  ignoreDeps: ["python"],
+  suppressNotifications: ["prEditedNotification"],
+  mode: "full",
+  // Wait 3 days before proposing updates to limit supply chain attack exposure
+  minimumReleaseAge: "3 days",
+  lockFileMaintenance: {
+    enabled: true,
+    automerge: true,
+    automergeType: "branch",
+    schedule: ["* * * * 1"],
+    automergeSchedule: ["* * * * 2"],
+  },
+  packageRules: [
+    {
+      matchPackageNames: ["mypy"],
+      rangeStrategy: "widen",
+    },
+    {
+      // Group upload/download artifact updates, the versions are dependent
+      groupName: "Artifact GitHub Actions dependencies",
+      matchManagers: ["github-actions"],
+      matchPackageNames: ["actions/upload-artifact", "actions/download-artifact"],
+    },
+    {
+      // Don't update GitHub runners (e.g. 'runs-on: ubuntu-latest')
+      groupName: "GitHub runners",
+      matchManagers: ["github-actions"],
+      matchDatasources: ["github-runners"],
+      enabled: false,
+    },
+    {
+      // Django 6.0 dropped Python <3.12 support, keep the compat pin on 5.x
+      matchPackageNames: ["django"],
+      matchCurrentVersion: "/^5\\./",
+      allowedVersions: "<6.0.0",
+    },
+  ],
+}

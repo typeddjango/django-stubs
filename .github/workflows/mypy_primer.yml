@@ -20,15 +20,15 @@ jobs:
         shard-index: [0]  # e.g. change this to [0, 1, 2] and --num-shards below to 3
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
         with:
           path: django-stubs_to_test
           fetch-depth: 0
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: "3.14"
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
       - name: Install dependencies
         run: |
           uv venv
@@ -68,7 +68,7 @@ jobs:
         run: |
           echo ${{ github.event.pull_request.number }} | tee pr_number.txt
       - name: Upload mypy_primer diff + PR number
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7
         if: ${{ matrix.shard-index == 0 }}
         with:
           name: mypy_primer_diffs-${{ matrix.shard-index }}
@@ -76,7 +76,7 @@ jobs:
             diff_${{ matrix.shard-index }}.txt
             pr_number.txt
       - name: Upload mypy_primer diff
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7
         if: ${{ matrix.shard-index != 0 }}
         with:
           name: mypy_primer_diffs-${{ matrix.shard-index }}
@@ -90,7 +90,7 @@ jobs:
       contents: read
     steps:
       - name: Merge artifacts
-        uses: actions/upload-artifact/merge@v7
+        uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7
         with:
           name: mypy_primer_diffs
           pattern: mypy_primer_diffs-*

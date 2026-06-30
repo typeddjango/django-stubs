@@ -1,14 +1,14 @@
+from __future__ import annotations
+
 import importlib.metadata
 import itertools
 import sys
-from collections.abc import Callable
 from functools import cached_property, partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from mypy.build import PRI_MED, PRI_MYPY
 from mypy.modulefinder import mypy_path
 from mypy.nodes import MypyFile, TypeInfo
-from mypy.options import Options
 from mypy.plugin import (
     AnalyzeTypeContext,
     AttributeContext,
@@ -19,7 +19,6 @@ from mypy.plugin import (
     Plugin,
     ReportConfigContext,
 )
-from mypy.types import Type as MypyType
 from typing_extensions import override
 
 from mypy_django_plugin.config import DjangoPluginConfig
@@ -36,6 +35,7 @@ from mypy_django_plugin.transformers import (
     meta,
     orm_lookups,
     querysets,
+    save,
     settings,
 )
 from mypy_django_plugin.transformers.auth import get_user_model
@@ -43,6 +43,7 @@ from mypy_django_plugin.transformers.functional import resolve_str_promise_attri
 from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
+    reparametrize_any_field_hook,
     reparametrize_any_manager_hook,
     reparametrize_any_queryset_hook,
     resolve_manager_method,
@@ -54,6 +55,12 @@ from mypy_django_plugin.transformers.models import (
     set_auth_user_model_boolean_fields,
 )
 from mypy_django_plugin.transformers.request import check_querydict_is_mutable
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from mypy.options import Options
+    from mypy.types import Type as MypyType
 
 
 class NewSemanalDjangoPlugin(Plugin):
@@ -140,18 +147,23 @@ class NewSemanalDjangoPlugin(Plugin):
     @override
     def get_function_hook(self, fullname: str) -> Callable[[FunctionContext], MypyType] | None:
         info = self._get_typeinfo_or_none(fullname)
-        if info:
-            if info.has_base(fullnames.FIELD_FULLNAME):
-                return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
+        if not info:
+            return None
 
-            if helpers.is_model_type(info):
-                return partial(init_create.typecheck_model_init, django_context=self.django_context)
+        if info.has_base(fullnames.FIELD_FULLNAME):
+            return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
-            if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-                return querysets.determine_proper_manager_type
+        if helpers.is_model_type(info):
+            return partial(init_create.typecheck_model_init, django_context=self.django_context)
 
-            if info.has_base(fullnames.PREFETCH_CLASS_FULLNAME):
-                return partial(querysets.specialize_prefetch_type, django_context=self.django_context)
+        if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+            return querysets.determine_proper_manager_type
+
+        if info.has_base(fullnames.PREFETCH_CLASS_FULLNAME):
+            return partial(querysets.specialize_prefetch_type, django_context=self.django_context)
+
+        if info.has_base(fullnames.FUNC_EXPRESSION_FULLNAME):
+            return querysets.reparameterize_func_output_field
 
         return None
 
@@ -170,6 +182,10 @@ class NewSemanalDjangoPlugin(Plugin):
             "filter": typecheck_filtering_method,
             "get": typecheck_filtering_method,
             "aget": typecheck_filtering_method,
+            "get_or_create": typecheck_filtering_method,
+            "aget_or_create": typecheck_filtering_method,
+            "update_or_create": typecheck_filtering_method,
+            "aupdate_or_create": typecheck_filtering_method,
             "exclude": typecheck_filtering_method,
             "prefetch_related": partial(
                 querysets.extract_prefetch_related_annotations, django_context=self.django_context
@@ -203,12 +219,7 @@ class NewSemanalDjangoPlugin(Plugin):
         if method_name == "__init_subclass__" or fullname.startswith("builtins."):
             return None
 
-        if class_fullname.endswith("QueryDict"):
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.QUERYDICT_CLASS_FULLNAME):
-                return check_querydict_is_mutable
-
-        elif method_name == "__get__":
+        if method_name == "__get__":
             hooks = {
                 fullnames.MANYTOMANY_FIELD_FULLNAME: manytomany.refine_many_to_many_related_manager,
                 fullnames.MANY_TO_MANY_DESCRIPTOR: manytomany.refine_many_to_many_related_manager,
@@ -216,26 +227,44 @@ class NewSemanalDjangoPlugin(Plugin):
             }
             return hooks.get(class_fullname)
 
-        if method_name in self.manager_and_queryset_method_hooks:
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and helpers.has_any_of_bases(
-                info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]
-            ):
-                return self.manager_and_queryset_method_hooks[method_name]
-        elif method_name == "get_field":
-            info = self._get_typeinfo_or_none(class_fullname)
-            if info and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
-                return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
+        info = self._get_typeinfo_or_none(class_fullname)
+        if not info:
+            return None
+
+        if class_fullname.endswith("QueryDict") and info.has_base(fullnames.QUERYDICT_CLASS_FULLNAME):
+            return check_querydict_is_mutable
+
+        if method_name in self.manager_and_queryset_method_hooks and helpers.has_any_of_bases(
+            info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]
+        ):
+            return self.manager_and_queryset_method_hooks[method_name]
+
+        if method_name in ("save", "asave") and helpers.is_model_type(info):
+            return partial(save.validate_save_update_fields, django_context=self.django_context, method=method_name)
+
+        if method_name == "get_field" and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
+            return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
+
+        if helpers.has_any_of_bases(info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]):
+            return partial(querysets.merge_annotations_from_custom_method, django_context=self.django_context)
 
         return None
 
     @override
     def get_customize_class_mro_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
         info = self._get_typeinfo_or_none(fullname)
-        if info and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+        if not info:
+            return None
+
+        if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
             return reparametrize_any_manager_hook
-        if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+
+        if info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
             return reparametrize_any_queryset_hook
+
+        if info.has_base(fullnames.FIELD_FULLNAME):
+            return reparametrize_any_field_hook
+
         return None
 
     @override
@@ -273,34 +302,31 @@ class NewSemanalDjangoPlugin(Plugin):
             )
 
         info = self._get_typeinfo_or_none(class_name)
+        if not info:
+            return None
 
         # Lookup of the '.is_superuser' attribute
-        if info and info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
+        if info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
 
         # Lookup of the 'user.is_staff' or 'user.is_active' attribute
-        if info and info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
+        if info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
             return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
 
         # Lookup of a method on a dynamically generated manager class
         # i.e. a manager class only existing while mypy is running, not collected from the AST
-        if (
-            info
-            and info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
-            and "from_queryset_manager" in helpers.get_django_metadata(info)
-        ):
+        if info.has_base(
+            fullnames.BASE_MANAGER_CLASS_FULLNAME
+        ) and "from_queryset_manager" in helpers.get_django_metadata(info):
             return resolve_manager_method
 
-        if info and info.has_base(fullnames.STR_PROMISE_FULLNAME):
+        if info.has_base(fullnames.STR_PROMISE_FULLNAME):
             return resolve_str_promise_attribute
 
-        if info and (
-            (
-                info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
-                and attr_name in {"choices", "labels", "values", "__empty__"}
-            )
-            or (info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name in {"label", "value"})
-        ):
+        if (
+            info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
+            and attr_name in {"choices", "labels", "values", "__empty__"}
+        ) or (info.has_base(fullnames.CHOICES_CLASS_FULLNAME) and attr_name in {"label", "value"}):
             return choices.transform_into_proper_attr_type
 
         return None

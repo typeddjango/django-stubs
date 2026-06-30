@@ -3,8 +3,8 @@
     from typing_extensions import reveal_type
     from myapp.models import MyModel
     x = MyModel.objects.get(id=1)
-    reveal_type(x.id)  # N: Revealed type is "builtins.int"
-    reveal_type(x.pk)  # N: Revealed type is "builtins.int"
+    reveal_type(x.id)  # N: Revealed type is "int"
+    reveal_type(x.pk)  # N: Revealed type is "int"
 
     MyModel.objects.get(pk=1)
   installed_apps:
@@ -18,8 +18,8 @@
         class MyModel(models.Model):
             @override
             def __str__(self) -> str:
-                reveal_type(self.id)  # N: Revealed type is "builtins.int"
-                reveal_type(self.pk)  # N: Revealed type is "builtins.int"
+                reveal_type(self.id)  # N: Revealed type is "int"
+                reveal_type(self.pk)  # N: Revealed type is "int"
                 return ''
 
 
@@ -28,8 +28,8 @@
     from typing_extensions import reveal_type
     from myapp.models import MyModel
     x = MyModel.objects.get(id='a')
-    reveal_type(x.id)  # N: Revealed type is "builtins.str"
-    reveal_type(x.pk)  # N: Revealed type is "builtins.str"
+    reveal_type(x.id)  # N: Revealed type is "str"
+    reveal_type(x.pk)  # N: Revealed type is "str"
 
     MyModel.objects.get(pk='a')
   installed_apps:
@@ -45,8 +45,8 @@
 
             @override
             def __str__(self) -> str:
-                reveal_type(self.id)  # N: Revealed type is "builtins.str"
-                reveal_type(self.pk)  # N: Revealed type is "builtins.str"
+                reveal_type(self.id)  # N: Revealed type is "str"
+                reveal_type(self.pk)  # N: Revealed type is "str"
                 return self.id
 
 
@@ -55,8 +55,8 @@
     from typing_extensions import reveal_type
     from myapp.models import MyModel
     x = MyModel.objects.get(primary='a')
-    reveal_type(x.primary)  # N: Revealed type is "builtins.str"
-    reveal_type(x.pk)  # N: Revealed type is "builtins.str"
+    reveal_type(x.primary)  # N: Revealed type is "str"
+    reveal_type(x.pk)  # N: Revealed type is "str"
     x.id  # E: "MyModel" has no attribute "id"  [attr-defined]
 
     MyModel.objects.get(pk='a')
@@ -74,7 +74,7 @@
 
             @override
             def __str__(self) -> str:
-                reveal_type(self.primary)  # N: Revealed type is "builtins.str"
-                reveal_type(self.pk)  # N: Revealed type is "builtins.str"
+                reveal_type(self.primary)  # N: Revealed type is "str"
+                reveal_type(self.pk)  # N: Revealed type is "str"
                 self.id  # E: "MyModel" has no attribute "id"  [attr-defined]
                 return self.primary

@@ -24,10 +24,10 @@
                 settings = django.conf.settings
 
                 def test() -> None:
-                    reveal_type(settings.IMMEDIATE_VALUE)        # N: Revealed type is "builtins.int"
-                    reveal_type(settings.CIRCULAR_WITH_HINT)     # N: Revealed type is "builtins.int"
-                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_FUNCTION)  # N: Revealed type is "builtins.int"
-                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_CONST)     # N: Revealed type is "builtins.int"
+                    reveal_type(settings.IMMEDIATE_VALUE)        # N: Revealed type is "int"
+                    reveal_type(settings.CIRCULAR_WITH_HINT)     # N: Revealed type is "int"
+                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_FUNCTION)  # N: Revealed type is "int"
+                    reveal_type(settings.CIRCULAR_WITHOUT_HINT_CONST)     # N: Revealed type is "int"
                     reveal_type(settings.UNRESOLVABLE_CIRCULAR)  # N: Revealed type is "Any"
 
                 def function_returning_int() -> int:
@@ -46,6 +46,6 @@
         from typing_extensions import reveal_type
         from django.conf import settings
 
-        reveal_type(settings.LOGIN_URL)  # N: Revealed type is "builtins.str | django.utils.functional._StrPromise"
-        reveal_type(settings.LOGIN_REDIRECT_URL)  # N: Revealed type is "builtins.str | django.utils.functional._StrPromise"
-        reveal_type(settings.LOGOUT_REDIRECT_URL)  # N: Revealed type is "builtins.str | django.utils.functional._StrPromise | None"
+        reveal_type(settings.LOGIN_URL)  # N: Revealed type is "str | django.utils.functional._StrPromise"
+        reveal_type(settings.LOGIN_REDIRECT_URL)  # N: Revealed type is "str | django.utils.functional._StrPromise"
+        reveal_type(settings.LOGOUT_REDIRECT_URL)  # N: Revealed type is "str | django.utils.functional._StrPromise | None"

@@ -1,17 +1,18 @@
-import builtins
-from collections.abc import Iterable
+from __future__ import annotations
+
 from contextlib import suppress
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import pytest
-from _pytest.fixtures import FixtureRequest
-from _pytest.monkeypatch import MonkeyPatch
 from django.db.models import Model
 from django.forms.models import ModelForm
 
 import django_stubs_ext
 from django_stubs_ext import patch
 from django_stubs_ext.patch import _need_generic, _VersionSpec
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class _MakeGenericClasses(Protocol):
@@ -21,14 +22,13 @@ class _MakeGenericClasses(Protocol):
         self,
         django_version: _VersionSpec | None = None,
         extra_classes: Iterable[type] | None = None,
-        include_builtins: bool = True,
     ) -> None: ...
 
 
 @pytest.fixture(scope="function")
 def make_generic_classes(
-    request: FixtureRequest,
-    monkeypatch: MonkeyPatch,
+    request: pytest.FixtureRequest,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> _MakeGenericClasses:
     _extra_classes: list[type] = []
 
@@ -40,21 +40,16 @@ def make_generic_classes(
             with suppress(AttributeError):
                 delattr(cls, "__class_getitem__")
         _extra_classes.clear()
-        with suppress(AttributeError):
-            del builtins.reveal_type
-        with suppress(AttributeError):
-            del builtins.reveal_locals
 
     def factory(
         django_version: _VersionSpec | None = None,
         extra_classes: Iterable[type] | None = None,
-        include_builtins: bool = True,
     ) -> None:
         if extra_classes:
             _extra_classes.extend(extra_classes)
         if django_version is not None:
             monkeypatch.setattr(patch, "VERSION", django_version)
-        django_stubs_ext.monkeypatch(extra_classes=extra_classes, include_builtins=include_builtins)
+        django_stubs_ext.monkeypatch(extra_classes=extra_classes)
 
     request.addfinalizer(fin)
     return factory
@@ -109,27 +104,3 @@ def test_patched_version_specific(
     for el in _need_generic:
         if el.version is not None and django_version <= el.version:
             assert el.cls[int] is el.cls
-
-
-def test_mypy_builtins_not_patched_globally(
-    make_generic_classes: _MakeGenericClasses,
-) -> None:
-    """Ensures that builtins are not patched with `mypy` specific helpers.
-
-    This should only happen during `django.setup()`
-    (https://github.com/typeddjango/django-stubs/issues/609).
-    """
-    make_generic_classes(include_builtins=False)
-
-    assert not hasattr(builtins, "reveal_type")
-    assert not hasattr(builtins, "reveal_locals")
-
-
-def test_mypy_builtins_patched(
-    make_generic_classes: _MakeGenericClasses,
-) -> None:
-    """Ensures that builtins are patched by default."""
-    make_generic_classes()
-
-    assert hasattr(builtins, "reveal_type")
-    assert hasattr(builtins, "reveal_locals")

@@ -109,7 +109,7 @@
 
             @override
             def form_valid(self, form: forms.BaseModelForm) -> HttpResponse:
-                reveal_type(form.save)  # N: Revealed type is "def (commit: builtins.bool =) -> Any"
+                reveal_type(form.save)  # N: Revealed type is "def (commit: bool =) -> Any"
                 return HttpResponse()
 
 -   case: generic_modelchoicefield_label_from_instance

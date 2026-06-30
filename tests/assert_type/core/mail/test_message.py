@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from email.message import EmailMessage as StdlibEmailMessage
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from typing import Any
@@ -7,6 +10,7 @@ from typing_extensions import assert_type
 
 message = EmailMessage()
 assert_type(message, EmailMessage)
+assert_type(message.message(), StdlibEmailMessage)
 
 message.attach("myfilename", "mycontent", "text/plain")
 

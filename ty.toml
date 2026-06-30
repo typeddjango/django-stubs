@@ -1,6 +1,0 @@
-[analysis]
-# Respect only `# ty: ignore` (ignore `# type: ignore`)
-respect-type-ignore-comments = false
-
-[rules]
-empty-body = "ignore"

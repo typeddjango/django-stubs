@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 import os
 import tempfile
 import uuid
-from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest import mock
 
 import pytest
 
 from mypy_django_plugin.config import DjangoPluginConfig
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 TEMPLATE = """
 (config)

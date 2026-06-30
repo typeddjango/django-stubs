@@ -44,15 +44,15 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Generic, TypeVar
-                from typing_extensions import reveal_type
+                from typing import Generic
+                from typing_extensions import TypeVar, reveal_type
                 from django.db import models
 
                 _T = TypeVar('_T', bound=models.Model)
                 class Base(Generic[_T]):
                     def __init__(self, model_cls: type[_T]) -> None:
                         self.model_cls = model_cls
-                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T`1]"
+                        reveal_type(self.model_cls._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T]"
                 class MyModel(models.Model):
                     pass
                 class Child(Base[MyModel]):
@@ -71,15 +71,15 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Generic, TypeVar
-                from typing_extensions import reveal_type
+                from typing import Generic
+                from typing_extensions import TypeVar, reveal_type
                 from django.db import models
 
                 _T = TypeVar('_T', bound=models.Model)
                 class Base(Generic[_T]):
                     def __init__(self, model_cls: type[_T]) -> None:
                         self.model_cls = model_cls
-                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T`1]"
+                        reveal_type(self.model_cls._base_manager)  # N: Revealed type is "django.db.models.manager.Manager[_T]"
                 class MyModel(models.Model):
                     pass
                 class Child(Base[MyModel]):
@@ -97,7 +97,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar
+                from typing_extensions import TypeVar
                 from django.db import models
                 _T = TypeVar('_T', bound=models.Model)
                 class CustomManager(models.Manager[_T]):
@@ -116,7 +116,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import TypeVar
+                from typing_extensions import TypeVar
                 from django.db import models
                 from django_stubs_ext.db.models import TypedModelMeta
 
@@ -148,7 +148,7 @@
 
                 class UserManager(models.Manager['MyUser']):
                     def get_or_404(self) -> 'MyUser':
-                        pass
+                        raise NotImplementedError
 
                 class MyUser(models.Model):
                     objects = UserManager()
@@ -259,7 +259,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Generic, TypeVar
+                from typing import Generic
+                from typing_extensions import TypeVar
                 from django.db import models
 
                 T1 = TypeVar("T1", bound="AbstractBase1")
@@ -404,14 +405,14 @@
         reveal_type(User.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.User]"
         reveal_type(User.objects.select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User, myapp.models.User]"
         reveal_type(User.objects.get())  # N: Revealed type is "myapp.models.User"
-        reveal_type(User.objects.get_instance())  # N: Revealed type is "builtins.int"
+        reveal_type(User.objects.get_instance())  # N: Revealed type is "int"
         reveal_type(User.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
 
         from myapp.models import ChildUser
         reveal_type(ChildUser.objects)  # N: Revealed type is "myapp.models.MyManager[myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.select_related())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.ChildUser, myapp.models.ChildUser]"
         reveal_type(ChildUser.objects.get())  # N: Revealed type is "myapp.models.ChildUser"
-        reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "builtins.int"
+        reveal_type(ChildUser.objects.get_instance())  # N: Revealed type is "int"
         reveal_type(ChildUser.objects.get_instance_untyped('hello'))  # N: Revealed type is "Any"
     installed_apps:
         - myapp
@@ -423,9 +424,9 @@
                 from django.db import models
                 class MyManager(models.Manager):
                     def get_instance(self) -> int:
-                        pass
+                        raise NotImplementedError
                     def get_instance_untyped(self, name: str):  # type: ignore[no-untyped-def]
-                        pass
+                        raise NotImplementedError
                 class User(models.Model):
                     objects = MyManager()
                 class ChildUser(models.Model):
@@ -436,7 +437,7 @@
         from typing_extensions import reveal_type
         from myapp.models import ModelA, ModelB, ManagerA
         reveal_type(ModelA.objects)  # N: Revealed type is "myapp.models.ManagerA[myapp.models.ModelA]"
-        reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> builtins.str"
+        reveal_type(ModelA.objects.do_something)  # N: Revealed type is "def (other_obj: myapp.models.ModelB) -> str"
     installed_apps:
         - myapp
     files:
@@ -624,8 +625,8 @@
         myapp/models:57: note: Revealed type is "Any"
         myapp/models:58: note: Revealed type is "myapp.models.Booking | None"
         myapp/models:59: note: Revealed type is "myapp.models.Booking"
-        myapp/models:60: note: Revealed type is "builtins.list[myapp.models.Booking]"
-        myapp/models:61: note: Revealed type is "builtins.list[myapp.models.Booking]"
+        myapp/models:60: note: Revealed type is "list[myapp.models.Booking]"
+        myapp/models:61: note: Revealed type is "list[myapp.models.Booking]"
         myapp/models:65: note: Revealed type is "def () -> django.db.models.query.QuerySet[myapp.models.Booking, myapp.models.Booking]"
         myapp/models:66: error: "RelatedManager[Booking]" has no attribute "custom"  [attr-defined]
         myapp/models:66: note: Revealed type is "Any"
@@ -646,8 +647,8 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import ClassVar, TypeVar
-                from typing_extensions import Self
+                from typing import ClassVar
+                from typing_extensions import Self, TypeVar
                 from django.db import models
 
                 T = TypeVar("T", bound="MyModel")
@@ -678,12 +679,13 @@
     out: |
         main:3: note: Revealed type is "myapp.models.MySubManager"
         main:4: note: Revealed type is "Any"
-        myapp/models:9: error: Missing type parameters for generic type "MyManager"  [type-arg]
+        myapp/models:10: error: Missing type arguments for generic type "MyManager"  [type-arg]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import ClassVar, TypeVar
+                from typing import ClassVar
+                from typing_extensions import TypeVar
                 from django.db import models
 
                 T = TypeVar("T", bound="MyModel")
@@ -720,7 +722,7 @@
                 class MyModel(models.Model):
                     class MyManager(models.Manager):
                         def get_instance(self) -> int:
-                            pass
+                            raise NotImplementedError
                     objects = MyManager()
 
 -   case: test_typechecks_filter_methods_of_queryset_type
@@ -754,7 +756,7 @@
 
         reveal_type(MyModel.populated_manager_from_populated_queryset)  # N: Revealed type is "myapp.models.PopulatedManagerFromPopulatedQuerySet"
         reveal_type(MyModel.populated_manager_from_populated_queryset.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.populated_manager_from_populated_queryset.filter())  # N: Revealed type is "myapp.models.PopulatedQuerySet"
+        reveal_type(MyModel.populated_manager_from_populated_queryset.filter())  # N: Revealed type is "myapp.models.PopulatedQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
 
         reveal_type(MyModel.generic_manager)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
         reveal_type(MyModel.generic_manager.get())  # N: Revealed type is "myapp.models.MyModel"
@@ -766,7 +768,7 @@
 
         reveal_type(MyModel.generic_manager_from_populated_queryset)  # N: Revealed type is "myapp.models.ManagerFromPopulatedQuerySet[myapp.models.MyModel]"
         reveal_type(MyModel.generic_manager_from_populated_queryset.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel.generic_manager_from_populated_queryset.filter())  # N: Revealed type is "myapp.models.PopulatedQuerySet"
+        reveal_type(MyModel.generic_manager_from_populated_queryset.filter())  # N: Revealed type is "myapp.models.PopulatedQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
 
     installed_apps:
         - myapp

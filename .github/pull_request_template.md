@@ -1,29 +1,15 @@
 # I have made things!
-
 <!--
-Hi, thanks for submitting a Pull Request. We appreciate it.
-
-Please, fill in all the required information
-to make our review and merging processes easier.
-
-Cheers!
+Hi, thanks for submitting a Pull Request. We appreciate it. Please, fill in all the required information to make our review and merging processes easier.
 -->
 
 ## Related issues
-
 <!--
 Mark what issues this Pull Request closes or references.
 
-Format is:
-- Closes #issue-number
-- Refs #issue-number
-
-Example. Refs #0
+Example. Fixes #0
 Documentation: https://blog.github.com/2013-05-14-closing-issues-via-pull-requests/
 -->
 
-<!--
-If you have any feedback, just write it here.
-
-It can be whatever you want!
--->
+## AI Policy
+- [ ] I have read and agree to the [AI Policy](https://github.com/typeddjango/django-stubs/blob/master/.github/AI_POLICY.md), removed any "Co-Authored-By" lines attributing coding agents, and manually reviewed the final result

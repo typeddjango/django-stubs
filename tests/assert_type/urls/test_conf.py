@@ -1,13 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.conf.urls.i18n import urlpatterns as i18n_urlpatterns
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.contrib.flatpages import urls as flatpages_urls
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.http import HttpResponse
 from django.urls import URLPattern, URLResolver, _AnyURL, include, path, re_path
 from django.utils.translation import gettext_lazy as _
 from typing_extensions import assert_type
+
+if TYPE_CHECKING:
+    from django.http import HttpResponse
 
 # Test 'path' accepts mix of pattern and resolver object
 include1: tuple[list[_AnyURL], None, None] = ([], None, None)
@@ -24,8 +30,12 @@ assert_type(path("login/", LoginView.as_view(), name="login1"), URLPattern)
 assert_type(path(_("login/"), LoginView.as_view(), name="login2"), URLPattern)
 
 
-def v1() -> HttpResponse: ...
-async def v2() -> HttpResponse: ...
+def v1() -> HttpResponse:
+    raise NotImplementedError
+
+
+async def v2() -> HttpResponse:
+    raise NotImplementedError
 
 
 assert_type(path("v1/", v1), URLPattern)
@@ -52,7 +62,8 @@ assert_type(static("/media/"), list[URLPattern])
 assert_type(static("/media/", document_root="/tmp/media"), list[URLPattern])
 
 
-def custom_serve(request: object, path: str) -> HttpResponse: ...
+def custom_serve(request: object, path: str) -> HttpResponse:
+    raise NotImplementedError
 
 
 assert_type(static("/media/", view=custom_serve), list[URLPattern])

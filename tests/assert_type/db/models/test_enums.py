@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import enum
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal
 
 from django.db.models import Choices, IntegerChoices, Model, TextChoices
 from django.utils.functional import _StrOrPromise, _StrPromise
 from django.utils.translation import gettext_lazy as _
-from typing_extensions import assert_type, override
+from typing_extensions import TypeVar, assert_type, override
 
 # Choices in a separate model to test that the plugin resolves types correctly.
 from tests.assert_type.db.models import _enums as imported
@@ -95,7 +97,6 @@ class VoidChoices(BaseEmptyChoices):
 # Choice type that has been aliased to test that the plugin resolves types correctly.
 CompassPoint = imported.Direction
 
-
 # Choice type that has been aliased by type to test that the plugin resolves types correctly.
 Award: type[TextChoices] = Medal
 
@@ -167,7 +168,7 @@ assert_type(Vehicle.CAR.name, Literal["CAR"])
 assert_type(Vehicle.CAR.label, _StrOrPromise)  # ty: ignore[type-assertion-failure]
 assert_type(Vehicle.CAR.value, int)  # ty: ignore[type-assertion-failure]
 assert_type(Vehicle.CAR.do_not_call_in_templates, Literal[True])
-assert_type(Vehicle.__empty__, _StrPromise)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+assert_type(Vehicle.__empty__, _StrPromise)  # pyright: ignore[reportAssertTypeFailure]
 
 # Assertions for an text choices type that defines `__empty__` and uses plain strings for all labels.
 # Note: Suppress errors from pyright as the mypy plugin handles making types optional.
@@ -181,7 +182,7 @@ assert_type(Gender.MALE.name, Literal["MALE"])
 assert_type(Gender.MALE.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 assert_type(Gender.MALE.value, str)  # ty: ignore[type-assertion-failure]
 assert_type(Gender.MALE.do_not_call_in_templates, Literal[True])
-assert_type(Gender.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+assert_type(Gender.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]
 
 # Assertions for a text choices type that uses `enum.auto()`.
 # Note: Suppress errors from pyright as the mypy plugin narrows the type of labels if non-lazy.
@@ -221,7 +222,7 @@ assert_type(Constants.PI.name, Literal["PI"])
 assert_type(Constants.PI.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 assert_type(Constants.PI.value, float)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 assert_type(Constants.PI.do_not_call_in_templates, Literal[True])
-assert_type(Constants.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+assert_type(Constants.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]
 
 # Assertions for a choices type where `__empty__` is defined on a base class.
 # Note: Suppress errors from pyright as the mypy plugin handles making types optional.
@@ -240,10 +241,10 @@ assert_type(VoidChoices.ABYSS.name, Literal["ABYSS"])
 assert_type(VoidChoices.ABYSS.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 
 assert_type(VoidChoices.ABYSS.value, int)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(VoidChoices.ABYSS.value, Any)  # pyrefly: ignore[assert-type  # ty: ignore[type-assertion-failure]]
+assert_type(VoidChoices.ABYSS.value, Any)  # pyrefly: ignore[assert-type]
 
 assert_type(VoidChoices.ABYSS.do_not_call_in_templates, Literal[True])
-assert_type(VoidChoices.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+assert_type(VoidChoices.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]
 
 # Assertions for a choices type imported from another module to test the plugin resolves correctly.
 # Note: Suppress errors from pyright as the mypy plugin narrows the type of labels if non-lazy.
@@ -305,10 +306,9 @@ assert_type(  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failur
 )
 
 assert_type([member.value for choices in x3 for member in choices], list[bytes | float])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+assert_type(  # pyrefly: ignore[assert-type]
     [member.value for choices in x3 for member in choices], list[Any]
 )
-
 
 # Assertions for choices objects defined and aliased in a model.
 assert_type(DeckModel.Suit.choices, list[tuple[int, _StrPromise]])  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]

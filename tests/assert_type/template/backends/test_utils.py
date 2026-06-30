@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.http import HttpRequest
 from django.template.backends.utils import csrf_input_lazy, csrf_token_lazy
 from django.utils.functional import _StrPromise

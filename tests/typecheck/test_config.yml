@@ -3,7 +3,7 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel
         mymodel = MyModel(user_id=1)
-        reveal_type(mymodel.id)  # N: Revealed type is "builtins.int"
+        reveal_type(mymodel.id)  # N: Revealed type is "int"
         reveal_type(mymodel.user)  # N: Revealed type is "django.contrib.auth.models.User"
         reveal_type(mymodel.objects)  # N: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel]"
     mypy_config: |
@@ -29,7 +29,7 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel
         mymodel = MyModel(user_id=1)
-        reveal_type(mymodel.id)  # N: Revealed type is "builtins.int"
+        reveal_type(mymodel.id)  # N: Revealed type is "int"
     installed_apps:
         - django.contrib.auth
         - django.contrib.contenttypes

@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Sequence
-from typing import Any, Generic, Literal, TypeVar
+from typing import Any, Generic, Literal
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Combinable, Expression, Func
@@ -8,7 +8,7 @@ from django.db.models.query_utils import RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamT
 from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
-from typing_extensions import override
+from typing_extensions import TypeVar, override
 
 _T = TypeVar("_T", default=Any)
 
@@ -105,7 +105,7 @@ class IntegerGreaterThanOrEqual(IntegerFieldOverflow, IntegerFieldFloatRounding,
 class IntegerLessThan(IntegerFieldOverflow, IntegerFieldFloatRounding, LessThan[int | float]): ...
 class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual[int | float]): ...
 
-class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup[_T]):
+class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup[Iterable[_T]]):
     def split_parameter_list_as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> Any: ...
 
 class PatternLookup(BuiltinLookup[str]):

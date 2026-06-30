@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from wsgiref.simple_server import make_server
 
 from django.core.handlers.wsgi import WSGIHandler

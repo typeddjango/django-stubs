@@ -4,7 +4,7 @@
         from django.http.request import HttpRequest
         reveal_type(HttpRequest().user)  # N: Revealed type is "myapp.models.MyUser | django.contrib.auth.models.AnonymousUser"
         # check that other fields work ok
-        reveal_type(HttpRequest().method)  # N: Revealed type is "builtins.str | None"
+        reveal_type(HttpRequest().method)  # N: Revealed type is "str | None"
     custom_settings: |
         INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth', 'myapp')
         AUTH_USER_MODEL='myapp.MyUser'

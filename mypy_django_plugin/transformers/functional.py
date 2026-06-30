@@ -1,16 +1,16 @@
-from typing import Any
+from __future__ import annotations
 
-from mypy.checkmember import analyze_member_access
+from typing import TYPE_CHECKING
+
 from mypy.errorcodes import ATTR_DEFINED
 from mypy.nodes import CallExpr, MemberExpr
-from mypy.plugin import AttributeContext
 from mypy.types import AnyType, Instance, TypeOfAny
 from mypy.types import Type as MypyType
-from mypy.version import __version__ as mypy_version
 
 from mypy_django_plugin.lib import helpers
 
-mypy_version_info = tuple(map(int, mypy_version.partition("+")[0].split(".")))
+if TYPE_CHECKING:
+    from mypy.plugin import AttributeContext
 
 
 def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
@@ -26,12 +26,7 @@ def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
     assert str_info is not None
     str_type = Instance(str_info, [])
 
-    # TODO: [mypy 1.16+] Remove this workaround for passing `msg` to `analyze_member_access()`.
-    extra: dict[str, Any] = {}
-    if mypy_version_info < (1, 16):
-        extra["msg"] = ctx.api.msg
-
-    return analyze_member_access(
+    return helpers.analyze_member_access(
         method_name,
         str_type,
         ctx.context,
@@ -41,5 +36,4 @@ def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
         is_operator=False,
         original_type=ctx.type,
         chk=helpers.get_typechecker_api(ctx),
-        **extra,
     )

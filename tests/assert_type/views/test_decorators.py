@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.http import HttpRequest, HttpResponse
 from django.views.decorators.csp import csp_override, csp_report_only_override
 from typing_extensions import assert_type
@@ -10,7 +12,8 @@ from typing_extensions import assert_type
         "report-uri": "/path/to/reports-endpoint/",
     }
 )
-def my_view(request: HttpRequest) -> HttpResponse: ...
+def my_view(request: HttpRequest) -> HttpResponse:
+    raise NotImplementedError
 
 
 @csp_report_only_override(
@@ -20,7 +23,8 @@ def my_view(request: HttpRequest) -> HttpResponse: ...
         "report-uri": "/path/to/reports-endpoint/",
     }
 )
-def my_view2(request: HttpRequest) -> HttpResponse: ...
+def my_view2(request: HttpRequest) -> HttpResponse:
+    raise NotImplementedError
 
 
 assert_type(my_view(HttpRequest()), HttpResponse)

@@ -2,13 +2,13 @@
     main: |
         from typing_extensions import reveal_type
         from django.contrib.auth.models import User
-        reveal_type(User().username)  # N: Revealed type is "builtins.str"
-        reveal_type(User().password)  # N: Revealed type is "builtins.str"
-        reveal_type(User().first_name)  # N: Revealed type is "builtins.str"
-        reveal_type(User().last_name)  # N: Revealed type is "builtins.str"
-        reveal_type(User().email)  # N: Revealed type is "builtins.str"
-        reveal_type(User().is_staff)  # N: Revealed type is "builtins.bool"
-        reveal_type(User().is_active)  # N: Revealed type is "builtins.bool"
+        reveal_type(User().username)  # N: Revealed type is "str"
+        reveal_type(User().password)  # N: Revealed type is "str"
+        reveal_type(User().first_name)  # N: Revealed type is "str"
+        reveal_type(User().last_name)  # N: Revealed type is "str"
+        reveal_type(User().email)  # N: Revealed type is "str"
+        reveal_type(User().is_staff)  # N: Revealed type is "bool"
+        reveal_type(User().is_active)  # N: Revealed type is "bool"
         reveal_type(User().date_joined)  # N: Revealed type is "datetime.datetime"
         reveal_type(User().last_login)  # N: Revealed type is "datetime.datetime | None"
         reveal_type(User().is_authenticated)  # N: Revealed type is "Literal[True]"
@@ -23,15 +23,15 @@
         reveal_type(AnonymousUser().is_anonymous)  # N: Revealed type is "Literal[True]"
 
         from django.contrib.auth.models import Permission
-        reveal_type(Permission().name)  # N: Revealed type is "builtins.str"
-        reveal_type(Permission().codename)  # N: Revealed type is "builtins.str"
+        reveal_type(Permission().name)  # N: Revealed type is "str"
+        reveal_type(Permission().codename)  # N: Revealed type is "str"
 
         from django.contrib.auth.models import PermissionsMixin
         p: type[PermissionsMixin]
-        reveal_type(p().is_superuser)  # N: Revealed type is "builtins.bool"
+        reveal_type(p().is_superuser)  # N: Revealed type is "bool"
 
         from django.contrib.auth.models import Group
-        reveal_type(Group().name)  # N: Revealed type is "builtins.str"
+        reveal_type(Group().name)  # N: Revealed type is "str"
         reveal_type(Group().permissions.get())  # N: Revealed type is "django.contrib.auth.models.Permission"
         reveal_type(Group.permissions)  # N: Revealed type is "django.db.models.fields.related_descriptors.ManyToManyDescriptor[django.contrib.auth.models.Permission, django.contrib.auth.models.Group_permissions]"
 

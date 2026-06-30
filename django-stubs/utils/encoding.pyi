@@ -1,15 +1,16 @@
 import datetime
 from decimal import Decimal
-from typing import Any, Literal, TypeGuard, TypeVar, overload
+from typing import Any, Literal, TypeGuard, overload
 
 from django.utils.functional import Promise
+from typing_extensions import TypeVar
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError): ...
 
 _P = TypeVar("_P", bound=Promise)
 _S = TypeVar("_S", bound=str)
 _B = TypeVar("_B", bound=bytes)
-_PT = TypeVar("_PT", None, int, float, Decimal, datetime.datetime, datetime.date, datetime.time)
+_PT = TypeVar("_PT", bound=int | float | Decimal | datetime.date | datetime.time | None)
 
 @overload
 def smart_str(s: object, encoding: str = "utf-8", *, errors: str = "strict") -> str: ...

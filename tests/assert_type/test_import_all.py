@@ -1,5 +1,7 @@
 # pyright: reportUnusedImport=false
 # ruff: noqa: F401
+from __future__ import annotations
+
 import django
 import django.apps
 import django.apps.config
