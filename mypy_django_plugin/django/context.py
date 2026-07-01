@@ -11,7 +11,7 @@ from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import AutoField, CharField, Field
+from django.db.models.fields import CharField, Field
 from django.db.models.fields.related import ForeignKey, RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.lookups import Exact, In
@@ -40,7 +40,7 @@ if TYPE_CHECKING:
     from django.db.models.expressions import Expression
     from django.db.models.options import _AnyField
     from mypy.checker import TypeChecker
-    from mypy.nodes import TypeInfo
+    from mypy.nodes import Context
     from mypy.plugin import MethodContext
 
 
@@ -80,35 +80,6 @@ def initialize_django(settings_module: str) -> tuple[Apps, LazySettings]:
 
 class LookupsAreUnsupported(Exception):
     pass
-
-
-def get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> Instance | None:
-    if info is None:
-        return None
-    field_node = info.get(field_name)
-    if field_node is None:
-        return None
-    field_type = get_proper_type(field_node.type)
-    if not isinstance(field_type, Instance):
-        return None
-    # Field declares a set and a get type arg. Fallback to `None` when we can't find any args
-    if len(field_type.args) != 2:
-        return None
-    return field_type
-
-
-def _get_field_set_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
-    field_type = get_field_type_from_model_type_info(info, field_name)
-    if field_type is not None:
-        return field_type.args[0]
-    return None
-
-
-def _get_field_get_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
-    field_type = get_field_type_from_model_type_info(info, field_name)
-    if field_type is not None:
-        return field_type.args[1]
-    return None
 
 
 class DjangoContext:
@@ -158,7 +129,9 @@ class DjangoContext:
             if isinstance(field, ForeignObjectRel):
                 yield field
 
-    def get_field_lookup_exact_type(self, api: TypeChecker, field: Field[Any, Any] | ForeignObjectRel) -> MypyType:
+    def get_field_lookup_exact_type(
+        self, api: TypeChecker, field: Field[Any, Any, Any] | ForeignObjectRel, context: Context
+    ) -> MypyType:
         if isinstance(field, RelatedField | ForeignObjectRel):
             related_model_cls = self.get_field_related_model_cls(field)
             rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
@@ -166,7 +139,9 @@ class DjangoContext:
                 return AnyType(TypeOfAny.explicit)
 
             primary_key_field = self.get_primary_key_field(related_model_cls)
-            primary_key_type = self.get_field_get_type(api, rel_model_info, primary_key_field, method="init")
+            primary_key_type = helpers.get_field_get_type_from_model_type_info(
+                api, context, rel_model_info, primary_key_field.attname
+            )
 
             model_and_primary_key_type = UnionType.make_union([Instance(rel_model_info, []), primary_key_type])
             return make_optional_type(model_and_primary_key_type)
@@ -196,32 +171,28 @@ class DjangoContext:
                     return field
         raise ValueError("No primary key defined")
 
-    def get_expected_types(self, api: TypeChecker, model_cls: type[Model], *, method: str) -> dict[str, MypyType]:
+    def get_expected_types(self, api: TypeChecker, model_cls: type[Model], context: Context) -> dict[str, MypyType]:
+        """Return a mapping of field name to the type accepted when assigning/passing it as a kwarg."""
         contenttypes_in_apps = self.apps_registry.is_installed("django.contrib.contenttypes")
+        model_info = helpers.lookup_class_typeinfo(api, model_cls)
 
         expected_types = {}
-        # add pk if not abstract=True
         if not model_cls._meta.abstract:
             primary_key_field = self.get_primary_key_field(model_cls)
-            field_set_type = self.get_field_set_type(api, primary_key_field, method=method)
-            expected_types["pk"] = field_set_type
+            pk_set_type = helpers.get_field_set_type_from_model_type_info(
+                api, context, model_info, primary_key_field.attname
+            )
+            # Setting pk to None is allowed to copy instances
+            # https://docs.djangoproject.com/en/6.0/topics/db/queries/#copying-model-instances
+            expected_types["pk"] = make_optional_type(pk_set_type)
 
-        model_info = helpers.lookup_class_typeinfo(api, model_cls)
         for field in model_cls._meta.get_fields():
             if contenttypes_in_apps:
                 from django.contrib.contenttypes.fields import GenericForeignKey
 
                 if isinstance(field, GenericForeignKey):
-                    # it's generic, so cannot set specific model
-                    field_name = field.name
-                    gfk_info = helpers.lookup_class_typeinfo(api, field.__class__)
-                    if gfk_info is None:
-                        gfk_set_type: MypyType = AnyType(TypeOfAny.unannotated)
-                    else:
-                        gfk_set_type = helpers.get_private_descriptor_type(
-                            gfk_info, "_pyi_private_set_type", is_nullable=True
-                        )
-                    expected_types[field_name] = gfk_set_type
+                    # A GenericForeignKey can reference any model, so we can't narrow the assignment type (yet!)
+                    expected_types[field.name] = AnyType(TypeOfAny.unannotated)
                     continue
 
             if isinstance(field, Field):
@@ -231,44 +202,17 @@ class DjangoContext:
                 # recursive abstract model and we need to not crash and gracefully exit.
                 if field.related_model == "self" and model_cls._meta.abstract:  # type: ignore[comparison-overlap, unreachable]
                     continue  # type: ignore[unreachable]
-                # Try to retrieve set type from a model's TypeInfo object and fallback to retrieving it manually
-                # from django-stubs own declaration. This is to align with the setter types declared for
-                # assignment.
-                field_set_type = _get_field_set_type_from_model_type_info(
-                    model_info, field_name
-                ) or self.get_field_set_type(api, field, method=method)
-                expected_types[field_name] = field_set_type
 
+                expected_types[field_name] = helpers.get_field_set_type_from_model_type_info(
+                    api, context, model_info, field_name
+                )
                 if isinstance(field, ForeignKey):
-                    field_name = field.name
-                    foreign_key_info = helpers.lookup_class_typeinfo(api, field.__class__)
-                    if foreign_key_info is None:
-                        # maybe there's no type annotation for the field
-                        expected_types[field_name] = AnyType(TypeOfAny.unannotated)
-                        continue
-
-                    try:
-                        related_model = self.get_field_related_model_cls(field)
-                    except UnregisteredModelError:
-                        # Recognise the field but don't say anything about its type..
-                        expected_types[field_name] = AnyType(TypeOfAny.from_error)
-                        continue
-
-                    if related_model._meta.proxy_for_model is not None:
-                        related_model = related_model._meta.proxy_for_model
-
-                    related_model_info = helpers.lookup_class_typeinfo(api, related_model)
-                    if related_model_info is None:
-                        expected_types[field_name] = AnyType(TypeOfAny.unannotated)
-                        continue
-
-                    is_nullable = self.get_field_nullability(field, method)
-                    foreign_key_set_type = helpers.get_private_descriptor_type(
-                        foreign_key_info, "_pyi_private_set_type", is_nullable=is_nullable
+                    # In the case of a FK, we need to register both `fk_name` and `fk_name_id`
+                    # - `field.attname` -> `fk_name_id`
+                    # - `field.name`  -> `fk_name`
+                    expected_types[field.name] = helpers.get_field_set_type_from_model_type_info(
+                        api, context, model_info, field.name
                     )
-                    model_set_type = helpers.convert_any_to_type(foreign_key_set_type, Instance(related_model_info, []))
-
-                    expected_types[field_name] = model_set_type
 
         return expected_types
 
@@ -292,81 +236,13 @@ class DjangoContext:
             if klass is not models.Model
         }
 
-    def get_field_nullability(self, field: Field[Any, Any] | ForeignObjectRel, method: str | None) -> bool:
-        if method in ("values", "values_list"):
-            return field.null
-
+    def get_field_nullability(self, field: Field[Any, Any] | ForeignObjectRel) -> bool:
         nullable = field.null
         if not nullable and isinstance(field, CharField) and field.blank:
             return True
-        if method == "__init__":
-            if (isinstance(field, Field) and field.primary_key) or isinstance(field, ForeignKey):
-                return True
-        if method == "create":
-            if isinstance(field, AutoField):
-                return True
         if isinstance(field, Field) and field.has_default():
             return True
         return nullable
-
-    def get_field_set_type(
-        self, api: TypeChecker, field: Field[Any, Any] | ForeignObjectRel, *, method: str
-    ) -> MypyType:
-        """Get a type of __set__ for this specific Django field."""
-        target_field = field
-        if isinstance(field, ForeignKey):
-            try:
-                # We gotta be careful for exceptions when we're triggering '__get__'.
-                # Related model could very well be unresolvable
-                target_field = field.target_field
-            except ValueError:
-                return AnyType(TypeOfAny.from_error)
-
-        field_info = helpers.lookup_class_typeinfo(api, target_field.__class__)
-        if field_info is None:
-            return AnyType(TypeOfAny.from_error)
-
-        field_set_type = helpers.get_private_descriptor_type(
-            field_info, "_pyi_private_set_type", is_nullable=self.get_field_nullability(field, method)
-        )
-        if isinstance(target_field, ArrayField):
-            argument_field_type = self.get_field_set_type(api, target_field.base_field, method=method)
-            field_set_type = helpers.convert_any_to_type(field_set_type, argument_field_type)
-        return field_set_type
-
-    def get_field_get_type(
-        self,
-        api: TypeChecker,
-        model_info: TypeInfo | None,
-        field: Field[Any, Any] | ForeignObjectRel,
-        *,
-        method: str,
-    ) -> MypyType:
-        """Get a type of __get__ for this specific Django field."""
-        if isinstance(field, Field):
-            get_type = _get_field_get_type_from_model_type_info(model_info, getattr(field, "attname", field.name))
-            if get_type is not None:
-                return get_type
-
-        field_info = helpers.lookup_class_typeinfo(api, field.__class__)
-        if field_info is None:
-            return AnyType(TypeOfAny.unannotated)
-
-        is_nullable = self.get_field_nullability(field, method)
-        if isinstance(field, RelatedField):
-            related_model_cls = self.get_field_related_model_cls(field)
-            rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
-
-            if method in ("values", "values_list"):
-                primary_key_field = self.get_primary_key_field(related_model_cls)
-                return self.get_field_get_type(api, rel_model_info, primary_key_field, method=method)
-
-            model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
-            if model_info is None:
-                return AnyType(TypeOfAny.unannotated)
-
-            return Instance(model_info, [])
-        return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
 
     def get_field_related_model_cls(self, field: RelatedField[Any, Any] | ForeignObjectRel) -> type[Model]:
         if isinstance(field, RelatedField):
@@ -477,7 +353,8 @@ class DjangoContext:
         Returns:
             The resolved type, or None if it couldn't be determined
         """
-        lookup_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), lookup_cls)
+        api = helpers.get_typechecker_api(ctx)
+        lookup_info = helpers.lookup_class_typeinfo(api, lookup_cls)
         if lookup_info is None:
             return None
 
@@ -488,12 +365,16 @@ class DjangoContext:
                     if field is None:
                         # No field available (e.g., annotation), can't resolve further
                         return None
-                    field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
+                    field_info = helpers.lookup_class_typeinfo(api, field.__class__)
                     if field_info is None:
                         return None
-                    return get_proper_type(
-                        helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=field.null)
-                    )
+                    defaults = helpers.fill_field_defaults(field_info, api)
+                    field_type_args = helpers.get_field_type_args(defaults)
+                    assert field_type_args is not None
+                    result: MypyType = field_type_args.get
+                    if field.null:
+                        result = make_optional_type(result)
+                    return result
                 return lookup_type
 
         return None
@@ -568,10 +449,10 @@ class DjangoContext:
                 return AnyType(TypeOfAny.explicit)
 
         if lookup_cls is None or issubclass(lookup_cls, Exact):
-            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field, ctx.context)
 
         if issubclass(lookup_cls, In):
-            exact_type = self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            exact_type = self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field, ctx.context)
             return ctx.api.named_generic_type("typing.Iterable", [exact_type])
 
         resolved_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls, field)

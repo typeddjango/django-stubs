@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, NamedTuple, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField, Field
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
-from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, UnionType, get_proper_type
+from mypy.typeanal import make_optional_type
+from mypy.types import AnyType, Instance, LiteralType, ProperType, TypeOfAny, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.exceptions import UnregisteredModelError
@@ -48,14 +49,6 @@ def _get_current_field_from_assignment(
         return None
 
 
-def reparametrize_related_field_type(related_field_type: Instance, set_type: MypyType, get_type: MypyType) -> Instance:
-    args = [
-        helpers.convert_any_to_type(related_field_type.args[0], set_type),
-        helpers.convert_any_to_type(related_field_type.args[1], get_type),
-    ]
-    return related_field_type.copy_modified(args=args)
-
-
 def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     current_field = _get_current_field_from_assignment(ctx, django_context)
     if current_field is None:
@@ -80,7 +73,7 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
                 derived_model_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), model_cls)
                 if derived_model_info is not None:
                     fk_ref_type = Instance(derived_model_info, [])
-                    derived_fk_type = reparametrize_related_field_type(
+                    derived_fk_type = helpers.reparametrize_field_type(
                         default_related_field_type, set_type=fk_ref_type, get_type=fk_ref_type
                     )
                     helpers.add_new_sym_for_info(derived_model_info, name=current_field.name, sym_type=derived_fk_type)
@@ -108,23 +101,18 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     else:
         related_model_to_set_type = Instance(related_model_to_set_info, [])
 
+    is_nullable = helpers.get_bool_call_argument_by_name(ctx, "null", default=False)
+
+    set_type: MypyType = related_model_to_set_type
+    get_type: MypyType = related_model_type
+    if is_nullable:
+        set_type = make_optional_type(set_type)
+        get_type = make_optional_type(get_type)
+
     # replace Any with referred_to_type
-    return reparametrize_related_field_type(
-        default_related_field_type, set_type=related_model_to_set_type, get_type=related_model_type
+    return helpers.reparametrize_field_type(
+        default_related_field_type, set_type=set_type, get_type=get_type, is_nullable=is_nullable
     )
-
-
-class FieldDescriptorTypes(NamedTuple):
-    set: MypyType
-    get: MypyType
-
-
-def get_field_descriptor_types(
-    field_info: TypeInfo, *, is_set_nullable: bool, is_get_nullable: bool
-) -> FieldDescriptorTypes:
-    set_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_set_type", is_nullable=is_set_nullable)
-    get_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_get_nullable)
-    return FieldDescriptorTypes(set=set_type, get=get_type)
 
 
 def set_descriptor_types_for_field_callback(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
@@ -136,95 +124,34 @@ def set_descriptor_types_for_field_callback(ctx: FunctionContext, django_context
     return set_descriptor_types_for_field(ctx)
 
 
-def set_descriptor_types_for_field(
-    ctx: FunctionContext, *, is_set_nullable: bool = False, is_get_nullable: bool = False
-) -> Instance:
+def set_descriptor_types_for_field(ctx: FunctionContext, *, is_set_nullable: bool = False) -> Instance:
     default_return_type = cast("Instance", ctx.default_return_type)
+    if len(default_return_type.args) != 3:
+        # Explicitly bound fields. For ex:
+        # `class CustomValueField(fields.Field[CustomFieldValue | int, CustomFieldValue])`
+        return default_return_type
 
     is_nullable = helpers.get_bool_call_argument_by_name(ctx, "null", default=False)
+
     is_primary_key = helpers.get_bool_call_argument_by_name(ctx, "primary_key", default=False)
-    # Allow setting field value to `None` when a field is primary key and has a default that can produce a value
     default_expr = helpers.get_call_argument_by_name(ctx, "default")
     if default_expr is not None:
         is_set_nullable = is_primary_key
 
-    set_type, get_type = get_field_descriptor_types(
-        default_return_type.type,
-        is_set_nullable=is_set_nullable or is_nullable,
-        is_get_nullable=is_get_nullable or is_nullable,
-    )
+    set_type = default_return_type.args[0]
+    get_type = default_return_type.args[1]
+    # Handle `primary_key` + `default` allows setting to None
+    if is_set_nullable:
+        set_type = make_optional_type(set_type)
 
-    # reconcile set and get types with the base field class
-    mapped_types = helpers.get_field_type_args(default_return_type)
-    assert mapped_types is not None
-
-    # bail if either mapped set or get type is Never
-    if not (isinstance(mapped_types.set, UninhabitedType) or isinstance(mapped_types.get, UninhabitedType)):
-        # always replace set_type and get_type with (non-Any) mapped types
-        set_type = helpers.convert_any_to_type(mapped_types.set, set_type)
-        get_type = get_proper_type(helpers.convert_any_to_type(mapped_types.get, get_type))
-
-        # the get_type must be optional if the field is nullable
-        if (is_get_nullable or is_nullable) and not (
-            isinstance(get_type, NoneType) or helpers.is_optional(get_type) or isinstance(get_type, AnyType)
-        ):
-            ctx.api.fail(
-                f"{default_return_type.type.name} is nullable but its generic get type parameter is not optional",
-                ctx.context,
-            )
-
-    return default_return_type.copy_modified(args=[set_type, get_type])
-
-
-def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    default_return_type = set_descriptor_types_for_field(ctx)
-
-    base_field_arg_type = get_proper_type(helpers.get_call_argument_type_by_name(ctx, "base_field"))
-    if not base_field_arg_type or not isinstance(base_field_arg_type, Instance):
-        return default_return_type
-
-    def drop_combinable(_type: MypyType) -> MypyType | None:
-        _type = get_proper_type(_type)
-        if isinstance(_type, Instance) and _type.type.has_base(fullnames.COMBINABLE_EXPRESSION_FULLNAME):
-            return None
-        if isinstance(_type, UnionType):
-            items_without_combinable = []
-            for item in _type.items:
-                reduced = drop_combinable(item)
-                if reduced is not None:
-                    items_without_combinable.append(reduced)
-
-            if len(items_without_combinable) > 1:
-                return UnionType(
-                    items_without_combinable,
-                    line=_type.line,
-                    column=_type.column,
-                    is_evaluated=_type.is_evaluated,
-                    uses_pep604_syntax=_type.uses_pep604_syntax,
-                )
-            if len(items_without_combinable) == 1:
-                return items_without_combinable[0]
-            return None
-
-        return _type
-
-    # Both base_field and return type should derive from Field and thus expect 2 arguments
-    assert len(base_field_arg_type.args) == len(default_return_type.args) == 2
-    args = []
-    for new_type, default_arg in zip(base_field_arg_type.args, default_return_type.args, strict=False):
-        # Drop any base_field Combinable type
-        reduced = drop_combinable(new_type)
-        if reduced is None:
-            ctx.api.fail(
-                f"Can't have ArrayField expecting {fullnames.COMBINABLE_EXPRESSION_FULLNAME!r} as data type",
-                ctx.context,
-            )
-        else:
-            new_type = reduced
-
-        args.append(helpers.convert_any_to_type(default_arg, new_type))
-
-    return default_return_type.copy_modified(args=args)
+    # Update the _NT (null flag) type argument to match the resolved nullability.
+    # In the future, we should be able to remove that once `primary_key` and `default`
+    # are also part of the type and can hence be used to derive the `_NT` value
+    trailing = list(default_return_type.args[2:])
+    nt_proper = get_proper_type(trailing[0]) if trailing else None
+    if isinstance(nt_proper, LiteralType):
+        trailing[0] = LiteralType(value=is_nullable, fallback=nt_proper.fallback)
+    return default_return_type.copy_modified(args=[set_type, get_type, *trailing])
 
 
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
@@ -233,7 +160,7 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_type(outer_model_info):
-        return set_descriptor_types_for_field(ctx)
+        return default_return_type
 
     assert isinstance(outer_model_info, TypeInfo)
 
@@ -243,8 +170,5 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
         )
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)
-
-    if default_return_type.type.has_base(fullnames.ARRAY_FIELD_FULLNAME):
-        return determine_type_of_array_field(ctx, django_context)
 
     return set_descriptor_types_for_field_callback(ctx, django_context)

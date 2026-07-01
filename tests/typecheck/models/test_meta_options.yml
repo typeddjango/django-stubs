@@ -17,14 +17,14 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyUser
-        reveal_type(MyUser._meta.get_field('base_name'))  # N: Revealed type is "django.db.models.fields.CharField[str | int | django.db.models.expressions.Combinable, str]"
-        reveal_type(MyUser.base_name.field)  # N: Revealed type is "django.db.models.fields.CharField[str | int | django.db.models.expressions.Combinable, str]"
-        reveal_type(MyUser._meta.get_field('name'))  # N: Revealed type is "django.db.models.fields.CharField[str | int | django.db.models.expressions.Combinable, str]"
-        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[str | int | django.db.models.expressions.Combinable, str]"
-        reveal_type(MyUser._meta.get_field('age'))  # N: Revealed type is "django.db.models.fields.IntegerField[float | int | str | django.db.models.expressions.Combinable, int]"
-        reveal_type(MyUser.age.field)  # N: Revealed type is "django.db.models.fields.IntegerField[float | int | str | django.db.models.expressions.Combinable, int]"
-        reveal_type(MyUser._meta.get_field('to_user'))  # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.MyUser | django.db.models.expressions.Combinable, myapp.models.MyUser]"
-        reveal_type(MyUser.to_user.field)  # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.MyUser | django.db.models.expressions.Combinable, myapp.models.MyUser]"
+        reveal_type(MyUser._meta.get_field('base_name'))  # N: Revealed type is "django.db.models.fields.CharField[str | int | django.db.models.expressions.Combinable, str, Literal[False]]"
+        reveal_type(MyUser.base_name.field)  # N: Revealed type is "django.db.models.fields.CharField[str | int, str, Literal[False]]"
+        reveal_type(MyUser._meta.get_field('name'))  # N: Revealed type is "django.db.models.fields.CharField[str | int | django.db.models.expressions.Combinable, str, Literal[False]]"
+        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[str | int, str, Literal[False]]"
+        reveal_type(MyUser._meta.get_field('age'))  # N: Revealed type is "django.db.models.fields.IntegerField[float | int | str | django.db.models.expressions.Combinable, int, Literal[False]]"
+        reveal_type(MyUser.age.field)  # N: Revealed type is "django.db.models.fields.IntegerField[float | int | str, int, Literal[False]]"
+        reveal_type(MyUser._meta.get_field('to_user'))  # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.MyUser | django.db.models.expressions.Combinable, myapp.models.MyUser, Literal[False]]"
+        reveal_type(MyUser.to_user.field)  # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.MyUser, myapp.models.MyUser, Literal[False]]"
 
         MyUser._meta.get_field('unknown')  # E: MyUser has no field named 'unknown'  [misc]
     installed_apps:
@@ -48,10 +48,11 @@
 
         MyModel._meta.get_field('non_existant')  # E: MyModel has no field named 'non_existant'  [misc]
 
-        reveal_type(MyModel._meta.get_field('field'))  # N: Revealed type is "django.contrib.postgres.fields.array.ArrayField[typing.Sequence[float | int | str] | django.db.models.expressions.Combinable, list[int]]"
+        reveal_type(MyModel._meta.get_field('field'))  # N: Revealed type is "django.contrib.postgres.fields.array.ArrayField[typing.Sequence[float | int | str] | django.db.models.expressions.Combinable, list[int], Literal[False]]"
+        reveal_type(MyModel._meta.get_field('null_field'))  # N: Revealed type is "django.contrib.postgres.fields.array.ArrayField[typing.Sequence[float | int | str] | django.db.models.expressions.Combinable | None, list[int] | None, Literal[True]]"
 
         field: str
-        reveal_type(MyModel._meta.get_field(field))  # N: Revealed type is "django.db.models.fields.Field[Any, Any] | django.db.models.fields.reverse_related.ForeignObjectRel"
+        reveal_type(MyModel._meta.get_field(field))  # N: Revealed type is "django.db.models.fields.Field[Any, Any, Literal[False]] | django.db.models.fields.reverse_related.ForeignObjectRel"
     installed_apps:
         - myapp
     files:
@@ -67,6 +68,7 @@
 
                 class MyModel(AbstractModel):
                     field = ArrayField(models.IntegerField(), default=[])
+                    null_field = ArrayField(models.IntegerField(), default=[], null=True)
 
 -   case: get_field_reverse_fk_with_related_query_name
     main: |
@@ -74,10 +76,10 @@
         from myapp.models import ModelA
 
         reveal_type(ModelA._meta.get_field("model_b")) # N: Revealed type is "django.db.models.fields.reverse_related.ManyToOneRel"
-        reveal_type(ModelA.modelb_set.field) # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.ModelB, myapp.models.ModelB]"
+        reveal_type(ModelA.modelb_set.field) # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.ModelB, myapp.models.ModelB, Literal[False]]"
 
         reveal_type(ModelA._meta.get_field("model_b_bis")) # N: Revealed type is "django.db.models.fields.reverse_related.ManyToOneRel"
-        reveal_type(ModelA.model_b_bis.field) # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.ModelB, myapp.models.ModelB]"
+        reveal_type(ModelA.model_b_bis.field) # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.ModelB, myapp.models.ModelB, Literal[False]]"
 
     installed_apps:
         - myapp
