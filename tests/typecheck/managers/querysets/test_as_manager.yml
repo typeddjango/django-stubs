@@ -66,6 +66,38 @@
                 class MyModel(models.Model):
                     objects = MyQuerySet.as_manager()
 
+-   case: overridden_as_manager_returning_custom_manager
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.CustomManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.manager_method())  # N: Revealed type is "str"
+        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "int"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import override
+
+                class CustomManager(models.Manager):
+                    def manager_method(self) -> str:
+                        return ""
+
+                class MyQuerySet(models.QuerySet["MyModel"]):
+                    def queryset_method(self) -> int:
+                        return 0
+
+                    @classmethod
+                    @override
+                    def as_manager(cls) -> "CustomManager":
+                        return CustomManager.from_queryset(cls)()
+
+                class MyModel(models.Model):
+                    objects = MyQuerySet.as_manager()
+
 -   case: declares_manager_type_like_django
     main: |
         from typing_extensions import reveal_type

@@ -536,8 +536,8 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     if existing_as_manager is not None and existing_as_manager.plugin_generated:
         # We generated `as_manager` on a previous pass; nothing left to do.
         return
-    # A user-declared `as_manager` override reaches here and still needs a
-    # generated manager; remember it so we don't overwrite it below.
+    # If `as_manager` is still present, the user declared it (ours returned above).
+    # Track it so we generate the manager but don't overwrite their method below.
     user_defined_as_manager = existing_as_manager is not None
 
     base_as_manager = queryset_info.get("as_manager")
@@ -549,7 +549,10 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         return _defer()
 
     manager_base = manager_sym.node
+    # The generated manager subclasses `base_ret_type`; `runtime_manager_base` is the
+    # base Django uses at runtime, which drives the generated name (see below).
     base_ret_type = manager_base
+    runtime_manager_base = manager_base
 
     if base_as_manager.fullname != f"{fullnames.QUERYSET_CLASS_FULLNAME}.as_manager":
         # `as_manager` is overridden (by a parent queryset's generated method or a
@@ -567,8 +570,14 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
             return
 
         base_ret_type = base_as_manager_ret_type.type
+        # A real override builds the runtime manager as `<Manager>.from_queryset(cls)()`,
+        # which Django names f"{Manager}From{QuerySet}". Match that name and register
+        # under `<Manager>` so the model's manager resolves; a generated stub has no
+        # runtime counterpart and stays on the plain `Manager`.
+        if not base_as_manager.plugin_generated and base_ret_type.has_base(fullnames.MANAGER_CLASS_FULLNAME):
+            runtime_manager_base = base_ret_type
 
-    manager_class_name = f"{manager_base.name}From{queryset_info.name}"
+    manager_class_name = f"{runtime_manager_base.name}From{queryset_info.name}"
     current_module = semanal_api.modules[semanal_api.cur_mod_id]
     existing_sym = current_module.names.get(manager_class_name)
     if (
@@ -596,7 +605,7 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         register_dynamically_created_manager(
             fullname=new_manager_info.fullname,
             manager_name=manager_class_name,
-            manager_base=manager_base,
+            manager_base=runtime_manager_base,
         )
 
     # Add the new manager to the current module
