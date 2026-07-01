@@ -532,9 +532,13 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     if any(has_placeholder(tv) for tv in queryset_info.defn.type_vars):
         return _defer()
 
-    # either a manual `as_manager` definition or this is a deferral pass
-    if "as_manager" in queryset_info.names:
+    existing_as_manager = queryset_info.names.get("as_manager")
+    if existing_as_manager is not None and existing_as_manager.plugin_generated:
+        # We generated `as_manager` on a previous pass; nothing left to do.
         return
+    # A user-declared `as_manager` override reaches here and still needs a
+    # generated manager; remember it so we don't overwrite it below.
+    user_defined_as_manager = existing_as_manager is not None
 
     base_as_manager = queryset_info.get("as_manager")
     if base_as_manager is None:
@@ -548,10 +552,17 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     base_ret_type = manager_base
 
     if base_as_manager.fullname != f"{fullnames.QUERYSET_CLASS_FULLNAME}.as_manager":
-        base_as_manager_type = get_proper_type(base_as_manager.type)
+        # `as_manager` is overridden (by a parent queryset's generated method or a
+        # user override); use its return type as the manager base.
+        base_as_manager_type = _get_funcdef_type(base_as_manager.node)
         if not isinstance(base_as_manager_type, CallableType):
             return
-        base_as_manager_ret_type = get_proper_type(base_as_manager_type.ret_type)
+        # A user override's return annotation may still be unanalyzed here, so
+        # resolve it explicitly (a no-op if already analyzed); defer if incomplete.
+        base_as_manager_ret_type = semanal_api.anal_type(base_as_manager_type.ret_type)
+        if base_as_manager_ret_type is None:
+            return _defer()
+        base_as_manager_ret_type = get_proper_type(base_as_manager_ret_type)
         if not isinstance(base_as_manager_ret_type, Instance):
             return
 
@@ -595,6 +606,11 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         # Note that the generated manager type is always inserted at module level
         SymbolTableNode(GDEF, new_manager_info, plugin_generated=True)
     )
+
+    if user_defined_as_manager:
+        # Leave the user's own `as_manager` signature intact; the model resolves
+        # its manager via the registration above, not this method's return type.
+        return
 
     add_method_to_class(
         semanal_api,
