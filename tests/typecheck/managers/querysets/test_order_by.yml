@@ -186,6 +186,24 @@
                     created = models.DateTimeField(auto_now_add=True)
                     author = models.ForeignKey(Author, on_delete=models.CASCADE)
 
+-   case: order_by_with_jsonfield_key_transforms
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Item
+
+        Item.objects.order_by("data__field")
+        Item.objects.order_by("-data__field")
+        Item.objects.order_by("data__nested__key")
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Item(models.Model):
+                    data = models.JSONField()
+
 -   case: order_by_with_annotations_typeddict
     installed_apps:
         - myapp
