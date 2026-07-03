@@ -12,7 +12,6 @@ from django.db.models.fields.related_descriptors import (
     ReverseOneToOneDescriptor,
 )
 from django.db.models.fields.reverse_related import ForeignObjectRel
-from django.db.models.lookups import Transform
 from django.db.models.sql.query import Query
 from mypy.errorcodes import NO_REDEF
 from mypy.nodes import (
@@ -45,13 +44,13 @@ from mypy.types import Type as MypyType
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib.field_validation import check_field_concrete, try_get_field, validate_non_pk_concrete_field
 from mypy_django_plugin.transformers.models import get_annotated_type
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from django.db.models.base import Model
-    from django.db.models.options import _AnyField
     from mypy.checker import TypeChecker
     from mypy.plugin import FunctionContext, MethodContext
 
@@ -990,45 +989,6 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     return default_return_type.copy_modified(args=[annotated_model, row_type])
 
 
-def _try_get_field(
-    ctx: MethodContext, model_cls: type[Model], field_name: str, *, resolve_pk: bool = False
-) -> _AnyField | None:
-    opts = model_cls._meta
-    resolved_name = opts.pk.name if resolve_pk and field_name == "pk" else field_name
-    try:
-        return opts.get_field(resolved_name)
-    except FieldDoesNotExist as e:
-        ctx.api.fail(str(e), ctx.context)
-        return None
-
-
-def _check_field_concrete(ctx: MethodContext, field: _AnyField, field_name: str, method: str) -> bool:
-    if not field.concrete or field.many_to_many:
-        ctx.api.fail(f'"{method}()" can only be used with concrete fields. Got "{field_name}"', ctx.context)
-        return False
-    return True
-
-
-def _check_field_not_pk(
-    ctx: MethodContext,
-    model_cls: type[Model],
-    field: _AnyField,
-    field_name: str,
-    method: str,
-    *,
-    attr_name: str | None = None,
-) -> bool:
-    opts = model_cls._meta
-    all_pk_fields = set(getattr(opts, "pk_fields", [opts.pk]))
-    for parent in getattr(opts, "all_parents", opts.get_parent_list()):
-        all_pk_fields.update(getattr(parent._meta, "pk_fields", [parent._meta.pk]))
-    if field in all_pk_fields:
-        param_str = f' in "{attr_name}="' if attr_name else ""
-        ctx.api.fail(f'"{method}()" does not support primary key fields{param_str}. Got "{field_name}"', ctx.context)
-        return False
-    return True
-
-
 def _extract_field_names_from_collection(
     ctx: MethodContext, django_context: DjangoContext, arg_index: int
 ) -> list[str] | None:
@@ -1123,16 +1083,6 @@ def validate_select_related(ctx: MethodContext, django_context: DjangoContext) -
     return ctx.default_return_type
 
 
-def _validate_bulk_update_field(
-    ctx: MethodContext, model_cls: type[Model], field_name: str, method: str, *, attr_name: str | None = None
-) -> bool:
-    return (
-        (field := _try_get_field(ctx, model_cls, field_name)) is not None
-        and _check_field_concrete(ctx, field, field_name, method)
-        and _check_field_not_pk(ctx, model_cls, field, field_name, method, attr_name=attr_name)
-    )
-
-
 def validate_bulk_update(
     ctx: MethodContext, django_context: DjangoContext, method: Literal["bulk_update", "abulk_update"]
 ) -> MypyType:
@@ -1155,7 +1105,7 @@ def validate_bulk_update(
         return ctx.default_return_type
 
     for field_name in field_names:
-        _validate_bulk_update_field(ctx, django_model.cls, field_name, method)
+        validate_non_pk_concrete_field(ctx, django_model.cls, field_name, method)
 
     return ctx.default_return_type
 
@@ -1163,7 +1113,7 @@ def validate_bulk_update(
 def _validate_bulk_create_unique_field(
     ctx: MethodContext, model_cls: type[Model], field_name: str, method: str
 ) -> bool:
-    return (field := _try_get_field(ctx, model_cls, field_name, resolve_pk=True)) is not None and _check_field_concrete(
+    return (field := try_get_field(ctx, model_cls, field_name, resolve_pk=True)) is not None and check_field_concrete(
         ctx, field, field_name, method
     )
 
@@ -1182,7 +1132,7 @@ def validate_bulk_create(
     update_field_names = _extract_field_names_from_collection(ctx, django_context, arg_index=4)
     if update_field_names is not None:
         for field_name in update_field_names:
-            _validate_bulk_update_field(ctx, django_model.cls, field_name, method, attr_name="update_fields")
+            validate_non_pk_concrete_field(ctx, django_model.cls, field_name, method, attr_name="update_fields")
 
     unique_field_names = _extract_field_names_from_collection(ctx, django_context, arg_index=5)
     if unique_field_names is not None:
@@ -1209,8 +1159,7 @@ def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts:
     if remainder:
         # Check if the trailing part is a valid transform (e.g. __year, __month) on the field.
         # Transforms are allowed in order_by, but lookups (e.g. __exact) are not.
-        lookup_cls = final_field.get_lookups().get(remainder[0])
-        if lookup_cls is None or not issubclass(lookup_cls, Transform):
+        if final_field.get_transform(remainder[0]) is None:
             msg = f"Cannot resolve keyword '{remainder[0]}' into field or transform on '{final_field.name}'."
             ctx.api.fail(msg, ctx.context)
 
@@ -1239,6 +1188,11 @@ def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> Mypy
 def _validate_defer_only_fields(
     ctx: MethodContext, model_cls: type[Model], field_names: list[str], *, is_defer: bool
 ) -> None:
+    if not is_defer and model_cls._meta.abstract:
+        # Abstract models do not have a primary key field, but Query.add_immediate_loading()
+        # assumes that one exists when resolving the "pk" alias.
+        field_names = [field_name for field_name in field_names if field_name != "pk"]
+
     query = Query(model_cls)
     query.add_deferred_loading(field_names) if is_defer else query.add_immediate_loading(field_names)
 

@@ -2,10 +2,10 @@ import sys
 from collections.abc import Callable, Iterable
 from typing import Any, Protocol, overload, type_check_only
 
-from django.core import validators  # due to weird mypy.stubtest error
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
+from django.core.validators import _ValidatorCallable
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
 from django.db.models.fields import _NT, _ST, NOT_PROVIDED, Field, _ErrorMessagesMapping, _FieldDescriptor
@@ -93,7 +93,7 @@ class FileField(Field[_ST, _GT_File, _NT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     # At runtime, FileDescriptor.__get__ ALWAYS returns a FieldFile even when the underlying database value is NULL.

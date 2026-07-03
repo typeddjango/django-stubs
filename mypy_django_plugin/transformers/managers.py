@@ -513,6 +513,52 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
         )
 
 
+def _get_or_create_manager_class_for_queryset(
+    semanal_api: SemanticAnalyzer,
+    queryset_info: TypeInfo,
+    *,
+    base_manager_info: TypeInfo,
+    runtime_manager_base: TypeInfo,
+) -> TypeInfo:
+    """Get or create the generated manager for `<QuerySet>.as_manager()`.
+
+    A new manager is populated from the queryset, registered, and inserted into the
+    module. It subclasses `base_manager_info` but is named and registered after
+    `runtime_manager_base` — the base Django subclasses at runtime.
+    Raises `IncompleteDefnException` to defer.
+    """
+    name = f"{runtime_manager_base.name}From{queryset_info.name}"
+    current_module = semanal_api.modules[semanal_api.cur_mod_id]
+    existing_sym = current_module.names.get(name)
+    if (
+        existing_sym is not None
+        and isinstance(existing_sym.node, TypeInfo)
+        and existing_sym.node.has_base(fullnames.MANAGER_CLASS_FULLNAME)
+        and existing_sym.node.metadata.get("django", {}).get("from_queryset_manager") == queryset_info.fullname
+    ):
+        # Reuse an identical, already generated, manager
+        new_manager_info = existing_sym.node
+    else:
+        new_manager_info = create_manager_class(
+            api=semanal_api,
+            base_manager_info=base_manager_info,
+            name=name,
+            line=queryset_info.line,
+            with_unique_name=True,
+        )
+        populate_manager_from_queryset(new_manager_info, queryset_info)
+        register_dynamically_created_manager(
+            fullname=new_manager_info.fullname,
+            manager_name=name,
+            manager_base=runtime_manager_base,
+        )
+
+    # Insert at module level, keyed by the manager's unique `name` to sidestep
+    # collisions with other module-level objects.
+    current_module.names[new_manager_info.name] = SymbolTableNode(GDEF, new_manager_info, plugin_generated=True)
+    return new_manager_info
+
+
 def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     """
     Insert a new manager class node for a: '<Manager> = <QuerySet>.as_manager()'.
@@ -534,9 +580,13 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     if any(has_placeholder(tv) for tv in queryset_info.defn.type_vars):
         return _defer()
 
-    # either a manual `as_manager` definition or this is a deferral pass
-    if "as_manager" in queryset_info.names:
+    existing_as_manager = queryset_info.names.get("as_manager")
+    if existing_as_manager is not None and existing_as_manager.plugin_generated:
+        # We generated `as_manager` on a previous pass; nothing left to do.
         return
+    # If `as_manager` is still present, the user declared it (ours returned above).
+    # Track it so we generate the manager but don't overwrite their method below.
+    user_defined_as_manager = existing_as_manager is not None
 
     base_as_manager = queryset_info.get("as_manager")
     if base_as_manager is None:
@@ -547,56 +597,48 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         return _defer()
 
     manager_base = manager_sym.node
-    base_ret_type = manager_base
+    # The generated manager subclasses `base_manager_info`; `runtime_manager_base` is the
+    # base Django uses at runtime, which drives the generated name (see below).
+    base_manager_info = manager_base
+    runtime_manager_base = manager_base
 
     if base_as_manager.fullname != f"{fullnames.QUERYSET_CLASS_FULLNAME}.as_manager":
-        base_as_manager_type = get_proper_type(base_as_manager.type)
+        # `as_manager` is overridden (by a parent queryset's generated method or a
+        # user override); use its return type as the manager base.
+        base_as_manager_type = _get_funcdef_type(base_as_manager.node)
         if not isinstance(base_as_manager_type, CallableType):
             return
-        base_as_manager_ret_type = get_proper_type(base_as_manager_type.ret_type)
+        # A user override's return annotation may still be unanalyzed here, so
+        # resolve it explicitly (a no-op if already analyzed); defer if incomplete.
+        base_as_manager_ret_type = semanal_api.anal_type(base_as_manager_type.ret_type)
+        if base_as_manager_ret_type is None:
+            return _defer()
+        base_as_manager_ret_type = get_proper_type(base_as_manager_ret_type)
         if not isinstance(base_as_manager_ret_type, Instance):
             return
 
-        base_ret_type = base_as_manager_ret_type.type
+        base_manager_info = base_as_manager_ret_type.type
+        # A real override builds the runtime manager as `<Manager>.from_queryset(cls)()`,
+        # which Django names f"{Manager}From{QuerySet}". Match that name and register
+        # under `<Manager>` so the model's manager resolves; a generated stub has no
+        # runtime counterpart and stays on the plain `Manager`.
+        if not base_as_manager.plugin_generated and base_manager_info.has_base(fullnames.MANAGER_CLASS_FULLNAME):
+            runtime_manager_base = base_manager_info
 
-    manager_class_name = f"{manager_base.name}From{queryset_info.name}"
-    current_module = semanal_api.modules[semanal_api.cur_mod_id]
-    existing_sym = current_module.names.get(manager_class_name)
-    if (
-        existing_sym is not None
-        and isinstance(existing_sym.node, TypeInfo)
-        and existing_sym.node.has_base(fullnames.MANAGER_CLASS_FULLNAME)
-        and existing_sym.node.metadata.get("django", {}).get("from_queryset_manager") == queryset_info.fullname
-    ):
-        # Reuse an identical, already generated, manager
-        new_manager_info = existing_sym.node
-    else:
-        # Create a new `TypeInfo` instance for the manager type
-        try:
-            new_manager_info = create_manager_class(
-                api=semanal_api,
-                base_manager_info=base_ret_type,
-                name=manager_class_name,
-                line=queryset_info.line,
-                with_unique_name=True,
-            )
-        except helpers.IncompleteDefnException:
-            return _defer()
-
-        populate_manager_from_queryset(new_manager_info, queryset_info)
-        register_dynamically_created_manager(
-            fullname=new_manager_info.fullname,
-            manager_name=manager_class_name,
-            manager_base=manager_base,
+    try:
+        new_manager_info = _get_or_create_manager_class_for_queryset(
+            semanal_api,
+            queryset_info,
+            base_manager_info=base_manager_info,
+            runtime_manager_base=runtime_manager_base,
         )
+    except helpers.IncompleteDefnException:
+        return _defer()
 
-    # Add the new manager to the current module
-    # We'll use `new_manager_info.name` instead of `manager_class_name` here
-    # to handle possible name collisions, as it's unique.
-    current_module.names[new_manager_info.name] = (
-        # Note that the generated manager type is always inserted at module level
-        SymbolTableNode(GDEF, new_manager_info, plugin_generated=True)
-    )
+    if user_defined_as_manager:
+        # Leave the user's own `as_manager` signature intact; the model resolves
+        # its manager via the registration above, not this method's return type.
+        return
 
     add_method_to_class(
         semanal_api,

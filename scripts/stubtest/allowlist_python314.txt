@@ -1,0 +1,5 @@
+# Version specific allowlist for Python3.14 only.
+
+# We simplify the Enum subclasses creation logic:
+django.db.models.enums.IntegerChoices.__init__
+django.db.models.enums.TextChoices.__init__

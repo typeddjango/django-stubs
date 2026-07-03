@@ -6,8 +6,8 @@ from datetime import datetime as real_datetime
 from typing import Any, ClassVar, Generic, Literal, Protocol, TypeAlias, overload, type_check_only
 
 from django import forms
-from django.core import validators  # due to weird mypy.stubtest error
 from django.core.checks import CheckMessage
+from django.core.validators import _ValidatorCallable
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model
 from django.db.models.expressions import Col, Combinable, Expression, Func
@@ -143,7 +143,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT, _NT]):
     empty_values: Sequence[Any]
     creation_counter: int
     auto_creation_counter: int
-    default_validators: Sequence[validators._ValidatorCallable]
+    default_validators: list[_ValidatorCallable]
     default_error_messages: ClassVar[_ErrorMessagesDict]
     hidden: bool
     system_check_removed_details: Any | None
@@ -171,7 +171,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT, _NT]):
         db_column: str | None = None,
         db_tablespace: str | None = None,
         auto_created: bool = False,
-        validators: Iterable[validators._ValidatorCallable] = (),
+        validators: Iterable[_ValidatorCallable] = (),
         error_messages: _ErrorMessagesMapping | None = None,
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
@@ -219,7 +219,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT, _NT]):
     @cached_property
     def error_messages(self) -> _ErrorMessagesDict: ...
     @cached_property
-    def validators(self) -> list[validators._ValidatorCallable]: ...
+    def validators(self) -> list[_ValidatorCallable]: ...
     def run_validators(self, value: Any) -> None: ...
     def validate(self, value: Any, model_instance: Model | None) -> None: ...
     def clean(self, value: Any, model_instance: Model | None) -> Any: ...
@@ -342,7 +342,7 @@ class DecimalField(Field[_ST_Decimal, _GT_Decimal, _NT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @cached_property
@@ -379,7 +379,7 @@ class CharField(Field[_ST_Char, _GT_Char, _NT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         *,
         db_collation: str | None = None,
@@ -411,7 +411,7 @@ class SlugField(CharField[_ST_Char, _GT_Char, _NT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         *,
         max_length: int | None = 50,
@@ -453,7 +453,7 @@ class URLField(CharField[_ST_Char, _GT_Char, _NT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @override
@@ -488,7 +488,7 @@ class TextField(Field[_ST_Text, _GT_Text, _NT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
         *,
         db_collation: str | None = None,
@@ -542,7 +542,7 @@ class GenericIPAddressField(Field[_ST_GenIP, _GT_IP, _NT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @override
@@ -581,7 +581,7 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date, _GT_Date, _NT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @override
@@ -617,7 +617,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST_Time, _GT_Time, _NT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @override
@@ -661,7 +661,7 @@ class UUIDField(Field[_ST_UUID, _GT_UUID, _NT]):
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
         auto_created: bool = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @override
@@ -699,7 +699,7 @@ class FilePathField(Field[_ST, _GT, _NT]):
         db_column: str | None = ...,
         db_comment: str | None = ...,
         db_tablespace: str | None = ...,
-        validators: Iterable[validators._ValidatorCallable] = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
     @override
