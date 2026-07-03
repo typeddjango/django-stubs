@@ -20,6 +20,11 @@ from typing_extensions import Self, TypeVar, override
 _TestClass: TypeAlias = type[SimpleTestCase]
 _DecoratedTest: TypeAlias = Callable[..., Any] | _TestClass
 _DT = TypeVar("_DT", bound=_DecoratedTest)
+
+# Django's TestContextDecorator.__call__ only checks isinstance(decorated, type)
+# or callable(decorated) with no fixed signature — decorate_callable wraps using
+# *args, **kwargs since the decorated function/method can have varying signatures.
+# See: https://github.com/django/django/blob/main/django/test/utils.py
 _C = TypeVar("_C", bound=Callable[..., Any])  # Any callable
 
 TZ_SUPPORT: bool
@@ -94,6 +99,7 @@ class CaptureQueriesContext(Iterable[dict[str, str]]):
     initial_queries: int
     final_queries: int | None
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
+    @override
     def __iter__(self) -> Iterator[dict[str, str]]: ...
     def __getitem__(self, index: int) -> dict[str, str]: ...
     def __len__(self) -> int: ...
