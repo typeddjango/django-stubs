@@ -6,7 +6,7 @@ from django.db.models import AutoField, CharField, IntegerField
 
 # --- `_ST` is contravariant ---
 # A field whose set-type is wider can stand in for one whose set-type is narrower.
-wide_set: AutoField[int | str, int] = AutoField()  # ty: ignore[invalid-assignment]
+wide_set: AutoField[int | str, int] = AutoField()
 narrow_set: AutoField[int, int] = wide_set
 
 # Reverse direction is rejected: a narrower set-type cannot stand in for a wider one.
@@ -36,7 +36,7 @@ bad_to_non_nullable: IntegerField[int, int, Literal[False]] = nullable  # type: 
 # CharField specializes the bounds (`_ST=str | int`, `_GT=str`); the same variance rules still apply.
 
 # ST contravariance: source set-type wider than target → OK.
-char_wide_set: CharField[str | int, str] = CharField()  # ty: ignore[invalid-assignment]
+char_wide_set: CharField[str | int, str] = CharField()
 char_narrow_set: CharField[str, str] = char_wide_set
 
 # GT covariance: source get-type narrower than target → OK.
