@@ -3,7 +3,7 @@ from __future__ import annotations
 import importlib.metadata
 import itertools
 import sys
-from functools import cached_property, partial
+from functools import cache, cached_property, partial
 from typing import TYPE_CHECKING, Any
 
 from mypy.build import PRI_MED, PRI_MYPY
@@ -354,14 +354,20 @@ class NewSemanalDjangoPlugin(Plugin):
         # Cache would be cleared if any settings do change.
         extra_data = {
             "AUTH_USER_MODEL": self.django_context.settings.AUTH_USER_MODEL,
-            "django_version": importlib.metadata.version("django"),
-            "django_stubs_version": importlib.metadata.version("django-stubs"),
+            "django_version": _package_version("django"),
+            "django_stubs_version": _package_version("django-stubs"),
         }
-        try:
-            extra_data["django_stubs_ext_version"] = importlib.metadata.version("django-stubs-ext")
-        except importlib.metadata.PackageNotFoundError:
-            pass
+        if (django_stubs_ext_version := _package_version("django-stubs-ext")) is not None:
+            extra_data["django_stubs_ext_version"] = django_stubs_ext_version
         return self.plugin_config.to_json(extra_data)
+
+
+@cache
+def _package_version(package: str) -> str | None:
+    try:
+        return importlib.metadata.version(package)
+    except importlib.metadata.PackageNotFoundError:
+        return None
 
 
 def plugin(version: str) -> type[NewSemanalDjangoPlugin]:
