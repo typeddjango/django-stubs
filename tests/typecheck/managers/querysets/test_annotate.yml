@@ -604,6 +604,48 @@
         class MyModel(models.Model):
             name = models.CharField(max_length=100)
 
+- case: test_annotated_date_transform_in_lookup_type_checking
+  main: |
+    from datetime import date
+    from django.db.models import QuerySet
+    from django.db.models.functions import Now, TruncDate
+    from django_stubs_ext import WithAnnotations
+    from typing_extensions import TypedDict
+    from myapp.models import MyModel
+
+    class MyAnnotations(TypedDict):
+        created_date: date
+
+    AnnotatedModel = WithAnnotations[MyModel, MyAnnotations]
+
+    def filter_annotated(qs: QuerySet[AnnotatedModel]) -> QuerySet[AnnotatedModel]:
+        years: list[int] = [2025, 2026]
+        invalid_years: list[str] = ["a"]
+        dates: list[date] = [date(2026, 1, 1)]
+        qs.filter(created_date__in=dates)
+        qs.filter(created_date__year__in=years)
+        qs.filter(created_date__year__in=invalid_years)  # E: Incompatible type for lookup 'created_date__year__in': (got "list[str]", expected "Iterable[int]")  [misc]
+        return qs
+
+    years: list[int] = [2025, 2026]
+    invalid_years: list[str] = ["a"]
+    dates: list[date] = [date(2026, 1, 1)]
+    invalid_dates: list[int] = [1]
+    MyModel.objects.annotate(created_date=TruncDate("created_at")).filter(created_date__year__in=years)
+    MyModel.objects.annotate(created_date=TruncDate("created_at")).filter(created_date__year__in=invalid_years)  # E: Incompatible type for lookup 'created_date__year__in': (got "list[str]", expected "Iterable[int]")  [misc]
+    MyModel.objects.annotate(current_time=Now()).filter(current_time__date__in=dates)
+    MyModel.objects.annotate(current_time=Now()).filter(current_time__date__in=invalid_dates)  # E: Incompatible type for lookup 'current_time__date__in': (got "list[int]", expected "Iterable[date]")  [misc]
+
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class MyModel(models.Model):
+            created_at = models.DateTimeField()
+
 - case: annotate_on_implicitly_generic_custom_queryset
   main: |
     from typing_extensions import reveal_type
