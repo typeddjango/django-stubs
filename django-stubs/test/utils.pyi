@@ -93,13 +93,12 @@ class override_system_checks(TestContextDecorator):
     old_deployment_checks: set[Callable[..., Any]]
 
 # Private API removed, iterable-based
-class CaptureQueriesContext(Iterable[dict[str, str]]):
+class CaptureQueriesContext:
     connection: BaseDatabaseWrapper
     force_debug_cursor: bool
     initial_queries: int
     final_queries: int | None
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
-    @override
     def __iter__(self) -> Iterator[dict[str, str]]: ...
     def __getitem__(self, index: int) -> dict[str, str]: ...
     def __len__(self) -> int: ...
