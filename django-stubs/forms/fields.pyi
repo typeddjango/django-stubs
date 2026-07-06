@@ -1,5 +1,5 @@
-import json
 import datetime
+import json
 from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 from decimal import Decimal
 from re import Pattern
@@ -14,9 +14,8 @@ from django.forms.forms import BaseForm
 from django.forms.widgets import Widget
 from django.utils.choices import CallableChoiceIterator, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import _PropertyDescriptor
-from django.utils.functional import _StrOrPromise, SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, _StrOrPromise
 from typing_extensions import Self, override
-from django.utils.functional import SimpleLazyObject
 
 # Problem: attribute `widget` is always of type `Widget` after field instantiation.
 # However, on class level it can be set to `Type[Widget]` too.
@@ -106,7 +105,7 @@ class IntegerField(Field):
     max_value: int | Callable[[], int] | None
     min_value: int | Callable[[], int] | None
     step_size: int | Callable[[], int] | None
-    re_decimal: SimpleLazyObject[Pattern[str]] 
+    re_decimal: SimpleLazyObject[Pattern[str]]
     def __init__(
         self,
         *,
@@ -622,7 +621,12 @@ class JSONField(CharField):
     widget: _ClassLevelWidgetT
     encoder: type[json.JSONEncoder] | None
     decoder: type[json.JSONDecoder] | None
-    def __init__(self, encoder: type[json.JSONEncoder] | None = None, decoder: type[json.JSONDecoder] | None = None, **kwargs: Any) -> None: ...
+    def __init__(
+        self,
+        encoder: type[json.JSONEncoder] | None = None,
+        decoder: type[json.JSONDecoder] | None = None,
+        **kwargs: Any,
+    ) -> None: ...
     @override
     def to_python(self, value: Any) -> Any: ...
     @override
