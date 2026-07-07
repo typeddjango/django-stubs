@@ -16,6 +16,7 @@ from django.utils.choices import CallableChoiceIterator, _ChoicesCallable, _Choi
 from django.utils.datastructures import _PropertyDescriptor
 from django.utils.functional import _StrOrPromise, SimpleLazyObject
 from typing_extensions import Self, override
+from django.utils.functional import SimpleLazyObject
 
 # Problem: attribute `widget` is always of type `Widget` after field instantiation.
 # However, on class level it can be set to `Type[Widget]` too.
@@ -105,7 +106,7 @@ class IntegerField(Field):
     max_value: int | Callable[[], int] | None
     min_value: int | Callable[[], int] | None
     step_size: int | Callable[[], int] | None
-    re_decimal: Pattern[str] 
+    re_decimal: SimpleLazyObject[Pattern[str]] 
     def __init__(
         self,
         *,

@@ -11,7 +11,8 @@ from typing_extensions import deprecated, override
 VOID_ELEMENTS: frozenset[str]
 MAX_URL_LENGTH: int
 MAX_STRIP_TAGS_DEPTH: int
-long_open_tag_without_closing_re: Pattern[str]
+long_open_tag_without_closing_re:  SimpleLazyObject[Pattern[str]]
+
 
 def escape(text: Any) -> SafeString: ...
 def escapejs(value: Any) -> SafeString: ...
@@ -50,9 +51,12 @@ class CountsDict(dict[str, Any]):
 class Urlizer:
     trailing_punctuation_chars: str
     wrapping_punctuation: list[tuple[str, str]]
-    word_split_re: Pattern[str] 
-    simple_url_re: Pattern[str] 
-    simple_url_2_re: Pattern[str] 
+    word_split_re: SimpleLazyObject[Pattern[str]]
+
+    simple_url_re: SimpleLazyObject[Pattern[str]]
+ 
+    simple_url_2_re: SimpleLazyObject[Pattern[str]]
+
     mailto_template: str
     url_template: str
     def __call__(
