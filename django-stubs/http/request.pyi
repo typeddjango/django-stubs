@@ -42,17 +42,9 @@ class HttpHeaders(CaseInsensitiveMapping[str]):
     @classmethod
     def to_asgi_names(cls, headers: Mapping[str, Any]) -> dict[str, Any]: ...
 
-# The magic. If we instantiate HttpRequest directly somewhere, it has
-# mutable GET and POST. However, both ASGIRequest and WSGIRequest have immutable,
-# so when we use HttpRequest to refer to any of them we want exactly this.
-# Case when some function creates *exactly* HttpRequest (not subclass)
-# remain uncovered, however it's probably the best solution we can afford.
-_QueryT = TypeVar("_QueryT", default=_ImmutableQueryDict)
-
-# If you want to use
-class HttpRequest(Generic[_QueryT]):
-    GET: _QueryT
-    POST: _QueryT
+class HttpRequest:
+    GET: _ImmutableQueryDict
+    POST: _ImmutableQueryDict
     COOKIES: dict[str, str]
     META: dict[str, Any]
     FILES: MultiValueDict[str, uploadedfile.UploadedFile]
@@ -77,9 +69,7 @@ class HttpRequest(Generic[_QueryT]):
     site: Site
     # django.contrib.sessions.middleware.SessionMiddleware
     session: SessionBase
-    # When created directly, you can modify
-    # `HttpRequest.GET` and `HttpRequest.POST` data:
-    def __new__(cls) -> HttpRequest[QueryDict]: ...
+    def __init__(self) -> None: ...
     def get_host(self) -> str: ...
     def get_port(self) -> str: ...
     def get_full_path(self, force_append_slash: bool = False) -> str: ...
