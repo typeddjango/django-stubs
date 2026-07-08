@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping, Sequence
 from re import Pattern
-from typing import Any, BinaryIO, Literal, NoReturn, Protocol, TypeAlias, overload, type_check_only
+from typing import Any, BinaryIO, Literal, NoReturn, Protocol, TypeAlias, overload, type_check_only, Generic
 
 from django.contrib.auth.models import _AnyUser
 from django.contrib.sessions.backends.base import SessionBase
@@ -42,9 +42,17 @@ class HttpHeaders(CaseInsensitiveMapping[str]):
     @classmethod
     def to_asgi_names(cls, headers: Mapping[str, Any]) -> dict[str, Any]: ...
 
-class HttpRequest:
-    GET: _ImmutableQueryDict
-    POST: _ImmutableQueryDict
+# The magic. If we instantiate HttpRequest directly somewhere, it has
+# mutable GET and POST. However, both ASGIRequest and WSGIRequest have immutable,
+# so when we use HttpRequest to refer to any of them we want exactly this.
+# Case when some function creates *exactly* HttpRequest (not subclass)
+# remain uncovered, however it's probably the best solution we can afford.
+_QueryT = TypeVar("_QueryT", default=_ImmutableQueryDict)
+
+# If you want to use
+class HttpRequest(Generic[_QueryT]):
+    GET: _QueryT
+    POST: _QueryT
     COOKIES: dict[str, str]
     META: dict[str, Any]
     FILES: MultiValueDict[str, uploadedfile.UploadedFile]
@@ -69,15 +77,9 @@ class HttpRequest:
     site: Site
     # django.contrib.sessions.middleware.SessionMiddleware
     session: SessionBase
-    # The magic. If we instantiate HttpRequest directly somewhere, it has
-    # mutable GET and POST. However, both ASGIRequest and WSGIRequest have immutable,
-    # so when we use HttpRequest to refer to any of them we want exactly this.
-    # Case when some function creates *exactly* HttpRequest (not subclass)
-    # remain uncovered, however it's probably the best solution we can afford.
-    def __new__(cls) -> _MutableHttpRequest: ...
-    # When both __init__ and __new__ are present, mypy will prefer __init__
-    # (see comments in mypy.checkmember.type_object_type)
-    # def __init__(self) -> None: ...
+    # When created direcly, you can modify
+    # `HttpRequest.GET` and `HttpRequest.POST` data:
+    def __new__(cls) -> HttpRequest[QueryDict]: ...
     def get_host(self) -> str: ...
     def get_port(self) -> str: ...
     def get_full_path(self, force_append_slash: bool = False) -> str: ...
@@ -118,11 +120,6 @@ class HttpRequest:
     def readline(self, limit: int | None = -1, /) -> bytes: ...
     def __iter__(self) -> Iterator[bytes]: ...
     def readlines(self) -> list[bytes]: ...
-
-@type_check_only
-class _MutableHttpRequest(HttpRequest):
-    GET: QueryDict  # type: ignore[assignment]
-    POST: QueryDict  # type: ignore[assignment]
 
 _Z = TypeVar("_Z")
 
