@@ -78,9 +78,14 @@
         from django.http.request import HttpRequest
 
         request = HttpRequest()
-        reveal_type(request)  # N: Revealed type is "django.http.request._MutableHttpRequest"
-        reveal_type(request.GET)  # N: Revealed type is "django.http.request.QueryDict"
-        request.GET['foo'] = 'bar'
+        reveal_type(request)  # N: Revealed type is "django.http.request.HttpRequest"
+        reveal_type(request.GET)  # N: Revealed type is "django.http.request._ImmutableQueryDict"
+        request.GET['foo'] = 'bar'  # E: This QueryDict is immutable.  [misc]
+
+-   case: request_get_post_func_ret
+    main: |
+        from typing_extensions import reveal_type
+        from django.http.request import HttpRequest
 
         def mk_request() -> HttpRequest:
             return HttpRequest()
@@ -89,23 +94,4 @@
         reveal_type(req)  # N: Revealed type is "django.http.request.HttpRequest"
         reveal_type(req.GET)  # N: Revealed type is "django.http.request._ImmutableQueryDict"
         req.GET.setdefault('foo', 'bar')  # E: This QueryDict is immutable.  [misc]
-        x = 1  # E: Statement is unreachable  [unreachable]
-
--   case: request_get_post_unreachable
-    main: |
-        from typing_extensions import reveal_type
-        from django.http.request import HttpRequest
-
-        request = HttpRequest()
-        reveal_type(request)  # N: Revealed type is "django.http.request._MutableHttpRequest"
-        reveal_type(request.GET)  # N: Revealed type is "django.http.request.QueryDict"
-        request.GET['foo'] = 'bar'
-
-        def mk_request() -> HttpRequest:
-            return HttpRequest()
-
-        req = mk_request()
-        reveal_type(req)  # N: Revealed type is "django.http.request.HttpRequest"
-        reveal_type(req.GET)  # N: Revealed type is "django.http.request._ImmutableQueryDict"
-        req.GET['foo'] = 'bar'  # E: This QueryDict is immutable.  [misc]
         x = 1  # E: Statement is unreachable  [unreachable]
