@@ -107,12 +107,12 @@
         users: list[User] = [User()]
         User.objects.filter(age__in=users)  # E: Incompatible type for lookup 'age__in': (got "list[User]", expected "Iterable[str | int]")  [misc]
 
-        year: int = 2026
-        years: list[int] = [2025, 2026]
-        invalid_years: list[str] = ["a"]
-        date_parts: list[int] = [1, 2]
-        invalid_date_parts: list[str] = ["a"]
-        dates: list[date] = [date(2026, 1, 1)]
+        year = 2026
+        years = [2025, 2026]
+        invalid_years = ["a"]
+        date_parts = [1, 2]
+        invalid_date_parts = ["a"]
+        dates = [date(2026, 1, 1)]
         User.objects.filter(start_date__year=year)
         User.objects.filter(start_date__in=dates)
         User.objects.filter(start_date__year__in=years)

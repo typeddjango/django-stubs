@@ -619,18 +619,18 @@
     AnnotatedModel = WithAnnotations[MyModel, MyAnnotations]
 
     def filter_annotated(qs: QuerySet[AnnotatedModel]) -> QuerySet[AnnotatedModel]:
-        years: list[int] = [2025, 2026]
-        invalid_years: list[str] = ["a"]
-        dates: list[date] = [date(2026, 1, 1)]
+        years = [2025, 2026]
+        invalid_years = ["a"]
+        dates = [date(2026, 1, 1)]
         qs.filter(created_date__in=dates)
         qs.filter(created_date__year__in=years)
         qs.filter(created_date__year__in=invalid_years)  # E: Incompatible type for lookup 'created_date__year__in': (got "list[str]", expected "Iterable[int]")  [misc]
         return qs
 
-    years: list[int] = [2025, 2026]
-    invalid_years: list[str] = ["a"]
-    dates: list[date] = [date(2026, 1, 1)]
-    invalid_dates: list[int] = [1]
+    years = [2025, 2026]
+    invalid_years = ["a"]
+    dates = [date(2026, 1, 1)]
+    invalid_dates = [1]
     MyModel.objects.annotate(created_date=TruncDate("created_at")).filter(created_date__year__in=years)
     MyModel.objects.annotate(created_date=TruncDate("created_at")).filter(created_date__year__in=invalid_years)  # E: Incompatible type for lookup 'created_date__year__in': (got "list[str]", expected "Iterable[int]")  [misc]
     MyModel.objects.annotate(current_time=Now()).filter(current_time__date__in=dates)
