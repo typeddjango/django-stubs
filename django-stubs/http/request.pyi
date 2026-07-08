@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Awaitable, Callable, Iterable, Iterator, Mapping, Sequence
 from re import Pattern
-from typing import Any, BinaryIO, Literal, NoReturn, Protocol, TypeAlias, overload, type_check_only, Generic
+from typing import Any, BinaryIO, Generic, Literal, NoReturn, Protocol, TypeAlias, overload, type_check_only
 
 from django.contrib.auth.models import _AnyUser
 from django.contrib.sessions.backends.base import SessionBase
