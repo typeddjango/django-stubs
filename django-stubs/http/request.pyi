@@ -77,7 +77,7 @@ class HttpRequest(Generic[_QueryT]):
     site: Site
     # django.contrib.sessions.middleware.SessionMiddleware
     session: SessionBase
-    # When created direcly, you can modify
+    # When created directly, you can modify
     # `HttpRequest.GET` and `HttpRequest.POST` data:
     def __new__(cls) -> HttpRequest[QueryDict]: ...
     def get_host(self) -> str: ...
