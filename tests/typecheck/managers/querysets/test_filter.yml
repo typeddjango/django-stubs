@@ -260,6 +260,29 @@
                     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
 
 
+-   case: lookup_with_union_of_model_and_outer_ref
+    main: |
+        from django.db.models import Exists, OuterRef, QuerySet
+        from myapp.models import Profile, User
+
+        def profiles_for(user: User | OuterRef) -> "QuerySet[Profile]":
+            return Profile.objects.filter(user=user)
+
+        profiles_for(User())
+        users_with_profile = User.objects.filter(Exists(profiles_for(OuterRef("pk"))))
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass
+                class Profile(models.Model):
+                    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+
+
 # TODO
 -   case: f_expression_simple_case
     main: |

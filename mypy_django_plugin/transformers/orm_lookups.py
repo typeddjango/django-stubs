@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mypy.nodes import ARG_NAMED, DictExpr, StrExpr
-from mypy.types import AnyType, Instance, ProperType, TypeOfAny, get_proper_type
+from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UnionType, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.exceptions import UnregisteredModelError
@@ -29,11 +29,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
     for lookup_kwarg, provided_type in zip(lookup_kwargs, provided_lookup_types, strict=False):
         if lookup_kwarg is None:
             continue
-        provided_type = get_proper_type(provided_type)
-        if isinstance(provided_type, Instance) and provided_type.type.has_base(
-            fullnames.COMBINABLE_EXPRESSION_FULLNAME
-        ):
-            provided_type = resolve_combinable_type(provided_type, django_context)
+        provided_type = resolve_combinables(get_proper_type(provided_type), django_context)
 
         lookup_type: MypyType
         try:
@@ -108,9 +104,14 @@ def _typecheck_defaults_kwarg(
             )
 
 
-def resolve_combinable_type(combinable_type: Instance, django_context: DjangoContext) -> ProperType:
-    if combinable_type.type.fullname != fullnames.F_EXPRESSION_FULLNAME:
-        # Combinables aside from F expressions are unsupported
-        return AnyType(TypeOfAny.explicit)
-
-    return django_context.resolve_f_expression_type(combinable_type)
+def resolve_combinables(provided_type: ProperType, django_context: DjangoContext) -> ProperType:
+    if isinstance(provided_type, UnionType):
+        return UnionType.make_union(
+            [resolve_combinables(get_proper_type(item), django_context) for item in provided_type.items]
+        )
+    if isinstance(provided_type, Instance) and provided_type.type.has_base(fullnames.COMBINABLE_EXPRESSION_FULLNAME):
+        if provided_type.type.fullname != fullnames.F_EXPRESSION_FULLNAME:
+            # Combinables aside from F expressions are unsupported
+            return AnyType(TypeOfAny.explicit)
+        return django_context.resolve_f_expression_type(provided_type)
+    return provided_type
