@@ -10,7 +10,6 @@ django.contrib.gis.db.models.FETCH_PEERS
 django.contrib.gis.db.models.JSONNull
 django.contrib.gis.db.models.RAISE
 django.contrib.gis.db.models.__all__
-django.core.management.commands.sendtestemail.Command.handle
 django.core.serializers.pyyaml.DjangoSafeDumper.represent_ordered_dict
 django.core.serializers.pyyaml.DjangoSafeDumper.represent_time
 django.core.serializers.xml_serializer.check_element_type
