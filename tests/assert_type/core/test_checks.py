@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from django.core.checks import CheckMessage, Warning, register
 from typing_extensions import assert_type
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 def check_foo(
     app_configs: Sequence[AppConfig] | None,
     databases: Sequence[str] | None,
-    **kwargs: Any,
+    **kwargs: object,
 ) -> list[Warning]:
     if databases and "databass" in databases:
         return [Warning("Naughty list")]
@@ -25,7 +25,7 @@ assert_type(check_foo.tags, Sequence[str])
 
 
 @register
-def check_bar(*, app_configs: Sequence[AppConfig] | None, **kwargs: Any) -> list[CheckMessage]:
+def check_bar(*, app_configs: Sequence[AppConfig] | None, **kwargs: object) -> list[CheckMessage]:
     raise NotImplementedError
 
 
@@ -33,7 +33,7 @@ assert_type(check_bar.tags, Sequence[str])
 
 
 @register
-def check_baz(**kwargs: Any) -> list[CheckMessage]:
+def check_baz(**kwargs: object) -> list[CheckMessage]:
     raise NotImplementedError
 
 
