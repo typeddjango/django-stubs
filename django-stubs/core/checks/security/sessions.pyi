@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
 from django.apps.config import AppConfig
-from django.core.checks.messages import Warning
+from django.core.checks.messages import CheckMessage, Warning
 
 def add_session_cookie_message(message: str) -> str: ...
 
@@ -15,5 +15,5 @@ W013: Warning
 W014: Warning
 W015: Warning
 
-def check_session_cookie_secure(app_configs: Sequence[AppConfig] | None, **kwargs: object) -> list[Warning]: ...
-def check_session_cookie_httponly(app_configs: Sequence[AppConfig] | None, **kwargs: object) -> list[Warning]: ...
+def check_session_cookie_secure(app_configs: Sequence[AppConfig] | None, **kwargs: object) -> list[CheckMessage]: ...
+def check_session_cookie_httponly(app_configs: Sequence[AppConfig] | None, **kwargs: object) -> list[CheckMessage]: ...

@@ -15,7 +15,7 @@ def check_foo(
     app_configs: Sequence[AppConfig] | None,
     databases: Sequence[str] | None,
     **kwargs: object,
-) -> list[Warning]:
+) -> list[CheckMessage]:
     if databases and "databass" in databases:
         return [Warning("Naughty list")]
     return []
