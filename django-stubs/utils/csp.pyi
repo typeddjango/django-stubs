@@ -1,7 +1,10 @@
 import sys
 from collections.abc import Collection, Mapping
 
+from django.forms import Media
+from django.template import Context
 from django.utils.functional import SimpleLazyObject
+from django.utils.safestring import SafeString
 from typing_extensions import override
 
 if sys.version_info >= (3, 11):
@@ -11,6 +14,8 @@ else:
 
     class _ReprEnum(Enum): ...  # type: ignore[misc]
     class _StrEnum(str, _ReprEnum): ...  # type: ignore[misc]
+
+CONTEXT_KEY: str
 
 class CSP(_StrEnum):
     HEADER_ENFORCE = "Content-Security-Policy"
@@ -32,6 +37,7 @@ class LazyNonce(SimpleLazyObject[str]):
     @override
     def __bool__(self) -> bool: ...
 
+def nonce_attr(context: Context, media: Media | None = None) -> SafeString: ...
 def generate_nonce() -> str: ...
 def build_policy(
     config: Mapping[str, Collection[str] | str], nonce: SimpleLazyObject[str] | str | None = None

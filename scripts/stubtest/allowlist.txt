@@ -116,7 +116,6 @@ django.template.base.kwarg_re
 django.test.client.CONTENT_TYPE_RE
 django.test.client.JSON_CONTENT_TYPE_RE
 django.test.html.ASCII_WHITESPACE
-django.utils.cache.cc_delim_re
 django.utils.dateformat.re_escaped
 django.utils.dateformat.re_formatchars
 django.utils.dateparse.date_re

@@ -1,17 +1,1 @@
-django.utils.cache.cc_delim_re
-django.utils.crypto.salted_hmac
-django.utils.csp.CONTEXT_KEY
-django.utils.csp.nonce_attr
-django.utils.deprecation.RemovedInDjango61Warning
-django.utils.deprecation.warn_about_external_use
-django.utils.deprecation.warn_about_implementation
-django.utils.http.split_directive_names
-django.utils.http.split_header_value
-django.utils.inspect.getfullargspec
-django.utils.log.AdminEmailHandler.__init__
-django.utils.log.AdminEmailHandler.connection
-django.utils.version.PY315
-django.utils.version.PY38
-django.utils.version.PY39
-django.utils.xmlutils.UnserializableContentError.__init__
 django.views.generic.base.RedirectView.preserve_request
