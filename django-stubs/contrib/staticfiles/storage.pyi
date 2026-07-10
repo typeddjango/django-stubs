@@ -2,9 +2,9 @@ from collections.abc import Callable, Iterator
 from re import Match
 from typing import Any, TypeAlias
 
+from _typeshed import StrPath
 from django.core.files.base import File
 from django.core.files.storage import FileSystemStorage, Storage
-from django.utils._os import _PathCompatible
 from django.utils.functional import LazyObject
 from typing_extensions import override
 
@@ -12,10 +12,10 @@ _PostProcessT: TypeAlias = Iterator[tuple[str, str, bool] | tuple[str, None, Run
 
 class StaticFilesStorage(FileSystemStorage):
     def __init__(
-        self, location: _PathCompatible | None = None, base_url: str | None = None, *args: Any, **kwargs: Any
+        self, location: StrPath | None = None, base_url: str | None = None, *args: Any, **kwargs: Any
     ) -> None: ...
     @override
-    def path(self, name: _PathCompatible) -> str: ...
+    def path(self, name: StrPath) -> str: ...
 
 class HashedFilesMixin:
     default_template: str
