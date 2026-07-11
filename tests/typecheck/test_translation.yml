@@ -1,0 +1,53 @@
+-   case: ngettext_accepts_int_and_float
+    main: |
+        from typing_extensions import reveal_type
+        from django.utils.translation import ngettext, npgettext
+
+        reveal_type(ngettext("apple", "apples", 1))  # N: Revealed type is "str"
+        reveal_type(ngettext("apple", "apples", 1.0))  # N: Revealed type is "str"
+        reveal_type(npgettext("fruit", "apple", "apples", 1))  # N: Revealed type is "str"
+        reveal_type(npgettext("fruit", "apple", "apples", 1.0))  # N: Revealed type is "str"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    pass
+
+-   case: ngettext_lazy_accepts_int_str_and_none
+    main: |
+        from typing_extensions import reveal_type
+        from django.utils.translation import ngettext_lazy, npgettext_lazy
+
+        reveal_type(ngettext_lazy("apple", "apples", 1))  # N: Revealed type is "django.utils.functional._StrPromise"
+        reveal_type(ngettext_lazy("apple", "apples", "count"))  # N: Revealed type is "django.utils.functional._StrPromise"
+        reveal_type(ngettext_lazy("apple", "apples"))  # N: Revealed type is "django.utils.functional._StrPromise"
+        reveal_type(npgettext_lazy("fruit", "apple", "apples", 1))  # N: Revealed type is "django.utils.functional._StrPromise"
+        reveal_type(npgettext_lazy("fruit", "apple", "apples", "count"))  # N: Revealed type is "django.utils.functional._StrPromise"
+        reveal_type(npgettext_lazy("fruit", "apple", "apples"))  # N: Revealed type is "django.utils.functional._StrPromise"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    pass
+
+-   case: ngettext_rejects_str_number
+    main: |
+        from django.utils.translation import ngettext
+        ngettext("apple", "apples", "1")  # E: Argument 3 to "ngettext" has incompatible type "str"; expected "int | float"  [arg-type]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class MyModel(models.Model):
+                    pass
