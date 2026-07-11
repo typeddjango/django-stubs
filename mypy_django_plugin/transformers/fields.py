@@ -62,6 +62,8 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
         return AnyType(TypeOfAny.from_error)
 
     default_related_field_type = set_descriptor_types_for_field(ctx)
+    if len(default_related_field_type.args) != 3:
+        return default_related_field_type
 
     # self reference with abstract=True on the model where ForeignKey is defined
     current_model_cls = current_field.model
