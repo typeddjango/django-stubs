@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing_extensions import assert_type
-
 from django.utils.functional import _StrPromise
 from django.utils.translation import ngettext, ngettext_lazy, npgettext, npgettext_lazy
+from typing_extensions import assert_type
 
 # ngettext / npgettext accept int and float
 assert_type(ngettext("apple", "apples", 1), str)
