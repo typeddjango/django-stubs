@@ -5,7 +5,7 @@ import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, NamedTuple, Literal
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
@@ -411,9 +411,7 @@ class DjangoContext:
 
         return related_model_cls
 
-    def _resolve_field_from_parts(
-        self, field_parts: Iterable[str], model_cls: type[Model]
-    ) -> ResolvedLookupField:
+    def _resolve_field_from_parts(self, field_parts: Iterable[str], model_cls: type[Model]) -> ResolvedLookupField:
         """
         Resolve ``field_parts`` (as produced by ``Query.solve_lookup_type``) to a
         concrete field and the model it belongs to.  ``is_nullable`` is ``True``
@@ -606,9 +604,7 @@ class DjangoContext:
                 return AnyType(TypeOfAny.explicit)
 
         if lookup_cls is None or issubclass(lookup_cls, Exact):
-            return self.get_field_lookup_exact_type(
-                helpers.get_typechecker_api(ctx), field, is_nullable=is_nullable
-            )
+            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field, is_nullable=is_nullable)
 
         if issubclass(lookup_cls, In):
             exact_type = self.get_field_lookup_exact_type(
