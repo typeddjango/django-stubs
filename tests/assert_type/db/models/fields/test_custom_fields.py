@@ -39,7 +39,7 @@ def single_type_field() -> None:
     class MyModel(models.Model):
         field = SingleTypeField[bool]()
         explicit_null_field = SingleTypeField[bool | None, Literal[True]](null=True)
-        conflict_null_field = SingleTypeField[bool](null=True)  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+        conflict_null_field = SingleTypeField[bool](null=True)  # type: ignore[arg-type] # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
         explicit_conflict_null_field = SingleTypeField[bool, Literal[False]](null=True)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
 
     instance = MyModel()
