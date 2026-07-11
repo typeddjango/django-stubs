@@ -5,7 +5,7 @@ import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, NamedTuple, Literal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
@@ -111,6 +111,14 @@ def _get_field_get_type_from_model_type_info(info: TypeInfo | None, field_name: 
     return None
 
 
+class ResolvedLookupField(NamedTuple):
+    """Result of resolving a lookup's field parts to a concrete field."""
+
+    field: Field[Any, Any] | ForeignObjectRel
+    model: type[Model]
+    is_nullable: bool
+
+
 class DjangoContext:
     def __init__(self, django_settings_module: str) -> None:
         self.django_settings_module = django_settings_module
@@ -163,7 +171,7 @@ class DjangoContext:
         api: TypeChecker,
         field: Field[Any, Any] | ForeignObjectRel,
         *,
-        is_nullable_fk_id: bool = False,
+        is_nullable: bool = False,
     ) -> MypyType:
         if isinstance(field, RelatedField | ForeignObjectRel):
             related_model_cls = self.get_field_related_model_cls(field)
@@ -181,7 +189,7 @@ class DjangoContext:
         if field_info is None:
             return AnyType(TypeOfAny.explicit)
         return helpers.get_private_descriptor_type(
-            field_info, "_pyi_lookup_exact_type", is_nullable=field.null or is_nullable_fk_id
+            field_info, "_pyi_lookup_exact_type", is_nullable=field.null or is_nullable
         )
 
     def get_related_target_field(
@@ -405,18 +413,19 @@ class DjangoContext:
 
     def _resolve_field_from_parts(
         self, field_parts: Iterable[str], model_cls: type[Model]
-    ) -> tuple[Field[Any, Any] | ForeignObjectRel, type[Model], bool]:
+    ) -> ResolvedLookupField:
         """
         Resolve ``field_parts`` (as produced by ``Query.solve_lookup_type``) to a
-        concrete field and the model it belongs to.  The third return value is
-        ``True`` when the resolved field was reached via a nullable FK ``_id``
-        attname (e.g. ``prospect_id`` on ``prospect = ForeignKey(null=True)``);
-        callers that inspect ``field.null`` should treat the field as nullable in
-        that case, because the underlying PK field is always ``null=False``.
+        concrete field and the model it belongs to.  ``is_nullable`` is ``True``
+        when the resolved field should be treated as nullable even if
+        ``field.null`` is ``False`` — this happens when the lookup goes through
+        a nullable FK ``_id`` attname (e.g. ``prospect_id`` on
+        ``prospect = ForeignKey(null=True)``), because the underlying PK field
+        is always ``null=False`` but the column is nullable when the FK is.
         """
         currently_observed_model = model_cls
         field: _AnyField | None = None
-        is_nullable_fk_id = False
+        is_nullable = False
         for field_part in field_parts:
             if field_part == "pk":
                 field = self.get_primary_key_field(currently_observed_model)
@@ -435,7 +444,7 @@ class DjangoContext:
                     # FK is.
                     # ``field_part != field.name`` excludes ManyToManyField, whose
                     # ``attname`` equals its ``name`` (no ``_id`` column variant).
-                    is_nullable_fk_id = field.null
+                    is_nullable = field.null
                     field = self.get_primary_key_field(currently_observed_model)
 
             if isinstance(field, ForeignObjectRel):
@@ -443,7 +452,7 @@ class DjangoContext:
 
         # Guaranteed by `query.solve_lookup_type` before.
         assert isinstance(field, Field | ForeignObjectRel)
-        return field, currently_observed_model, is_nullable_fk_id
+        return ResolvedLookupField(field, currently_observed_model, is_nullable)
 
     def solve_lookup_type(
         self, model_cls: type[Model], lookup: str
@@ -584,7 +593,9 @@ class DjangoContext:
         if is_expression:
             return AnyType(TypeOfAny.explicit)
 
-        field, _, is_nullable_fk_id = self._resolve_field_from_parts(field_parts, model_cls)
+        resolved = self._resolve_field_from_parts(field_parts, model_cls)
+        field = resolved.field
+        is_nullable = resolved.is_nullable
 
         lookup_cls = None
         if lookup_parts:
@@ -596,12 +607,12 @@ class DjangoContext:
 
         if lookup_cls is None or issubclass(lookup_cls, Exact):
             return self.get_field_lookup_exact_type(
-                helpers.get_typechecker_api(ctx), field, is_nullable_fk_id=is_nullable_fk_id
+                helpers.get_typechecker_api(ctx), field, is_nullable=is_nullable
             )
 
         if issubclass(lookup_cls, In):
             exact_type = self.get_field_lookup_exact_type(
-                helpers.get_typechecker_api(ctx), field, is_nullable_fk_id=is_nullable_fk_id
+                helpers.get_typechecker_api(ctx), field, is_nullable=is_nullable
             )
             return ctx.api.named_generic_type("typing.Iterable", [exact_type])
 
