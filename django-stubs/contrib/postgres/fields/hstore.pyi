@@ -11,8 +11,6 @@ from typing_extensions import override
 class HStoreField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
     @override
     def get_transform(self, name: str) -> Any: ...
-    @override
-    def formfield(self, **kwargs: Any) -> Any: ...  # type: ignore[override]
 
 class KeyTransform(Transform):
     output_field: ClassVar[TextField]

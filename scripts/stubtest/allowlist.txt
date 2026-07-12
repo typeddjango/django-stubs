@@ -237,6 +237,11 @@ django.urls.resolvers.ResolverMatch.__iter__
 django.template.smartif.key
 django.template.smartif.op
 
+# The parameters form_class / choices_form_class are positional at runtime, but
+# usage and docs always pass them as keyword args; additionally, all subclasses
+# require them to be keyword-only, so require all usage to be keyword-only.
+django.db.models.fields.Field.formfield
+
 # Field.__get__/__set__ are stub-only for the mypy plugin, they don't exist at runtime
 django.db.models.fields.Field.__get__
 django.db.models.fields.Field.__set__
