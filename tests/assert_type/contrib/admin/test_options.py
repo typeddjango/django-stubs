@@ -53,7 +53,7 @@ class FullModelAdmin(admin.ModelAdmin[FullAdminModel]):
         "another_field": admin.HORIZONTAL,
     }
     prepopulated_fields = {"slug": ("title",)}
-    formfield_overrides = {models.TextField: {"widget": Textarea}}  # pyright: ignore[reportUnknownVariableType]
+    formfield_overrides = {models.TextField: {"widget": Textarea}}
     readonly_fields = ("date_modified",)
     ordering = ("-pk", "date_modified")
     sortable_by = ["pk"]
