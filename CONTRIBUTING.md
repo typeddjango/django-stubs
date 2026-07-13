@@ -86,51 +86,12 @@ pre-commit install --install-hooks
 
 ### Testing and Linting
 
-Running `just` at the root of the repository lists all available recipes:
-
-```
-$ just
-Available recipes:
-    [dev]
-    bootstrap      # Bootstrap dev environment: install pre-commit hooks and sync dependencies
-    lint           # Run pre-commit hooks on all files
-    pre-mr-check   # Run all checks before submitting a PR
-    clean          # Remove mypy cache
-
-    [typecheck]
-    mypy           # Run mypy on plugin, ext, scripts, stubs and tests
-    pyright        # Run pyright on test cases
-    pyrefly        # Run pyrefly on test cases
-    ty             # Run ty on test cases
-
-    [test]
-    test +args     # Run pytest on specific files or with custom args (no xdist)
-    all-test       # Run full pytest test suite with parallel workers
-    stubtest *args # Run stubtest to check stubs match runtime
-    ext-test       # Run django-stubs-ext tests
-
-    [build]
-    build          # Build all packages
-    lock-check     # Check that uv.lock is up to date
-```
+Running `just` at the root of the repository lists all available recipes
 
 Before submitting a PR, run all checks at once:
 
 ```bash
 just pre-mr-check
-```
-
-Or run individual checks:
-
-```bash
-just lint          # pre-commit hooks (ruff, codespell, ...)
-just mypy          # mypy on plugin, ext, scripts, stubs and tests
-just test tests/test_xyz.yml  # run specific tests (no xdist)
-just all-test      # full pytest suite (parallel)
-just stubtest      # stubtest: check stubs match runtime
-just pyright       # pyright on test cases
-just ty            # ty on test cases
-just pyrefly       # pyrefly on test cases
 ```
 
 Extra arguments can be passed to `test` and `stubtest`:
@@ -141,6 +102,21 @@ just stubtest --allowlist extra.txt
 ```
 
 If you get unexpected results, clear the mypy cache with `just clean`.
+
+### Model-based `assert_type` tests
+
+For tests that need Django models, add a `models.py` module under `tests/assert_type/`.
+Its package is discovered and automatically added to `INSTALLED_APPS` for the test suite.
+
+For example, a model-based test can be structured like this:
+
+```text
+tests/assert_type/
+└── db/models/fields/test_related_forward/
+    ├── __init__.py
+    └── models.py
+    └── test_my_feature.py
+```
 
 ### Debugging plugin code
 
