@@ -30,7 +30,7 @@ _ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
 _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 _LimitChoicesToCallable: TypeAlias = Callable[[], _LimitChoicesTo]
 
-_F = TypeVar("_F", bound=Field, covariant=True)
+_F = TypeVar("_F", bound=Field[Any, Any], covariant=True)
 
 @type_check_only
 class _FieldDescriptor(Protocol[_F]):
