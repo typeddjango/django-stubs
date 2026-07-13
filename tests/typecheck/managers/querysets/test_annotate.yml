@@ -319,13 +319,10 @@
 
         # The following should happen to the TypeVars:
         #  1st typevar (Model): Blog => django_stubs_ext.WithAnnotations[Blog]
-        #  2nd typevar (Row): Should assume that we don't know what is in the row anymore (due to the annotation)
-        # Since we can't trust that only 'text' is in the row type anymore.
-
-        # It's possible to provide more precise types than than this, but without inspecting the
-        # arguments to .annotate, these are the best types we can infer.
+        #  2nd typevar (Row): The values() dict keys are preserved and extended with the
+        #  annotation aliases, mirroring Django's `.values(...).annotate(...)` behavior.
         qs1 = Blog.objects.values('text').annotate(foo=F('id'))
-        reveal_type(qs1) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], dict[str, Any]]"
+        reveal_type(qs1) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], TypedDict({'text': str, 'foo': Any})]"
         qs2 = Blog.objects.values_list('text').annotate(foo=F('id'))
         reveal_type(qs2) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], tuple[Any, ...]]"
         qs3 = Blog.objects.values_list('text', named=True).annotate(foo=F('id'))
@@ -340,7 +337,7 @@
 
 
         before_values_no_params = Blog.objects.values().annotate(foo=F('id')).get()
-        reveal_type(before_values_no_params)  # N: Revealed type is "dict[str, Any]"
+        reveal_type(before_values_no_params)  # N: Revealed type is "TypedDict({'id': int, 'num_posts': int, 'text': str, 'foo': Any})"
 
         before_values_list_no_params = Blog.objects.values_list().annotate(foo=F('id')).get()
         reveal_type(before_values_list_no_params)  # N: Revealed type is "tuple[Any, ...]"

@@ -15,6 +15,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query import _OrderByFieldName
 from django.db.models.query_utils import Q, RegisterLookupMixin
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
+from django.forms.widgets import Widget
 from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
@@ -264,9 +265,22 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT, _NT]):
     def save_form_data(self, instance: Model, data: Any) -> None: ...
     def formfield(
         self,
-        form_class: type[forms.Field] | None = None,
-        choices_form_class: type[forms.ChoiceField] | None = None,
+        *,
+        form_class: type[forms.Field] | None = ...,
+        choices_form_class: type[forms.ChoiceField] | None = ...,
+        required: bool = ...,
+        widget: Widget | type[Widget] | None = ...,
+        label: _StrOrPromise | None = ...,
+        initial: Any | None = ...,
+        help_text: _StrOrPromise = ...,
+        error_messages: _ErrorMessagesMapping | None = ...,
+        show_hidden_initial: bool = ...,
+        validators: Iterable[_ValidatorCallable] = ...,
+        localize: bool = ...,
+        disabled: bool = ...,
+        label_suffix: str | None = ...,
         **kwargs: Any,
+        # Subclasses are allowed to return None
     ) -> forms.Field | None: ...
     def value_from_object(self, obj: Model) -> _GT: ...
     def slice_expression(self, expression: Expression, start: int, length: int | None) -> Func: ...
@@ -276,8 +290,6 @@ _GT_Int = TypeVar("_GT_Int", covariant=True, default=int)
 
 class IntegerField(Field[_ST_Int, _GT_Int, _NT]):
     _pyi_lookup_exact_type: str | int
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
@@ -286,31 +298,21 @@ class SmallIntegerField(IntegerField[_ST_Int, _GT_Int, _NT]): ...
 
 class BigIntegerField(IntegerField[_ST_Int, _GT_Int, _NT]):
     MAX_BIGINT: ClassVar[int]
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int, _GT_Int, _NT]):
     integer_field_class: type[IntegerField]
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST_Int, _GT_Int, _NT]):
     integer_field_class: type[SmallIntegerField]
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST_Int, _GT_Int, _NT]):
     integer_field_class: type[BigIntegerField]
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_Float = TypeVar("_ST_Float", contravariant=True, default=float | int | str)
 _GT_Float = TypeVar("_GT_Float", covariant=True, default=float)
 
 class FloatField(Field[_ST_Float, _GT_Float, _NT]):
     _pyi_lookup_exact_type: float
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_Decimal = TypeVar("_ST_Decimal", contravariant=True, default=str | float | decimal.Decimal)
 _GT_Decimal = TypeVar("_GT_Decimal", covariant=True, default=decimal.Decimal)
@@ -347,8 +349,6 @@ class DecimalField(Field[_ST_Decimal, _GT_Decimal, _NT]):
     ) -> None: ...
     @cached_property
     def context(self) -> decimal.Context: ...
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_Char = TypeVar("_ST_Char", contravariant=True, default=str | int)
 _GT_Char = TypeVar("_GT_Char", covariant=True, default=str)
@@ -384,8 +384,6 @@ class CharField(Field[_ST_Char, _GT_Char, _NT]):
         *,
         db_collation: str | None = None,
     ) -> None: ...
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 class CommaSeparatedIntegerField(CharField[_ST_Char, _GT_Char, _NT]): ...
 
@@ -418,14 +416,10 @@ class SlugField(CharField[_ST_Char, _GT_Char, _NT]):
         db_index: bool = True,
         allow_unicode: bool = False,
     ) -> None: ...
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_Email = TypeVar("_ST_Email", contravariant=True, default=str)
 
-class EmailField(CharField[_ST_Email, _GT_Char, _NT]):
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
+class EmailField(CharField[_ST_Email, _GT_Char, _NT]): ...
 
 class URLField(CharField[_ST_Char, _GT_Char, _NT]):
     def __init__(
@@ -456,8 +450,6 @@ class URLField(CharField[_ST_Char, _GT_Char, _NT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_Text = TypeVar("_ST_Text", contravariant=True, default=str)
 _GT_Text = TypeVar("_GT_Text", covariant=True, default=str)
@@ -493,16 +485,12 @@ class TextField(Field[_ST_Text, _GT_Text, _NT]):
         *,
         db_collation: str | None = None,
     ) -> None: ...
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_Bool = TypeVar("_ST_Bool", contravariant=True, default=bool)
 _GT_Bool = TypeVar("_GT_Bool", covariant=True, default=bool)
 
 class BooleanField(Field[_ST_Bool, _GT_Bool, _NT]):
     _pyi_lookup_exact_type: bool
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_NBool = TypeVar("_ST_NBool", contravariant=True, default=bool | None)
 _GT_NBool = TypeVar("_GT_NBool", covariant=True, default=bool | None)
@@ -545,8 +533,6 @@ class GenericIPAddressField(Field[_ST_GenIP, _GT_IP, _NT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 class DateTimeCheckMixin:
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
@@ -586,8 +572,6 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date, _GT_Date, _NT]):
     ) -> None: ...
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_Time = TypeVar("_ST_Time", contravariant=True, default=str | time | real_datetime)
 _GT_Time = TypeVar("_GT_Time", covariant=True, default=time)
@@ -620,16 +604,12 @@ class TimeField(DateTimeCheckMixin, Field[_ST_Time, _GT_Time, _NT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_DateTime = TypeVar("_ST_DateTime", contravariant=True, default=str | real_datetime | date)
 _GT_DateTime = TypeVar("_GT_DateTime", covariant=True, default=real_datetime)
 
 class DateTimeField(DateField[_ST_DateTime, _GT_DateTime, _NT]):
     _pyi_lookup_exact_type: str | real_datetime
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_UUID = TypeVar("_ST_UUID", contravariant=True, default=str | uuid.UUID)
 _GT_UUID = TypeVar("_GT_UUID", covariant=True, default=uuid.UUID)
@@ -664,8 +644,6 @@ class UUIDField(Field[_ST_UUID, _GT_UUID, _NT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 class FilePathField(Field[_ST, _GT, _NT]):
     path: Any
@@ -702,8 +680,6 @@ class FilePathField(Field[_ST, _GT, _NT]):
         validators: Iterable[_ValidatorCallable] = ...,
         error_messages: _ErrorMessagesMapping | None = ...,
     ) -> None: ...
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
 
 _ST_Binary = TypeVar("_ST_Binary", contravariant=True, default=bytes | bytearray | memoryview)
 _GT_Binary = TypeVar("_GT_Binary", covariant=True, default=bytes | memoryview)
@@ -714,9 +690,7 @@ class BinaryField(Field[_ST_Binary, _GT_Binary, _NT]):
 _ST_Duration = TypeVar("_ST_Duration", contravariant=True, default=str | timedelta)
 _GT_Duration = TypeVar("_GT_Duration", covariant=True, default=timedelta)
 
-class DurationField(Field[_ST_Duration, _GT_Duration, _NT]):
-    @override
-    def formfield(self, **kwargs: Any) -> forms.Field | None: ...  # type: ignore[override]
+class DurationField(Field[_ST_Duration, _GT_Duration, _NT]): ...
 
 class AutoFieldMixin:
     db_returning: bool
