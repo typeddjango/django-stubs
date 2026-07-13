@@ -16,37 +16,44 @@ lint:
 
 # Run all checks before submitting a PR
 [group('dev')]
-pre-mr-check: lint typecheck-all stubtest ext-test test
+pre-mr-check: lint typecheck-all mypy-self stubtest ext-test test
 
 # Remove mypy cache
 [group('dev')]
-clean:
+clean-cache:
     rm -rf .mypy_cache
+    rm -rf .pytest_cache
+    rm -rf .ruff_cache
 
-# Run mypy on plugin, ext, scripts, stubs and tests
+# Run mypy on the internal python code.
 [group('typecheck')]
-mypy:
-    uv run mypy ext scripts mypy_django_plugin tests
+mypy-self:
+    uv run mypy ext scripts mypy_django_plugin
     uv run mypy --cache-dir=/dev/null --no-incremental django-stubs
 
-# Run pyright on test cases
+# Run mypy on test cases (default), or on the given files
 [group('typecheck')]
-pyright:
-    uv run pyright
+mypy *files="tests/assert_type":
+    uv run mypy {{ files }}
 
-# Run pyrefly on test cases
+# Run pyright on test cases (default), or on the given files
 [group('typecheck')]
-pyrefly:
-    uv run pyrefly check tests/assert_type
+pyright *files="tests/assert_type":
+    uv run pyright {{ files }}
 
-# Run ty on test cases
+# Run pyrefly on test cases (default), or on the given files
 [group('typecheck')]
-ty:
-    uv run ty check tests/assert_type
+pyrefly *files="tests/assert_type":
+    uv run pyrefly check {{ files }}
 
-# Run all typechecker on test cases
+# Run ty on test cases (default), or on the given files
 [group('typecheck')]
-typecheck-all: pyrefly ty pyright mypy
+ty *files="tests/assert_type":
+    uv run ty check {{ files }}
+
+# Run all typecheckers on test cases (default), or on the given files
+[group('typecheck')]
+typecheck-all *files="tests/assert_type": (pyrefly files) (ty files) (pyright files) (mypy files)
 
 # Run pytest tests
 [group('test')]
