@@ -60,6 +60,10 @@
 
         # values() with annotation then order_by
         Article.objects.values(name=F("author__name")).order_by("name")
+
+        # values() alias preserved through a subsequent annotate()
+        Article.objects.values(name=F("id")).annotate(foo=F("id")).order_by("name")
+        Article.objects.values(name=F("id")).annotate(foo=F("id")).order_by("foo")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py

@@ -417,10 +417,10 @@ def _resolve_annotate_row_type(
         return annotated_model
     original_row_type = get_proper_type(default_return_type.args[1])
     if isinstance(original_row_type, TypedDictType):
-        return api.named_generic_type(
-            "builtins.dict",
-            [api.named_generic_type("builtins.str", []), AnyType(TypeOfAny.from_omitted_generics)],
+        annotation_td = helpers.make_typeddict(
+            api, {name: AnyType(TypeOfAny.from_omitted_generics) for name in expression_types}
         )
+        return helpers.merge_typeddict(api, original_row_type, annotation_td)
     if isinstance(original_row_type, TupleType):
         if original_row_type.partial_fallback.type.has_base("typing.NamedTuple"):
             # Rebuild the NamedTuple with existing fields + annotation fields.
