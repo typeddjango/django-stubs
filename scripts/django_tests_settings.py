@@ -9,13 +9,11 @@ _ASSERT_TYPE_APPS_ROOT = _REPO_ROOT / "tests" / "assert_type"
 
 
 def _discover_assert_type_apps() -> list[str]:
-    """Discover Django apps under ``tests/assert_type``.
+    """Discover Django apps under `tests/assert_type`.
 
-    Each directory containing a ``models.py`` is registered as an app,
-    with the directory name as the implicit ``app_label``.
+    Each directory containing a `models.py` is registered as an app,
+    with the directory name as the implicit `app_label`.
     """
-    if not _ASSERT_TYPE_APPS_ROOT.is_dir():
-        return []
     return sorted(
         ".".join(models_py.parent.relative_to(_REPO_ROOT).parts)
         for models_py in _ASSERT_TYPE_APPS_ROOT.rglob("models.py")
