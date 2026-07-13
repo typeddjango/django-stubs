@@ -22,7 +22,6 @@ from mypy.semanal_shared import has_placeholder
 from mypy.subtypes import find_member
 from mypy.types import AnyType, CallableType, Instance, ProperType, TypeOfAny, TypeType, UnionType, get_proper_type
 from mypy.types import Type as MypyType
-from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.lib import fullnames, helpers
 
@@ -264,25 +263,14 @@ def create_manager_info_from_from_queryset_call(
 def create_manager_class(
     api: SemanticAnalyzer, base_manager_info: TypeInfo, name: str, line: int, with_unique_name: bool
 ) -> TypeInfo:
-    base_manager_instance = fill_typevars(base_manager_info)
-    assert isinstance(base_manager_instance, Instance)
-
     # If any of the type vars are undefined we need to defer. This is handled by the caller
     if any(has_placeholder(type_var) for type_var in base_manager_info.defn.type_vars):
         raise helpers.IncompleteDefnException
 
-    if with_unique_name:
-        manager_info = helpers.add_new_class_for_module(
-            module=api.modules[api.cur_mod_id],
-            name=name,
-            bases=[base_manager_instance],
-        )
-    else:
-        manager_info = helpers.create_type_info(name, api.cur_mod_id, bases=[base_manager_instance])
-
+    manager_info = helpers.build_reparametrized_subclass(
+        api.modules[api.cur_mod_id], base_manager_info, name, unique_name=with_unique_name
+    )
     manager_info.line = line
-    manager_info.type_vars = base_manager_info.type_vars
-    manager_info.defn.type_vars = base_manager_info.defn.type_vars
     manager_info.defn.line = line
 
     return manager_info
