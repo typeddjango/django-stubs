@@ -4,8 +4,7 @@ from typing import Any
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable
-from django.db.models.fields import Field, _AllLimitChoicesTo
+from django.db.models.fields import _GT, _NT, _ST, Field, _AllLimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import ForeignObject
 from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
@@ -16,11 +15,7 @@ from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
 from typing_extensions import override
 
-class GenericForeignKey(FieldCacheMixin, Field):
-    # django-stubs implementation only fields
-    _pyi_private_set_type: Any | Combinable
-    _pyi_private_get_type: Any
-    # attributes
+class GenericForeignKey(FieldCacheMixin, Field[_ST, _GT, _NT]):
     hidden: bool
     is_relation: bool
     many_to_many: bool
@@ -74,7 +69,7 @@ class GenericRel(ForeignObjectRel):
         limit_choices_to: _AllLimitChoicesTo | None = None,
     ) -> None: ...
 
-class GenericRelation(ForeignObject[Any, Any]):
+class GenericRelation(ForeignObject[Any, Any, Any]):
     rel_class: type[GenericRel]
     mti_inherited: bool
     object_id_field_name: str
@@ -91,7 +86,7 @@ class GenericRelation(ForeignObject[Any, Any]):
         **kwargs: Any,
     ) -> None: ...
     @override
-    def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
+    def resolve_related_fields(self) -> list[tuple[Field[Any, Any, Any], Field[Any, Any, Any]]]: ...
     @override
     def get_local_related_value(self, instance: Model) -> tuple[Any, ...]: ...
     @override

@@ -72,7 +72,7 @@ def _typecheck_defaults_kwarg(
         return
 
     api = helpers.get_typechecker_api(ctx)
-    expected_types = django_context.get_expected_types(api, django_model.cls, method="create")
+    expected_types = django_context.get_expected_types(api, django_model.cls, ctx.context)
     model_name = django_model.cls.__name__
 
     for idx in defaults_positions:

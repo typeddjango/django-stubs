@@ -246,10 +246,11 @@ django.db.models.fields.Field.formfield
 django.db.models.fields.Field.__get__
 django.db.models.fields.Field.__set__
 django.db.models.fields.files.FileField.__get__
-django.db.models.fields.files.ImageField.__get__
 django.db.models.fields.related.ForeignObject.__get__
+django.db.models.fields.related.ForeignObject.__set__
 django.db.models.fields.related.ManyToManyField.__get__
 django.db.models.fields.related.OneToOneField.__get__
+django.db.models.fields.related.OneToOneField.__set__
 
 # These are dynamically added at runtime with loose types
 django.utils.functional.LazyObject.__bool__

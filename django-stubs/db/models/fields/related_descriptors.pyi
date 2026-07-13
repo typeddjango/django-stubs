@@ -13,7 +13,7 @@ from django.utils.functional import cached_property
 from typing_extensions import Never, Self, TypeVar, override
 
 _M = TypeVar("_M", bound=Model)
-_F = TypeVar("_F", bound=Field)
+_F = TypeVar("_F", bound=Field[Any, Any, Any])
 _From = TypeVar("_From", bound=Model)
 _Through = TypeVar("_Through", bound=Model, default=Model)
 _To = TypeVar("_To", bound=Model)
@@ -135,7 +135,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor, Generic[_To, _Through]):
 
     # 'field' here is 'rel.field'
     rel: ManyToManyRel  # type: ignore[assignment]
-    field: ManyToManyField[_To, _Through]  # type: ignore[assignment]
+    field: ManyToManyField[_To, _Through]
     reverse: bool
     def __init__(self, rel: ManyToManyRel, reverse: bool = False) -> None: ...
     @property

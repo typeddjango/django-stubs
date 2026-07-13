@@ -5,9 +5,10 @@ from django.contrib.postgres import forms
 from django.contrib.postgres.utils import CheckPostgresInstalledMixin
 from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.models.fields import _NT, _ST
 from django.db.models.lookups import PostgresOperatorLookup
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
-from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range  # type: ignore[import-untyped]
+from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange  # type: ignore[import-untyped]
 from typing_extensions import TypeVar, override
 
 class RangeBoundary(models.Expression):
@@ -27,9 +28,9 @@ class RangeOperators:
     NOT_GT: Literal["&<"]
     ADJACENT_TO: Literal["-|-"]
 
-_RangeT = TypeVar("_RangeT", bound=Range[Any])
+_RangeT = TypeVar("_RangeT", covariant=True, default=Any)
 
-class RangeField(CheckPostgresInstalledMixin, models.Field[Any, _RangeT]):
+class RangeField(CheckPostgresInstalledMixin, models.Field[_ST, _RangeT, _NT]):
     empty_strings_allowed: bool
     base_field: type[models.Field]
     range_type: type[_RangeT]
@@ -41,27 +42,27 @@ class RangeField(CheckPostgresInstalledMixin, models.Field[Any, _RangeT]):
     @override
     def value_to_string(self, obj: models.Model) -> str | None: ...  # type: ignore[override]
 
-class ContinuousRangeField(RangeField[_RangeT]):
+class ContinuousRangeField(RangeField[_ST, _RangeT, _NT]):
     default_bounds: str
     def __init__(self, *args: Any, default_bounds: str = "[)", **kwargs: Any) -> None: ...
 
-class IntegerRangeField(RangeField[NumericRange]):
+class IntegerRangeField(RangeField[_ST, NumericRange, _NT]):
     base_field: type[models.IntegerField]
     form_field: type[forms.IntegerRangeField]
 
-class BigIntegerRangeField(RangeField[NumericRange]):
+class BigIntegerRangeField(RangeField[_ST, NumericRange, _NT]):
     base_field: type[models.BigIntegerField]
     form_field: type[forms.IntegerRangeField]
 
-class DecimalRangeField(ContinuousRangeField[NumericRange]):
+class DecimalRangeField(ContinuousRangeField[_ST, NumericRange, _NT]):
     base_field: type[models.DecimalField]
     form_field: type[forms.DecimalRangeField]
 
-class DateTimeRangeField(ContinuousRangeField[DateTimeTZRange]):
+class DateTimeRangeField(ContinuousRangeField[_ST, DateTimeTZRange, _NT]):
     base_field: type[models.DateTimeField]
     form_field: type[forms.DateTimeRangeField]
 
-class DateRangeField(RangeField[DateRange]):
+class DateRangeField(RangeField[_ST, DateRange, _NT]):
     base_field: type[models.DateField]
     form_field: type[forms.DateRangeField]
 

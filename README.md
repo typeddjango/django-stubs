@@ -409,23 +409,34 @@ Use this setting on your own risk, because it can hide valid errors.
 > This require type generic support, see <a href="#i-cannot-use-queryset-or-manager-with-type-annotations">this section</a> to enable it.
 
 
-Django `models.Field` (and subclasses) are generic types with two parameters:
+Django `models.Field` (and subclasses) are generic types with three parameters:
 - `_ST`: type that can be used when setting a value
 - `_GT`: type that will be returned when getting a value
+- `_NT`: `Literal[True]` or `Literal[False]`, tracking the field's `null=...` flag so
+  `None` can be added to `_GT`/ `_ST` automatically when the field is nullable
 
 When you create a subclass, you have two options depending on how strict you want
 the type to be for consumers of your custom field.
 
+> [!IMPORTANT]
+> Each `TypeVar` you forward to `models.Field` (or one of its subclasses) **must**
+> declare a `default=` value (PEP 696). Without a default, mypy will not be able
+> to instantiate your field without explicit type arguments and the plugin will
+> not be able to infer the right types for your model attributes.
+
 1. Generic subclass:
 
 ```python
-from typing import TypeVar, reveal_type
+from typing import Literal, reveal_type
+from typing_extensions import TypeVar  # for `default=` (PEP 696)
 from django.db import models
+from django.db.models.expressions import Combinable
 
-_ST = TypeVar("_ST", contravariant=True)
-_GT = TypeVar("_GT", covariant=True)
+_ST = TypeVar("_ST", contravariant=True, default=float | int | str | Combinable)
+_GT = TypeVar("_GT", covariant=True, default=int)
+_NT = TypeVar("_NT", Literal[True], Literal[False], default=Literal[False])
 
-class MyIntegerField(models.IntegerField[_ST, _GT]):
+class MyIntegerField(models.IntegerField[_ST, _GT, _NT]):
     ...
 
 class User(models.Model):
@@ -439,12 +450,14 @@ User().my_field = "12"  # OK (because Django IntegerField allows str and will tr
 2. Non-generic subclass (more strict):
 
 ```python
-from typing import reveal_type
+from typing import Literal, reveal_type, TypeVar
 from django.db import models
+
+_NT = TypeVar("_NT", Literal[True], Literal[False], default=Literal[False])
 
 # This is a non-generic subclass being very explicit
 # that it expects only int when setting values.
-class MyStrictIntegerField(models.IntegerField[int, int]):
+class MyStrictIntegerField(models.IntegerField[int, int, _NT]):
     ...
 
 class User(models.Model):
@@ -456,6 +469,34 @@ User().my_field = "12" # E: Incompatible types in assignment (expression has typ
 ```
 
 See mypy section on [generic classes subclasses](https://mypy.readthedocs.io/en/stable/generics.html#defining-subclasses-of-generic-classes).
+
+#### Overriding `__init__`
+
+If you override `__init__`, expose `null: _NT` in the signature so type
+checkers can track the `null=` flag — a plain `*args, **kwargs` passthrough
+loses it and `_NT` falls back to `Literal[False]`:
+
+```python
+from typing import Any, Literal
+from typing_extensions import TypeVar, assert_type
+from django.db import models
+
+_ST = TypeVar("_ST", contravariant=True, default=float | int | str)
+_GT = TypeVar("_GT", covariant=True, default=int)
+_NT = TypeVar("_NT", Literal[True], Literal[False], default=Literal[False])
+
+class MyIntegerField(models.IntegerField[_ST, _GT, _NT]):
+    def __init__(self, *args: Any, null: _NT = False, **kwargs: Any) -> None:  # type: ignore[assignment]
+        kwargs["null"] = null
+        super().__init__(*args, **kwargs)
+
+class User(models.Model):
+    custom_int = MyIntegerField(null=False)
+    custom_int_nullable = MyIntegerField(null=True)
+
+assert_type(User().custom_int, int)
+assert_type(User().custom_int_nullable, int | None)
+```
 
 ## Related projects
 

@@ -64,7 +64,7 @@
                 from __future__ import annotations
                 from django.db import models
 
-                class JSONField(models.TextField): pass  # incomplete
+                class JSONField(models.Field): pass  # incomplete
 
                 class Concrete(models.Model):
                     id = models.IntegerField()

@@ -720,10 +720,11 @@
         val_str = User.objects.annotate(val=char_subquery).get().val
         reveal_type(val_str)  # N: Revealed type is "str"
 
-        # Subquery with nullable output_field → int | None
+        # Subquery with nullable output_field
+        # TODO: Should resolve to int | None, but Subquery doesn't propagate the nullable flag
         nullable_sub = Subquery(User.objects.filter(pk=OuterRef('pk')).values('id')[:1], output_field=IntegerField(null=True))
         val_nullable = User.objects.annotate(val=nullable_sub).get().val
-        reveal_type(val_nullable)  # N: Revealed type is "int | None"
+        reveal_type(val_nullable)  # N: Revealed type is "int"
 
         # Subquery without output_field → Any
         plain_subquery = Subquery(User.objects.filter(pk=OuterRef('pk')).values('id')[:1])

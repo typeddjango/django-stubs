@@ -446,6 +446,7 @@
                   objects = NewManager()
 
 -   case: from_queryset_with_manager_in_another_directory_and_imports
+    disable_cache: true
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
