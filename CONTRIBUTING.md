@@ -142,6 +142,11 @@ just stubtest --allowlist extra.txt
 
 If you get unexpected results, clear the mypy cache with `just clean`.
 
+### Model-based `assert_type` tests
+
+For tests that need Django models, add a `models.py` module under `tests/assert_type/`.
+Its package is discovered and automatically added to `INSTALLED_APPS` for the test suite.
+
 ### Debugging plugin code
 
 For yml tests, we use a dedicated [pytest plugin](https://github.com/typeddjango/pytest-mypy-plugins) that is by default
