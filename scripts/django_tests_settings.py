@@ -4,6 +4,10 @@ from __future__ import annotations
 
 import pathlib
 
+import django_stubs_ext
+
+django_stubs_ext.monkeypatch()
+
 _REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 _ASSERT_TYPE_APPS_ROOT = _REPO_ROOT / "tests" / "assert_type"
 
