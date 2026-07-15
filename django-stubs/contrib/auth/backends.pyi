@@ -23,13 +23,16 @@ class BaseBackend:
     async def ahas_perm(self, user_obj: _AnyUser, perm: str, obj: Model | None = ...) -> bool: ...
 
 class ModelBackend(BaseBackend):
+    # Inherit `authenticate` / `aauthenticate` from `BaseBackend` so subclasses
+    # can override with custom (e.g. token-based) credentials without an
+    # [override] error. Django calls all backends with credentials as `**kwargs`.
     @override
     def authenticate(
-        self, request: HttpRequest | None, username: str | None = ..., password: str | None = ..., **kwargs: Any
+        self, request: HttpRequest | None, **kwargs: Any
     ) -> _User | None: ...
     @override
     async def aauthenticate(
-        self, request: HttpRequest | None, username: str | None = ..., password: str | None = ..., **kwargs: Any
+        self, request: HttpRequest | None, **kwargs: Any
     ) -> _User | None: ...
     def user_can_authenticate(self, user: _AnyUser | None) -> bool: ...
     def has_module_perms(self, user_obj: _AnyUser, app_label: str) -> bool: ...
