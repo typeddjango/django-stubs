@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
@@ -12,16 +12,12 @@ from typing_extensions import assert_type
 # (self, request, **kwargs), so subclasses can accept custom credentials
 # without an [override] error.
 class CodeBackend(ModelBackend):
-    def authenticate(
-        self, request: object = None, code: Optional[str] = None, **kwargs: Any
-    ) -> Optional[User]:
+    def authenticate(self, request: object = None, code: str | None = None, **kwargs: Any) -> User | None:
         return User.objects.filter(username=code).first()
 
 
 class TokenBackend(ModelBackend):
-    async def aauthenticate(
-        self, request: object = None, token: str = "", **kwargs: Any
-    ) -> Optional[User]:
+    async def aauthenticate(self, request: object = None, token: str = "", **kwargs: Any) -> User | None:
         return User.objects.filter(username=token).first()
 
 
@@ -29,5 +25,5 @@ class TokenBackend(ModelBackend):
 ModelBackend().authenticate(request=None, username="u", password="p")
 assert_type(
     CodeBackend().authenticate(request=None, code="abc"),
-    Optional[User],
+    User | None,
 )
