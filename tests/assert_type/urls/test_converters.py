@@ -32,4 +32,4 @@ class BadConverter:
         return int(value)
 
 
-register_converter(BadConverter, "bigint")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]
+register_converter(BadConverter, "bigint")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
