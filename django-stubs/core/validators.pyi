@@ -1,7 +1,7 @@
 from collections.abc import Callable, Collection, Sequence, Sized
 from decimal import Decimal
 from re import Pattern, RegexFlag
-from typing import Any, TypeAlias
+from typing import Any, AnyStr, TypeAlias
 
 from django.core.files.base import File
 from django.utils.deconstruct import _Deconstructible
@@ -153,10 +153,10 @@ class FileExtensionValidator(_Deconstructible):
         message: _StrOrPromise | None = None,
         code: str | None = None,
     ) -> None: ...
-    def __call__(self, value: File) -> None: ...
+    def __call__(self, value: File[AnyStr]) -> None: ...
 
 def get_available_image_extensions() -> Sequence[str]: ...
-def validate_image_file_extension(value: File) -> None: ...
+def validate_image_file_extension(value: File[AnyStr]) -> None: ...
 
 class ProhibitNullCharactersValidator(_Deconstructible):
     message: _StrOrPromise
