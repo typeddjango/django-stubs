@@ -194,5 +194,5 @@ class ParentObjInline(admin.StackedInline[InlineChildModel, InlineParentModel]):
 inline_req = HttpRequest()
 inline_instance = ParentObjInline(InlineParentModel, admin.AdminSite())
 inline_instance.get_fields(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
-inline_instance.get_inlines(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType, reportUnknownMemberType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+inline_instance.get_inlines(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
 inline_instance.get_readonly_fields(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
