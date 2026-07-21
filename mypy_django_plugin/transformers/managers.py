@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final
 
-from mypy.copytype import copy_type
 from mypy.nodes import (
     GDEF,
     CallExpr,
@@ -21,20 +20,7 @@ from mypy.nodes import (
 from mypy.plugins.common import add_method_to_class
 from mypy.semanal_shared import has_placeholder
 from mypy.subtypes import find_member
-from mypy.types import (
-    AnyType,
-    CallableType,
-    FunctionLike,
-    Instance,
-    Overloaded,
-    ProperType,
-    TupleType,
-    TypeOfAny,
-    TypeType,
-    TypeVarType,
-    UnionType,
-    get_proper_type,
-)
+from mypy.types import AnyType, CallableType, Instance, ProperType, TypeOfAny, TypeType, UnionType, get_proper_type
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars
 
@@ -93,83 +79,22 @@ def get_method_type_from_dynamic_manager(
     queryset_info = helpers.lookup_fully_qualified_typeinfo(api, queryset_fullname)
     assert queryset_info is not None
 
-    is_fallback_queryset = queryset_info.metadata.get("django", {}).get("any_fallback_queryset", False)
-
-    base_that_has_method = queryset_info.get_containing_type_info(method_name)
-    if base_that_has_method is None:
-        return None
-    method_type = _get_funcdef_type(base_that_has_method.names[method_name].node)
-    if not isinstance(method_type, FunctionLike):
-        return method_type
-
-    items = []
-    for item in method_type.items:
-        items.append(
-            _process_dynamic_method(
-                method_name,
-                item,
-                base_that_has_method=base_that_has_method,
-                queryset_info=queryset_info,
-                manager_instance=manager_instance,
-                is_fallback_queryset=is_fallback_queryset,
-            )
-        )
-    return Overloaded(items) if len(items) > 1 else items[0]
-
-
-def _process_dynamic_method(
-    method_name: str,
-    method_type: CallableType,
-    *,
-    queryset_info: TypeInfo,
-    base_that_has_method: TypeInfo,
-    manager_instance: Instance,
-    is_fallback_queryset: bool,
-) -> CallableType:
-    variables = method_type.variables
-    ret_type = method_type.ret_type
-
     manager_model = get_proper_type(find_member("model", manager_instance, manager_instance))
     assert isinstance(manager_model, TypeType), manager_model
-    manager_model_type = manager_model.item
 
-    queryset_instance = Instance(queryset_info, (manager_model_type,) * len(queryset_info.type_vars))
+    # Resolve the method as if it was accessed on the queryset, parametrized with the manager's model.
+    queryset_instance = Instance(queryset_info, (manager_model.item,) * len(queryset_info.type_vars))
+    method_type = find_member(method_name, queryset_instance, queryset_instance)
 
     # For methods on the manager that return a queryset we need to override the
     # return type to be the actual queryset class, not the base QuerySet that's
     # used by the typing stubs.
-    if method_name in MANAGER_METHODS_RETURNING_QUERYSET:
-        ret_type = queryset_instance
-    args_types = method_type.arg_types[1:]
-    if _has_compatible_type_vars(base_that_has_method):
-        typed_var = manager_instance.args or queryset_info.bases[0].args
-        if (
-            typed_var
-            and isinstance((model_arg := get_proper_type(typed_var[0])), Instance)
-            and model_arg.type.has_base(fullnames.MODEL_CLASS_FULLNAME)
-            and helpers.is_model_type(model_arg.type)
-        ):
-            ret_type = _replace_type_var(ret_type, base_that_has_method.defn.type_vars[0].fullname, model_arg)
-            args_types = [
-                _replace_type_var(arg_type, base_that_has_method.defn.type_vars[0].fullname, model_arg)
-                for arg_type in args_types
-            ]
-    if base_that_has_method.self_type:
-        # Manages -> Self returns
-        ret_type = _replace_type_var(ret_type, base_that_has_method.self_type.fullname, queryset_instance)
-        # The `self` argument is also stripped (lines below), so its `Self` type variable
-        # has no binding site and should be removed. Other method-level type variables
-        # (e.g. _LookupT in prefetch_related) are preserved for call-site inference.
-        variables = tuple(v for v in variables if v.id != base_that_has_method.self_type.id)
+    if method_name in MANAGER_METHODS_RETURNING_QUERYSET and isinstance(
+        (method_proper_type := get_proper_type(method_type)), CallableType
+    ):
+        method_type = method_proper_type.copy_modified(ret_type=queryset_instance)
 
-    # Drop any 'self' argument as our manager is already initialized
-    return method_type.copy_modified(
-        arg_types=args_types,
-        arg_kinds=method_type.arg_kinds[1:],
-        arg_names=method_type.arg_names[1:],
-        variables=variables,
-        ret_type=ret_type,
-    )
+    return get_proper_type(method_type) if method_type is not None else None
 
 
 def _get_funcdef_type(definition: Node | None) -> ProperType | None:
@@ -178,106 +103,6 @@ def _get_funcdef_type(definition: Node | None) -> ProperType | None:
     if isinstance(definition, Decorator):
         return definition.func.type
     return None
-
-
-def _has_compatible_type_vars(type_info: TypeInfo) -> bool:
-    """
-    Determines whether the provided 'type_info',
-    is a generically parameterized subclass of models.QuerySet[T], with exactly
-    one type variable.
-
-    Criteria for compatibility:
-    1. 'type_info' must be a generic class with exactly one type variable.
-    2. All superclasses of 'type_info', up to and including models.QuerySet,
-       must also be generic classes with exactly one type variable.
-
-    Examples:
-
-    Compatible:
-        class _MyModelQuerySet(models.QuerySet[T]): ...
-        class MyModelQuerySet(_MyModelQuerySet[T_2]):
-            def example(self) -> T_2: ...
-
-    Incompatible:
-        class MyModelQuerySet(models.QuerySet[T], Generic[T, T2]):
-            def example(self, a: T2) -> T_2: ...
-
-    Returns:
-        True if the 'base' meets the criteria, otherwise False.
-    """
-    args = type_info.defn.type_vars
-    if not args or len(args) > 1 or not isinstance(args[0], TypeVarType):
-        # No type var to manage, or too many
-        return False
-    type_var: MypyType | None = None
-    # check that for all the bases it has only one type vars
-    for sub_base in type_info.bases:
-        unic_args = list(set(sub_base.args))
-        if not unic_args or len(unic_args) > 1:
-            # No type var for the sub_base, skipping
-            continue
-        if type_var and unic_args and type_var != unic_args[0]:
-            # There is two different type vars in the bases, we are not compatible
-            return False
-        type_var = unic_args[0]
-    if not type_var:
-        # No type var found in the bases.
-        return False
-
-    if type_info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-        # If it is a subclass of QuerySet, it is compatible.
-        return True
-    # check that at least one base is a subclass of queryset with Generic type vars
-    return any(_has_compatible_type_vars(sub_base.type) for sub_base in type_info.bases)
-
-
-def _replace_type_var(ret_type: MypyType, to_replace: str, replace_by: MypyType) -> MypyType:
-    """
-    Substitutes a specified type variable within a Mypy type expression with an actual type.
-
-    This function is recursive, and it operates on various kinds of Mypy types like Instance,
-    ProperType, etc., to deeply replace the specified type variable.
-
-    Parameters:
-    - ret_type: A Mypy type expression where the substitution should occur.
-    - to_replace: The type variable to be replaced, specified as its full name.
-    - replace_by: The actual Mypy type to substitute in place of 'to_replace'.
-
-    Example:
-    Given:
-        ret_type = "typing.Collection[T]"
-        to_replace = "T"
-        replace_by = "myapp.models.MyModel"
-    Result:
-        "typing.Collection[myapp.models.MyModel]"
-    """
-    if isinstance(ret_type, TypeVarType) and ret_type.fullname == to_replace:
-        return replace_by
-
-    ret_type = copy_type(get_proper_type(ret_type))
-
-    if isinstance(ret_type, Instance):
-        # Since it is an instance, recursively find the type var for all its args.
-        return ret_type.copy_modified(
-            args=tuple(_replace_type_var(item, to_replace, replace_by) for item in ret_type.args)
-        )
-    if isinstance(ret_type, TypeType):
-        return TypeType.make_normalized(
-            _replace_type_var(ret_type.item, to_replace, replace_by),
-            line=ret_type.line,
-            column=ret_type.column,
-        )
-    if isinstance(ret_type, TupleType):
-        return ret_type.copy_modified(
-            items=[_replace_type_var(item, to_replace, replace_by) for item in ret_type.items]
-        )
-    if isinstance(ret_type, UnionType):
-        return UnionType.make_union(
-            items=[_replace_type_var(item, to_replace, replace_by) for item in ret_type.items],
-            line=ret_type.line,
-            column=ret_type.column,
-        )
-    return ret_type
 
 
 def resolve_manager_method_from_instance(instance: Instance, method_name: str, ctx: AttributeContext) -> MypyType:
