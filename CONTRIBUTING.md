@@ -157,8 +157,8 @@ Unfortunately, the syntax for generics is also valid Python syntax.
 For instance, the statement `class SomeClass(SuperType[int])` implicitly translates to `class SomeClass(SuperType.__class_getitem__(int))`.
 If `SuperType` doesn't define the `__class_getitem__` method, this causes a runtime error, even if the code passes type checking.
 
-When adding a new generic class, or changing an existing class to use generics, run a quick test to see if it causes a runtime error.
-If it does, please add the new generic class to the `_need_generic` list in the [`django_stubs_ext.patch` module](https://github.com/typeddjango/django-stubs/blob/master/ext/django_stubs_ext/patch.py).
+When adding a new generic class, or changing an existing class to use generics, the `tests/test_generic_consistency.py` test checks that the class (or one of its bases) is patched in the [`django_stubs_ext.patch` module](https://github.com/typeddjango/django-stubs/blob/master/ext/django_stubs_ext/patch.py).
+If it fails, please add the new generic class to the `_need_generic` list there.
 
 ## Private attributes
 
