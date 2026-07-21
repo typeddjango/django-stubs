@@ -2,12 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from django.db.models.query import (
-    QuerySet,
-    RawQuerySet,
-    aprefetch_related_objects,  # pyright: ignore[reportUnknownVariableType]
-    prefetch_related_objects,  # pyright: ignore[reportUnknownVariableType]
-)
+from django.db.models.query import QuerySet, RawQuerySet, aprefetch_related_objects, prefetch_related_objects
 from typing_extensions import assert_type
 
 if TYPE_CHECKING:
