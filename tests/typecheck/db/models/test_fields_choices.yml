@@ -5,7 +5,7 @@
     class MyModel(models.Model):
         char1 = models.CharField(max_length=200, choices='test')
   out: |
-    main:4: error: Argument "choices" to "CharField" has incompatible type "str"; expected "Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any] | type[Choices] | Callable[[], Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any]] | None"  [arg-type]
+    main:4: error: Argument "choices" to "CharField" has incompatible type "str"; expected "Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any] | type[Choices] | Callable[[], Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any] | type[Choices]] | None"  [arg-type]
     main:4: note: Following member(s) of "str" have conflicts:
     main:4: note:     Expected:
     main:4: note:         def __iter__(self) -> Iterator[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]]
@@ -19,7 +19,7 @@
     class MyModel(models.Model):
         int1 = models.IntegerField(choices='test')
   out: |
-    main:4: error: Argument "choices" to "IntegerField" has incompatible type "str"; expected "Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any] | type[Choices] | Callable[[], Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any]] | None"  [arg-type]
+    main:4: error: Argument "choices" to "IntegerField" has incompatible type "str"; expected "Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any] | type[Choices] | Callable[[], Iterable[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]] | Mapping[Any, Any] | type[Choices]] | None"  [arg-type]
     main:4: note: Following member(s) of "str" have conflicts:
     main:4: note:     Expected:
     main:4: note:         def __iter__(self) -> Iterator[tuple[Any, Any] | tuple[str, Iterable[tuple[Any, Any]]]]
@@ -65,6 +65,11 @@
     def int_mapping() -> Mapping[int, str]:
         return {3: "bar", 4: "bazz"}
 
+    class ExternalIntegerChoices(models.IntegerChoices):
+        FIRST = 1
+
+    def choices_type() -> type[models.Choices]:
+        return ExternalIntegerChoices
 
     class TestModel(models.Model):
         class TextChoices(models.TextChoices):
@@ -94,3 +99,4 @@
         int7 = models.IntegerField(choices=to_named_seq(int_mapping), default=1)
         int8 = models.IntegerField(choices=to_named_seq(int_tuple)(), default=1)
         int9 = models.IntegerField(choices=to_named_seq(int_mapping)(), default=1)
+        int10 = models.IntegerField(choices=choices_type)

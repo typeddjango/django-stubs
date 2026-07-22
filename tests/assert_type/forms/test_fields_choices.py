@@ -42,6 +42,14 @@ def int_mapping() -> Mapping[int, str]:
     return {3: "bar", 4: "bazz"}
 
 
+class ExternalIntegerChoices(models.IntegerChoices):
+    FIRST = 1
+
+
+def choices_type() -> type[models.Choices]:
+    return ExternalIntegerChoices
+
+
 # Invalid choices
 class BadForm(forms.Form):
     my_choice = forms.ChoiceField(choices="test")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
@@ -76,3 +84,4 @@ class TestForm(forms.Form):
     int7 = forms.ChoiceField(choices=to_named_seq(int_mapping))
     int8 = forms.ChoiceField(choices=to_named_seq(int_tuple)())
     int9 = forms.ChoiceField(choices=to_named_seq(int_mapping)())
+    int10 = forms.ChoiceField(choices=choices_type)
