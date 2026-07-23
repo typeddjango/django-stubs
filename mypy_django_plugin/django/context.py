@@ -17,7 +17,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.lookups import Exact, In
 from django.db.models.sql.query import Query
 from mypy.typeanal import make_optional_type
-from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UnionType, get_proper_type
+from mypy.types import AnyType, Instance, NoneTyp, ProperType, TypeOfAny, UnionType, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.exceptions import UnregisteredModelError
@@ -175,6 +175,51 @@ class DjangoContext:
         if field_info is None:
             return AnyType(TypeOfAny.explicit)
         return helpers.get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
+
+    def get_field_lookup_exact_type_from_transforms(
+        self, api: TypeChecker, field: Field[Any, Any] | ForeignObjectRel, transform_parts: Sequence[str]
+    ) -> MypyType | None:
+        if not transform_parts:
+            return self.get_field_lookup_exact_type(api, field)
+
+        if not isinstance(field, Field):
+            return None
+
+        transformed_field = field
+        for transform_name in transform_parts:
+            transform_cls = transformed_field.get_transform(transform_name)
+            output_field = getattr(transform_cls, "output_field", None)
+            if not isinstance(output_field, Field):
+                return None
+            transformed_field = output_field
+
+        field_info = helpers.lookup_class_typeinfo(api, transformed_field.__class__)
+        if field_info is None:
+            return AnyType(TypeOfAny.explicit)
+        return helpers.get_private_descriptor_type(
+            field_info, "_pyi_private_get_type", is_nullable=transformed_field.null
+        )
+
+    def _get_field_for_annotation_type(self, annotation_type: MypyType) -> Field[Any, Any] | None:
+        proper_type = get_proper_type(annotation_type)
+        if isinstance(proper_type, UnionType):
+            union_items = [
+                item for item in (get_proper_type(item) for item in proper_type.items) if not isinstance(item, NoneTyp)
+            ]
+            if len(union_items) != 1:
+                return None
+            proper_type = union_items[0]
+
+        if not isinstance(proper_type, Instance):
+            return None
+
+        if proper_type.type.fullname == "datetime.datetime":
+            return models.DateTimeField()
+        if proper_type.type.fullname == "datetime.date":
+            return models.DateField()
+        if proper_type.type.fullname == "datetime.time":
+            return models.TimeField()
+        return None
 
     def get_related_target_field(
         self, related_model_cls: type[Model], field: ForeignKey[Any, Any]
@@ -523,6 +568,15 @@ class DjangoContext:
             return annotation_type
 
         if annotation_type is not None and issubclass(lookup_cls, In):
+            transform_parts = annotation_lookup_parts[:-1]
+            if transform_parts:
+                annotation_field = self._get_field_for_annotation_type(annotation_type)
+                if annotation_field is not None:
+                    transformed_type = self.get_field_lookup_exact_type_from_transforms(
+                        helpers.get_typechecker_api(ctx), annotation_field, transform_parts
+                    )
+                    if transformed_type is not None:
+                        return ctx.api.named_generic_type("typing.Iterable", [transformed_type])
             return ctx.api.named_generic_type("typing.Iterable", [annotation_type])
 
         lookup_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls)
@@ -567,7 +621,10 @@ class DjangoContext:
             return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
 
         if issubclass(lookup_cls, In):
-            exact_type = self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            api = helpers.get_typechecker_api(ctx)
+            exact_type = self.get_field_lookup_exact_type_from_transforms(api, field, lookup_parts[:-1])
+            if exact_type is None:
+                exact_type = self.get_field_lookup_exact_type(api, field)
             return ctx.api.named_generic_type("typing.Iterable", [exact_type])
 
         resolved_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls, field)
