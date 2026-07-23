@@ -683,8 +683,7 @@ def resolve_lazy_reference(
     reference: str, *, api: TypeChecker | SemanticAnalyzer, django_context: DjangoContext, ctx: Context
 ) -> TypeInfo | None:
     """
-    Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a
-    'TypeInfo' instance.
+    Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a 'TypeInfo' instance.
     """
     if "." not in reference:
         # <object_name> -- needs prefix of <app_label>. We can't implicitly solve
@@ -692,7 +691,7 @@ def resolve_lazy_reference(
         return None
 
     # Reference conforms to the structure of a lazy reference: '<app_label>.<object_name>'
-    fullname = django_context.model_class_fullnames_by_label.get(reference)
+    fullname = django_context.model_class_fullname_for_label(reference)
     if fullname is not None:
         model_info = lookup_fully_qualified_typeinfo(api, fullname)
         if model_info is not None:

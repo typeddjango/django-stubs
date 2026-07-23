@@ -285,12 +285,17 @@ class DjangoContext:
         return all_model_bases
 
     @cached_property
-    def model_class_fullnames_by_label(self) -> Mapping[str, str]:
+    def _model_class_fullnames_by_label_lower(self) -> Mapping[str, str]:
         return {
-            klass._meta.label: helpers.get_class_fullname(klass)
+            klass._meta.label_lower: helpers.get_class_fullname(klass)
             for klass in self.all_registered_model_classes
             if klass is not models.Model
         }
+
+    def model_class_fullname_for_label(self, label: str) -> str | None:
+        """Model names are case-insensitive, app labels are not (as in `Apps.get_model`)."""
+        app_label, _, model_name = label.partition(".")
+        return self._model_class_fullnames_by_label_lower.get(f"{app_label}.{model_name.lower()}")
 
     def get_field_nullability(self, field: _AnyField, method: str | None) -> bool:
         if method in ("values", "values_list"):
