@@ -64,7 +64,7 @@ if TYPE_CHECKING:
     from mypy.types import Type as MypyType
 
 
-_APPS_MODULES = frozenset({"django.apps", "django.apps.registry"})
+_APPS_MODULES: Final = frozenset({"django.apps", "django.apps.registry"})
 
 
 class NewSemanalDjangoPlugin(Plugin):
