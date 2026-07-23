@@ -1,10 +1,13 @@
-from typing import IO, Any, AnyStr
+from typing import IO, Any
 
 from django.core.files.base import File
 from django.utils.functional import cached_property
-from typing_extensions import Self, override
+from typing_extensions import Self, TypeVar, override
 
-class UploadedFile(File[AnyStr]):
+# `typing.AnyStr` is deprecated from 3.16+, so we define our own equivalent constrained TypeVar.
+_AnyStr = TypeVar("_AnyStr", str, bytes)
+
+class UploadedFile(File[_AnyStr]):
     content_type: str | None
     charset: str | None
     content_type_extra: dict[str, bytes] | None
@@ -14,7 +17,7 @@ class UploadedFile(File[AnyStr]):
     name: str | None
     def __init__(
         self,
-        file: IO[AnyStr] | None = None,
+        file: IO[_AnyStr] | None = None,
         name: str | None = None,
         content_type: str | None = None,
         size: int | None = None,
