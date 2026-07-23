@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from mypy.build import PRI_MED, PRI_MYPY
 from mypy.modulefinder import mypy_path
-from mypy.nodes import MypyFile, TypeInfo
+from mypy.nodes import Import, ImportFrom, MypyFile, TypeInfo
 from mypy.plugin import (
     AnalyzeTypeContext,
     AttributeContext,
@@ -26,6 +26,7 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
+    apps,
     choices,
     fields,
     forms,
@@ -63,6 +64,9 @@ if TYPE_CHECKING:
     from mypy.types import Type as MypyType
 
 
+_APPS_MODULES = frozenset({"django.apps", "django.apps.registry"})
+
+
 class NewSemanalDjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
@@ -93,6 +97,15 @@ class NewSemanalDjangoPlugin(Plugin):
         fake_lineno = -1
         return (priority, module, fake_lineno)
 
+    def _file_imports_apps_module(self, file: MypyFile) -> bool:
+        for import_node in file.imports:
+            if isinstance(import_node, Import):
+                if any(module in _APPS_MODULES for module, _ in import_node.ids):
+                    return True
+            elif isinstance(import_node, ImportFrom) and import_node.id in _APPS_MODULES:
+                return True
+        return False
+
     @override
     def get_additional_deps(self, file: MypyFile) -> list[tuple[int, str, int]]:
         # for settings
@@ -113,11 +126,19 @@ class NewSemanalDjangoPlugin(Plugin):
                 return []
             return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
+        deps: set[tuple[int, str, int]] = set()
+
+        # A file using `apps.get_model()` may depend on any model module.
+        # Skip stubs to keep Django's own build graph untouched.
+        if not file.is_stub and self._file_imports_apps_module(file):
+            deps.update(
+                self._new_dependency(module) for module in self.django_context.model_modules if module != file.fullname
+            )
+
         # ensure that all mentions to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
         if not defined_model_classes:
-            return []
-        deps = set()
+            return list(deps)
 
         for model_class in defined_model_classes.values():
             for field in itertools.chain(
