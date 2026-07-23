@@ -158,7 +158,7 @@ class DjangoContext:
             if isinstance(field, ForeignObjectRel):
                 yield field
 
-    def get_field_lookup_exact_type(self, api: TypeChecker, field: Field[Any, Any] | ForeignObjectRel) -> MypyType:
+    def get_field_lookup_exact_type(self, api: TypeChecker, field: _AnyField) -> MypyType:
         if isinstance(field, RelatedField | ForeignObjectRel):
             related_model_cls = self.get_field_related_model_cls(field)
             rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
@@ -292,7 +292,7 @@ class DjangoContext:
             if klass is not models.Model
         }
 
-    def get_field_nullability(self, field: Field[Any, Any] | ForeignObjectRel, method: str | None) -> bool:
+    def get_field_nullability(self, field: _AnyField, method: str | None) -> bool:
         if method in ("values", "values_list"):
             return field.null
 
@@ -309,9 +309,7 @@ class DjangoContext:
             return True
         return nullable
 
-    def get_field_set_type(
-        self, api: TypeChecker, field: Field[Any, Any] | ForeignObjectRel, *, method: str
-    ) -> MypyType:
+    def get_field_set_type(self, api: TypeChecker, field: _AnyField, *, method: str) -> MypyType:
         """Get a type of __set__ for this specific Django field."""
         target_field = field
         if isinstance(field, ForeignKey):
@@ -338,7 +336,7 @@ class DjangoContext:
         self,
         api: TypeChecker,
         model_info: TypeInfo | None,
-        field: Field[Any, Any] | ForeignObjectRel,
+        field: _AnyField,
         *,
         method: str,
     ) -> MypyType:
@@ -397,7 +395,7 @@ class DjangoContext:
 
     def _resolve_field_from_parts(
         self, field_parts: Iterable[str], model_cls: type[Model]
-    ) -> tuple[Field[Any, Any] | ForeignObjectRel, type[Model]]:
+    ) -> tuple[_AnyField, type[Model]]:
         currently_observed_model = model_cls
         field: _AnyField | None = None
         for field_part in field_parts:
@@ -453,9 +451,7 @@ class DjangoContext:
         entire_query_parts = [query_parts[0], *sub_query[1]]
         return sub_query[0], entire_query_parts, sub_query[2]
 
-    def resolve_lookup_into_field(
-        self, model_cls: type[Model], lookup: str
-    ) -> tuple[Field[Any, Any] | ForeignObjectRel | None, type[Model]]:
+    def resolve_lookup_into_field(self, model_cls: type[Model], lookup: str) -> tuple[_AnyField | None, type[Model]]:
         solved_lookup = self.solve_lookup_type(model_cls, lookup)
         if solved_lookup is None:
             return None, model_cls
@@ -465,7 +461,7 @@ class DjangoContext:
         return self._resolve_field_from_parts(field_parts, model_cls)
 
     def _resolve_lookup_type_from_lookup_class(
-        self, ctx: MethodContext, lookup_cls: type, field: Field[Any, Any] | ForeignObjectRel | None = None
+        self, ctx: MethodContext, lookup_cls: type, field: _AnyField | None = None
     ) -> MypyType | None:
         """Resolve the expected type for a lookup class (used both for regular fields and annotated fields)
 
