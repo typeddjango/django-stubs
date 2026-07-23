@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Collection
+from re import Match, Pattern
 from typing import Any
 
 from django import forms
@@ -56,3 +57,11 @@ def test_json_field_serialization_types() -> None:
     field = JSONField(encoder=MyEncoder, decoder=MyDecoder)
     assert_type(field.encoder, type[json.JSONEncoder] | None)
     assert_type(field.decoder, type[json.JSONDecoder] | None)
+
+
+def test_lazy_regex_pattern_methods_are_typed() -> None:
+    field = forms.IntegerField()
+    assert_type(field.re_decimal, Pattern[str])
+    assert_type(field.re_decimal.match("1.0"), Match[str] | None)
+    assert_type(field.re_decimal.sub("", "1.000"), str)
+    assert_type(field.re_decimal.pattern, str)

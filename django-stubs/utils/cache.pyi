@@ -5,9 +5,8 @@ from typing import Any
 from django.core.cache.backends.base import BaseCache
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
-from django.utils.functional import SimpleLazyObject
 
-cc_delim_re: SimpleLazyObject[Pattern[str]]
+cc_delim_re: Pattern[str]
 
 def patch_cache_control(response: HttpResponseBase, **kwargs: Any) -> None: ...
 def get_max_age(response: HttpResponseBase) -> int | None: ...
