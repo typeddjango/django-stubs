@@ -111,7 +111,7 @@ class URLResolver:
     namespace: str | None
     app_name: str | None
     _local: Any
-    _reverse_dict: MultiValueDict
+    _reverse_dict: MultiValueDict[Any, Any]
     def __init__(
         self,
         pattern: _Pattern,
@@ -121,7 +121,7 @@ class URLResolver:
         namespace: str | None = None,
     ) -> None: ...
     @property
-    def reverse_dict(self) -> MultiValueDict: ...
+    def reverse_dict(self) -> MultiValueDict[Any, Any]: ...
     @property
     def namespace_dict(self) -> dict[str, tuple[str, URLResolver]]: ...
     @property
