@@ -25,9 +25,9 @@ def default_reference_role(
     content: Any | None = ...,
 ) -> tuple[list[Any], list[Any]]: ...
 
-named_group_matcher: Any
-unnamed_group_matcher: Any
-non_capturing_group_matcher: Any
+named_group_matcher: Pattern[str]
+unnamed_group_matcher: Pattern[str]
+non_capturing_group_matcher: Pattern[str]
 
 def replace_metacharacters(pattern: str) -> str: ...
 def replace_named_groups(pattern: str) -> str: ...

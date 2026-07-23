@@ -1,5 +1,6 @@
 import datetime
 from collections.abc import Iterable, Iterator, Mapping, Sequence
+from re import Pattern
 from typing import Any, Literal, Protocol, TypeAlias, type_check_only
 
 import _typeshed
@@ -351,7 +352,7 @@ class SelectDateWidget(Widget):
     template_name: str
     input_type: str
     select_widget: type[ChoiceWidget]
-    date_re: Any
+    date_re: Pattern[str]
     years: Iterable[int | str]
     months: Mapping[int, str]
     year_none_value: tuple[Literal[""], str]

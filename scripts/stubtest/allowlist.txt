@@ -68,6 +68,10 @@ django.db.models.query_utils.RegisterLookupMixin._unregister_lookup
 
 # Lazy regex
 django.contrib.admin.utils.UNQUOTE_RE
+django.contrib.admindocs.utils.named_group_matcher
+django.contrib.admindocs.utils.non_capturing_group_matcher
+django.contrib.admindocs.utils.unnamed_group_matcher
+django.contrib.gis.db.models.lookups.RelateLookup.pattern_regex
 django.contrib.gis.geometry.hex_regex
 django.contrib.gis.geometry.json_regex
 django.contrib.gis.geometry.wkt_regex
@@ -82,14 +86,23 @@ django.core.validators.slug_unicode_re
 django.core.validators.URLValidator.regex
 django.core.management.commands.makemessages.plural_forms_re
 django.core.management.commands.runserver.naiveip_re
+django.db.backends.mysql.base.server_version_re
+django.db.backends.mysql.compiler.SQLCompiler.ordering_parts
+django.db.backends.sqlite3.base.FORMAT_QMARK_REGEX
+django.db.backends.sqlite3.introspection.field_size_re
 django.db.models.functions.comparison.Collate.collation_re
+django.db.models.sql.compiler.SQLCompiler.ordering_parts
+django.forms.fields.IntegerField.re_decimal
+django.forms.widgets.SelectDateWidget.date_re
 django.http.request.host_validation_re
 django.middleware.csrf.invalid_token_chars_re
+django.middleware.gzip.re_accepts_gzip
 django.template.base.filter_re
 django.template.base.kwarg_re
 django.test.client.CONTENT_TYPE_RE
 django.test.client.JSON_CONTENT_TYPE_RE
 django.test.html.ASCII_WHITESPACE
+django.utils.cache.cc_delim_re
 django.utils.dateformat.re_escaped
 django.utils.dateformat.re_formatchars
 django.utils.dateparse.date_re
@@ -98,6 +111,10 @@ django.utils.dateparse.iso8601_duration_re
 django.utils.dateparse.postgres_interval_re
 django.utils.dateparse.standard_duration_re
 django.utils.dateparse.time_re
+django.utils.html.Urlizer.simple_url_2_re
+django.utils.html.Urlizer.simple_url_re
+django.utils.html.Urlizer.word_split_re
+django.utils.html.long_open_tag_without_closing_re
 django.utils.http.ASCTIME_DATE
 django.utils.http.ETAG_MATCH
 django.utils.http.RFC1123_DATE

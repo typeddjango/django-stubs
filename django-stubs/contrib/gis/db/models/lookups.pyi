@@ -1,3 +1,4 @@
+from re import Pattern
 from typing import Any
 
 from django.db.models import Lookup, Transform
@@ -87,7 +88,7 @@ class OverlapsLookup(GISLookup):
 class RelateLookup(GISLookup):
     lookup_name: str
     sql_template: str
-    pattern_regex: Any
+    pattern_regex: Pattern[str]
     @override
     def process_rhs(self, compiler: Any, connection: Any) -> Any: ...
 
