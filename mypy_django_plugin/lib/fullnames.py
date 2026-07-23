@@ -3,6 +3,7 @@ from __future__ import annotations
 ABSTRACT_BASE_USER_MODEL_FULLNAME = "django.contrib.auth.base_user.AbstractBaseUser"
 ABSTRACT_USER_MODEL_FULLNAME = "django.contrib.auth.models.AbstractUser"
 PERMISSION_MIXIN_CLASS_FULLNAME = "django.contrib.auth.models.PermissionsMixin"
+APPS_FULLNAME = "django.apps.registry.Apps"
 MODEL_METACLASS_FULLNAME = "django.db.models.base.ModelBase"
 MODEL_CLASS_FULLNAME = "django.db.models.base.Model"
 FIELD_FULLNAME = "django.db.models.fields.Field"
