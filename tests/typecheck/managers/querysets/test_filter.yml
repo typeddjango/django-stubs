@@ -177,6 +177,57 @@
                     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, related_name='blogs')
 
 
+-   case: nullable_foreign_key_id_lookup
+    main: |
+        from myapp.models import Article, Author
+        author = Author()
+
+        # Nullable FK: filtering on the _id column with None is valid
+        Article.objects.filter(author_id=None)
+        Article.objects.filter(author_id=1)
+        Article.objects.filter(author_id=author)  # E: Incompatible type for lookup 'author_id': (got "Author", expected "str | int | None")  [misc]
+
+        # Non-nullable FK: None is not valid for the _id column
+        Article.objects.filter(blog_id=None)  # E: Incompatible type for lookup 'blog_id': (got "None", expected "str | int")  [misc]
+        Article.objects.filter(blog_id=1)
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Author(models.Model):
+                    pass
+                class Blog(models.Model):
+                    pass
+                class Article(models.Model):
+                    author = models.ForeignKey(Author, null=True, on_delete=models.SET_NULL, related_name='articles')
+                    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='articles')
+
+
+-   case: nullable_one_to_one_id_lookup
+    main: |
+        from myapp.models import User, Profile
+        user = User()
+
+        # Nullable O2O: filtering on the _id column with None is valid
+        Profile.objects.filter(user_id=None)
+        Profile.objects.filter(user_id=1)
+        Profile.objects.filter(user_id=user)  # E: Incompatible type for lookup 'user_id': (got "User", expected "str | int | None")  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class User(models.Model):
+                    pass
+                class Profile(models.Model):
+                    user = models.OneToOneField(User, null=True, on_delete=models.SET_NULL)
+
+
 -   case: related_model_reverse_foreign_key_lookup
     main: |
         from myapp.models import Blog, Publisher, Category
