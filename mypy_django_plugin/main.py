@@ -4,7 +4,7 @@ import importlib.metadata
 import itertools
 import sys
 from functools import cache, cached_property, partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Final
 
 from mypy.build import PRI_MED, PRI_MYPY
 from mypy.modulefinder import mypy_path
@@ -266,7 +266,13 @@ class NewSemanalDjangoPlugin(Plugin):
         if method_name == "get_field" and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
             return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
-        if method_name == "get_model" and info.has_base(fullnames.APPS_FULLNAME):
+        if (
+            method_name == "get_model"
+            and info.has_base(fullnames.APPS_FULLNAME)
+            # `StateApps` returns historical models rebuilt from migration state whose fields
+            # differ from the current definitions, so narrowing to the current model is wrong.
+            and not info.has_base(fullnames.STATE_APPS_FULLNAME)
+        ):
             return partial(apps.resolve_model_for_get_model, django_context=self.django_context)
 
         if helpers.has_any_of_bases(info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]):

@@ -6,6 +6,7 @@ from django.apps import apps
 from django.apps.registry import apps as registry_apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.migrations.state import ProjectState
 from typing_extensions import assert_type
 
 
@@ -37,3 +38,9 @@ def get_model_of_unknown_or_dynamic_reference_is_permissive() -> None:
     model = apps.get_model(app_label, "First")
     assert_type(model, type[Any])
     model.objects.whatever()
+
+
+def get_model_of_historical_state_is_not_narrowed() -> None:
+    # `StateApps` returns historical models rebuilt from migration state, so skip narrowing.
+    state_apps = ProjectState().apps
+    assert_type(state_apps.get_model("test_registry.First"), type[Any])
