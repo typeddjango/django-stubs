@@ -1,5 +1,6 @@
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Sequence
+from re import Pattern
 from typing import Any, Literal, overload, type_check_only
 from uuid import UUID
 
@@ -22,6 +23,7 @@ _T = TypeVar("_T")
 
 QUOTE_MAP: dict[int, str]
 UNQUOTE_MAP: dict[str, str]
+UNQUOTE_RE: Pattern[str]
 
 class FieldIsAForeignKeyColumnName(Exception): ...
 

@@ -1,6 +1,7 @@
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from datetime import date, datetime
 from decimal import Decimal
+from re import Pattern
 from typing import Any, Literal, TypeAlias, overload
 from uuid import UUID
 
@@ -31,7 +32,7 @@ class SQLCompiler:
     select: Any
     annotation_col_map: Any
     klass_info: Any
-    ordering_parts: Any
+    ordering_parts: Pattern[str]
     def __init__(
         self, query: Query, connection: BaseDatabaseWrapper, using: str | None, elide_empty: bool = True
     ) -> None: ...
