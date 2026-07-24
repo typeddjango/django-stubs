@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from mypy.nodes import TypeInfo
-
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import helpers
 
 if TYPE_CHECKING:
     from mypy.plugin import ClassDefContext
@@ -17,12 +15,3 @@ def make_meta_nested_class_inherit_from_any(ctx: ClassDefContext) -> None:
             ctx.api.defer()
     else:
         meta_node.fallback_to_any = True
-
-
-def transform_form_class(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        bases = helpers.get_django_metadata_bases(sym.node, "baseform_bases")
-        bases[ctx.cls.fullname] = 1
-
-    make_meta_nested_class_inherit_from_any(ctx)
