@@ -4,11 +4,11 @@ import importlib.metadata
 import itertools
 import sys
 from functools import cache, cached_property, partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Final
 
 from mypy.build import PRI_MED, PRI_MYPY
 from mypy.modulefinder import mypy_path
-from mypy.nodes import MypyFile, TypeInfo
+from mypy.nodes import Import, ImportFrom, MypyFile, TypeInfo
 from mypy.plugin import (
     AnalyzeTypeContext,
     AttributeContext,
@@ -26,6 +26,7 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
+    apps,
     choices,
     fields,
     forms,
@@ -63,6 +64,9 @@ if TYPE_CHECKING:
     from mypy.types import Type as MypyType
 
 
+_APPS_MODULES: Final = frozenset({"django.apps", "django.apps.registry"})
+
+
 class NewSemanalDjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
@@ -93,6 +97,15 @@ class NewSemanalDjangoPlugin(Plugin):
         fake_lineno = -1
         return (priority, module, fake_lineno)
 
+    def _file_imports_apps_module(self, file: MypyFile) -> bool:
+        for import_node in file.imports:
+            if isinstance(import_node, Import):
+                if any(module in _APPS_MODULES for module, _ in import_node.ids):
+                    return True
+            elif isinstance(import_node, ImportFrom) and import_node.id in _APPS_MODULES:
+                return True
+        return False
+
     @override
     def get_additional_deps(self, file: MypyFile) -> list[tuple[int, str, int]]:
         # for settings
@@ -113,11 +126,19 @@ class NewSemanalDjangoPlugin(Plugin):
                 return []
             return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
+        deps: set[tuple[int, str, int]] = set()
+
+        # A file using `apps.get_model()` may depend on any model module.
+        # Skip stubs to keep Django's own build graph untouched.
+        if not file.is_stub and self._file_imports_apps_module(file):
+            deps.update(
+                self._new_dependency(module) for module in self.django_context.model_modules if module != file.fullname
+            )
+
         # ensure that all mentions to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
         if not defined_model_classes:
-            return []
-        deps = set()
+            return list(deps)
 
         for model_class in defined_model_classes.values():
             for field in itertools.chain(
@@ -244,6 +265,15 @@ class NewSemanalDjangoPlugin(Plugin):
 
         if method_name == "get_field" and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
             return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
+
+        if (
+            method_name == "get_model"
+            and info.has_base(fullnames.APPS_FULLNAME)
+            # `StateApps` returns historical models rebuilt from migration state whose fields
+            # differ from the current definitions, so narrowing to the current model is wrong.
+            and not info.has_base(fullnames.STATE_APPS_FULLNAME)
+        ):
+            return partial(apps.resolve_model_for_get_model, django_context=self.django_context)
 
         if helpers.has_any_of_bases(info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]):
             return partial(querysets.merge_annotations_from_custom_method, django_context=self.django_context)
