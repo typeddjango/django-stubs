@@ -379,17 +379,26 @@ class NewSemanalDjangoPlugin(Plugin):
                 return create_new_manager_class_from_from_queryset_method
         return None
 
-    @override
-    def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
+    @cached_property
+    def _report_config_data(self) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
         extra_data = {
+            # The additional deps depend on the installed apps
+            "INSTALLED_APPS": list(self.django_context.settings.INSTALLED_APPS),
+            # The user model determines the `_User` alias expansion
             "AUTH_USER_MODEL": self.django_context.settings.AUTH_USER_MODEL,
+            # The implicit `pk` field type depends on `DEFAULT_AUTO_FIELD`
+            "DEFAULT_AUTO_FIELD": self.django_context.settings.DEFAULT_AUTO_FIELD,
             "django_version": _package_version("django"),
             "django_stubs_version": _package_version("django-stubs"),
         }
         if (django_stubs_ext_version := _package_version("django-stubs-ext")) is not None:
             extra_data["django_stubs_ext_version"] = django_stubs_ext_version
         return self.plugin_config.to_json(extra_data)
+
+    @override
+    def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
+        return self._report_config_data
 
 
 @cache
