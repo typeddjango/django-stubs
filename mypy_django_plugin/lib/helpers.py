@@ -500,6 +500,23 @@ def add_new_class_for_module(
     return new_typeinfo
 
 
+def build_reparametrized_subclass(module: MypyFile, base_info: TypeInfo, name: str, *, unique_name: bool) -> TypeInfo:
+    """Create a ``TypeInfo`` subclassing generic ``base_info``, generic over the same type vars.
+
+    With ``unique_name`` the class is inserted into ``module`` under a collision-free name,
+    otherwise it's built under ``name`` verbatim and the caller registers it.
+    """
+    base_instance = fill_typevars(base_info)
+    assert isinstance(base_instance, Instance)
+    if unique_name:
+        info = add_new_class_for_module(module, name, bases=[base_instance])
+    else:
+        info = create_type_info(name, module.fullname, bases=[base_instance])
+    info.defn.type_vars = base_info.defn.type_vars.copy()
+    info.add_type_vars()
+    return info
+
+
 def get_current_module(api: TypeChecker) -> MypyFile:
     """
     Scope is guaranteed to be initialized with the module as the first element of the stack.
