@@ -61,8 +61,8 @@ INTERNAL_RESET_SESSION_TOKEN: str
 class PasswordResetDoneView(PasswordContextMixin, TemplateView):
     title: _StrOrPromise
 
-class PasswordResetConfirmView(PasswordContextMixin, FormView[SetPasswordForm]):
-    form_class: type[SetPasswordForm]
+class PasswordResetConfirmView(PasswordContextMixin, FormView[SetPasswordForm[Any]]):
+    form_class: type[SetPasswordForm[Any]]
     post_reset_login: bool
     post_reset_login_backend: str | None
     reset_url_token: str
