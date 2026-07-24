@@ -230,7 +230,10 @@ def create_manager_info_from_from_queryset_call(
         # Reuse an identical, already generated, manager
         new_manager_info = manager_sym.node
     else:
-        # Create a new `TypeInfo` instance for the manager type
+        # Create a new `TypeInfo` instance for the manager type.
+        # mypy registers the assignment's lvalue before running this hook, so when that
+        # lvalue already carries `manager_name` we must claim it instead of treating our
+        # own symbol as a collision and renaming the generated class.
         try:
             new_manager_info = create_manager_class(
                 api=api,

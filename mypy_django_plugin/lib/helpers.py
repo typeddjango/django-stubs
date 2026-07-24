@@ -501,17 +501,10 @@ def add_new_class_for_module(
 
 
 def build_reparametrized_subclass(module: MypyFile, base_info: TypeInfo, name: str, *, unique_name: bool) -> TypeInfo:
-    """Create a new ``TypeInfo`` subclassing the generic ``base_info`` and carrying the
-    same type variables, so the synthetic class stays generic over the same parameters.
+    """Create a ``TypeInfo`` subclassing generic ``base_info``, generic over the same type vars.
 
-    This is the shared kernel for the plugin's dynamically generated Manager/QuerySet
-    classes: fill the base's type vars, build the subclass, then copy ``type_vars`` onto
-    both the ``TypeInfo`` and its ``defn`` (mypy needs both). ``metaclass_type`` is set by
-    ``create_type_info``, so callers must not recompute it.
-
-    ``unique_name=True`` inserts the class into ``module`` under a collision-free name;
-    ``unique_name=False`` builds it under ``name`` verbatim without inserting it, leaving
-    registration to the caller.
+    With ``unique_name`` the class is inserted into ``module`` under a collision-free name,
+    otherwise it's built under ``name`` verbatim and the caller registers it.
     """
     base_instance = fill_typevars(base_info)
     assert isinstance(base_instance, Instance)
@@ -519,8 +512,8 @@ def build_reparametrized_subclass(module: MypyFile, base_info: TypeInfo, name: s
         info = add_new_class_for_module(module, name, bases=[base_instance])
     else:
         info = create_type_info(name, module.fullname, bases=[base_instance])
-    info.type_vars = base_info.type_vars.copy()
     info.defn.type_vars = base_info.defn.type_vars.copy()
+    info.add_type_vars()
     return info
 
 
