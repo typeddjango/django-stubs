@@ -62,7 +62,9 @@ class CompositePrimaryKey(Field[Any, Any]):
     def __iter__(self) -> Iterator[_AnyField]: ...
     def __len__(self) -> int: ...
     @override
-    def get_pk_value_on_save(self, instance: Model) -> tuple: ...  # actual type is tuple of field.value_from_object
+    def get_pk_value_on_save(
+        self, instance: Model
+    ) -> tuple[Any, ...]: ...  # actual type is tuple[Any, ...] of field.value_from_object
     @override
     def get_attname_column(self) -> tuple[str, None]: ...
 
