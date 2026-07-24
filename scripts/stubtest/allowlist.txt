@@ -225,6 +225,21 @@ django.contrib.auth.views.UserModel
 # Limited stubtest support for enums (https://github.com/python/mypy/issues/16806)
 django.db.migrations.operations.base.OperationCategory.__new__
 
+# The `label` parameter in __new__ is a deliberate stub-only addition:
+# Django's ChoicesType metaclass processes (value, label) tuples at class definition time,
+# but the runtime __new__ (from enum.Enum) only accepts (cls, value).
+# We keep the label overload so that defining enum members type-checks correctly.
+django.db.models.enums.IntegerChoices.__new__
+django.db.models.enums.TextChoices.__new__
+django.db.models.IntegerChoices.__new__
+django.db.models.TextChoices.__new__
+django.contrib.gis.db.models.IntegerChoices.__new__
+django.contrib.gis.db.models.TextChoices.__new__
+django.tasks.TaskResultStatus.__new__
+django.tasks.base.TaskResultStatus.__new__
+django.tasks.base.TextChoices.__new__
+django.tasks.signals.TaskResultStatus.__new__
+
 # These are dynamically added when using `save(commit=False)`
 # See https://docs.djangoproject.com/en/stable/topics/forms/modelforms/#the-save-method
 django.forms.models.BaseModelForm.save_m2m
