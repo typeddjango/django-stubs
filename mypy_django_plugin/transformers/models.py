@@ -26,7 +26,6 @@ from mypy.semanal import SemanticAnalyzer
 from mypy.typeanal import TypeAnalyser
 from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, TypeVarType, get_proper_type
 from mypy.types import Type as MypyType
-from mypy.typevars import fill_typevars
 from typing_extensions import override
 
 from mypy_django_plugin.errorcodes import MANAGER_MISSING
@@ -45,6 +44,7 @@ if TYPE_CHECKING:
 
     from django.db.models import Manager, Model
     from mypy.checker import TypeChecker
+    from mypy.nodes import MypyFile
     from mypy.plugin import AnalyzeTypeContext, AttributeContext, ClassDefContext
 
     from mypy_django_plugin.config import DjangoPluginConfig
@@ -94,9 +94,12 @@ class ModelClassInitializer:
             self.model_classdef.info, name=name, sym_type=typ, no_serialize=no_serialize, is_classvar=is_classvar
         )
 
+    @property
+    def current_module(self) -> MypyFile:
+        return self.api.modules[self.model_classdef.info.module_name]
+
     def add_new_class_for_current_module(self, name: str, bases: list[Instance]) -> TypeInfo:
-        current_module = self.api.modules[self.model_classdef.info.module_name]
-        return helpers.add_new_class_for_module(current_module, name=name, bases=bases)
+        return helpers.add_new_class_for_module(self.current_module, name=name, bases=bases)
 
     def run(self) -> None:
         model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
@@ -143,14 +146,10 @@ class ModelClassInitializer:
         if base_manager_info is None:
             return None
 
-        base_manager = fill_typevars(base_manager_info)
-        assert isinstance(base_manager, Instance)
-        manager_info = self.add_new_class_for_current_module(name, [base_manager])
+        manager_info = helpers.build_reparametrized_subclass(
+            self.current_module, base_manager_info, name, unique_name=True
+        )
         manager_info.fallback_to_any = True
-
-        manager_info.type_vars = base_manager_info.type_vars
-        manager_info.defn.type_vars = base_manager_info.defn.type_vars
-        manager_info.metaclass_type = manager_info.calculate_metaclass_type()
 
         # For methods on BaseManager that return a queryset we need to update
         # the return type to be the actual queryset subclass used. This is done
@@ -187,17 +186,13 @@ class ModelClassInitializer:
         if base_queryset_info is None:
             return None
 
-        base_queryset = fill_typevars(base_queryset_info)
-        assert isinstance(base_queryset, Instance)
-        queryset_info = self.add_new_class_for_current_module(name, [base_queryset])
+        queryset_info = helpers.build_reparametrized_subclass(
+            self.current_module, base_queryset_info, name, unique_name=True
+        )
         queryset_info.metadata["django"] = {
             "any_fallback_queryset": True,
         }
         queryset_info.fallback_to_any = True
-
-        queryset_info.type_vars = base_queryset_info.type_vars.copy()
-        queryset_info.defn.type_vars = base_queryset_info.defn.type_vars.copy()
-        queryset_info.metaclass_type = queryset_info.calculate_metaclass_type()
 
         return queryset_info
 
