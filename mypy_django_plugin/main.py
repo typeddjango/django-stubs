@@ -77,16 +77,6 @@ class NewSemanalDjangoPlugin(Plugin):
         sys.path.extend(options.mypy_path)
         self.django_context = DjangoContext(self.plugin_config.django_settings_module)
 
-    def _get_current_form_bases(self) -> dict[str, int]:
-        model_info = self._get_typeinfo_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
-        if model_info:
-            bases = helpers.get_django_metadata_bases(model_info, "baseform_bases")
-            bases[fullnames.BASEFORM_CLASS_FULLNAME] = 1
-            bases[fullnames.FORM_CLASS_FULLNAME] = 1
-            bases[fullnames.MODELFORM_CLASS_FULLNAME] = 1
-            return bases
-        return {}
-
     def _get_typeinfo_or_none(self, class_name: str) -> TypeInfo | None:
         sym = self.lookup_fully_qualified(class_name)
         if sym is not None and isinstance(sym.node, TypeInfo):
@@ -305,17 +295,20 @@ class NewSemanalDjangoPlugin(Plugin):
 
     @override
     def get_base_class_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
-        # Base class is a Model class definition
         info = self._get_typeinfo_or_none(fullname)
-        if info and helpers.is_model_type(info):
+        if not info:
+            return None
+
+        # Base class is a Model class definition
+        if helpers.is_model_type(info):
             return partial(process_model_class, django_context=self.django_context)
 
         # Base class is a Form class definition
-        if fullname in self._get_current_form_bases():
-            return forms.transform_form_class
+        if info.has_base(fullnames.BASEFORM_CLASS_FULLNAME):
+            return forms.make_meta_nested_class_inherit_from_any
 
         # Base class is a QuerySet class definition
-        if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+        if info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
             return add_as_manager_to_queryset_class
         return None
 

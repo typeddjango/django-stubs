@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, cast
+from typing import TYPE_CHECKING, Any, NamedTuple, TypedDict, cast
 
 from mypy import checker
 from mypy.checker import TypeChecker
@@ -76,7 +76,6 @@ class DjangoTypeMetadata(TypedDict, total=False):
     is_annotated_model: bool
     from_queryset_manager: str
     reverse_managers: dict[str, str]
-    baseform_bases: dict[str, int]
     m2m_throughs: dict[str, str]
     m2m_managers: dict[str, str]
     manager_to_model: str
@@ -84,10 +83,6 @@ class DjangoTypeMetadata(TypedDict, total=False):
 
 def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
     return cast("DjangoTypeMetadata", model_info.metadata.setdefault("django", {}))
-
-
-def get_django_metadata_bases(model_info: TypeInfo, key: Literal["baseform_bases"]) -> dict[str, int]:
-    return get_django_metadata(model_info).setdefault(key, cast("dict[str, int]", {}))
 
 
 def get_reverse_manager_info(
