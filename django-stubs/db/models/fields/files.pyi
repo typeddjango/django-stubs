@@ -16,7 +16,7 @@ from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
 from typing_extensions import Self, TypeVar, override
 
-class FieldFile(File, AltersData):
+class FieldFile(File[Any], AltersData):
     instance: Model
     field: FileField
     storage: Storage
@@ -36,7 +36,7 @@ class FieldFile(File, AltersData):
     def size(self) -> int: ...
     @override
     def open(self, mode: str = "rb") -> Self: ...  # type: ignore[override]
-    def save(self, name: str, content: File, save: bool = True) -> None: ...
+    def save(self, name: str, content: File[Any], save: bool = True) -> None: ...
     def delete(self, save: bool = True) -> None: ...
     @property
     @override
@@ -64,12 +64,12 @@ class FileField(Field[Any, Any]):
     attr_class: type[FieldFile]
     descriptor_class: type[FileDescriptor]
     storage: Storage
-    upload_to: _PathCompatible | _UploadToCallable
+    upload_to: _PathCompatible | _UploadToCallable[Any]
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
-        upload_to: _PathCompatible | _UploadToCallable = "",
+        upload_to: _PathCompatible | _UploadToCallable[Any] = "",
         storage: Storage | Callable[[], Storage] | None = None,
         *,
         max_length: int | None = ...,
