@@ -500,7 +500,9 @@ def add_new_class_for_module(
     return new_typeinfo
 
 
-def build_reparametrized_subclass(module: MypyFile, base_info: TypeInfo, name: str, *, unique_name: bool) -> TypeInfo:
+def build_reparametrized_subclass(
+    module: MypyFile, base_info: TypeInfo, name: str, *, unique_name: bool, line: int = -1
+) -> TypeInfo:
     """
     Create a `TypeInfo` subclassing generic `base_info`, generic over the same type vars.
     """
@@ -512,6 +514,8 @@ def build_reparametrized_subclass(module: MypyFile, base_info: TypeInfo, name: s
         info = create_type_info(name, module.fullname, bases=[base_instance])
     info.defn.type_vars = base_info.defn.type_vars.copy()
     info.add_type_vars()
+    info.set_line(line)
+    info.defn.set_line(line)
     return info
 
 

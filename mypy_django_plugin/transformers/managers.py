@@ -230,7 +230,7 @@ def create_manager_info_from_from_queryset_call(
         # Reuse an identical, already generated, manager
         new_manager_info = manager_sym.node
     else:
-        # Create a new `TypeInfo` instance for the manager type.
+        # Create a new `TypeInfo` instance for the manager type
         try:
             new_manager_info = create_manager_class(
                 api=api,
@@ -267,13 +267,9 @@ def create_manager_class(
     if any(has_placeholder(type_var) for type_var in base_manager_info.defn.type_vars):
         raise helpers.IncompleteDefnException
 
-    manager_info = helpers.build_reparametrized_subclass(
-        api.modules[api.cur_mod_id], base_manager_info, name, unique_name=with_unique_name
+    return helpers.build_reparametrized_subclass(
+        api.modules[api.cur_mod_id], base_manager_info, name, unique_name=with_unique_name, line=line
     )
-    manager_info.line = line
-    manager_info.defn.line = line
-
-    return manager_info
 
 
 def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeInfo) -> None:
