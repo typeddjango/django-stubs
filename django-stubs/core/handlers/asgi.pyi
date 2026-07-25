@@ -35,7 +35,7 @@ class ASGIRequest(HttpRequest):
     POST: _ImmutableQueryDict
     @property
     @override
-    def FILES(self) -> MultiValueDict[str, uploadedfile.UploadedFile]: ...  # type: ignore[override]
+    def FILES(self) -> MultiValueDict[str, uploadedfile.UploadedFile[Any]]: ...  # type: ignore[override]
     @cached_property
     @override
     def COOKIES(self) -> dict[str, str]: ...  # type: ignore[override]
