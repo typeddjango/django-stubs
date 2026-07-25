@@ -21,5 +21,5 @@ assert_type(Direction.choices, list[tuple[str, str]])  # pyright: ignore[reportA
 assert_type(Direction.NORTH, Literal[Direction.NORTH])
 assert_type(Direction.NORTH.name, Literal["NORTH"])
 assert_type(Direction.NORTH.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(Direction.NORTH.value, str)  # ty: ignore[type-assertion-failure]
+assert_type(Direction.NORTH.value, str)
 assert_type(Direction.NORTH.do_not_call_in_templates, Literal[True])

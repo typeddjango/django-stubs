@@ -143,7 +143,7 @@ assert_type(Suit.choices, list[tuple[int, _StrPromise]])  # pyright: ignore[repo
 assert_type(Suit.CLUB, Literal[Suit.CLUB])
 assert_type(Suit.CLUB.name, Literal["CLUB"])
 assert_type(Suit.CLUB.label, _StrPromise)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(Suit.CLUB.value, int)  # ty: ignore[type-assertion-failure]
+assert_type(Suit.CLUB.value, int)
 assert_type(Suit.CLUB.do_not_call_in_templates, Literal[True])
 
 # Assertions for a text choices type that uses a lazy translatable string for all labels.
@@ -154,7 +154,7 @@ assert_type(YearInSchool.choices, list[tuple[str, _StrPromise]])  # pyright: ign
 assert_type(YearInSchool.SENIOR, Literal[YearInSchool.SENIOR])
 assert_type(YearInSchool.SENIOR.name, Literal["SENIOR"])
 assert_type(YearInSchool.SENIOR.label, _StrPromise)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(YearInSchool.SENIOR.value, str)  # ty: ignore[type-assertion-failure]
+assert_type(YearInSchool.SENIOR.value, str)
 assert_type(YearInSchool.SENIOR.do_not_call_in_templates, Literal[True])
 
 # Assertions for an integer choices type that defines `__empty__`, generates most labels, etc.
@@ -166,7 +166,7 @@ assert_type(Vehicle.choices, list[tuple[int | None, _StrOrPromise]])  # pyright:
 assert_type(Vehicle.CAR, Literal[Vehicle.CAR])
 assert_type(Vehicle.CAR.name, Literal["CAR"])
 assert_type(Vehicle.CAR.label, _StrOrPromise)  # ty: ignore[type-assertion-failure]
-assert_type(Vehicle.CAR.value, int)  # ty: ignore[type-assertion-failure]
+assert_type(Vehicle.CAR.value, int)
 assert_type(Vehicle.CAR.do_not_call_in_templates, Literal[True])
 assert_type(Vehicle.__empty__, _StrPromise)  # pyright: ignore[reportAssertTypeFailure]
 
@@ -180,7 +180,7 @@ assert_type(Gender.choices, list[tuple[str | None, str]])  # pyright: ignore[rep
 assert_type(Gender.MALE, Literal[Gender.MALE])
 assert_type(Gender.MALE.name, Literal["MALE"])
 assert_type(Gender.MALE.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(Gender.MALE.value, str)  # ty: ignore[type-assertion-failure]
+assert_type(Gender.MALE.value, str)
 assert_type(Gender.MALE.do_not_call_in_templates, Literal[True])
 assert_type(Gender.__empty__, str)  # pyright: ignore[reportAssertTypeFailure]
 
@@ -193,7 +193,7 @@ assert_type(Medal.choices, list[tuple[str, str]])  # pyright: ignore[reportAsser
 assert_type(Medal.GOLD, Literal[Medal.GOLD])
 assert_type(Medal.GOLD.name, Literal["GOLD"])
 assert_type(Medal.GOLD.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(Medal.GOLD.value, str)  # ty: ignore[type-assertion-failure]
+assert_type(Medal.GOLD.value, str)
 assert_type(Medal.GOLD.do_not_call_in_templates, Literal[True])
 
 # Assertions for a choices type that uses a custom base type.
@@ -255,7 +255,7 @@ assert_type(imported.Direction.choices, list[tuple[str, str]])  # pyright: ignor
 assert_type(imported.Direction.NORTH, Literal[imported.Direction.NORTH])
 assert_type(imported.Direction.NORTH.name, Literal["NORTH"])
 assert_type(imported.Direction.NORTH.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(imported.Direction.NORTH.value, str)  # ty: ignore[type-assertion-failure]
+assert_type(imported.Direction.NORTH.value, str)
 assert_type(imported.Direction.NORTH.do_not_call_in_templates, Literal[True])
 
 # Assertions for a choices type aliased from another to test the plugin resolves correctly.
@@ -267,7 +267,7 @@ assert_type(CompassPoint.choices, list[tuple[str, str]])  # pyright: ignore[repo
 assert_type(CompassPoint.NORTH, Literal[imported.Direction.NORTH])
 assert_type(CompassPoint.NORTH.name, Literal["NORTH"])
 assert_type(CompassPoint.NORTH.label, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(CompassPoint.NORTH.value, str)  # ty: ignore[type-assertion-failure]
+assert_type(CompassPoint.NORTH.value, str)
 assert_type(CompassPoint.NORTH.do_not_call_in_templates, Literal[True])
 
 # Assertions for a choices type aliased by type to test the plugin resolves correctly.
@@ -280,7 +280,7 @@ assert_type(Award.choices, list[tuple[str, str]])  # pyright: ignore[reportAsser
 # Assertions for mixing multiple choices types with consistent base types - only `IntegerChoices`.
 x0 = (Suit, Vehicle)
 assert_type([member.label for choices in x0 for member in choices], list[_StrOrPromise])  # ty: ignore[type-assertion-failure]
-assert_type([member.value for choices in x0 for member in choices], list[int])  # ty: ignore[type-assertion-failure]
+assert_type([member.value for choices in x0 for member in choices], list[int])
 
 # Assertions for mixing multiple choices types with consistent base types - only `TextChoices`.
 x1 = (Medal, Gender)
@@ -290,12 +290,12 @@ assert_type(  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failur
     [member.label for choices in x1 for member in choices], list[_StrOrPromise]
 )
 
-assert_type([member.value for choices in x1 for member in choices], list[str])  # ty: ignore[type-assertion-failure]
+assert_type([member.value for choices in x1 for member in choices], list[str])
 
 # Assertions for mixing multiple choices types with different base types - `IntegerChoices` and `TextChoices`.
 x2 = (Medal, Suit)
 assert_type([member.label for choices in x2 for member in choices], list[_StrOrPromise])  # ty: ignore[type-assertion-failure]
-assert_type([member.value for choices in x2 for member in choices], list[int | str])  # ty: ignore[type-assertion-failure]
+assert_type([member.value for choices in x2 for member in choices], list[int | str])
 
 # Assertions for mixing multiple choices types with consistent base types - custom types.
 x3 = (Constants, Separator)
