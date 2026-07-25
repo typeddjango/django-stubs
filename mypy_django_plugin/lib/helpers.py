@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, cast
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.checkmember import analyze_member_access as _mypy_analyze_member_access
+from mypy.lookup import lookup_fully_qualified
 from mypy.maptype import map_instance_to_supertype
 from mypy.mro import calculate_mro
 from mypy.nodes import (
@@ -23,7 +24,6 @@ from mypy.nodes import (
     Node,
     RefExpr,
     StrExpr,
-    SymbolNode,
     SymbolTable,
     SymbolTableNode,
     TypeInfo,
@@ -149,54 +149,9 @@ class IncompleteDefnException(Exception):
     pass
 
 
-def lookup_fully_qualified_sym(fullname: str, all_modules: dict[str, MypyFile]) -> SymbolTableNode | None:
-    if "." not in fullname:
-        return None
-    if "[" in fullname and "]" in fullname:
-        # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better representation to users
-        # Make sure that we handle lookups of those types of names correctly if the part inside [] contains "."
-        bracket_start = fullname.index("[")
-        fullname_without_bracket = fullname[:bracket_start]
-        module, cls_name = fullname_without_bracket.rsplit(".", 1)
-        cls_name += fullname[bracket_start:]
-    else:
-        module, cls_name = fullname.rsplit(".", 1)
-
-    parent_classes: list[str] = []
-    while True:
-        module_file = all_modules.get(module)
-        if module_file:
-            break
-        if "." not in module:
-            return None
-        module, parent_cls = module.rsplit(".", 1)
-        parent_classes.insert(0, parent_cls)
-
-    scope: MypyFile | TypeInfo = module_file
-    for parent_cls in parent_classes:
-        sym = scope.names.get(parent_cls)
-        if sym is None:
-            return None
-        if isinstance(sym.node, TypeInfo):
-            scope = sym.node
-        else:
-            return None
-
-    sym = scope.names.get(cls_name)
-    if sym is None:
-        return None
-    return sym
-
-
-def lookup_fully_qualified_generic(name: str, all_modules: dict[str, MypyFile]) -> SymbolNode | None:
-    sym = lookup_fully_qualified_sym(name, all_modules)
-    if sym is None:
-        return None
-    return sym.node
-
-
 def lookup_fully_qualified_typeinfo(api: TypeChecker | SemanticAnalyzer, fullname: str) -> TypeInfo | None:
-    node = lookup_fully_qualified_generic(fullname, api.modules)
+    sym = lookup_fully_qualified(fullname, api.modules)
+    node = sym.node if sym is not None else None
     if not isinstance(node, TypeInfo):
         return None
     return node
