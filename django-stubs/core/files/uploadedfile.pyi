@@ -25,7 +25,7 @@ class UploadedFile(File[_AnyStr]):
         content_type_extra: dict[str, bytes] | None = None,
     ) -> None: ...
 
-class TemporaryUploadedFile(UploadedFile):
+class TemporaryUploadedFile(UploadedFile[Any]):
     def __init__(
         self,
         name: str,
@@ -36,7 +36,7 @@ class TemporaryUploadedFile(UploadedFile):
     ) -> None: ...
     def temporary_file_path(self) -> str: ...
 
-class InMemoryUploadedFile(UploadedFile):
+class InMemoryUploadedFile(UploadedFile[Any]):
     field_name: str | None
     def __init__(
         self,

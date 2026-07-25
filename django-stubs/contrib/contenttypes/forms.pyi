@@ -5,7 +5,7 @@ from django.forms.models import BaseModelFormSet, ModelForm
 from typing_extensions import TypeVar, override
 
 _M = TypeVar("_M", bound=Model)
-_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm)
+_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm[Any])
 
 class BaseGenericInlineFormSet(BaseModelFormSet[_M, _ModelFormT]):
     instance: Any
