@@ -28,7 +28,7 @@ _Widgets: TypeAlias = dict[str, type[Widget] | Widget]
 _Labels: TypeAlias = dict[str, str]
 _HelpTexts: TypeAlias = dict[str, str]
 _ErrorMessages: TypeAlias = dict[str, dict[str, str]]
-_FormFieldCallback: TypeAlias = Callable[[models.Field], Field | None]
+_FormFieldCallback: TypeAlias = Callable[[models.Field[Any, Any]], Field | None]
 
 _M = TypeVar("_M", bound=Model)
 _ParentM = TypeVar("_ParentM", bound=Model)
@@ -181,7 +181,7 @@ class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT], Generic[_M, _ParentM,
     instance: _ParentM
     save_as_new: bool
     unique_fields: Collection[str]
-    fk: ForeignKey  # set by inlineformset_set
+    fk: ForeignKey[Any, Any]  # set by inlineformset_set
     def __init__(
         self,
         data: _DataT | None = None,
@@ -207,11 +207,11 @@ class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT], Generic[_M, _ParentM,
 @overload
 def _get_foreign_key(
     parent_model: type[Model], model: type[Model], fk_name: str | None = None, can_fail: Literal[False] = ...
-) -> ForeignKey: ...
+) -> ForeignKey[Any, Any]: ...
 @overload
 def _get_foreign_key(
     parent_model: type[Model], model: type[Model], fk_name: str | None = None, can_fail: Literal[True] = ...
-) -> ForeignKey | None: ...
+) -> ForeignKey[Any, Any] | None: ...
 def inlineformset_factory(
     parent_model: type[_ParentM],
     model: type[_M],
@@ -262,9 +262,9 @@ class ModelChoiceIteratorValue:
     def __init__(self, value: Any, instance: Model) -> None: ...
 
 class ModelChoiceIterator(BaseChoiceIterator):
-    field: ModelChoiceField
+    field: ModelChoiceField[Any]
     queryset: QuerySet
-    def __init__(self, field: ModelChoiceField) -> None: ...
+    def __init__(self, field: ModelChoiceField[Any]) -> None: ...
     @override
     def __iter__(self) -> Iterator[tuple[ModelChoiceIteratorValue | str, str]]: ...
     def __len__(self) -> int: ...

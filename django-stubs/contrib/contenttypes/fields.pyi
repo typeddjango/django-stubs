@@ -16,7 +16,7 @@ from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
 from typing_extensions import override
 
-class GenericForeignKey(FieldCacheMixin, Field):
+class GenericForeignKey(FieldCacheMixin, Field[Any, Any]):
     # django-stubs implementation only fields
     _pyi_private_set_type: Any | Combinable
     _pyi_private_get_type: Any
@@ -107,6 +107,6 @@ class GenericRelation(ForeignObject[Any, Any]):
     def get_extra_restriction(self, alias: str | None, remote_alias: str) -> WhereNode: ...
     def bulk_related_objects(self, objs: list[Model], using: str = "default") -> QuerySet: ...
 
-class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor): ...
+class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor[Any]): ...
 
 def create_generic_related_manager(superclass: Any, rel: Any) -> type[Any]: ...  # GenericRelatedObjectManager
