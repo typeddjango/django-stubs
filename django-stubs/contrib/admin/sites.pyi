@@ -84,4 +84,5 @@ class AdminSite:
 
 class DefaultAdminSite(LazyObject[AdminSite]): ...
 
+# site is actually an instance of DefaultAdminSite, but it proxies through to a AdminSite
 site: AdminSite
