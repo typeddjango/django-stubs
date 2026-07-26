@@ -51,7 +51,7 @@ class Group(models.Model):
     objects: ClassVar[GroupManager]
 
     name: models.CharField[str | int | Combinable, str]
-    permissions: models.ManyToManyField[Permission, Permission]
+    permissions = models.ManyToManyField(Permission)
     def natural_key(self) -> tuple[str]: ...
 
 class UserManager(BaseUserManager[_UserType]):
@@ -78,8 +78,8 @@ class UserManager(BaseUserManager[_UserType]):
 
 class PermissionsMixin(models.Model):
     is_superuser: models.BooleanField[bool | Combinable, bool]
-    groups: models.ManyToManyField[Group, Group]
-    user_permissions: models.ManyToManyField[Permission, Permission]
+    groups = models.ManyToManyField(Group)
+    user_permissions = models.ManyToManyField(Permission)
 
     class Meta:
         abstract: ClassVar[bool]

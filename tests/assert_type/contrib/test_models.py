@@ -31,7 +31,7 @@ def flatpage_fields_are_inferred() -> None:
     assert_type(page.enable_comments, bool)
     assert_type(page.template_name, str)
     assert_type(page.registration_required, bool)
-    assert_type(page.sites.get(), Site)
+    assert_type(page.sites.get(), Site)  # pyright: ignore[reportUnknownMemberType]
 
 
 def redirect_fields_are_inferred() -> None:
@@ -70,7 +70,7 @@ def permission_fields_are_inferred() -> None:
 def group_fields_are_inferred() -> None:
     group = Group()
     assert_type(group.name, str)
-    assert_type(group.permissions.get(), Permission)
+    assert_type(group.permissions.get(), Permission)  # pyright: ignore[reportUnknownMemberType]
 
 
 def user_fields_are_inferred() -> None:
@@ -85,5 +85,5 @@ def user_fields_are_inferred() -> None:
     assert_type(user.is_active, bool)
     assert_type(user.is_superuser, bool)
     assert_type(user.date_joined, datetime)
-    assert_type(user.groups.get(), Group)
-    assert_type(user.user_permissions.get(), Permission)
+    assert_type(user.groups.get(), Group)  # pyright: ignore[reportUnknownMemberType]
+    assert_type(user.user_permissions.get(), Permission)  # pyright: ignore[reportUnknownMemberType]

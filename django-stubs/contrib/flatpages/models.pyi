@@ -9,5 +9,5 @@ class FlatPage(models.Model):
     enable_comments: models.BooleanField[bool | Combinable, bool]
     template_name: models.CharField[str | int | Combinable, str]
     registration_required: models.BooleanField[bool | Combinable, bool]
-    sites: models.ManyToManyField[Site, Site]
+    sites = models.ManyToManyField(Site)
     def get_absolute_url(self) -> str: ...
