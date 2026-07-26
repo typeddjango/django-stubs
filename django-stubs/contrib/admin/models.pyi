@@ -1,3 +1,4 @@
+import datetime as dt
 from collections.abc import Iterable
 from typing import Any, ClassVar, Literal, overload
 from uuid import UUID
@@ -6,6 +7,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.expressions import Combinable
 
 ADDITION: int
 CHANGE: int
@@ -35,7 +37,7 @@ class LogEntryManager(models.Manager[LogEntry]):
     ) -> list[LogEntry]: ...
 
 class LogEntry(models.Model):
-    action_time = models.DateTimeField()
+    action_time: models.DateTimeField[str | dt.datetime | dt.date | Combinable, dt.datetime]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, blank=True, null=True)
     object_id = models.TextField(blank=True, null=True)

@@ -13,7 +13,7 @@ from typing_extensions import assert_type
 
 def log_entry_fields_are_inferred() -> None:
     entry = LogEntry()
-    assert_type(entry.action_time, datetime)  # pyright: ignore[reportUnknownMemberType, reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(entry.action_time, datetime)
     assert_type(entry.user, User)  # pyright: ignore[reportUnknownMemberType, reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     assert_type(entry.content_type, ContentType | None)  # pyright: ignore[reportUnknownMemberType, reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(entry.object_id, str | None)  # pyright: ignore[reportUnknownMemberType, reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
