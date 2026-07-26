@@ -13,7 +13,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
 from django.template.response import TemplateResponse
 from django.urls import URLPattern, URLResolver
-from django.utils.functional import _StrOrPromise
+from django.utils.functional import LazyObject, _StrOrPromise
 
 all_sites: WeakSet[AdminSite]
 
@@ -81,6 +81,7 @@ class AdminSite:
     def catch_all_view(self, request: HttpRequest, url: str) -> HttpResponse: ...
     def get_log_entries(self, request: HttpRequest) -> QuerySet[LogEntry]: ...
 
-class DefaultAdminSite(AdminSite): ...
+class DefaultAdminSite(LazyObject[AdminSite]): ...
 
-site: DefaultAdminSite
+# site is actually an instance of DefaultAdminSite, but it proxies through to a AdminSite
+site: AdminSite
