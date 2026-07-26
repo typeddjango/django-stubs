@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from typing import Any, ClassVar, Literal, overload
 from uuid import UUID
 
-from django.conf import settings
+from django.contrib.auth.models import _User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.base import Model
@@ -38,12 +38,12 @@ class LogEntryManager(models.Manager[LogEntry]):
 
 class LogEntry(models.Model):
     action_time: models.DateTimeField[str | dt.datetime | dt.date | Combinable, dt.datetime]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, blank=True, null=True)
-    object_id = models.TextField(blank=True, null=True)
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.PositiveSmallIntegerField()
-    change_message = models.TextField(blank=True)
+    user: models.ForeignKey[_User | Combinable, _User]
+    content_type: models.ForeignKey[ContentType | Combinable | None, ContentType | None]
+    object_id: models.TextField[str | Combinable | None, str | None]
+    object_repr: models.CharField[str | int | Combinable, str]
+    action_flag: models.PositiveSmallIntegerField[float | int | str | Combinable, int]
+    change_message: models.TextField[str | Combinable, str]
     objects: ClassVar[LogEntryManager]
     def is_addition(self) -> bool: ...
     def is_change(self) -> bool: ...
