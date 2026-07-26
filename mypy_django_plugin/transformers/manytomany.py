@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, NamedTuple
 
 from mypy.nodes import AssignmentStmt, NameExpr, Node, TypeInfo
-from mypy.types import Instance, ProperType, UninhabitedType, get_proper_type
+from mypy.types import AnyType, Instance, ProperType, TypeOfAny, UninhabitedType, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.lib import fullnames, helpers
@@ -30,6 +30,16 @@ class M2MArguments(NamedTuple):
     through: M2MThrough | None
 
 
+def _through_arg_is_unset(m2m_field: Instance) -> bool:
+    """Whether the 'through' type argument was left unsolved, or fell back on its 'Model' default."""
+    if len(m2m_field.args) < 2:
+        return False
+    through_arg = get_proper_type(m2m_field.args[1])
+    return isinstance(through_arg, UninhabitedType) or (
+        isinstance(through_arg, Instance) and through_arg.type.fullname == fullnames.MODEL_CLASS_FULLNAME
+    )
+
+
 def fill_model_args_for_many_to_many_field(
     *,
     ctx: FunctionContext,
@@ -44,6 +54,11 @@ def fill_model_args_for_many_to_many_field(
         and len(default_return_type.args) >= 2
         and (args := get_m2m_arguments(ctx=ctx, model_info=model_info, django_context=django_context))
     ):
+        if isinstance(default_return_type, Instance) and _through_arg_is_unset(default_return_type):
+            # Nothing could be resolved, so don't let the 'Model' default pass for a real answer.
+            return default_return_type.copy_modified(
+                args=[default_return_type.args[0], AnyType(TypeOfAny.from_omitted_generics)]
+            )
         return ctx.default_return_type
 
     default_to_arg = get_proper_type(default_return_type.args[0])
@@ -54,14 +69,13 @@ def fill_model_args_for_many_to_many_field(
         # Avoid overwriting a decent 'to' argument
         to_arg = default_return_type.args[0]
 
-    default_through_arg = get_proper_type(default_return_type.args[1])
-    if isinstance(default_through_arg, UninhabitedType):
+    if _through_arg_is_unset(default_return_type):
         if helpers.is_abstract_model(model_info):
             # Many to many on abstract models doesn't create any implicit, concrete
             # through model, so we populate it with the upper bound to avoid error messages
             through_arg = default_return_type.type.defn.type_vars[1].upper_bound
         elif args.through is None:
-            through_arg = default_through_arg
+            through_arg = UninhabitedType()
         else:
             through_arg = args.through.model
     else:

@@ -307,7 +307,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     forward_related_accessor_class: type[ForwardOneToOneDescriptor[Any]]
     related_accessor_class: type[ReverseOneToOneDescriptor[Any, Any]]  # type: ignore[assignment]
 
-_Through = TypeVar("_Through", bound=Model)
+_Through = TypeVar("_Through", bound=Model, default=Model)
 _To = TypeVar("_To", bound=Model)
 
 class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
