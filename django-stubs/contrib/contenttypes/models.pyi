@@ -2,6 +2,7 @@ from typing import Any, ClassVar
 
 from django.db import models
 from django.db.models.base import Model
+from django.db.models.expressions import Combinable
 from django.db.models.query import QuerySet
 
 class ContentTypeManager(models.Manager[ContentType]):
@@ -14,8 +15,8 @@ class ContentTypeManager(models.Manager[ContentType]):
 
 class ContentType(models.Model):
     id: int
-    app_label = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
+    app_label: models.CharField[str | int | Combinable, str]
+    model: models.CharField[str | int | Combinable, str]
     objects: ClassVar[ContentTypeManager]
     @property
     def name(self) -> str: ...

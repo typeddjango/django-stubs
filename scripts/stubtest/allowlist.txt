@@ -42,6 +42,8 @@ django.contrib.auth.models.Permission_RelatedManager
 django.contrib.auth.models.Group_ManyRelatedManager
 django.contrib.auth.models.Permission_ManyRelatedManager
 django.contrib.auth.models.User_ManyRelatedManager
+django.contrib.flatpages.models.FlatPage_ManyRelatedManager
+django.contrib.sites.models.Site_ManyRelatedManager
 
 # BaseArchive abstract methods that take no argument, but typed with arguments to match the Archive and TarArchive Implementations
 django.utils.archive.BaseArchive.list
