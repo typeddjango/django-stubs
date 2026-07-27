@@ -3,7 +3,7 @@ from collections.abc import Iterable, Iterator, Mapping, Sequence
 from re import Pattern
 from typing import Any, Literal, Protocol, TypeAlias, type_check_only
 
-import _typeshed
+from _typeshed import Self as MetaclassSelf  # noqa: TID251
 from django.core.files.base import File
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import _DataT, _FilesT
@@ -52,11 +52,11 @@ class Media:
 
 class MediaDefiningClass(type):
     def __new__(
-        mcs: type[_typeshed.Self],  # noqa: TID251
+        mcs: type[MetaclassSelf],
         name: str,
         bases: tuple[type, ...],
         attrs: dict[str, Any],
-    ) -> _typeshed.Self: ...  # noqa: TID251
+    ) -> MetaclassSelf: ...
 
 class Widget(metaclass=MediaDefiningClass):
     needs_multipart_form: bool

@@ -1,6 +1,7 @@
 from collections.abc import Awaitable, Callable, Sequence
 from typing import Any, ClassVar, Protocol, TypeAlias, type_check_only
 
+from _typeshed import Self as MetaclassSelf  # noqa: TID251
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from typing_extensions import TypeVar
@@ -27,7 +28,9 @@ class warn_about_renamed_method:
 
 class RenameMethodsBase(type):
     renamed_methods: tuple[tuple[str, str, type[DeprecationWarning]], ...]
-    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> type: ...
+    def __new__(
+        cls: type[MetaclassSelf], name: str, bases: tuple[type, ...], attrs: dict[str, Any]
+    ) -> MetaclassSelf: ...
 
 def deprecate_posargs(deprecation_warning: type[Warning], remappable_names: Sequence[str], /) -> Callable[[_C], _C]: ...
 

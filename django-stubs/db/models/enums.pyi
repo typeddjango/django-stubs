@@ -3,8 +3,9 @@ import sys
 from typing import Any, Literal, overload, type_check_only
 
 from _typeshed import ConvertibleToInt
+from _typeshed import Self as MetaclassSelf  # noqa: TID251
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeVar, override
+from typing_extensions import override
 
 if sys.version_info >= (3, 11):
     from enum import EnumType, IntEnum, StrEnum
@@ -17,13 +18,11 @@ else:
     class IntEnum(int, ReprEnum): ...  # type: ignore[misc]
     class StrEnum(str, ReprEnum): ...  # type: ignore[misc]
 
-_Self = TypeVar("_Self", bound=ChoicesType)
-
 class ChoicesType(EnumType):
     __empty__: _StrOrPromise
     def __new__(
-        metacls: type[_Self], classname: str, bases: tuple[type, ...], classdict: enum._EnumDict, **kwds: Any
-    ) -> _Self: ...
+        metacls: type[MetaclassSelf], classname: str, bases: tuple[type, ...], classdict: enum._EnumDict, **kwds: Any
+    ) -> MetaclassSelf: ...
     @property
     def names(self) -> list[str]: ...
     @property
