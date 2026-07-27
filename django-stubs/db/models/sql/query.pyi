@@ -56,7 +56,7 @@ class Query(BaseExpression):
     where: WhereNode
     filter_is_sticky: bool
     subquery: bool
-    group_by: None | Sequence[Combinable] | Sequence[str] | Literal[True]
+    group_by: Sequence[Combinable] | Sequence[str] | Literal[True] | None
     order_by: Sequence[_OrderByFieldName]
     distinct: bool
     distinct_fields: tuple[str, ...]
