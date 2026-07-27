@@ -22,8 +22,7 @@ _ExecuteQuery: TypeAlias = str | _Composable
 
 # Python types that can be adapted to SQL.
 _SQLType: TypeAlias = (
-    None
-    | bool
+    bool
     | int
     | float
     | Decimal
@@ -34,6 +33,7 @@ _SQLType: TypeAlias = (
     | UUID
     | tuple[Any, ...]
     | list[Any]
+    | None
 )
 _ExecuteParameters: TypeAlias = Sequence[_SQLType] | Mapping[str, _SQLType] | None
 
