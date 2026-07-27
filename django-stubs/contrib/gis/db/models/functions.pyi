@@ -20,6 +20,7 @@ class GeoFuncMixin:
     def name(self) -> str: ...
     @cached_property
     def geo_field(self) -> Any: ...
+    # `as_sql` drops `template`/`arg_joiner` from `Func.as_sql`, matching runtime.
     def as_sql(
         self,
         compiler: SQLCompiler,
@@ -33,8 +34,7 @@ class GeoFuncMixin:
         **kwargs: Any,
     ) -> Any: ...
 
-class GeoFunc(GeoFuncMixin, Func):  # type: ignore[misc]
-    ...
+class GeoFunc(GeoFuncMixin, Func): ...  # type: ignore[misc]
 
 class GeomOutputGeoFunc(GeoFunc):
     @cached_property
