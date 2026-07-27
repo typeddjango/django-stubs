@@ -4,9 +4,9 @@ from http.cookies import SimpleCookie
 from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
-from types import TracebackType
 from typing import Any, Generic, Literal, NoReturn, TypeAlias, TypedDict, type_check_only
 
+from _typeshed import ExcInfo
 from asgiref.typing import ASGIVersions
 from django.contrib.auth.models import _User
 from django.contrib.sessions.backends.base import SessionBase
@@ -258,7 +258,7 @@ class _MonkeyPatchedASGIResponse(_ASGIResponse):
     redirect_chain: list[tuple[str, int]]
 
 class ClientMixin:
-    def store_exc_info(self, **kwargs: Any) -> None: ...
+    def store_exc_info(self, **kwargs: object) -> None: ...
     def check_exception(self, response: HttpResponseBase) -> NoReturn: ...
     @property
     def session(self) -> SessionBase: ...
@@ -273,7 +273,7 @@ class ClientMixin:
 class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
     handler: ClientHandler
     raise_request_exception: bool
-    exc_info: tuple[type[BaseException], BaseException, TracebackType] | None
+    exc_info: ExcInfo | None
     extra: dict[str, Any] | None
     headers: dict[str, Any]
     def __init__(
@@ -392,7 +392,7 @@ class Client(ClientMixin, _RequestFactory[_MonkeyPatchedWSGIResponse]):
 class AsyncClient(ClientMixin, _AsyncRequestFactory[Awaitable[_MonkeyPatchedASGIResponse]]):
     handler: AsyncClientHandler
     raise_request_exception: bool
-    exc_info: Any
+    exc_info: ExcInfo | None
     extra: dict[str, Any] | None
     headers: dict[str, Any]
     def __init__(
