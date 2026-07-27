@@ -10,6 +10,17 @@ if TYPE_CHECKING:
 
 
 def django_plugin_hook(test_item: YamlTestItem) -> None:
+    # Fixtures deliberately exercise bare/incomplete generic defs, as end-user projects
+    # write them: keep `disallow_any_generics` (enabled by `strict` in `mypy.ini`) off,
+    # unless a case opts in via `mypy_config:`.
+    if "disallow_any_generics" not in test_item.additional_mypy_config:
+        if "[mypy]" in test_item.additional_mypy_config:
+            test_item.additional_mypy_config = test_item.additional_mypy_config.replace(
+                "[mypy]", "[mypy]\ndisallow_any_generics = false", 1
+            )
+        else:
+            test_item.additional_mypy_config = "disallow_any_generics = false\n" + test_item.additional_mypy_config
+
     custom_settings = test_item.parsed_test_data.get("custom_settings", "")
     installed_apps = test_item.parsed_test_data.get("installed_apps", None)
     monkeypatch = test_item.parsed_test_data.get("monkeypatch", False)
