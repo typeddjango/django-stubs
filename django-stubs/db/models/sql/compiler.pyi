@@ -12,13 +12,12 @@ from django.db.models.base import Model
 from django.db.models.expressions import BaseExpression, Expression, Ref
 from django.db.models.sql.query import Query
 from django.db.models.sql.subqueries import AggregateQuery, DeleteQuery, InsertQuery, UpdateQuery
-from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import cached_property
 from typing_extensions import override
 
 _ParamT: TypeAlias = str | int
 
-_ParamsT: TypeAlias = _ListOrTuple[_ParamT]
+_ParamsT: TypeAlias = tuple[_ParamT, ...]
 _AsSqlType: TypeAlias = tuple[str, _ParamsT]
 
 class PositionRef(Ref):
