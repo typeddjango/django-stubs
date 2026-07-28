@@ -157,3 +157,57 @@
 
                 class Article(models.Model):
                     name = models.CharField(max_length=128)
+
+-   case: form_fields_attribute_is_typed_per_declared_field
+    main: |
+        from typing import Any
+        from django import forms
+        from typing_extensions import reveal_type
+
+        class BaseForm(forms.Form):
+            name = forms.CharField()
+
+        class MyForm(BaseForm):
+            age = forms.IntegerField()
+            name = forms.EmailField()  # override parent field with a different type
+
+        form = MyForm()
+        reveal_type(form.fields["age"])  # N: Revealed type is "django.forms.fields.IntegerField"
+        reveal_type(form.fields["name"])  # N: Revealed type is "django.forms.fields.EmailField"
+        form.fields["missing"]  # E: "missing" is not a valid TypedDict key; expected one of ("age", "name")  [misc]
+
+        # dynamic reassignment of the whole dict is still allowed
+        form.fields = {}
+
+        # a plain, undeclared Form still falls back to the default 'dict[str, Field]' typing
+        plain_form = forms.Form()
+        reveal_type(plain_form.fields)  # N: Revealed type is "dict[str, django.forms.fields.Field]"
+
+-   case: form_fields_queryset_assignment_via_typed_dict
+    main: |
+        from typing import Any
+        from django import forms
+        from django.db.models import QuerySet
+        from myapp.models import Merchant
+        from typing_extensions import reveal_type
+
+        class MyForm(forms.Form):
+            brands = forms.ModelChoiceField(required=True, queryset=None)  # type: ignore[var-annotated]
+
+            def __init__(self, *args: Any, **kwargs: Any) -> None:
+                super().__init__(*args, **kwargs)
+                self.fields["brands"].queryset = Merchant.objects.all()
+
+        form = MyForm()
+        reveal_type(form.fields["brands"])  # N: Revealed type is "django.forms.models.ModelChoiceField[Any]"
+
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Merchant(models.Model):
+                    name = models.CharField(max_length=128)
