@@ -24,7 +24,7 @@ from django.db.models.manager import BaseManager
 from django.db.models.options import Options
 from django.db.models.query import BaseIterable, ModelIterable, Prefetch, QuerySet, RawQuerySet
 from django.forms.formsets import BaseFormSet
-from django.forms.models import BaseModelForm, BaseModelFormSet, ModelChoiceField, ModelFormOptions
+from django.forms.models import BaseModelForm, BaseModelFormSet, ModelChoiceField, ModelChoiceIterator, ModelFormOptions
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
 from django.utils.functional import LazyObject, classproperty
 from django.views.generic.detail import SingleObjectMixin
@@ -78,6 +78,7 @@ _need_generic: list[MPGeneric[Any]] = [
     MPGeneric(BaseModelForm),
     MPGeneric(BaseModelFormSet),
     MPGeneric(ModelChoiceField),
+    MPGeneric(ModelChoiceIterator),
     MPGeneric(Feed),
     MPGeneric(Sitemap),
     MPGeneric(SuccessMessageMixin),

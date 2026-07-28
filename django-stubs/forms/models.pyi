@@ -109,7 +109,7 @@ def modelform_factory(
     field_classes: Mapping[str, type[Field]] | None = None,
 ) -> type[ModelForm[_M]]: ...
 
-_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm[Any])
+_ModelFormT = TypeVar("_ModelFormT", bound=ModelForm[Any], default=ModelForm[_M])  # ONLY use together with _M
 
 class BaseModelFormSet(BaseFormSet[_ModelFormT], AltersData, Generic[_M, _ModelFormT]):
     model: type[_M] | None
@@ -261,18 +261,18 @@ class InlineForeignKeyField(Field):
 class ModelChoiceIteratorValue:
     def __init__(self, value: Any, instance: Model) -> None: ...
 
-class ModelChoiceIterator(BaseChoiceIterator):
-    field: ModelChoiceField[Any]
-    queryset: QuerySet[Any]
-    def __init__(self, field: ModelChoiceField[Any]) -> None: ...
+class ModelChoiceIterator(BaseChoiceIterator, Generic[_M]):
+    field: ModelChoiceField[_M]
+    queryset: QuerySet[_M]
+    def __init__(self, field: ModelChoiceField[_M]) -> None: ...
     @override
     def __iter__(self) -> Iterator[tuple[ModelChoiceIteratorValue | str, str]]: ...
     def __len__(self) -> int: ...
     def __bool__(self) -> bool: ...
-    def choice(self, obj: Model) -> tuple[ModelChoiceIteratorValue, str]: ...
+    def choice(self, obj: _M) -> tuple[ModelChoiceIteratorValue, str]: ...
 
 class ModelChoiceField(ChoiceField, Generic[_M]):
-    iterator: type[ModelChoiceIterator]
+    iterator: type[ModelChoiceIterator[_M]]
     empty_label: _StrOrPromise | None
     queryset: QuerySet[_M] | None
     limit_choices_to: _AllLimitChoicesTo | None
@@ -299,7 +299,7 @@ class ModelChoiceField(ChoiceField, Generic[_M]):
     def label_from_instance(self, obj: _M) -> str: ...
     choices: _PropertyDescriptor[
         _ChoicesInput | _ChoicesCallable | CallableChoiceIterator,
-        _ChoicesInput | CallableChoiceIterator | ModelChoiceIterator,
+        _ChoicesInput | CallableChoiceIterator | ModelChoiceIterator[_M],
     ]
     @override
     def prepare_value(self, value: Any) -> Any: ...
