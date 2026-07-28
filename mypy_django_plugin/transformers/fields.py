@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, NamedTuple, cast
+from typing import TYPE_CHECKING, NamedTuple, cast
 
 from django.core.exceptions import FieldDoesNotExist
-from django.db.models.fields import AutoField, Field
+from django.db.models.fields import AutoField
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
 from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, UnionType, get_proper_type
@@ -14,15 +14,13 @@ from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import manytomany
 
 if TYPE_CHECKING:
-    from django.db.models.fields.reverse_related import ForeignObjectRel
+    from django.db.models.options import _AnyField
     from mypy.plugin import FunctionContext
 
     from mypy_django_plugin.django.context import DjangoContext
 
 
-def _get_current_field_from_assignment(
-    ctx: FunctionContext, django_context: DjangoContext
-) -> Field[Any, Any] | ForeignObjectRel | None:
+def _get_current_field_from_assignment(ctx: FunctionContext, django_context: DjangoContext) -> _AnyField | None:
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_type(outer_model_info):
         return None

@@ -29,6 +29,16 @@ def check_field_concrete(ctx: MethodContext, field: _AnyField, field_name: str, 
     return True
 
 
+def check_field_unique(
+    ctx: MethodContext, model_cls: type[Model], field: _AnyField, field_name: str, method: str
+) -> bool:
+    unique_fields = [c.fields[0] for c in model_cls._meta.total_unique_constraints if len(c.fields) == 1]
+    if not getattr(field, "unique", None) and field_name not in unique_fields:
+        ctx.api.fail(f'"{method}()"\'s field_name must be a unique field but "{field_name}" isn\'t', ctx.context)
+        return False
+    return True
+
+
 def check_field_not_pk(
     ctx: MethodContext,
     model_cls: type[Model],

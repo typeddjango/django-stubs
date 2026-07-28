@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from typing import TYPE_CHECKING
 
 from pytest_mypy_plugins.collect import File
@@ -12,6 +13,12 @@ def django_plugin_hook(test_item: YamlTestItem) -> None:
     custom_settings = test_item.parsed_test_data.get("custom_settings", "")
     installed_apps = test_item.parsed_test_data.get("installed_apps", None)
     monkeypatch = test_item.parsed_test_data.get("monkeypatch", False)
+
+    # When the result of `Plugin.report_config_data` changes, the mypy cache is invalidated.
+    # This slows down the test suite because test can be executed in any order, regularly invalidating shared cache.
+    # To mitigate this, use different cache dirs based on the settings.
+    config_hash = hashlib.md5(f"{installed_apps}{custom_settings}".encode(), usedforsecurity=False).hexdigest()[:10]
+    test_item.incremental_cache_dir += config_hash
 
     if installed_apps and custom_settings:
         raise ValueError('"installed_apps" and "custom_settings" are not compatible, please use one or the other')

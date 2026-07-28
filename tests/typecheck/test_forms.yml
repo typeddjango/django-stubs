@@ -25,6 +25,30 @@
                 class Category(models.Model):
                     pass
 
+-   case: no_incompatible_meta_nested_class_false_positive_through_indirect_bases
+    main: |
+        from myapp.forms import ArticleFormBase, CategoryFormBase
+        class ArticleForm(ArticleFormBase):
+            class Meta:
+                fields = '__all__'
+        class CategoryForm(CategoryFormBase):
+            class Meta:
+                exclude = ('id',)
+        class CompositeForm(ArticleForm, CategoryForm):
+            pass
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/forms.py
+            content: |
+                from django import forms
+
+                class FormBase(forms.ModelForm):
+                    pass
+                class ArticleFormBase(FormBase):
+                    pass
+                class CategoryFormBase(FormBase):
+                    pass
+
 -   case: formview_methods_on_forms_return_proper_types
     main: |
         from typing import Any

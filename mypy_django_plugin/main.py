@@ -4,11 +4,11 @@ import importlib.metadata
 import itertools
 import sys
 from functools import cache, cached_property, partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Final
 
 from mypy.build import PRI_MED, PRI_MYPY
 from mypy.modulefinder import mypy_path
-from mypy.nodes import MypyFile, TypeInfo
+from mypy.nodes import Import, ImportFrom, MypyFile, TypeInfo
 from mypy.plugin import (
     AnalyzeTypeContext,
     AttributeContext,
@@ -26,6 +26,7 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
+    apps,
     choices,
     fields,
     forms,
@@ -63,6 +64,9 @@ if TYPE_CHECKING:
     from mypy.types import Type as MypyType
 
 
+_APPS_MODULES: Final = frozenset({"django.apps", "django.apps.registry"})
+
+
 class NewSemanalDjangoPlugin(Plugin):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
@@ -73,16 +77,6 @@ class NewSemanalDjangoPlugin(Plugin):
         sys.path.extend(options.mypy_path)
         self.django_context = DjangoContext(self.plugin_config.django_settings_module)
 
-    def _get_current_form_bases(self) -> dict[str, int]:
-        model_info = self._get_typeinfo_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
-        if model_info:
-            bases = helpers.get_django_metadata_bases(model_info, "baseform_bases")
-            bases[fullnames.BASEFORM_CLASS_FULLNAME] = 1
-            bases[fullnames.FORM_CLASS_FULLNAME] = 1
-            bases[fullnames.MODELFORM_CLASS_FULLNAME] = 1
-            return bases
-        return {}
-
     def _get_typeinfo_or_none(self, class_name: str) -> TypeInfo | None:
         sym = self.lookup_fully_qualified(class_name)
         if sym is not None and isinstance(sym.node, TypeInfo):
@@ -92,6 +86,15 @@ class NewSemanalDjangoPlugin(Plugin):
     def _new_dependency(self, module: str, priority: int = PRI_MYPY) -> tuple[int, str, int]:
         fake_lineno = -1
         return (priority, module, fake_lineno)
+
+    def _file_imports_apps_module(self, file: MypyFile) -> bool:
+        for import_node in file.imports:
+            if isinstance(import_node, Import):
+                if any(module in _APPS_MODULES for module, _ in import_node.ids):
+                    return True
+            elif isinstance(import_node, ImportFrom) and import_node.id in _APPS_MODULES:
+                return True
+        return False
 
     @override
     def get_additional_deps(self, file: MypyFile) -> list[tuple[int, str, int]]:
@@ -113,11 +116,19 @@ class NewSemanalDjangoPlugin(Plugin):
                 return []
             return [self._new_dependency(auth_user_module), self._new_dependency("django_stubs_ext")]
 
+        deps: set[tuple[int, str, int]] = set()
+
+        # A file using `apps.get_model()` may depend on any model module.
+        # Skip stubs to keep Django's own build graph untouched.
+        if not file.is_stub and self._file_imports_apps_module(file):
+            deps.update(
+                self._new_dependency(module) for module in self.django_context.model_modules if module != file.fullname
+            )
+
         # ensure that all mentions to='someapp.SomeModel' are loaded with corresponding related Fields
         defined_model_classes = self.django_context.model_modules.get(file.fullname)
         if not defined_model_classes:
-            return []
-        deps = set()
+            return list(deps)
 
         for model_class in defined_model_classes.values():
             for field in itertools.chain(
@@ -210,6 +221,11 @@ class NewSemanalDjangoPlugin(Plugin):
             "alatest": partial(querysets.validate_order_by, django_context=self.django_context),
             "defer": partial(querysets.validate_defer_only, django_context=self.django_context, is_defer=True),
             "only": partial(querysets.validate_defer_only, django_context=self.django_context, is_defer=False),
+            "distinct": partial(querysets.validate_distinct, django_context=self.django_context),
+            "update": partial(querysets.validate_update, django_context=self.django_context),
+            "aupdate": partial(querysets.validate_update, django_context=self.django_context),
+            "in_bulk": partial(querysets.validate_in_bulk, django_context=self.django_context),
+            "ain_bulk": partial(querysets.validate_in_bulk, django_context=self.django_context),
         }
 
     @override
@@ -245,6 +261,15 @@ class NewSemanalDjangoPlugin(Plugin):
         if method_name == "get_field" and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
             return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
 
+        if (
+            method_name == "get_model"
+            and info.has_base(fullnames.APPS_FULLNAME)
+            # `StateApps` returns historical models rebuilt from migration state whose fields
+            # differ from the current definitions, so narrowing to the current model is wrong.
+            and not info.has_base(fullnames.STATE_APPS_FULLNAME)
+        ):
+            return partial(apps.resolve_model_for_get_model, django_context=self.django_context)
+
         if helpers.has_any_of_bases(info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]):
             return partial(querysets.merge_annotations_from_custom_method, django_context=self.django_context)
 
@@ -275,17 +300,20 @@ class NewSemanalDjangoPlugin(Plugin):
 
     @override
     def get_base_class_hook(self, fullname: str) -> Callable[[ClassDefContext], None] | None:
-        # Base class is a Model class definition
         info = self._get_typeinfo_or_none(fullname)
-        if info and helpers.is_model_type(info):
+        if not info:
+            return None
+
+        # Base class is a Model class definition
+        if helpers.is_model_type(info):
             return partial(process_model_class, django_context=self.django_context)
 
         # Base class is a Form class definition
-        if fullname in self._get_current_form_bases():
-            return forms.transform_form_class
+        if info.has_base(fullnames.BASEFORM_CLASS_FULLNAME):
+            return forms.make_meta_nested_class_inherit_from_any
 
         # Base class is a QuerySet class definition
-        if info and info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
+        if info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
             return add_as_manager_to_queryset_class
         return None
 
@@ -353,17 +381,26 @@ class NewSemanalDjangoPlugin(Plugin):
                 return create_new_manager_class_from_from_queryset_method
         return None
 
-    @override
-    def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
+    @cached_property
+    def _report_config_data(self) -> dict[str, Any]:
         # Cache would be cleared if any settings do change.
         extra_data = {
+            # The additional deps depend on the installed apps
+            "INSTALLED_APPS": list(self.django_context.settings.INSTALLED_APPS),
+            # The user model determines the `_User` alias expansion
             "AUTH_USER_MODEL": self.django_context.settings.AUTH_USER_MODEL,
+            # The implicit `pk` field type depends on `DEFAULT_AUTO_FIELD`
+            "DEFAULT_AUTO_FIELD": self.django_context.settings.DEFAULT_AUTO_FIELD,
             "django_version": _package_version("django"),
             "django_stubs_version": _package_version("django-stubs"),
         }
         if (django_stubs_ext_version := _package_version("django-stubs-ext")) is not None:
             extra_data["django_stubs_ext_version"] = django_stubs_ext_version
         return self.plugin_config.to_json(extra_data)
+
+    @override
+    def report_config_data(self, ctx: ReportConfigContext) -> dict[str, Any]:
+        return self._report_config_data
 
 
 @cache

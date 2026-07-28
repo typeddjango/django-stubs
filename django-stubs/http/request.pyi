@@ -47,7 +47,7 @@ class HttpRequest:
     POST: _ImmutableQueryDict
     COOKIES: dict[str, str]
     META: dict[str, Any]
-    FILES: MultiValueDict[str, uploadedfile.UploadedFile]
+    FILES: MultiValueDict[str, uploadedfile.UploadedFile[Any]]
     path: str
     path_info: str
     method: str | None
@@ -97,7 +97,7 @@ class HttpRequest:
     def get_preferred_type(self, media_types: Sequence[str]) -> str | None: ...
     def parse_file_upload(
         self, META: Mapping[str, Any], post_data: _PostDataProtocol
-    ) -> tuple[QueryDict, MultiValueDict[str, uploadedfile.UploadedFile]]: ...
+    ) -> tuple[QueryDict, MultiValueDict[str, uploadedfile.UploadedFile[Any]]]: ...
     @cached_property
     def headers(self) -> HttpHeaders: ...
     @property

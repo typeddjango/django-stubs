@@ -35,7 +35,7 @@ def get_user_model(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> My
         auth_user_model, api=ctx.api.api, django_context=django_context, ctx=ctx.context
     )
     if model_info is None:
-        fullname = django_context.model_class_fullnames_by_label.get(auth_user_model)
+        fullname = django_context.model_class_fullname_for_label(auth_user_model)
         if fullname is not None:
             # When we've tried to resolve 'AUTH_USER_MODEL' but got no class back but
             # we notice that its value is recognised we'll return a placeholder for

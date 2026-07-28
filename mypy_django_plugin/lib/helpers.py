@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, cast
+from typing import TYPE_CHECKING, Any, NamedTuple, TypedDict, cast
 
 from mypy import checker
 from mypy.checker import TypeChecker
 from mypy.checkmember import analyze_member_access as _mypy_analyze_member_access
+from mypy.lookup import lookup_fully_qualified
 from mypy.maptype import map_instance_to_supertype
 from mypy.mro import calculate_mro
 from mypy.nodes import (
@@ -23,7 +24,6 @@ from mypy.nodes import (
     Node,
     RefExpr,
     StrExpr,
-    SymbolNode,
     SymbolTable,
     SymbolTableNode,
     TypeInfo,
@@ -76,7 +76,6 @@ class DjangoTypeMetadata(TypedDict, total=False):
     is_annotated_model: bool
     from_queryset_manager: str
     reverse_managers: dict[str, str]
-    baseform_bases: dict[str, int]
     m2m_throughs: dict[str, str]
     m2m_managers: dict[str, str]
     manager_to_model: str
@@ -84,10 +83,6 @@ class DjangoTypeMetadata(TypedDict, total=False):
 
 def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
     return cast("DjangoTypeMetadata", model_info.metadata.setdefault("django", {}))
-
-
-def get_django_metadata_bases(model_info: TypeInfo, key: Literal["baseform_bases"]) -> dict[str, int]:
-    return get_django_metadata(model_info).setdefault(key, cast("dict[str, int]", {}))
 
 
 def get_reverse_manager_info(
@@ -149,54 +144,9 @@ class IncompleteDefnException(Exception):
     pass
 
 
-def lookup_fully_qualified_sym(fullname: str, all_modules: dict[str, MypyFile]) -> SymbolTableNode | None:
-    if "." not in fullname:
-        return None
-    if "[" in fullname and "]" in fullname:
-        # We sometimes generate fake fullnames like a.b.C[x.y.Z] to provide a better representation to users
-        # Make sure that we handle lookups of those types of names correctly if the part inside [] contains "."
-        bracket_start = fullname.index("[")
-        fullname_without_bracket = fullname[:bracket_start]
-        module, cls_name = fullname_without_bracket.rsplit(".", 1)
-        cls_name += fullname[bracket_start:]
-    else:
-        module, cls_name = fullname.rsplit(".", 1)
-
-    parent_classes: list[str] = []
-    while True:
-        module_file = all_modules.get(module)
-        if module_file:
-            break
-        if "." not in module:
-            return None
-        module, parent_cls = module.rsplit(".", 1)
-        parent_classes.insert(0, parent_cls)
-
-    scope: MypyFile | TypeInfo = module_file
-    for parent_cls in parent_classes:
-        sym = scope.names.get(parent_cls)
-        if sym is None:
-            return None
-        if isinstance(sym.node, TypeInfo):
-            scope = sym.node
-        else:
-            return None
-
-    sym = scope.names.get(cls_name)
-    if sym is None:
-        return None
-    return sym
-
-
-def lookup_fully_qualified_generic(name: str, all_modules: dict[str, MypyFile]) -> SymbolNode | None:
-    sym = lookup_fully_qualified_sym(name, all_modules)
-    if sym is None:
-        return None
-    return sym.node
-
-
 def lookup_fully_qualified_typeinfo(api: TypeChecker | SemanticAnalyzer, fullname: str) -> TypeInfo | None:
-    node = lookup_fully_qualified_generic(fullname, api.modules)
+    sym = lookup_fully_qualified(fullname, api.modules)
+    node = sym.node if sym is not None else None
     if not isinstance(node, TypeInfo):
         return None
     return node
@@ -500,6 +450,25 @@ def add_new_class_for_module(
     return new_typeinfo
 
 
+def build_reparametrized_subclass(
+    module: MypyFile, base_info: TypeInfo, name: str, *, unique_name: bool, line: int = -1
+) -> TypeInfo:
+    """
+    Create a `TypeInfo` subclassing generic `base_info`, generic over the same type vars.
+    """
+    base_instance = fill_typevars(base_info)
+    assert isinstance(base_instance, Instance)
+    if unique_name:
+        info = add_new_class_for_module(module, name, bases=[base_instance])
+    else:
+        info = create_type_info(name, module.fullname, bases=[base_instance])
+    info.defn.type_vars = base_info.defn.type_vars.copy()
+    info.add_type_vars()
+    info.set_line(line)
+    info.defn.set_line(line)
+    return info
+
+
 def get_current_module(api: TypeChecker) -> MypyFile:
     """
     Scope is guaranteed to be initialized with the module as the first element of the stack.
@@ -683,8 +652,7 @@ def resolve_lazy_reference(
     reference: str, *, api: TypeChecker | SemanticAnalyzer, django_context: DjangoContext, ctx: Context
 ) -> TypeInfo | None:
     """
-    Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a
-    'TypeInfo' instance.
+    Attempts to resolve a lazy reference(e.g. "<app_label>.<object_name>") to a 'TypeInfo' instance.
     """
     if "." not in reference:
         # <object_name> -- needs prefix of <app_label>. We can't implicitly solve
@@ -692,7 +660,7 @@ def resolve_lazy_reference(
         return None
 
     # Reference conforms to the structure of a lazy reference: '<app_label>.<object_name>'
-    fullname = django_context.model_class_fullnames_by_label.get(reference)
+    fullname = django_context.model_class_fullname_for_label(reference)
     if fullname is not None:
         model_info = lookup_fully_qualified_typeinfo(api, fullname)
         if model_info is not None:

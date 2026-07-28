@@ -40,3 +40,5 @@ def test_task_with_context_and_priority(context: TaskContext[Any, Any], x: int, 
 
 assert_type(test_task_with_context_and_priority, Task[[int], int])
 assert_type(test_task_with_context_and_priority.enqueue(1), TaskResult[[int], int])
+
+assert_type(test_task_with_context.get_backend().enqueue(test_task_with_context, [1], {}), TaskResult[[int], int])

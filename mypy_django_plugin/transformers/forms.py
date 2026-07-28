@@ -23,15 +23,6 @@ def make_meta_nested_class_inherit_from_any(ctx: ClassDefContext) -> None:
         meta_node.fallback_to_any = True
 
 
-def transform_form_class(ctx: ClassDefContext) -> None:
-    sym = ctx.api.lookup_fully_qualified_or_none(fullnames.BASEFORM_CLASS_FULLNAME)
-    if sym is not None and isinstance(sym.node, TypeInfo):
-        bases = helpers.get_django_metadata_bases(sym.node, "baseform_bases")
-        bases[ctx.cls.fullname] = 1
-
-    make_meta_nested_class_inherit_from_any(ctx)
-
-
 def _iter_declared_field_names(info: TypeInfo) -> Iterator[str]:
     """Yield each class-body-assigned attribute name once, starts from the most-derived class."""
     seen: set[str] = set()

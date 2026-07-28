@@ -407,6 +407,28 @@
                 class User(models.Model):
                     friends = models.ManyToManyField('self')
 
+-   case: implicit_through_model_gets_managers_despite_deferrals
+    main: |
+        from typing_extensions import reveal_type
+        from django.contrib.auth.models import Group
+        reveal_type(Group.permissions.through.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.contrib.auth.models.Group_permissions]"
+        reveal_type(Group.permissions.through._default_manager)  # N: Revealed type is "django.db.models.manager.Manager[django.contrib.auth.models.Group_permissions]"
+    custom_settings: |
+        INSTALLED_APPS = ('django.contrib.contenttypes', 'django.contrib.auth', 'myapp')
+        # 'django.contrib.auth.models' is analyzed *before* 'myapp' (which imports it), so
+        # this 'DEFAULT_AUTO_FIELD' lookup fails and triggers a deferral right after the
+        # implicit through models of 'django.contrib.auth' were created.
+        DEFAULT_AUTO_FIELD = 'myapp.models.MyAutoField'
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.contrib.auth.models import Group  # noqa: F401
+
+                class MyAutoField(models.BigAutoField):
+                    ...
+
 -   case: recursively_checking_for_base_model_in_to_parameter
     main: |
     installed_apps:

@@ -108,14 +108,34 @@ If you get unexpected results, clear the mypy cache with `just clean`.
 For tests that need Django models, add a `models.py` module under `tests/assert_type/`.
 Its package is discovered and automatically added to `INSTALLED_APPS` for the test suite.
 
-For example, a model-based test can be structured like this:
+To keep a test self-contained, put both the models **and** the `assert_type` assertions in
+that single `models.py`. Write the assertions inside functions, they are never executed and only statically checked,
+so they can safely reference the app registry:
+
+```python
+# tests/assert_type/apps/test_registry/models.py
+from __future__ import annotations
+
+from django.apps import apps
+from django.db import models
+from typing_extensions import assert_type
+
+
+class First(models.Model):
+    pass
+
+
+def get_model_resolves_literal_references() -> None:
+    # only the mypy plugin resolves the reference; the stubs return `type[Any]`, so the
+    # other type checkers need an inline ignore for the `assert_type` mismatch
+    assert_type(apps.get_model("test_registry.First"), type[First])  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+```
 
 ```text
 tests/assert_type/
-└── db/models/fields/test_related_forward/
+└── apps/test_registry/
     ├── __init__.py
     └── models.py
-    └── test_my_feature.py
 ```
 
 ### Debugging plugin code
@@ -157,8 +177,8 @@ Unfortunately, the syntax for generics is also valid Python syntax.
 For instance, the statement `class SomeClass(SuperType[int])` implicitly translates to `class SomeClass(SuperType.__class_getitem__(int))`.
 If `SuperType` doesn't define the `__class_getitem__` method, this causes a runtime error, even if the code passes type checking.
 
-When adding a new generic class, or changing an existing class to use generics, run a quick test to see if it causes a runtime error.
-If it does, please add the new generic class to the `_need_generic` list in the [`django_stubs_ext.patch` module](https://github.com/typeddjango/django-stubs/blob/master/ext/django_stubs_ext/patch.py).
+When adding a new generic class, or changing an existing class to use generics, the `tests/test_generic_consistency.py` test checks that the class (or one of its bases) is patched in the [`django_stubs_ext.patch` module](https://github.com/typeddjango/django-stubs/blob/master/ext/django_stubs_ext/patch.py).
+If it fails, please add the new generic class to the `_need_generic` list there.
 
 ## Private attributes
 
