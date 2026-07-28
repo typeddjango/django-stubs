@@ -59,6 +59,7 @@ class _IntegerChoicesType(ChoicesType):
 # all the arguments of `int.__new__`/`str.__new__` (e.g. `base`, `encoding`).
 # They are omitted on purpose to avoid having convoluted stubs for these enums:
 class IntegerChoices(Choices, IntEnum, metaclass=_IntegerChoicesType):  # type: ignore[misc]
+    _value_: int
     @overload
     def __init__(self, x: ConvertibleToInt) -> None: ...
     @overload
@@ -78,6 +79,7 @@ class _TextChoicesType(ChoicesType):
     def values(self) -> list[str]: ...
 
 class TextChoices(Choices, StrEnum, metaclass=_TextChoicesType):  # type: ignore[misc]
+    _value_: str
     @overload
     def __init__(self, object: str) -> None: ...
     @overload

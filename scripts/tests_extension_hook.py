@@ -41,6 +41,15 @@ def django_plugin_hook(test_item: YamlTestItem) -> None:
         if "[mypy.plugins.django-stubs]" not in test_item.additional_mypy_config:
             test_item.additional_mypy_config += django_settings_section
 
+    # yml tests use bare generics on purpose, to test real world cases.
+    disable_any_generics = "disallow_any_generics = false\n"
+    if "[mypy]\n" in test_item.additional_mypy_config:
+        test_item.additional_mypy_config = test_item.additional_mypy_config.replace(
+            "[mypy]\n", "[mypy]\n" + disable_any_generics, 1
+        )
+    else:
+        test_item.additional_mypy_config = "[mypy]\n" + disable_any_generics + test_item.additional_mypy_config
+
     mysettings_file = File(path="mysettings.py", content=custom_settings)
     test_item.files.append(mysettings_file)
 
