@@ -10,17 +10,6 @@ if TYPE_CHECKING:
 
 
 def django_plugin_hook(test_item: YamlTestItem) -> None:
-    # Fixtures deliberately exercise bare/incomplete generic defs, as end-user projects
-    # write them: keep `disallow_any_generics` (enabled by `strict` in `mypy.ini`) off,
-    # unless a case opts in via `mypy_config:`.
-    if "disallow_any_generics" not in test_item.additional_mypy_config:
-        if "[mypy]" in test_item.additional_mypy_config:
-            test_item.additional_mypy_config = test_item.additional_mypy_config.replace(
-                "[mypy]", "[mypy]\ndisallow_any_generics = false", 1
-            )
-        else:
-            test_item.additional_mypy_config = "disallow_any_generics = false\n" + test_item.additional_mypy_config
-
     custom_settings = test_item.parsed_test_data.get("custom_settings", "")
     installed_apps = test_item.parsed_test_data.get("installed_apps", None)
     monkeypatch = test_item.parsed_test_data.get("monkeypatch", False)
@@ -51,6 +40,15 @@ def django_plugin_hook(test_item: YamlTestItem) -> None:
     else:
         if "[mypy.plugins.django-stubs]" not in test_item.additional_mypy_config:
             test_item.additional_mypy_config += django_settings_section
+
+    # yml tests use bare generics on purpose, to test real world cases.
+    disable_any_generics = "disallow_any_generics = false\n"
+    if "[mypy]\n" in test_item.additional_mypy_config:
+        test_item.additional_mypy_config = test_item.additional_mypy_config.replace(
+            "[mypy]\n", "[mypy]\n" + disable_any_generics, 1
+        )
+    else:
+        test_item.additional_mypy_config = "[mypy]\n" + disable_any_generics + test_item.additional_mypy_config
 
     mysettings_file = File(path="mysettings.py", content=custom_settings)
     test_item.files.append(mysettings_file)
