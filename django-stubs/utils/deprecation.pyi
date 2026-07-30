@@ -35,18 +35,8 @@ class RenameMethodsBase(type):
 def deprecate_posargs(deprecation_warning: type[Warning], remappable_names: Sequence[str], /) -> Callable[[_C], _C]: ...
 
 @type_check_only
-class _GetResponseCallable(Protocol):
-    def __call__(self, request: HttpRequest, /) -> HttpResponseBase: ...
-
-@type_check_only
-class _AsyncGetResponseCallable(Protocol):
-    def __call__(self, request: HttpRequest, /) -> Awaitable[HttpResponseBase]: ...
-
-@type_check_only
-class _MiddlewareGetResponseCallable(Protocol):
+class _AnyGetResponseCallable(Protocol):
     def __call__(self, request: HttpRequest, /) -> HttpResponseBase | Awaitable[HttpResponseBase]: ...
-
-_AnyGetResponseCallable: TypeAlias = _GetResponseCallable | _AsyncGetResponseCallable | _MiddlewareGetResponseCallable
 
 class MiddlewareMixin:
     sync_capable: ClassVar[bool]
