@@ -42,12 +42,18 @@ class _GetResponseCallable(Protocol):
 class _AsyncGetResponseCallable(Protocol):
     def __call__(self, request: HttpRequest, /) -> Awaitable[HttpResponseBase]: ...
 
+@type_check_only
+class _MiddlewareGetResponseCallable(Protocol):
+    def __call__(self, request: HttpRequest, /) -> HttpResponseBase | Awaitable[HttpResponseBase]: ...
+
+_AnyGetResponseCallable: TypeAlias = _GetResponseCallable | _AsyncGetResponseCallable | _MiddlewareGetResponseCallable
+
 class MiddlewareMixin:
     sync_capable: ClassVar[bool]
     async_capable: ClassVar[bool]
 
-    get_response: _GetResponseCallable | _AsyncGetResponseCallable
+    get_response: _AnyGetResponseCallable
     async_mode: bool
-    def __init__(self, get_response: _GetResponseCallable | _AsyncGetResponseCallable) -> None: ...
+    def __init__(self, get_response: _AnyGetResponseCallable) -> None: ...
     def __call__(self, request: HttpRequest) -> HttpResponseBase | Awaitable[HttpResponseBase]: ...
     async def __acall__(self, request: HttpRequest) -> HttpResponseBase: ...

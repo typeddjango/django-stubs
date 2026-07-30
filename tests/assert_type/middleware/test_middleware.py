@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.redirects.middleware import RedirectFallbackMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.http.response import (
     FileResponse,
     HttpResponse,
@@ -54,3 +56,10 @@ class ResponseGoneFallbackMiddleware(RedirectFallbackMiddleware):
     @override
     def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
         return self.response_gone_class()
+
+
+def test_middleware_composition(request: HttpRequest) -> None:
+    def get_response(request: HttpRequest, /) -> HttpResponse:
+        return HttpResponse()
+
+    SessionMiddleware(AuthenticationMiddleware(get_response)).process_request(request)
