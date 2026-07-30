@@ -1,19 +1,24 @@
 from __future__ import annotations
 
+from collections.abc import Awaitable
 from typing import TYPE_CHECKING
 
+from django.contrib.auth.middleware import AuthenticationMiddleware, RemoteUserMiddleware
 from django.contrib.redirects.middleware import RedirectFallbackMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.http.response import (
     FileResponse,
     HttpResponse,
+    HttpResponseBase,
     HttpResponseGone,
     HttpResponsePermanentRedirect,
     HttpResponseRedirect,
     HttpResponseRedirectBase,
 )
+from django.middleware.cache import CacheMiddleware
 from django.middleware.common import CommonMiddleware
 from django.middleware.locale import LocaleMiddleware
-from typing_extensions import override
+from typing_extensions import assert_type, override
 
 if TYPE_CHECKING:
     from django.http.request import HttpRequest
@@ -54,3 +59,25 @@ class ResponseGoneFallbackMiddleware(RedirectFallbackMiddleware):
     @override
     def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
         return self.response_gone_class()
+
+
+def test_middleware_composition(request: HttpRequest) -> None:
+    def sync_get_response(request: HttpRequest, /) -> HttpResponse:
+        return HttpResponse()
+
+    async def async_get_response(request: HttpRequest, /) -> HttpResponse:
+        return HttpResponse()
+
+    # Plain sync and async views are accepted.
+    AuthenticationMiddleware(sync_get_response)
+    AuthenticationMiddleware(async_get_response)
+
+    # A middleware instance is accepted (regression test for #3537).
+    composed = SessionMiddleware(AuthenticationMiddleware(sync_get_response))
+    assert_type(composed(request), HttpResponseBase | Awaitable[HttpResponseBase])
+
+    remote = RemoteUserMiddleware(SessionMiddleware(sync_get_response))
+    assert_type(remote(request), HttpResponseBase | Awaitable[HttpResponseBase])
+
+    cache = CacheMiddleware(AuthenticationMiddleware(sync_get_response))
+    assert_type(cache(request), HttpResponseBase | Awaitable[HttpResponseBase])
