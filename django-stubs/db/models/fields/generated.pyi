@@ -7,7 +7,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.expressions import Expression
 from django.db.models.fields import _ErrorMessagesMapping
 from django.db.models.sql import Query
-from django.utils.choices import _Choices
+from django.utils.choices import _ChoicesInput
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _StrOrPromise, cached_property
 from typing_extensions import override
@@ -37,7 +37,7 @@ class GeneratedField(models.Field[Any, Any]):
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_comment: str | None = ...,
