@@ -100,3 +100,58 @@
         int8 = models.IntegerField(choices=to_named_seq(int_tuple)(), default=1)
         int9 = models.IntegerField(choices=to_named_seq(int_mapping)(), default=1)
         int10 = models.IntegerField(choices=choices_type)
+
+        generated1 = models.GeneratedField(
+            expression=models.Value("foo"),
+            output_field=models.CharField(max_length=5),
+            choices=TextChoices,
+            db_persist=False,
+        )
+        generated2 = models.GeneratedField(
+            expression=models.Value("foo"),
+            output_field=models.CharField(max_length=5),
+            choices=str_tuple,
+            db_persist=False,
+        )
+        generated3 = models.GeneratedField(
+            expression=models.Value("foo"),
+            output_field=models.CharField(max_length=5),
+            choices=str_mapping,
+            db_persist=False,
+        )
+        generated4 = models.GeneratedField(
+            expression=models.Value("foo"),
+            output_field=models.CharField(max_length=5),
+            choices=str_tuple(),
+            db_persist=False,
+        )
+        generated5 = models.GeneratedField(
+            expression=models.Value("foo"),
+            output_field=models.CharField(max_length=5),
+            choices=str_mapping(),
+            db_persist=False,
+        )
+        generated6 = models.GeneratedField(
+            expression=models.Value("foo"),
+            output_field=models.CharField(max_length=5),
+            choices=to_named_seq(str_tuple),
+            db_persist=False,
+        )
+        generated7 = models.GeneratedField(
+            expression=models.Value("foo"),
+            output_field=models.CharField(max_length=5),
+            choices=to_named_mapping(str_mapping),
+            db_persist=False,
+        )
+        generated8 = models.GeneratedField(
+            expression=models.Value("foo"),
+            output_field=models.CharField(max_length=5),
+            choices=to_named_seq(str_tuple)(),
+            db_persist=False,
+        )
+        generated9 = models.GeneratedField(
+            expression=models.Value("foo"),
+            output_field=models.CharField(max_length=5),
+            choices=to_named_mapping(str_mapping)(),
+            db_persist=False,
+        )
