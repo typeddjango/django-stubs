@@ -99,6 +99,5 @@ django.db.migrations.recorder.MigrationRecorder.Migration.get_previous_by_applie
 django.db.migrations.recorder.MigrationRecorder.Migration.id
 django.db.models.fields.CharField.description
 django.db.models.fields.Field.description
-django.db.models.fields.json.CaseInsensitiveMixin.process_lhs
 django.forms.models.inlineformset_factory
 django.forms.models.modelformset_factory
