@@ -71,7 +71,6 @@ django.contrib.flatpages.models.FlatPage.sites
 django.contrib.flatpages.models.FlatPage.template_name
 django.contrib.flatpages.models.FlatPage.title
 django.contrib.flatpages.models.FlatPage.url
-django.contrib.gis.db.backends.spatialite.base.DatabaseWrapper.ops
 django.contrib.redirects.models.Redirect.id
 django.contrib.redirects.models.Redirect.new_path
 django.contrib.redirects.models.Redirect.old_path
@@ -91,9 +90,6 @@ django.contrib.sessions.models.Session.session_key
 django.contrib.sites.models.Site.domain
 django.contrib.sites.models.Site.id
 django.contrib.sites.models.Site.name
-django.db.backends.mysql.base.DatabaseWrapper.ops
-django.db.backends.postgresql.base.DatabaseWrapper.ops
-django.db.backends.sqlite3.base.DatabaseWrapper.ops
 django.db.migrations.recorder.MigrationRecorder.Migration.get_next_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.get_previous_by_applied
 django.db.migrations.recorder.MigrationRecorder.Migration.id
