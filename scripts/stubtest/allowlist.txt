@@ -151,6 +151,7 @@ django.db.migrations.operations.models.AlterTogetherOptionOperation.option_name
 
 # These are set to None in the base class but *must* be overridden
 # because they are required in the init, so we type them without the None option.
+django.contrib.gis.db.backends.spatialite.base.DatabaseWrapper.ops
 django.db.backends.base.base.BaseDatabaseWrapper.SchemaEditorClass
 django.db.backends.base.base.BaseDatabaseWrapper.client_class
 django.db.backends.base.base.BaseDatabaseWrapper.creation_class
@@ -158,6 +159,9 @@ django.db.backends.base.base.BaseDatabaseWrapper.features_class
 django.db.backends.base.base.BaseDatabaseWrapper.introspection_class
 django.db.backends.base.base.BaseDatabaseWrapper.ops
 django.db.backends.base.base.BaseDatabaseWrapper.ops_class
+django.db.backends.mysql.base.DatabaseWrapper.ops
+django.db.backends.postgresql.base.DatabaseWrapper.ops
+django.db.backends.sqlite3.base.DatabaseWrapper.ops
 
 # Attributes defaulting to None messing with mypy
 django.contrib.admin.options.InlineModelAdmin.model
