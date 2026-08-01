@@ -93,6 +93,29 @@
                     model_a = models.ForeignKey(ModelA, on_delete=models.CASCADE, related_query_name="model_b")
                     model_a_bis = models.ForeignKey(ModelA, on_delete=models.CASCADE, related_name="model_b_bis")
 
+# Regression test for #2833
+-   case: get_field_with_model_defined_later_in_module
+    main: |
+        from myapp.models import MyModel
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing_extensions import reveal_type
+                from django.db import models
+
+                def get_field_before_model_is_defined() -> None:
+                    # Definition order is the test: this body is checked before `MyModel`'s fields are inferred.
+                    reveal_type(MyModel._meta.get_field('short_id'))  # N: Revealed type is "django.db.models.fields.IntegerField[float | int | str | django.db.models.expressions.Combinable, int]"
+
+                # A module-level lambda has nothing to defer, so this falls back to the runtime lookup.
+                unresolvable = lambda: reveal_type(MyModel._meta.get_field('short_id'))  # N: Revealed type is "django.db.models.fields.IntegerField"
+
+                class MyModel(models.Model):
+                    short_id = models.IntegerField()
+
 -   case: base_model_meta_incompatible_types
     main: |
         from django.db import models
