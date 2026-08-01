@@ -68,7 +68,7 @@
                 class MyModel(AbstractModel):
                     field = ArrayField(models.IntegerField(), default=[])
 
--   case: get_field_reverse_fk_with_related_query_name
+-   case: get_field_reverse_relations
     main: |
         from typing_extensions import reveal_type
         from myapp.models import ModelA
@@ -78,6 +78,9 @@
 
         reveal_type(ModelA._meta.get_field("model_b_bis")) # N: Revealed type is "django.db.models.fields.reverse_related.ManyToOneRel"
         reveal_type(ModelA.model_b_bis.field) # N: Revealed type is "django.db.models.fields.related.ForeignKey[myapp.models.ModelB, myapp.models.ModelB]"
+
+        # The reverse o2o accessor is a two arg descriptor, not a field
+        reveal_type(ModelA._meta.get_field("modelc")) # N: Revealed type is "django.db.models.fields.reverse_related.OneToOneRel"
 
     installed_apps:
         - myapp
@@ -92,6 +95,9 @@
                 class ModelB(models.Model):
                     model_a = models.ForeignKey(ModelA, on_delete=models.CASCADE, related_query_name="model_b")
                     model_a_bis = models.ForeignKey(ModelA, on_delete=models.CASCADE, related_name="model_b_bis")
+
+                class ModelC(models.Model):
+                    model_a = models.OneToOneField(ModelA, on_delete=models.CASCADE)
 
 -   case: base_model_meta_incompatible_types
     main: |
