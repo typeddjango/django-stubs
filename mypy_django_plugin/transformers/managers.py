@@ -149,6 +149,8 @@ def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefConte
     """
     Insert a new manager class node for a: '<Name> = <Manager>.from_queryset(<QuerySet>)'.
     When the assignment expression lives at module level.
+
+    class level cases are resolved in `AddManagers.try_create_manager_from_from_queryset`
     """
     semanal_api = helpers.get_semanal_api(ctx)
 
