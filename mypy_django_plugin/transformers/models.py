@@ -895,22 +895,14 @@ class ProcessManyToManyFields(ModelClassInitializer):
 
     def add_through_table_managers(self, through_model: TypeInfo) -> None:
         """The `self.manager_info` lookup might trigger a deferral pass so this has to be idempotent"""
-        # Add a manager named 'objects'
-        if through_model.names.get("objects") is None:
-            helpers.add_new_sym_for_info(
-                through_model,
-                name="objects",
-                sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
-                is_classvar=True,
-            )
-        # Also add manager as '_default_manager' attribute
-        if through_model.names.get("_default_manager") is None:
-            helpers.add_new_sym_for_info(
-                through_model,
-                name="_default_manager",
-                sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
-                is_classvar=True,
-            )
+        for name in ("objects", "_default_manager"):
+            if through_model.names.get(name) is None:
+                helpers.add_new_sym_for_info(
+                    through_model,
+                    name=name,
+                    sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
+                    is_classvar=True,
+                )
 
     def resolve_many_to_many_arguments(self, call: CallExpr, /, context: Context) -> M2MArguments | None:
         """
