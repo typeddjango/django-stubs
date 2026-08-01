@@ -4,7 +4,6 @@ from typing import Any, Generic
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBase
-from django.template.response import TemplateResponse
 from django.utils.functional import _Getter
 from typing_extensions import TypeVar, override
 
@@ -26,11 +25,11 @@ class View(Generic[_ViewResponse]):
     @classmethod
     def as_view(cls: Any, **initkwargs: Any) -> Callable[..., _ViewResponse]: ...
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None: ...
-    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> _ViewResponse: ...
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
     def http_method_not_allowed(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse: ...
     def options(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseBase: ...
 
-_TemplateResponse = TypeVar("_TemplateResponse", bound=HttpResponse, default=TemplateResponse)
+_TemplateResponse = TypeVar("_TemplateResponse", bound=HttpResponse, default=HttpResponse)
 
 class TemplateResponseMixin(Generic[_TemplateResponse]):
     template_name: str | None
