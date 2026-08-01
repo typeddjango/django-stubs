@@ -255,9 +255,19 @@ django.test.selenium.SeleniumTestCase.__init_subclass__
 # mypy does not understand __getitem__ unpacking python/mypy#2220
 django.urls.resolvers.ResolverMatch.__iter__
 
-# Loop leak variables - values depend on dict iteration order, not public API
+# Targets of the module-level `for key, op in OPERATORS.items()` in template/smartif.py,
+# left over in the module namespace. Not public API.
 django.template.smartif.key
 django.template.smartif.op
+
+# Targets of the module-level loop over _connector_combinations in db/models/expressions.py,
+# left over in the module namespace. Not public API.
+django.db.models.expressions.connector
+django.db.models.expressions.d
+django.db.models.expressions.field_types
+django.db.models.expressions.lhs
+django.db.models.expressions.result
+django.db.models.expressions.rhs
 
 # The parameters form_class / choices_form_class are positional at runtime, but
 # usage and docs always pass them as keyword args; additionally, all subclasses
