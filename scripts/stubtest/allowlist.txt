@@ -282,6 +282,13 @@ django.db.models.expressions.rhs
 # require them to be keyword-only, so require all usage to be keyword-only.
 django.db.models.fields.Field.formfield
 
+# `form` is a TypeVar with a PEP 696 default of `ModelForm[_M]`, so omitting it still ties the
+# formset to the model. stubtest never resolves TypeVar defaults, so it can't tell that the
+# runtime `ModelForm` default satisfies `type[_ModelFormT]`.
+django.contrib.contenttypes.forms.generic_inlineformset_factory
+django.forms.models.inlineformset_factory
+django.forms.models.modelformset_factory
+
 # Field.__get__/__set__ are stub-only for the mypy plugin, they don't exist at runtime
 django.db.models.fields.Field.__get__
 django.db.models.fields.Field.__set__
