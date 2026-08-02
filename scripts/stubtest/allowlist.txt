@@ -17,6 +17,10 @@ django.contrib.redirects.migrations.*
 django.contrib.sessions.migrations.*
 django.contrib.sites.migrations.*
 
+# `python -m django` entry point: everything is behind `if __name__ == "__main__"`,
+# so there is nothing importable to stub. Same as the locale and migration modules above.
+django.__main__
+
 # Note: At runtime, these are `LazyObject` or `ConnectionProxy` instances.
 # However, to avoid type degradation, we stub them using the underlying target type instead.
 #
