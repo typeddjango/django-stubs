@@ -45,14 +45,14 @@ class ModelBase(type):
     def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any], **kwargs: Any) -> ModelBase: ...
     def add_to_class(cls, name: str, value: Any) -> None: ...
     @property
-    def _base_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
+    def _base_manager(cls: type[_Self]) -> Manager[_Self, QuerySet[_Self]]: ...  # type: ignore[misc]
     @property
-    def _default_manager(cls: type[_Self]) -> Manager[_Self]: ...  # type: ignore[misc]
+    def _default_manager(cls: type[_Self]) -> Manager[_Self, QuerySet[_Self]]: ...  # type: ignore[misc]
     # Class level only access for the `objects` manager when it's not defined explicitly.
     # Because this acts as a fallback (matching django adding this manager if not defined), it resolves conflict
     # we previously had with pyright and pyrefly when overriding `objects`.
     # See https://github.com/typeddjango/django-stubs/pull/3559#issue-5057479304
-    def __getattr__(cls: type[_Self], name: Literal["objects"]) -> Manager[_Self]: ...
+    def __getattr__(cls: type[_Self], name: Literal["objects"]) -> Manager[_Self, QuerySet[_Self]]: ...
 
 class Model(AltersData, metaclass=ModelBase):
     # These attributes should only exist on concrete subclasses, not abstract models, and are
