@@ -57,7 +57,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
-        shard: [0, 1, 2, 3]
+        shard: [0, 1]
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
@@ -82,14 +82,14 @@ jobs:
 
       # Must match `shard` definition in the test matrix:
       - name: Run pytest tests
-        run: uv run pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests
+        run: uv run pytest --num-shards=2 --shard-id=${{ matrix.shard }} -n auto tests
 
   test-older-django:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shard: [0, 1, 2, 3]
+        shard: [0, 1]
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
@@ -117,7 +117,7 @@ jobs:
 
       # Exit 1 only if ont of the pytest error is a mypy crash
       - name: Run pytest tests
-        run: "! uv run pytest --num-shards=4 --shard-id=${{ matrix.shard }} -n auto tests | grep 'pytest_mypy_plugins.utils.TypecheckAssertionError: Critical error occurred'"
+        run: "! uv run pytest --num-shards=2 --shard-id=${{ matrix.shard }} -n auto tests | grep 'pytest_mypy_plugins.utils.TypecheckAssertionError: Critical error occurred'"
 
 
   stubtest:
