@@ -58,7 +58,6 @@ django.contrib.auth.models.User.last_name
 django.contrib.auth.models.User.password
 django.contrib.auth.models.User.user_permissions
 django.contrib.auth.models.User.username
-django.contrib.contenttypes.forms.generic_inlineformset_factory
 django.contrib.contenttypes.models.ContentType.app_label
 django.contrib.contenttypes.models.ContentType.id
 django.contrib.contenttypes.models.ContentType.model
@@ -95,5 +94,3 @@ django.db.migrations.recorder.MigrationRecorder.Migration.id
 django.db.models.fields.CharField.description
 django.db.models.fields.Field.description
 django.db.models.fields.json.CaseInsensitiveMixin.process_lhs
-django.forms.models.inlineformset_factory
-django.forms.models.modelformset_factory
