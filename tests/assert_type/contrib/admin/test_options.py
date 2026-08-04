@@ -146,8 +146,8 @@ class InvalidRadioFieldsKeyAdmin(admin.ModelAdmin[Any]):
 
 
 class InvalidFormfieldOverridesAdmin(admin.ModelAdmin[Any]):
-    formfield_overrides = {  # pyrefly: ignore[bad-assignment]
-        "not a field": {  # type: ignore[dict-item]  # pyright: ignore[reportAssignmentType]
+    formfield_overrides = {
+        "not a field": {  # type: ignore[dict-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
             "widget": Textarea,
         }
     }
