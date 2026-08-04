@@ -1,4 +1,3 @@
-django.db.transaction.savepoint_create
 django.forms.fields.FilePathField.set_choices
 django.forms.models.ModelChoiceField.__init__
 django.forms.widgets.Media.render
