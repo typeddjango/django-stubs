@@ -1,7 +1,3 @@
-django.db.models.functions.UUID4
-django.db.models.functions.UUID7
-django.db.models.functions.__all__
-django.db.models.functions.uuid
 django.db.models.lookups.PatternLookup.is_simple_lookup
 django.db.models.query.DEFAULT_FETCH_MODE
 django.db.models.query.PreventQuerySetCloning
