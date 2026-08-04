@@ -1,4 +1,3 @@
-django.shortcuts.redirect
 django.tasks.base.Task.__init__
 django.template.defaulttags.csp_nonce_attr
 django.template.library.parse_bits
