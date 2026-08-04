@@ -16,7 +16,6 @@ django.db.models.FETCH_PEERS
 django.db.models.JSONNull
 django.db.models.RAISE
 django.db.models.__all__
-django.db.models.constraints.UniqueConstraint.__init__
 django.db.models.deletion.Collector.__init__
 django.db.models.deletion.DB_CASCADE
 django.db.models.deletion.DB_SET_DEFAULT
