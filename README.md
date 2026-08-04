@@ -11,6 +11,7 @@ This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) an
 - mypy: full and complete support with multiple advanced features with our custom mypy plugin
 - pyright: basic support, checked in CI
 - pyrefly: basic support, checked in CI
+- ty: initial support, checked in CI, but has lots of known problems
 
 ## Installation
 
