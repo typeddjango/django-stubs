@@ -1,4 +1,3 @@
-django.db.models.lookups.PatternLookup.is_simple_lookup
 django.db.models.query.DEFAULT_FETCH_MODE
 django.db.models.query.PreventQuerySetCloning
 django.db.models.query.QuerySet.fetch_mode
