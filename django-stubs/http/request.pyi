@@ -7,6 +7,7 @@ from django.contrib.auth.models import _AnyUser
 from django.contrib.sessions.backends.base import SessionBase
 from django.contrib.sites.models import Site
 from django.core.files import uploadedfile, uploadhandler
+from django.http.multipartparser import MultiPartParser
 from django.urls import ResolverMatch
 from django.utils.datastructures import CaseInsensitiveMapping, ImmutableList, MultiValueDict
 from django.utils.functional import cached_property
@@ -94,6 +95,10 @@ class HttpRequest:
     def upload_handlers(self) -> _UploadHandlerList: ...
     @upload_handlers.setter
     def upload_handlers(self, upload_handlers: _UploadHandlerList) -> None: ...
+    @property
+    def multipart_parser_class(self) -> MultiPartParser: ...
+    @multipart_parser_class.setter
+    def multipart_parser_class(self, multipart_parser_class: MultiPartParser) -> None: ...
     @cached_property
     def accepted_types(self) -> list[MediaType]: ...
     @cached_property

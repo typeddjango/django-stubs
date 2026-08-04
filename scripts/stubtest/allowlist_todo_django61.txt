@@ -1,5 +1,3 @@
-django.http.request.HttpRequest.multipart_parser_class
-django.http.response.HttpResponseRedirectBase.__init__
 django.middleware.common.BrokenLinkEmailsMiddleware.send_mail
 django.middleware.common.BrokenLinkEmailsMiddleware.using
 django.shortcuts.redirect
