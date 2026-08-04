@@ -1,5 +1,3 @@
-django.test.signals.update_logging_config
-django.test.testcases._DatabaseFailure.__call__
 django.utils.cache.cc_delim_re
 django.utils.crypto.salted_hmac
 django.utils.csp.CONTEXT_KEY
