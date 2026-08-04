@@ -1,11 +1,3 @@
-django.forms.fields.FilePathField.set_choices
-django.forms.models.ModelChoiceField.__init__
-django.forms.widgets.Media.render
-django.forms.widgets.Media.render_css
-django.forms.widgets.Media.render_js
-django.forms.widgets.MediaAsset.render
-django.forms.widgets.Stylesheet
-django.forms.widgets.__all__
 django.http.request.HttpRequest.multipart_parser_class
 django.http.response.HttpResponseRedirectBase.__init__
 django.middleware.common.BrokenLinkEmailsMiddleware.send_mail

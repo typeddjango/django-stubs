@@ -536,6 +536,7 @@ class FilePathField(ChoiceField):
         disabled: bool = ...,
         label_suffix: str | None = ...,
     ) -> None: ...
+    def set_choices(self) -> None: ...
 
 class SplitDateTimeField(MultiValueField):
     widget: _ClassLevelWidgetT
