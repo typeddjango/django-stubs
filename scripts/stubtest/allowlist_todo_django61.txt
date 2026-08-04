@@ -1,4 +1,3 @@
-django.db.models.sql.query.Query.orderby_issubset_groupby
 django.db.models.utils.get_blank_choice_label
 django.db.transaction.savepoint_create
 django.forms.fields.FilePathField.set_choices
