@@ -6,6 +6,12 @@
 
 This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) and a custom mypy plugin to provide more precise static types and type inference for Django framework. Django uses some Python "magic" that makes having precise types for some code patterns problematic. This is why we need this project. The final goal is to be able to get precise types for most common patterns.
 
+## Supported type checkers
+
+- mypy: full and complete support with multiple advanced features with our custom mypy plugin
+- pyright: basic support, checked in CI
+- pyrefly: basic support, checked in CI
+
 ## Installation
 
 ```bash
