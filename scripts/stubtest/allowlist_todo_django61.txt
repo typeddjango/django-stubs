@@ -1,6 +1,3 @@
-django.db.models.query_utils.DeferredAttribute.fetch_many
-django.db.models.query_utils.DeferredAttribute.fetch_one
-django.db.models.query_utils.PROHIBITED_FILTER_KWARGS
 django.db.models.sql.query.Query.orderby_issubset_groupby
 django.db.models.utils.get_blank_choice_label
 django.db.transaction.savepoint_create
