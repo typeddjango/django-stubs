@@ -1,10 +1,11 @@
-from typing import Any
+from typing import Any, ClassVar
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 
 TEST_DATABASE_PREFIX: str
 
 class BaseDatabaseCreation:
+    destroy_test_db_connection_close_method: ClassVar[str | None]
     connection: BaseDatabaseWrapper
     def __init__(self, connection: BaseDatabaseWrapper) -> None: ...
     def __del__(self) -> None: ...

@@ -11,6 +11,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_any_value: bool
     @cached_property
     @override
+    def supports_uuid7_function(self) -> bool: ...  # type: ignore[override]
+    @cached_property
+    @override
     def django_test_skips(self) -> dict[str, set[str]]: ...  # type: ignore[override]
     @cached_property
     @override
