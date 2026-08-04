@@ -1,12 +1,14 @@
 import datetime
 import sys
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence, Sized
+from types import TracebackType
 from typing import Any, Generic, Literal, NamedTuple, TypeAlias, overload, type_check_only
 
 from django.db.backends.utils import _ExecuteQuery
 from django.db.models import Manager
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable, OrderBy
+from django.db.models.fetch_modes import FetchMode
 from django.db.models.sql.query import Query, RawQuery
 from django.db.models.utils import AltersData
 from django.utils.functional import cached_property
@@ -31,6 +33,7 @@ _OrderByFieldName: TypeAlias = str | Combinable
 
 MAX_GET_RESULTS: int
 REPR_OUTPUT_SIZE: int
+DEFAULT_FETCH_MODE: FetchMode
 PROHIBITED_FILTER_KWARGS: frozenset[str]
 
 class BaseIterable(Generic[_T]):
@@ -62,6 +65,17 @@ class FlatValuesListIterable(BaseIterable[_T]):
 @type_check_only
 class _SupportsContains(Generic[_ContainsT]):
     def __contains__(self, item: _ContainsT, /) -> bool: ...
+
+class PreventQuerySetCloning:
+    queryset: QuerySet[Any]
+    def __init__(self, queryset: QuerySet[Any]) -> None: ...
+    def __enter__(self) -> QuerySet[Any]: ...
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None: ...
 
 # Using `object` (not `_Row | None`) to satisfy Collection protocol and support `User | AnonymousUser` patterns
 class QuerySet(AltersData, _SupportsContains[object], Iterable[_Row], Sized, Generic[_Model, _Row]):
@@ -233,9 +247,12 @@ class QuerySet(AltersData, _SupportsContains[object], Iterable[_Row], Sized, Gen
     @overload
     def defer(self, *fields: str) -> Self: ...
     def only(self, *fields: str) -> Self: ...
+    def fetch_mode(self, fetch_mode: FetchMode) -> Self: ...
     def using(self, alias: str | None) -> Self: ...
     @property
     def ordered(self) -> bool: ...
+    @property
+    def totally_ordered(self) -> bool: ...
     @property
     def db(self) -> str: ...
     def _fetch_all(self) -> None: ...
@@ -257,6 +274,7 @@ class RawQuerySet(_SupportsContains[object], Iterable[_Model], Sized):
         translations: dict[str, str] | None = None,
         using: str | None = None,
         hints: dict[str, Model] | None = None,
+        fetch_mode: FetchMode = ...,
     ) -> None: ...
     def resolve_model_init_order(self) -> tuple[list[str], list[int], list[tuple[str, int]]]: ...
     @overload
@@ -333,7 +351,9 @@ class RelatedPopulator:
     related_populators: list[RelatedPopulator]
     local_setter: Any
     remote_setter: Any
-    def __init__(self, klass_info: dict[str, Any], select: Any, db: str) -> None: ...
+    def __init__(self, klass_info: dict[str, Any], select: Any, db: str, fetch_mode: FetchMode) -> None: ...
     def populate(self, row: Sequence[Any], from_obj: Model) -> None: ...
 
-def get_related_populators(klass_info: dict[str, Any], select: Any, db: str) -> list[RelatedPopulator]: ...
+def get_related_populators(
+    klass_info: dict[str, Any], select: Any, db: str, fetch_mode: FetchMode
+) -> list[RelatedPopulator]: ...
