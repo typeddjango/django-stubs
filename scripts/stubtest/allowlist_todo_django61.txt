@@ -16,11 +16,6 @@ django.db.models.FETCH_PEERS
 django.db.models.JSONNull
 django.db.models.RAISE
 django.db.models.__all__
-django.db.models.base.Model.from_db
-django.db.models.base.ModelState.__del__
-django.db.models.base.ModelState.fetch_mode
-django.db.models.base.ModelState.peers
-django.db.models.base.ModelStateFetchModeDescriptor
 django.db.models.constraints.UniqueConstraint.__init__
 django.db.models.deletion.Collector.__init__
 django.db.models.deletion.DB_CASCADE
