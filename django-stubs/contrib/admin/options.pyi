@@ -34,7 +34,7 @@ from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
-from typing_extensions import Self, TypedDict, TypeVar, override
+from typing_extensions import Self, TypedDict, TypeVar, deprecated, override
 
 IS_POPUP_VAR: Literal["_popup"]
 SOURCE_MODEL_VAR: Literal["_source_model"]
@@ -64,8 +64,10 @@ class Action:
     plural_description: str
     locations: list[ActionLocation]
     # RemovedInDjango70Warning.
+    @deprecated("Unpacking an action tuple is deprecated. Use Action attributes instead.")
     def __iter__(self) -> Iterator[_ActionCallable[ModelAdmin[Any], Any] | str]: ...
     # RemovedInDjango70Warning.
+    @deprecated("Using indexes on an action tuple is deprecated. Use Action attributes instead.")
     def __getitem__(self, index: int) -> _ActionCallable[ModelAdmin[Any], Any] | str: ...
 
 def get_content_type_for_model(obj: type[Model] | Model) -> ContentType: ...
