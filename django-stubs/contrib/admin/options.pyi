@@ -48,8 +48,8 @@ class ShowFacets(enum.Enum):
     ALWAYS = cast(str, ...)
 
 class ActionLocation(enum.Enum):
-    CHANGE_FORM = ...
-    CHANGE_LIST = ...
+    CHANGE_FORM = cast(str, ...)
+    CHANGE_LIST = cast(str, ...)
 
 HORIZONTAL: Literal[1]
 VERTICAL: Literal[2]
