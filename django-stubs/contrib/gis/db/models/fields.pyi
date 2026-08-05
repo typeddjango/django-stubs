@@ -95,6 +95,7 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         *,
         extent: tuple[float, float, float, float] = ...,
         tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
         srid: int = 4326,
         spatial_index: bool = True,
         name: str | None = ...,

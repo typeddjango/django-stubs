@@ -39,3 +39,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @property
     @override
     def can_return_rows_from_update(self) -> bool: ...  # type: ignore[override]
+    @property
+    @override
+    def supports_uuid4_function_in_default(self) -> bool: ...  # type: ignore[override]

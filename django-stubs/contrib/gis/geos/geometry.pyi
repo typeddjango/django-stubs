@@ -153,4 +153,10 @@ class LinearGeometryMixin:
     def closed(self) -> bool: ...
 
 class GEOSGeometry(_Deconstructible, GEOSGeometryBase, ListMixin):
-    def __init__(self, geo_input: Any, srid: int | None = ...) -> None: ...
+    def __init__(
+        self,
+        geo_input: Any,
+        srid: int | None = ...,
+        *,
+        max_geom_collections: int | None = ...,
+    ) -> None: ...

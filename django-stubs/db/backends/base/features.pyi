@@ -162,6 +162,7 @@ class BaseDatabaseFeatures:
     django_test_skips: dict[str, set[str]]
     disallowed_simple_test_case_connection_methods: list[tuple[str, str]]
     supports_uuid4_function: bool
+    supports_uuid4_function_in_default: bool
     supports_uuid7_function: bool
     supports_uuid7_function_shift: bool
     connection: BaseDatabaseWrapper

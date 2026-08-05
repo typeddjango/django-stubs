@@ -86,6 +86,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_uuid4_function(self) -> bool: ...  # type: ignore[override]
     @cached_property
     @override
+    def supports_uuid4_function_in_default(self) -> bool: ...  # type: ignore[override]
+    @cached_property
+    @override
     def supports_stored_generated_columns(self) -> bool: ...  # type: ignore[override]
     @cached_property
     @override

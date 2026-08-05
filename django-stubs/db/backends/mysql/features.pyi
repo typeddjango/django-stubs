@@ -122,6 +122,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     @override
     def supports_uuid4_function(self) -> bool: ...  # type: ignore[override]
+    @property
+    @override
+    def supports_uuid4_function_in_default(self) -> bool: ...  # type: ignore[override]
     @cached_property
     @override
     def supports_uuid7_function(self) -> bool: ...  # type: ignore[override]

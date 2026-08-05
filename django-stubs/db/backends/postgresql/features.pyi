@@ -88,3 +88,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @property
     @override
     def supports_virtual_generated_columns(self) -> bool: ...  # type: ignore[override]
+    @property
+    @override
+    def supports_uuid4_function_in_default(self) -> bool: ...  # type: ignore[override]
