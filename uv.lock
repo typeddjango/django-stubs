@@ -290,7 +290,7 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "6.1rc1"
+version = "6.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -301,9 +301,9 @@ dependencies = [
     { name = "sqlparse" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f9/6e/250a009775787f4f83e2af2ee47f8722505722266907471c298863a1d42e/django-6.1rc1.tar.gz", hash = "sha256:3964a696caea6ccfcc22f9a31ae1e322546002e52ea46bc8fdfe85a518ef6394", size = 11209590, upload-time = "2026-07-22T20:07:51.603Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e2/42/6cb20996733984c1f6661daeda3877990836c76c633c6c8879d39f7120eb/django-6.1.tar.gz", hash = "sha256:86a2aacd59b817e4d6ac2ebfe22356c58f66f7b24e503f71b7c2fead677ee48b", size = 11223034, upload-time = "2026-08-05T19:21:53.789Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/91/54c1548dd7fd14b1d63df33d6b085b7350695bdbd38d9ce5890cf8a2d8be/django-6.1rc1-py3-none-any.whl", hash = "sha256:f8a355d15fa6aa4cb65a71d692b55acfc84a1fe4ba5d375fa1164fe6b7a34ef5", size = 8411536, upload-time = "2026-07-22T20:07:43.766Z" },
+    { url = "https://files.pythonhosted.org/packages/91/9c/ce847620134cfab903e75690c498af73b46abbede2912ea89bd76d5c1e76/django-6.1-py3-none-any.whl", hash = "sha256:6c132cd980c9392b06807d4ca52d72530d631dc65a85d9dacede00a780cefbbe", size = 8417399, upload-time = "2026-08-05T19:21:47.285Z" },
 ]
 
 [[package]]
@@ -312,7 +312,7 @@ version = "6.0.7"
 source = { editable = "." }
 dependencies = [
     { name = "django", version = "5.2.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "django", version = "6.1rc1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "django", version = "6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "django-stubs-ext" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "types-pyyaml" },
@@ -334,7 +334,7 @@ redis = [
 [package.dev-dependencies]
 dev = [
     { name = "django", version = "5.2.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "django", version = "6.1rc1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "django", version = "6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "django-stubs", extra = ["compatible-mypy", "oracle", "redis"] },
     { name = "jinja2" },
     { name = "mysqlclient" },
@@ -358,7 +358,7 @@ pyright = [
 ]
 tests = [
     { name = "django", version = "5.2.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "django", version = "6.1rc1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "django", version = "6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "django-stubs", extra = ["compatible-mypy", "oracle", "redis"] },
     { name = "jinja2" },
     { name = "mysqlclient" },
@@ -392,7 +392,7 @@ provides-extras = ["compatible-mypy", "oracle", "redis"]
 [package.metadata.requires-dev]
 dev = [
     { name = "django", marker = "python_full_version < '3.12'", specifier = "==5.2.16" },
-    { name = "django", marker = "python_full_version >= '3.12'", specifier = "==6.1rc1" },
+    { name = "django", marker = "python_full_version >= '3.12'", specifier = "==6.1" },
     { name = "django-stubs", extras = ["compatible-mypy", "oracle", "redis"], editable = "." },
     { name = "jinja2", specifier = "==3.1.6" },
     { name = "mysqlclient", specifier = "==2.2.8" },
@@ -415,7 +415,7 @@ pyrefly = [
 pyright = [{ name = "pyright", specifier = "==1.1.411" }]
 tests = [
     { name = "django", marker = "python_full_version < '3.12'", specifier = "==5.2.16" },
-    { name = "django", marker = "python_full_version >= '3.12'", specifier = "==6.1rc1" },
+    { name = "django", marker = "python_full_version >= '3.12'", specifier = "==6.1" },
     { name = "django-stubs", extras = ["compatible-mypy", "oracle", "redis"], editable = "." },
     { name = "jinja2", specifier = "==3.1.6" },
     { name = "mysqlclient", specifier = "==2.2.8" },
@@ -438,7 +438,7 @@ version = "6.0.7"
 source = { editable = "ext" }
 dependencies = [
     { name = "django", version = "5.2.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "django", version = "6.1rc1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "django", version = "6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "typing-extensions" },
 ]
 
