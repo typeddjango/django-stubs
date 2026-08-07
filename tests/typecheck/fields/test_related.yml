@@ -1389,6 +1389,31 @@
                 class Fourth(models.Model):
                     ...
 
+-   case: test_many_to_many_with_unresolvable_through_model
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import First, Other
+        reveal_type(Other().first_set)
+        reveal_type(First().others)
+    out: |
+        main:3: error: "Other" has no attribute "first_set"  [attr-defined]
+        main:3: note: Revealed type is "Any"
+        main:4: note: Revealed type is "django.db.models.fields.related_descriptors.ManyRelatedManager[myapp.models.Other, Never]"
+        myapp/models:4: error: Could not match lazy reference with any model  [misc]
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class First(models.Model):
+                    others = models.ManyToManyField("myapp.Other", through="myapp.Missing")
+
+                class Other(models.Model):
+                    ...
+
 -   case: test_many_to_many_lazy_references_with_implicit_app_label
     main: |
         from typing_extensions import reveal_type
