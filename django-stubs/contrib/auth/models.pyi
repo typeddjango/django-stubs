@@ -41,6 +41,8 @@ class Permission(models.Model):
     name: models.CharField[str | int | Combinable, str]
     content_type: models.ForeignKey[ContentType | Combinable, ContentType]
     codename: models.CharField[str | int | Combinable, str]
+    @property
+    def user_perm_str(self) -> str: ...
     def natural_key(self) -> tuple[str, str, str]: ...
 
 class GroupManager(models.Manager[Group]):

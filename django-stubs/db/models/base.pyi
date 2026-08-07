@@ -1,14 +1,17 @@
 import sys
 from collections.abc import Collection, Iterable, Sequence
 from typing import Any, ClassVar, Final, overload
+from weakref import ReferenceType
 
 from django.core.checks.messages import CheckMessage
 from django.core.exceptions import MultipleObjectsReturned as BaseMultipleObjectsReturned
 from django.core.exceptions import ObjectDoesNotExist, ObjectNotUpdated, ValidationError
 from django.db.models import BaseConstraint, Field, QuerySet
+from django.db.models.fetch_modes import FetchMode
 from django.db.models.manager import Manager
 from django.db.models.options import Options
 from django.db.models.utils import AltersData
+from django.utils.datastructures import _ListOrTuple
 from typing_extensions import Self, TypeVar, override
 
 _Self = TypeVar("_Self", bound=Model)
@@ -23,10 +26,24 @@ class ModelStateFieldsCacheDescriptor:
     @overload
     def __get__(self, instance: ModelState, cls: type[ModelState] | None = None) -> dict[Any, Any]: ...
 
+class ModelStateFetchModeDescriptor:
+    @overload
+    def __get__(self, instance: None, cls: type[ModelState] | None = None) -> Self: ...
+    @overload
+    def __get__(self, instance: ModelState, cls: type[ModelState] | None = None) -> FetchMode: ...
+
 class ModelState:
     db: str | None
     adding: bool
     fields_cache: ModelStateFieldsCacheDescriptor
+    fetch_mode: ModelStateFetchModeDescriptor
+    peers: _ListOrTuple[ReferenceType[Model]]
+    if sys.version_info >= (3, 11):
+        @override
+        def __getstate__(self) -> dict[str, Any]: ...
+    else:
+        def __getstate__(self) -> dict[str, Any]: ...
+    def __del__(self) -> None: ...
 
 class ModelBase(type):
     def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any], **kwargs: Any) -> ModelBase: ...
@@ -53,7 +70,14 @@ class Model(AltersData, metaclass=ModelBase):
     _state: ModelState
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
     @classmethod
-    def from_db(cls, db: str | None, field_names: Collection[str], values: Collection[Any]) -> Self: ...
+    def from_db(
+        cls,
+        db: str | None,
+        field_names: Collection[str],
+        values: Collection[Any],
+        *,
+        fetch_mode: FetchMode | None = None,
+    ) -> Self: ...
     if sys.version_info >= (3, 11):
         @override
         def __getstate__(self) -> dict[str, Any]: ...

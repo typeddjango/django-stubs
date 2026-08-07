@@ -13,6 +13,7 @@ from typing_extensions import override
 
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
+    from django.http.response import HttpResponse
 
 
 # "Happy path" test for model admin, trying to cover as many valid
@@ -196,3 +197,30 @@ inline_instance = ParentObjInline(InlineParentModel, admin.AdminSite())
 inline_instance.get_fields(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
 inline_instance.get_inlines(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
 inline_instance.get_readonly_fields(inline_req, 1)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+
+
+class ValidActionModel(models.Model): ...
+
+
+@admin.action(description="Trigger an action from a global action function.")
+def valid_action_function(
+    modeladmin: admin.ModelAdmin[ValidActionModel],
+    request: HttpRequest,
+    queryset: QuerySet[ValidActionModel],
+) -> None:
+    raise NotImplementedError
+
+
+@admin.register(ValidActionModel)
+class ActionAdmin(admin.ModelAdmin[ValidActionModel]):
+    @admin.action(description="Trigger an action from a model admin action method.")
+    def valid_action_method(
+        self,
+        request: HttpRequest,
+        queryset: QuerySet[ValidActionModel],
+    ) -> HttpResponse:
+        raise NotImplementedError
+
+    # Normally a method would be passed by name as a string, but defining `actions` after the
+    # method makes it possible to ensure that it is typed correctly.
+    actions = [valid_action_function, valid_action_method]

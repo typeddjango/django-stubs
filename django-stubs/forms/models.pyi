@@ -281,7 +281,7 @@ class ModelChoiceField(ChoiceField, Generic[_M]):
         self,
         queryset: Manager[_M] | QuerySet[_M] | None,
         *,
-        empty_label: _StrOrPromise | None = "---------",
+        empty_label: _StrOrPromise | None = "",
         required: bool = True,
         widget: Widget | type[Widget] | None = None,
         label: _StrOrPromise | None = None,

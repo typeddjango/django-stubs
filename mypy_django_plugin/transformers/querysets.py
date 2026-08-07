@@ -830,9 +830,14 @@ def check_valid_prefetch_related_lookup(
             )
             return False
         if contenttypes_installed and is_generic_prefetch:
-            from django.contrib.contenttypes.fields import GenericForeignKey
+            try:
+                from django.contrib.contenttypes.fields import GenericForeignKeyDescriptor
+            except ImportError:  # Django < 6.1
+                from django.contrib.contenttypes.fields import (  # type: ignore[assignment]
+                    GenericForeignKey as GenericForeignKeyDescriptor,
+                )
 
-            if not isinstance(rel_obj_descriptor, GenericForeignKey):
+            if not isinstance(rel_obj_descriptor, GenericForeignKeyDescriptor):
                 # If current_model_cls is "self", we cannot use `__name__` and want "self".
                 model_name = getattr(current_model_cls, "__name__", current_model_cls)
                 ctx.api.fail(
@@ -859,9 +864,14 @@ def check_valid_prefetch_related_lookup(
             current_model_cls = rel_obj_descriptor.rel.related_model
         else:
             if contenttypes_installed:
-                from django.contrib.contenttypes.fields import GenericForeignKey
+                try:
+                    from django.contrib.contenttypes.fields import GenericForeignKeyDescriptor
+                except ImportError:  # Django < 6.1
+                    from django.contrib.contenttypes.fields import (  # type: ignore[assignment]
+                        GenericForeignKey as GenericForeignKeyDescriptor,
+                    )
 
-                if isinstance(rel_obj_descriptor, GenericForeignKey):
+                if isinstance(rel_obj_descriptor, GenericForeignKeyDescriptor):
                     # Generic foreign keys can point to any model, so we use Model as the base type
                     return True
             ctx.api.fail(

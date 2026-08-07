@@ -5,6 +5,7 @@ from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Any, Literal, overload
 
+from _typeshed import Unused
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
@@ -55,7 +56,7 @@ class _DatabaseFailure:
     wrapped: Any
     message: str
     def __init__(self, wrapped: Any, message: str) -> None: ...
-    def __call__(self) -> None: ...
+    def __call__(self, *args: Unused, **kwargs: Unused) -> None: ...
 
 class SimpleTestCase(unittest.TestCase):
     client_class: type[Client]
