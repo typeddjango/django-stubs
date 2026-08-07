@@ -52,7 +52,7 @@ tests = [
   "pytest-shard==0.1.2",
   "pytest-xdist==3.8.0",
   # Django deps:
-  "django==5.2.16; python_version < '3.12'",
+  "django==5.2.17; python_version < '3.12'",
   "django==6.1; python_version >= '3.12'",
   "mysqlclient==2.2.8",
   "psycopg[binary]==3.3.4",
