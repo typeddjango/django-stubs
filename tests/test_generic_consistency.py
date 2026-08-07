@@ -4,13 +4,12 @@ import ast
 import glob
 import importlib
 import os
+from pathlib import Path
 from typing import Any, final
 from unittest import mock
 
 import django
 from typing_extensions import override
-
-from django_stubs_ext.patch import MPGeneric
 
 # The root directory of the django-stubs package
 STUBS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "django-stubs"))
@@ -18,84 +17,72 @@ STUBS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "djan
 
 @final
 class GenericInheritanceVisitor(ast.NodeVisitor):
-    """AST visitor to find classes inheriting from `typing.Generic` in stubs."""
+    """AST visitor collecting type variables and classes with parameterized bases in the stubs."""
 
     def __init__(self) -> None:
-        self.generic_classes: set[str] = set()
+        self.module = ""
+        # Type variables are collected from `X = TypeVar(...)` assignments. `AnyStr` is declared
+        # in `typing` itself, not in the stubs, so it must be seeded manually.
+        self.type_vars: set[str] = {"AnyStr"}
+        # (module, class_name) -> {names parameterizing its bases}.
+        # A class is generic if one of those names is a type variable
+        self.candidate_classes: dict[tuple[str, str], set[str]] = {}
+
+    @override
+    def visit_Assign(self, node: ast.Assign) -> None:
+        func = node.value.func if isinstance(node.value, ast.Call) else None
+        if isinstance(func, ast.Name) and func.id in {"TypeVar", "ParamSpec", "TypeVarTuple"}:
+            self.type_vars.update(target.id for target in node.targets if isinstance(target, ast.Name))
 
     @override
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         for base in node.bases:
-            if (
-                isinstance(base, ast.Subscript)
-                and isinstance(base.value, ast.Name)
-                and base.value.id == "Generic"
-                and not any(dec.id == "type_check_only" for dec in node.decorator_list if isinstance(dec, ast.Name))
-            ):
-                self.generic_classes.add(node.name)
-                break
+            if isinstance(base, ast.Subscript):
+                self.candidate_classes.setdefault((self.module, node.name), set()).update(
+                    name.id for name in ast.walk(base.slice) if isinstance(name, ast.Name)
+                )
         self.generic_visit(node)
 
 
-def test_find_classes_inheriting_from_generic() -> None:
+def test_generic_classes_are_subscriptable_at_runtime() -> None:
     """
-    This test ensures that the `ext/django_stubs_ext/patch.py` stays up-to-date with the stubs.
-    It works as follows:
-        1. Parse the ast of each .pyi file, and collects classes inheriting from Generic.
-        2. For each Generic in the stubs, import the associated module and capture every class in the MRO
-        3. Ensure that at least one class in the mro is patched in `ext/django_stubs_ext/patch.py`.
+    Ensure `ext/django_stubs_ext/patch.py` stays up-to-date with the stubs.
+    Every class that is generic in the stubs must be subscriptable at runtime once `monkeypatch()` is called.
     """
     with mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": "scripts.django_tests_settings"}):
-        # We need this to be able to do django import
         django.setup()
 
-    # A dict of class_name -> [subclasses names] for each Generic in the stubs.
-    all_generic_classes: dict[str, list[str]] = {}
+    _monkeypatch()
 
-    print(f"Searching for classes inheriting from Generic in: {STUBS_ROOT}")
-    pyi_files = glob.glob("**/*.pyi", root_dir=STUBS_ROOT, recursive=True)
-    for file_path in pyi_files:
-        with open(os.path.join(STUBS_ROOT, file_path)) as f:
-            source = f.read()
+    visitor = GenericInheritanceVisitor()
+    for file_path in glob.glob("**/*.pyi", root_dir=STUBS_ROOT, recursive=True):
+        visitor.module = "django." + file_path.replace(".pyi", "").replace("/", ".").removesuffix(".__init__")
+        visitor.visit(ast.parse(Path(STUBS_ROOT, file_path).read_text()))
 
-        tree = ast.parse(source)
-        generic_visitor = GenericInheritanceVisitor()
-        generic_visitor.visit(tree)
-
-        # For each Generic in the stubs, import the associated module and capture every class in the MRO
-        if generic_visitor.generic_classes:
-            module_name = _get_module_from_pyi(file_path)
-            # Skip tasks modules for Django < 6.0 because it's not available
-            if module_name.startswith("django.tasks") and django.VERSION < (6, 0):
-                continue
-            django_module = importlib.import_module(module_name)
-            for cls in generic_visitor.generic_classes:
-                _skip_classes = {"AsyncPage", "AsyncPaginator", "BasePaginator", "DeferredSubDict"}
-                if cls in _skip_classes and django.VERSION < (6, 0):
-                    continue
-                all_generic_classes[cls] = [subcls.__name__ for subcls in getattr(django_module, cls).mro()[1:-1]]
-
-    print(f"Processed {len(pyi_files)} .pyi files.")
-    print(f"Found {len(all_generic_classes)} unique classes inheriting from Generic in stubs")
-
-    patched_classes = {mp_generic.cls.__name__ for mp_generic in _get_need_generic()}
-
-    # Pretty-print missing patch in `ext/django_stubs_ext/patch.py`
     errors = []
-    for cls_name, subcls_names in all_generic_classes.items():
-        if not any(name in patched_classes for name in [*subcls_names, cls_name]):
-            bases = f"({', '.join(subcls_names)})" if subcls_names else ""
-            errors.append(f"{cls_name}{bases} is not patched in `ext/django_stubs_ext/patch.py`")
+    for (module_name, cls_name), base_args in visitor.candidate_classes.items():
+        if not base_args & visitor.type_vars:
+            # Bases are only parameterized by concrete types (e.g. `Iterable[bytes]`)
+            continue
+
+        try:
+            django_module = importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            continue
+
+        if (cls := getattr(django_module, cls_name, None)) is None:
+            # `type_check_only`, or doesn't exist in the Django version being tested
+            continue
+
+        try:
+            cls[Any]
+        except TypeError:
+            errors.append(f"{module_name}.{cls_name} is not patched in `ext/django_stubs_ext/patch.py`")
 
     assert not errors, "\n".join(errors)
 
 
-def _get_module_from_pyi(pyi_path: str) -> str:
-    py_module = "django." + pyi_path.replace(".pyi", "").replace("/", ".")
-    return py_module.removesuffix(".__init__")
-
-
-def _get_need_generic() -> list[MPGeneric[Any]]:
+def _monkeypatch() -> None:
     """
     Symbols in `django.contrib.auth.forms` are very hard to patch automatically
     because we end up importing the User model and it crashes if `django.setup()` was not called beforehand.
@@ -108,7 +95,10 @@ def _get_need_generic() -> list[MPGeneric[Any]]:
     if django.VERSION >= (5, 1):
         from django.contrib.auth.forms import SetPasswordMixin, SetUnusablePasswordMixin
 
-        return [MPGeneric(SetPasswordMixin), MPGeneric(SetUnusablePasswordMixin), *django_stubs_ext.patch._need_generic]
-    from django.contrib.auth.forms import AdminPasswordChangeForm, SetPasswordForm
+        extra_classes: list[type] = [SetPasswordMixin, SetUnusablePasswordMixin]
+    else:
+        from django.contrib.auth.forms import AdminPasswordChangeForm, SetPasswordForm
 
-    return [MPGeneric(SetPasswordForm), MPGeneric(AdminPasswordChangeForm), *django_stubs_ext.patch._need_generic]
+        extra_classes = [SetPasswordForm, AdminPasswordChangeForm]
+
+    django_stubs_ext.monkeypatch(extra_classes=extra_classes)

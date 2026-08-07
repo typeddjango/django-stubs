@@ -26,6 +26,7 @@ from django.db.models.query import BaseIterable, ModelIterable, Prefetch, QueryS
 from django.forms.formsets import BaseFormSet
 from django.forms.models import BaseModelForm, BaseModelFormSet, ModelChoiceField, ModelChoiceIterator, ModelFormOptions
 from django.utils.connection import BaseConnectionHandler, ConnectionProxy
+from django.utils.datastructures import OrderedSet
 from django.utils.functional import LazyObject, classproperty
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
@@ -110,6 +111,7 @@ _need_generic: list[MPGeneric[Any]] = [
     MPGeneric(ReverseOneToOneDescriptor),
     MPGeneric(Prefetch),
     MPGeneric(SessionStore),
+    MPGeneric(OrderedSet),
 ]
 
 if VERSION >= (6, 0):
