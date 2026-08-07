@@ -744,7 +744,8 @@ class ProcessManyToManyFields(ModelClassInitializer):
                     model_fullname=f"{self.model_classdef.info.module_name}.{through_model_name}",
                     m2m_args=args,
                 )
-                if through_model is not None:
+                if through_model is not None and args.through is None:
+                    # Explicit through models are regular models, they get their managers from the usual initializers.
                     self.add_through_table_managers(through_model)
 
                 container = self.model_classdef.info.get_containing_type_info(m2m_field_name)
