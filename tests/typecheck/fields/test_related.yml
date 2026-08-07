@@ -442,7 +442,7 @@
         -   path: myapp/__init__.py
         -   path: myapp/models.py
             content: |
-                from typing import Self
+                from typing_extensions import Self
                 from django.db import models
 
                 class Book(models.Model):
