@@ -538,6 +538,9 @@ class AddReverseLookups(ModelClassInitializer):
             if not reverse_lookup_declared:
                 # TODO: 'relation' should be based on `TypeInfo` instead of Django runtime.
                 assert relation.through is not None
+                if isinstance(relation.through, str):
+                    # A lazy reference Django never resolved, i.e. the through model doesn't exist.
+                    return  # type:ignore[unreachable] # this can only happen for broken django setup
                 through_fullname = helpers.get_class_fullname(relation.through)
                 through_model_info = self.lookup_typeinfo_or_incomplete_defn_error(through_fullname)
                 self.add_new_var_to_model_class(
