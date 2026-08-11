@@ -96,3 +96,32 @@
                     published = models.BooleanField(default=False)
                     author = models.ForeignKey(Author, on_delete=models.CASCADE)
                     tags = models.ManyToManyField(Tag)
+
+
+-   case: update_override_with_declared_kwargs
+    installed_apps:
+        - myapp
+    main: |
+        from myapp.models import Article
+
+        # Kwargs declared explicitly by an `update()` override are consumed by
+        # the override; only ones destined for `**kwargs` are model fields.
+        Article.objects.update(title="new title", author_name="foo")
+        Article.objects.update(nonexistent=1, author_name="foo")  # E: Article has no field named 'nonexistent'  [misc]
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Any
+
+                from django.db import models
+                from typing_extensions import override
+
+                class ArticleQuerySet(models.QuerySet["Article"]):
+                    @override
+                    def update(self, *, author_name: str | None = None, **kwargs: Any) -> int:
+                        return super().update(**kwargs)
+
+                class Article(models.Model):
+                    title = models.CharField(max_length=200)
+                    objects = ArticleQuerySet.as_manager()

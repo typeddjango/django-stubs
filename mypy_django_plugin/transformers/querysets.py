@@ -1252,9 +1252,21 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
     return ctx.default_return_type
 
 
+def gather_update_kwargs(ctx: MethodContext) -> dict[str, MypyType]:
+    """Gather named arguments destined for the `**kwargs` collector."""
+    kwargs: dict[str, MypyType] = {}
+    named = (ARG_NAMED, ARG_NAMED_OPT)
+    slots = zip(ctx.callee_arg_names, ctx.arg_kinds, ctx.arg_types, ctx.arg_names, strict=False)
+    for formal_name, kinds, types, names in slots:
+        for kind, arg_type, name in zip(kinds, types, names, strict=False):
+            if kind in named and name is not None and name != formal_name:
+                kwargs[name] = arg_type
+    return kwargs
+
+
 def validate_update(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None or not (
-        kwargs := gather_kwargs(ctx)
+        kwargs := gather_update_kwargs(ctx)
     ):
         return ctx.default_return_type
 
