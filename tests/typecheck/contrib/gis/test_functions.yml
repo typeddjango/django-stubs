@@ -1,0 +1,24 @@
+-   case: distance_and_area_annotations_yield_measures
+    main: |
+        from typing_extensions import reveal_type
+        from django.contrib.gis.db.models.functions import Area, Distance
+        from django.contrib.gis.geos import Point
+        from myapp.models import MyModel
+
+        near = MyModel.objects.annotate(distance=Distance("point", Point(0, 0)))
+        reveal_type(near.get().distance)  # N: Revealed type is "django.contrib.gis.measure.Distance"
+
+        sized = MyModel.objects.annotate(area=Area("polygon"))
+        reveal_type(sized.get().area)  # N: Revealed type is "django.contrib.gis.measure.Area"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.contrib.gis.db.models.fields import PointField, PolygonField
+                from django.db.models import Model
+
+                class MyModel(Model):
+                    point = PointField()
+                    polygon = PolygonField()
