@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, assert_type
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.http import HttpRequest, HttpResponse, HttpResponseBase, JsonResponse
@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.test import RequestFactory
 from django.views.generic import TemplateView
-from typing_extensions import assert_type, override
+from typing_extensions import override
 
 request = RequestFactory().get("/")
 

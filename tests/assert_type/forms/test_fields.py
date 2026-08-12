@@ -3,12 +3,11 @@ from __future__ import annotations
 import json
 from collections.abc import Collection
 from re import Match, Pattern
-from typing import Any
+from typing import Any, assert_type
 
 from django import forms
 from django.forms import DateField, JSONField
 from django.forms.fields import DateTimeFormatsIterator
-from typing_extensions import assert_type
 
 
 # 1. Test for BaseTemporalField (via DateField)

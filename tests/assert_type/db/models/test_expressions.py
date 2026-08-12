@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import assert_type
 
 from django.db.models import F
 from django.db.models.expressions import CombinedExpression
-from typing_extensions import assert_type
 
 now = datetime.datetime.now()
 delta = datetime.timedelta(seconds=10)

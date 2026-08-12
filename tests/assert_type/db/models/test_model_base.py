@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Generic
+from typing import Generic, assert_type
 
 from django.db import models
-from typing_extensions import TypeVar, assert_type
+from typing_extensions import TypeVar
 
 _T = TypeVar("_T", bound=models.Model)
 

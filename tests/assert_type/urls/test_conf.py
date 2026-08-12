@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.conf.urls.i18n import urlpatterns as i18n_urlpatterns
 from django.conf.urls.static import static
@@ -10,7 +10,6 @@ from django.contrib.flatpages import urls as flatpages_urls
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import URLPattern, URLResolver, _AnyURL, include, path, re_path
 from django.utils.translation import gettext_lazy as _
-from typing_extensions import assert_type
 
 if TYPE_CHECKING:
     from django.http import HttpResponse

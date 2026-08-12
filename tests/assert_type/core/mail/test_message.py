@@ -3,10 +3,9 @@ from __future__ import annotations
 from email.message import EmailMessage as StdlibEmailMessage
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
-from typing import Any
+from typing import Any, assert_type
 
 from django.core.mail.message import EmailMessage
-from typing_extensions import assert_type
 
 message = EmailMessage()
 assert_type(message, EmailMessage)

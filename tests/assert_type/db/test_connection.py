@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.db import connection, connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper
-from typing_extensions import assert_type
 
 with connection.cursor() as cursor:
     assert_type(cursor, CursorWrapper)

@@ -3,7 +3,7 @@ import unittest
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from contextlib import AbstractContextManager
 from types import TracebackType
-from typing import Any, Literal, overload
+from typing import Any, Literal, Self, overload
 
 from _typeshed import Unused
 from django.core.exceptions import ImproperlyConfigured
@@ -22,7 +22,7 @@ from django.test.client import AsyncClient, Client
 from django.test.html import Element
 from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.functional import _StrOrPromise, classproperty
-from typing_extensions import Self, override
+from typing_extensions import override
 
 def to_list(value: Any) -> list[Any]: ...
 def assert_and_parse_html(self: Any, html: str, user_msg: str, msg: str) -> Element: ...

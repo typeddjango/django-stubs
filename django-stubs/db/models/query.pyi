@@ -1,8 +1,7 @@
 import datetime
-import sys
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence, Sized
 from types import TracebackType
-from typing import Any, Generic, Literal, NamedTuple, TypeAlias, overload, type_check_only
+from typing import Any, Generic, Literal, NamedTuple, Self, TypeAlias, overload, type_check_only
 
 from django.db.backends.utils import _ExecuteQuery
 from django.db.models import Manager
@@ -12,7 +11,7 @@ from django.db.models.fetch_modes import FetchMode
 from django.db.models.sql.query import Query, RawQuery
 from django.db.models.utils import AltersData
 from django.utils.functional import cached_property
-from typing_extensions import Self, TypeVar, override
+from typing_extensions import TypeVar, override
 
 _T = TypeVar("_T", covariant=True)
 _ContainsT = TypeVar("_ContainsT")
@@ -93,11 +92,8 @@ class QuerySet(AltersData, _SupportsContains[object], Iterable[_Row], Sized, Gen
     @classmethod
     def as_manager(cls) -> Manager[_Model]: ...
     def __deepcopy__(self, memo: dict[int, Any]) -> Self: ...
-    if sys.version_info >= (3, 11):
-        @override
-        def __getstate__(self) -> dict[str, Any]: ...
-    else:
-        def __getstate__(self) -> dict[str, Any]: ...
+    @override
+    def __getstate__(self) -> dict[str, Any]: ...
     @override
     def __len__(self) -> int: ...
     @override
@@ -313,11 +309,8 @@ class Prefetch(Generic[_LookupT, _PrefetchedQuerySetT, _ToAttrT]):
     def __init__(
         self, lookup: _LookupT, queryset: _PrefetchedQuerySetT | None = None, to_attr: _ToAttrT | None = None
     ) -> None: ...
-    if sys.version_info >= (3, 11):
-        @override
-        def __getstate__(self) -> dict[str, Any]: ...
-    else:
-        def __getstate__(self) -> dict[str, Any]: ...
+    @override
+    def __getstate__(self) -> dict[str, Any]: ...
     def add_prefix(self, prefix: str) -> None: ...
     def get_current_prefetch_to(self, level: int) -> str: ...
     def get_current_to_attr(self, level: int) -> tuple[str, str]: ...

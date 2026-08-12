@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.utils.datastructures import MultiValueDict
-from typing_extensions import assert_type
 
 # Constructors
 var1: MultiValueDict[str, str] = MultiValueDict()

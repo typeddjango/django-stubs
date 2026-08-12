@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, Literal
+from typing import Any, Literal, assert_type
 
 from django.db.models import Choices, IntegerChoices, Model, TextChoices
 from django.utils.functional import _StrOrPromise, _StrPromise
 from django.utils.translation import gettext_lazy as _
-from typing_extensions import TypeVar, assert_type, override
+from typing_extensions import TypeVar, override
 
 # Choices in a separate model to test that the plugin resolves types correctly.
 from tests.assert_type.db.models import _enums as imported
@@ -27,7 +27,7 @@ def get_values_using_property(choices: type[T_Choices]) -> list[int]:
 
 
 def get_labels_using_comprehension(choices: type[T_Choices]) -> list[str]:
-    return [choice.label for choice in choices]  # pyright: ignore[reportReturnType]
+    return [choice.label for choice in choices]  # pyright: ignore[reportReturnType]  # ty: ignore[invalid-return-type]
 
 
 def get_values_using_comprehension(choices: type[T_Choices]) -> list[int]:
@@ -165,7 +165,7 @@ assert_type(Vehicle.values, list[int | None])  # pyright: ignore[reportAssertTyp
 assert_type(Vehicle.choices, list[tuple[int | None, _StrOrPromise]])  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 assert_type(Vehicle.CAR, Literal[Vehicle.CAR])
 assert_type(Vehicle.CAR.name, Literal["CAR"])
-assert_type(Vehicle.CAR.label, _StrOrPromise)  # ty: ignore[type-assertion-failure]
+assert_type(Vehicle.CAR.label, _StrOrPromise)
 assert_type(Vehicle.CAR.value, int)
 assert_type(Vehicle.CAR.do_not_call_in_templates, Literal[True])
 assert_type(Vehicle.__empty__, _StrPromise)  # pyright: ignore[reportAssertTypeFailure]
@@ -279,14 +279,14 @@ assert_type(Award.choices, list[tuple[str, str]])  # pyright: ignore[reportAsser
 
 # Assertions for mixing multiple choices types with consistent base types - only `IntegerChoices`.
 x0 = (Suit, Vehicle)
-assert_type([member.label for choices in x0 for member in choices], list[_StrOrPromise])  # ty: ignore[type-assertion-failure]
+assert_type([member.label for choices in x0 for member in choices], list[_StrOrPromise])
 assert_type([member.value for choices in x0 for member in choices], list[int])
 
 # Assertions for mixing multiple choices types with consistent base types - only `TextChoices`.
 x1 = (Medal, Gender)
 
 assert_type([member.label for choices in x1 for member in choices], list[str])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+assert_type(  # pyrefly: ignore[assert-type]
     [member.label for choices in x1 for member in choices], list[_StrOrPromise]
 )
 
@@ -294,14 +294,14 @@ assert_type([member.value for choices in x1 for member in choices], list[str])
 
 # Assertions for mixing multiple choices types with different base types - `IntegerChoices` and `TextChoices`.
 x2 = (Medal, Suit)
-assert_type([member.label for choices in x2 for member in choices], list[_StrOrPromise])  # ty: ignore[type-assertion-failure]
+assert_type([member.label for choices in x2 for member in choices], list[_StrOrPromise])
 assert_type([member.value for choices in x2 for member in choices], list[int | str])
 
 # Assertions for mixing multiple choices types with consistent base types - custom types.
 x3 = (Constants, Separator)
 
 assert_type([member.label for choices in x3 for member in choices], list[str])  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-assert_type(  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+assert_type(  # pyrefly: ignore[assert-type]
     [member.label for choices in x3 for member in choices], list[_StrOrPromise]
 )
 

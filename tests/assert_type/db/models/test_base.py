@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.db import models
-from typing_extensions import assert_type, override
+from typing_extensions import override
 
 if TYPE_CHECKING:
     from collections.abc import Iterable

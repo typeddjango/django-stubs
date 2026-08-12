@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy
-from typing_extensions import assert_type
 
 s = "hello"
 assert_type(mark_safe(s), SafeString)

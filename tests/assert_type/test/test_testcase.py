@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.core.handlers.wsgi import WSGIRequest
 from django.test.client import Client
 from django.test.testcases import TestCase
-from typing_extensions import assert_type
 
 
 class ExampleTestCase(TestCase):

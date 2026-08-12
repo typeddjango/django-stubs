@@ -2,7 +2,7 @@ import enum
 import sys
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, ClassVar, Generic, Literal, TypeAlias, cast, type_check_only
+from typing import Any, ClassVar, Generic, Literal, Self, TypeAlias, cast, type_check_only
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
@@ -35,7 +35,7 @@ from django.urls.resolvers import URLPattern
 from django.utils.datastructures import _ListOrTuple
 from django.utils.functional import _StrOrPromise
 from django.utils.safestring import SafeString
-from typing_extensions import Self, TypedDict, TypeVar, deprecated, override
+from typing_extensions import TypedDict, TypeVar, deprecated, override
 
 IS_POPUP_VAR: Literal["_popup"]
 SOURCE_MODEL_VAR: Literal["_source_model"]

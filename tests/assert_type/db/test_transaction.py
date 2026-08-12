@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.db.transaction import atomic, non_atomic_requests
 from django.http import HttpRequest, HttpResponse
-from typing_extensions import assert_type
 
 # atomic as context manager
 with atomic():

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import Any, assert_type
 
 from django import template
 from django.template.base import Parser, Token, TokenType
 from django.template.defaulttags import CycleNode
-from typing_extensions import assert_type
 
 register = template.Library()
 

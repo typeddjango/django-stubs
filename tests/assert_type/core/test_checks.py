@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.core.checks import CheckMessage, Warning, register
-from typing_extensions import assert_type
 
 if TYPE_CHECKING:
     from django.apps.config import AppConfig

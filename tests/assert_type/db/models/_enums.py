@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, assert_type
 
 from django.db.models import TextChoices
-from typing_extensions import assert_type
 
 
 class Direction(TextChoices):

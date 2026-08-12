@@ -2,19 +2,14 @@ from __future__ import annotations
 
 import configparser
 import os
-import sys
 import textwrap
+import tomllib
 from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NoReturn
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-
-if sys.version_info[:2] >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 INI_USAGE = """
 (config)

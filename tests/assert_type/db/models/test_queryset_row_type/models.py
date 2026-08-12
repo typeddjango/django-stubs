@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, assert_type
 
 from django.db import models
 from django.db.models.query import QuerySet, RawQuerySet
 from django.utils import timezone
-from typing_extensions import assert_type
 
 
 class Blog(models.Model):

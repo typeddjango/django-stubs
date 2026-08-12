@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, assert_type
 
 from django.core.handlers.asgi import ASGIRequest
 from django.core.handlers.wsgi import WSGIRequest
 from django.template.base import Template
 from django.test.client import AsyncClient, AsyncRequestFactory, Client, RequestFactory
 from django.test.utils import ContextList
-from typing_extensions import assert_type
 
 # Client response attributes
 client = Client()

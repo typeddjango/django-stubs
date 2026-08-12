@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, NamedTuple, TypedDict, cast
+from typing import TYPE_CHECKING, Any, NamedTuple, Self, TypedDict, cast
 
 from mypy import checker
 from mypy.checker import TypeChecker
@@ -57,7 +57,6 @@ from mypy.types import (
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars, fill_typevars_with_any
 from mypy.version import __version__ as mypy_version
-from typing_extensions import Self
 
 from mypy_django_plugin.lib import fullnames
 

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, assert_type
 
 from django.contrib.auth.models import User
 from django.utils.functional import Promise, SimpleLazyObject, cached_property, classproperty, lazystr
-from typing_extensions import assert_type, override
+from typing_extensions import override
 
 if TYPE_CHECKING:
     from django_stubs_ext import StrOrPromise

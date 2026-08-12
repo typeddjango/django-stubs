@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import ClassVar, assert_type
 
 from django.db import models
 from django.db.models.fields.related_descriptors import RelatedManager, ReverseManyToOneDescriptor
-from typing_extensions import TypeVar, assert_type
+from typing_extensions import TypeVar
 
 _To = TypeVar("_To", bound=models.Model)
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django import forms
 from django.db import models
 from django.db.models import F
@@ -7,7 +9,6 @@ from django.db.models.functions import Upper
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView
 from django.views.generic.list import ListView
-from typing_extensions import assert_type
 
 
 class MyModel(models.Model): ...

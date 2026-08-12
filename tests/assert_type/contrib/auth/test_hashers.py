@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.contrib.auth.hashers import check_password
-from typing_extensions import assert_type
 
 
 def setter(password: str | None) -> None: ...

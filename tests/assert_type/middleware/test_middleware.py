@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.contrib.auth.middleware import AuthenticationMiddleware, RemoteUserMiddleware
 from django.contrib.redirects.middleware import RedirectFallbackMiddleware
@@ -18,7 +18,7 @@ from django.http.response import (
 from django.middleware.cache import CacheMiddleware
 from django.middleware.common import CommonMiddleware
 from django.middleware.locale import LocaleMiddleware
-from typing_extensions import assert_type, override
+from typing_extensions import override
 
 if TYPE_CHECKING:
     from django.http.request import HttpRequest

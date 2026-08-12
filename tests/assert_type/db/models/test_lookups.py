@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, assert_type
 
 from django.db.models import Lookup
-from typing_extensions import assert_type
 
 
 # Lookup can be used without explicit type argument (defaults to Any).
