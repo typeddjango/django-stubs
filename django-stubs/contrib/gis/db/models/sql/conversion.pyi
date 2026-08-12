@@ -10,7 +10,7 @@ _ST = TypeVar("_ST", contravariant=True)
 _GT = TypeVar("_GT", covariant=True)
 
 class AreaField(models.FloatField[_ST, _GT]):
-    _pyi_private_get_type: Area
+    _pyi_private_get_type: Area  # type: ignore[assignment]
     geo_field: Any
     def __init__(self, geo_field: Any) -> None: ...
     @override
@@ -22,7 +22,7 @@ class AreaField(models.FloatField[_ST, _GT]):
     def get_internal_type(self) -> Any: ...
 
 class DistanceField(models.FloatField[_ST, _GT]):
-    _pyi_private_get_type: Distance
+    _pyi_private_get_type: Distance  # type: ignore[assignment]
     geo_field: Any
     def __init__(self, geo_field: Any) -> None: ...
     @override
