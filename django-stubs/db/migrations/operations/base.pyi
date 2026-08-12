@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from enum import Enum, StrEnum
+from enum import StrEnum
 from typing import Any, ClassVar, Self
 
 from django.db.backends.base.base import BaseDatabaseWrapper
