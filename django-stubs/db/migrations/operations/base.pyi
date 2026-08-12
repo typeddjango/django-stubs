@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any, ClassVar, Self
 
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -7,7 +7,7 @@ from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.state import ProjectState
 from django.db.models import Model
 
-class OperationCategory(str, Enum):
+class OperationCategory(StrEnum):
     ADDITION = "+"
     REMOVAL = "-"
     ALTERATION = "~"
