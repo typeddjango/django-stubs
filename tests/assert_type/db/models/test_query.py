@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.db.models.query import QuerySet, RawQuerySet, aprefetch_related_objects, prefetch_related_objects
-from typing_extensions import assert_type
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, assert_type
 
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.shortcuts import redirect, render
-from typing_extensions import TypedDict, assert_type
+from typing_extensions import TypedDict
 
 # render function arguments
 TestContext = TypedDict("TestContext", {"user": Any})

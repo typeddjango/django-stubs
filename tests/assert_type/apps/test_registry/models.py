@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, assert_type
 
 from django.apps import apps
 from django.apps.registry import apps as registry_apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.migrations.state import ProjectState
-from typing_extensions import assert_type
 
 
 class First(models.Model):

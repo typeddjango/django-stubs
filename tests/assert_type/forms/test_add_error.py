@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.core.exceptions import ValidationError
 from django.forms import BaseForm
 from django.utils.functional import lazystr
-from typing_extensions import assert_type
 
 form = BaseForm()
 

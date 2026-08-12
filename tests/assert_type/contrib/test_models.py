@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import assert_type
 
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import Group, Permission, User
@@ -9,7 +10,6 @@ from django.contrib.flatpages.models import FlatPage
 from django.contrib.redirects.models import Redirect
 from django.contrib.sessions.models import Session
 from django.contrib.sites.models import Site
-from typing_extensions import assert_type
 
 
 def log_entry_fields_are_inferred() -> None:

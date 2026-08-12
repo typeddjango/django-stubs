@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.db import models
 from django.db.models.fields.files import FieldFile, ImageFieldFile
-from typing_extensions import assert_type
 
 
 class MyModel(models.Model):

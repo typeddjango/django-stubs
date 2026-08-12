@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import AsyncIterator, Iterator
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.http.response import HttpResponse, StreamingHttpResponse
 from django.utils.translation import gettext_lazy as _
-from typing_extensions import assert_type
 
 if TYPE_CHECKING:
     from django.http.request import HttpRequest

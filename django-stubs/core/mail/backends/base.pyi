@@ -1,9 +1,8 @@
 from collections.abc import Sequence
 from types import TracebackType
-from typing import Any
+from typing import Any, Self
 
 from django.core.mail.message import EmailMessage
-from typing_extensions import Self
 
 class BaseEmailBackend:
     fail_silently: bool

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.http import HttpRequest, HttpResponse
 from django.views.decorators.csp import csp_override, csp_report_only_override
-from typing_extensions import assert_type
 
 
 @csp_override(

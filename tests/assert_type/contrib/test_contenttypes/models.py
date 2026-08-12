@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import sys
-from typing import Any
+from typing import Any, assert_type
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from typing_extensions import assert_type
 
 # `GenericForeignKeyDescriptor` is only available in Django 6.1+ but we test against Django 5.2.x
 # on Python < 3.12, so only run these tests for newer Python versions to avoid lots of issues with

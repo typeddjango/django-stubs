@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.apps.config import AppConfig
 from django.utils.functional import cached_property
-from typing_extensions import assert_type, override
+from typing_extensions import override
 
 
 class FooConfig(AppConfig):

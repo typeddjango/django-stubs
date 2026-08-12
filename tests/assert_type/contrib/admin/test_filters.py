@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.contrib.admin.filters import FieldListFilter, ListFilter, SimpleListFilter, _ListFilterChoices
-from typing_extensions import assert_type, override
+from typing_extensions import override
 
 if TYPE_CHECKING:
     from django.contrib.admin.views.main import ChangeList

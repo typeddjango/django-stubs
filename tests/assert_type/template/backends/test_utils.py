@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.http import HttpRequest
 from django.template.backends.utils import csrf_input_lazy, csrf_token_lazy
 from django.utils.functional import _StrPromise
 from django.utils.safestring import SafeString
-from typing_extensions import assert_type
 
 request = HttpRequest()
 

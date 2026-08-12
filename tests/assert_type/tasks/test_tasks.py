@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, assert_type
 
 from django.tasks import task
 from django.tasks.base import Task, TaskContext, TaskResult
-from typing_extensions import assert_type
 
 
 @task
