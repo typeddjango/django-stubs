@@ -56,8 +56,7 @@ class DatabaseOnDelete:
 
     def __init__(self, operation: str, name: str, forced_collector: _Collector | None = ...) -> None: ...
 
-    __call__: _Collector
-
+    def __call__(collector, field: Field[Any, Any], sub_objs: QuerySet[Model], using: str) -> None: ...
     def on_delete_sql(self, schema_editor: BaseDatabaseSchemaEditor) -> str: ...
 
 DB_CASCADE: DatabaseOnDelete
