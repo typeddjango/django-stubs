@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, assert_type
 
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import FormMixin
-from typing_extensions import assert_type
 
 if TYPE_CHECKING:
     from django.forms import Form

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.db import models
 from django.forms.models import BaseInlineFormSet, BaseModelFormSet, ModelForm
-from typing_extensions import assert_type
 
 if TYPE_CHECKING:
     from django.contrib.contenttypes.forms import BaseGenericInlineFormSet

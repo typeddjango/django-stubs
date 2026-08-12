@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, ClassVar, Generic, Protocol, TypeAlias, overload, type_check_only
+from typing import Any, ClassVar, Generic, Protocol, Self, TypeAlias, overload, type_check_only
 
 from django import forms
 from django.core.checks import CheckMessage
@@ -19,7 +19,7 @@ from django.forms.widgets import Widget
 from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
-from typing_extensions import Self, TypeVar, override
+from typing_extensions import TypeVar, override
 
 class Empty: ...
 class NOT_PROVIDED: ...

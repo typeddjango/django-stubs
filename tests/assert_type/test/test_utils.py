@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.test import override_settings
-from typing_extensions import assert_type
 
 if TYPE_CHECKING:
     from django.test.utils import CaptureQueriesContext

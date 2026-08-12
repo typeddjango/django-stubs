@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
         shard: [0, 1]
       fail-fast: false
     steps:
@@ -107,13 +107,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: uv sync --no-dev --group tests
 
       - name: Downgrade Django
-        run: uv pip install django==5.0.0
+        run: uv pip install django==5.2.0
 
       # Exit 1 only if ont of the pytest error is a mypy crash
       - name: Run pytest tests
@@ -235,13 +235,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
-        django-version: ['5.0', '5.1', '5.2']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
+        django-version: ['5.2']
         include:
           - python-version: '3.12'
             django-version: '6.0'
           - python-version: '3.13'
             django-version: '6.0'
+          - python-version: '3.12'
+            django-version: '6.1'
+          - python-version: '3.13'
+            django-version: '6.1'
+          - python-version: '3.14'
+            django-version: '6.1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
       - name: Install uv

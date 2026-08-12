@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from typing import Any, overload
+from typing import Any, Self, overload
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
@@ -14,7 +14,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
-from typing_extensions import Self, override
+from typing_extensions import override
 
 class GenericForeignKey(FieldCacheMixin, Field[Any, Any]):
     # django-stubs implementation only fields

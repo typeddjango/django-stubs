@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.utils.functional import _StrPromise
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy
-from typing_extensions import assert_type
 
 result = format_lazy("{}", "test")
 assert_type(result, _StrPromise)

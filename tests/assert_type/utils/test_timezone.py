@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from datetime import date, datetime, time
-from typing import Literal
+from typing import Literal, assert_type
 
 from django.utils.timezone import is_aware, is_naive
-from typing_extensions import assert_type
 
 # is_naive
 is_naive(date(2020, 1, 1))  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue,reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[no-matching-overload]

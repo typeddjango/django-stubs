@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, Literal
+from typing import Any, Literal, assert_type
 
 from django.db.models import Choices, IntegerChoices, Model, TextChoices
 from django.utils.functional import _StrOrPromise, _StrPromise
 from django.utils.translation import gettext_lazy as _
-from typing_extensions import TypeVar, assert_type, override
+from typing_extensions import TypeVar, override
 
 # Choices in a separate model to test that the plugin resolves types correctly.
 from tests.assert_type.db.models import _enums as imported

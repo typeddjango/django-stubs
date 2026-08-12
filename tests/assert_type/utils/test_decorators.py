@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, assert_type
 
 from django.contrib.auth.decorators import login_required
 from django.http.response import HttpResponseBase
@@ -13,7 +13,7 @@ from django.utils.decorators import (
     method_decorator,
 )
 from django.views.generic.base import View
-from typing_extensions import assert_type, override
+from typing_extensions import override
 
 if TYPE_CHECKING:
     from django.http.request import HttpRequest

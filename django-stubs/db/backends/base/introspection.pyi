@@ -1,12 +1,12 @@
 from collections.abc import Iterable
-from typing import Any, Literal, NamedTuple, type_check_only
+from typing import Any, Literal, NamedTuple, NotRequired, type_check_only
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper
 from django.db.models.base import Model
 from django.db.models.deletion import DatabaseOnDelete, _Collector
 from django.db.models.fields import Field
-from typing_extensions import NotRequired, TypedDict
+from typing_extensions import TypedDict
 
 class TableInfo(NamedTuple):
     name: str

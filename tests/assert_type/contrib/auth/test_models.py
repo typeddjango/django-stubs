@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.contrib.auth.models import AbstractBaseUser, UserManager
-from typing_extensions import assert_type
 
 
 class MyUser(AbstractBaseUser):

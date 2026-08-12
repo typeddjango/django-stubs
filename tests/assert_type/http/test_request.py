@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Iterator
+from typing import assert_type
 
 from django.http import QueryDict
 from django.http.request import _ImmutableQueryDict
-from typing_extensions import assert_type
 
 q = QueryDict("", False)
 # Test constructor overloads -- Mutable

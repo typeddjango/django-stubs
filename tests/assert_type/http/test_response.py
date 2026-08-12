@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import AsyncIterable, AsyncIterator, Iterator
+from typing import assert_type
 
 from django.http.response import HttpResponse, StreamingHttpResponse
-from typing_extensions import assert_type
 
 # HttpResponse
 # ============

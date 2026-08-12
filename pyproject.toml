@@ -1,11 +1,11 @@
 [project]
 name = "django-stubs"
-version = "6.0.9"
+version = "6.1.0"
 description = "Mypy stubs for Django"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE.md"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [
   { name = "Maksim Kurnikov", email = "maxim.kurnikov@gmail.com" },
 ]
@@ -17,15 +17,12 @@ maintainers = [
 ]
 classifiers = [
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Typing :: Typed",
   "Framework :: Django",
-  "Framework :: Django :: 5.0",
-  "Framework :: Django :: 5.1",
   "Framework :: Django :: 5.2",
   "Framework :: Django :: 6.0",
   "Framework :: Django :: 6.1",
@@ -33,7 +30,6 @@ classifiers = [
 dependencies = [
   "django",
   "django-stubs-ext>=6.0.2",
-  "tomli; python_version < '3.11'",
   # Types:
   "types-pyyaml",
   "typing-extensions>=4.11.0",
@@ -139,7 +135,7 @@ ignore-words-list = "aadd,acount,asend,indentity,nam"
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
 line-length = 120
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 # See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/

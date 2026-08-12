@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import assert_type
 
 from django import http
 from django.contrib import admin
@@ -14,7 +15,6 @@ from django.contrib.admin.utils import (
 from django.db import models
 from django.db.models import F, Q
 from django.db.models.functions import Upper
-from typing_extensions import assert_type
 
 
 @admin.display(description="Name")

@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from re import Pattern
-from typing import Any, Literal, Protocol, TypeAlias, type_check_only
+from typing import Any, Literal, Protocol, Self, TypeAlias, type_check_only
 
 from _typeshed import Self as MetaclassSelf  # noqa: TID251
 from django.core.files.base import File
@@ -10,7 +10,7 @@ from django.forms.utils import _DataT, _FilesT
 from django.utils.choices import _Choices
 from django.utils.datastructures import _ListOrTuple
 from django.utils.safestring import SafeString
-from typing_extensions import Self, override
+from typing_extensions import override
 
 _OptAttrs: TypeAlias = dict[str, Any]
 

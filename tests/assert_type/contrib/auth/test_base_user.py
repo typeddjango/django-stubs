@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.contrib.auth.models import User
-from typing_extensions import assert_type
 
 
 def get_backend() -> str:

@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Self
 
 from django.contrib.postgres.fields import ArrayField
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -8,7 +8,7 @@ from django.db.models.expressions import BaseExpression, Combinable
 from django.db.models.query import _OrderByFieldName
 from django.db.models.query_utils import Q
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
-from typing_extensions import Self, deprecated, override
+from typing_extensions import deprecated, override
 
 from .mixins import OrderableAggMixin
 

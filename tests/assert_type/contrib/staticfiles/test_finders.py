@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import assert_type
+
 from django.contrib.staticfiles import finders
 from django.contrib.staticfiles.finders import AppDirectoriesFinder, BaseFinder, DefaultStorageFinder, FileSystemFinder
-from typing_extensions import assert_type
 
 # find (single)
 assert_type(finders.find("filepath"), str | None)

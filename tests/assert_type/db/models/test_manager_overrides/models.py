@@ -5,10 +5,10 @@ Regression test for https://github.com/typeddjango/django-stubs/issues/578.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, assert_type
 
 from django.db import models
-from typing_extensions import assert_type, override
+from typing_extensions import override
 
 # ---------------------------------------------------------------------------
 # Unparametrized manager: the plugin re-parametrizes it with the model it's on

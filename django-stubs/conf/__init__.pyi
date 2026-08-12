@@ -1,7 +1,7 @@
-from typing import Any, Literal, type_check_only
+from typing import Any, Literal, Self, type_check_only
 
 from django.utils.functional import LazyObject
-from typing_extensions import Self, override
+from typing_extensions import override
 
 # explicit dependency on standard settings to make it loaded
 from . import global_settings  # noqa: F401

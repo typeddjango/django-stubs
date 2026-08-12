@@ -55,7 +55,7 @@ We rely on different `django` and `mypy` versions:
 
 | django-stubs   | Mypy version | Django version | Django partial support | Python version |
 |----------------|--------------|----------------|------------------------|----------------|
-| 6.1.0 (unreleased) | 1.13 - 2.3   | 6.1            | 6.0, 5.2               | 3.10 - 3.14    |
+| 6.1.0          | 1.13 - 2.3   | 6.1            | 6.0, 5.2               | 3.11 - 3.14    |
 | 6.0.9          | 1.13 - 2.3   | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
 | 6.0.8          | 1.13 - 2.3   | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
 | 6.0.7          | 1.13 - 2.3   | 6.0            | 5.2, 5.1, 5.0          | 3.10 - 3.14    |
@@ -94,6 +94,7 @@ attributes:
 ```python
 from django.db import models
 from django_stubs_ext.db.models import TypedModelMeta
+
 
 class MyModel(models.Model):
     example = models.CharField(max_length=100)
@@ -190,6 +191,7 @@ This happens because these Django classes do not support [`__class_getitem__`](h
     import django_stubs_ext
     from django.apps import AppConfig
 
+
     class ClientsConfig(AppConfig):
         name = "clients"
 
@@ -229,6 +231,7 @@ something like this:
 ```python
 from django.db import models
 
+
 class MyManager(model.Manager):
     def create(self, **kwargs) -> "MyModel":
         pass
@@ -244,8 +247,7 @@ generic type of the base manager, which is any model. To fix this issue you
 should declare your manager with your model as the type variable:
 
 ```python
-class MyManager(models.Manager["MyModel"]):
-    ...
+class MyManager(models.Manager["MyModel"]): ...
 ```
 
 ### How do I annotate cases where I called QuerySet.annotate?
@@ -387,6 +389,7 @@ which accepts a model type and accesses its `.object` attribute:
 ```python
 from django.db import models
 
+
 def assert_zero_count(model_type: type[models.Model]) -> None:
     assert model_type.objects.count() == 0
 ```
@@ -436,14 +439,15 @@ from django.db import models
 _ST = TypeVar("_ST", contravariant=True)
 _GT = TypeVar("_GT", covariant=True)
 
-class MyIntegerField(models.IntegerField[_ST, _GT]):
-    ...
+
+class MyIntegerField(models.IntegerField[_ST, _GT]): ...
+
 
 class User(models.Model):
     my_field = MyIntegerField()
 
 
-reveal_type(User().my_field) # N: Revealed type is "int"
+reveal_type(User().my_field)  # N: Revealed type is "int"
 User().my_field = "12"  # OK (because Django IntegerField allows str and will try to coerce it)
 ```
 
@@ -453,17 +457,18 @@ User().my_field = "12"  # OK (because Django IntegerField allows str and will tr
 from typing import reveal_type
 from django.db import models
 
+
 # This is a non-generic subclass being very explicit
 # that it expects only int when setting values.
-class MyStrictIntegerField(models.IntegerField[int, int]):
-    ...
+class MyStrictIntegerField(models.IntegerField[int, int]): ...
+
 
 class User(models.Model):
     my_field = MyStrictIntegerField()
 
 
-reveal_type(User().my_field) # N: Revealed type is "int"
-User().my_field = "12" # E: Incompatible types in assignment (expression has type "str", variable has type "int")
+reveal_type(User().my_field)  # N: Revealed type is "int"
+User().my_field = "12"  # E: Incompatible types in assignment (expression has type "str", variable has type "int")
 ```
 
 See mypy section on [generic classes subclasses](https://mypy.readthedocs.io/en/stable/generics.html#defining-subclasses-of-generic-classes).

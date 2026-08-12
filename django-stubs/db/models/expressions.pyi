@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from decimal import Decimal
 from enum import Enum
-from typing import Any, ClassVar, Generic, Literal, TypeAlias
+from typing import Any, ClassVar, Generic, Literal, Never, Self, TypeAlias
 
 from django.core.exceptions import FieldError
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -14,7 +14,7 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType, _ParamsT
 from django.db.models.sql.query import Query
 from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import cached_property
-from typing_extensions import Never, Self, TypeVar, override
+from typing_extensions import TypeVar, override
 
 _OutputField = TypeVar("_OutputField", bound=Field[Any, Any], default=Field[Any, Any])
 _Numeric: TypeAlias = float | Decimal
