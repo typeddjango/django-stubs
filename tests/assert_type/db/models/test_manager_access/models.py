@@ -31,9 +31,8 @@ class Article(models.Model):
 
 
 def declared_manager_access_on_instance_is_banned() -> None:
-    # ty doesn't check the `instance` argument of `__get__`, so it accepts both accesses
-    Category().objects  # type: ignore[arg-type]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[bad-argument-type]
-    Category().secondary  # type: ignore[arg-type]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[bad-argument-type]
+    Category().objects  # type: ignore[arg-type]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-attribute-access]
+    Category().secondary  # type: ignore[arg-type]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-attribute-access]
 
 
 def default_manager_access_on_instance_is_banned() -> None:
@@ -51,7 +50,7 @@ def manager_access_on_class_is_allowed() -> None:
 
 def unknown_attribute_is_still_an_error() -> None:
     # `Literal["objects"]` must not turn `__getattr__` into a catch-all
-    Category.not_defined  # type: ignore[attr-defined]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[unresolved-attribute]
+    Category.not_defined  # type: ignore[attr-defined]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-attribute-access]
     Category().not_defined  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
 
 
