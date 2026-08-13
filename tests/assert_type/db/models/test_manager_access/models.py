@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, assert_type
+from typing import assert_type
 
 from django.contrib.auth.models import AnonymousUser, Group
 from django.db import models
 from django.db.models.manager import EmptyManager
 
-if TYPE_CHECKING:
-    from django.db.models.fields.related_descriptors import RelatedManager
+from django_stubs_ext.db.models.manager import RelatedManager
 
 
 class CategoryManager(models.Manager["Category"]):
@@ -27,6 +26,7 @@ class Post(models.Model):
 
 class Article(models.Model):
     # Reverse accessors are bound to instances, so they must be annotated with `RelatedManager`, not a bare `Manager`.
+    mistyped_category_set: models.Manager[Category]  # pyright: ignore[reportUninitializedInstanceVariable]
     category_set: RelatedManager[Category]  # pyright: ignore[reportUninitializedInstanceVariable]
 
 
@@ -55,7 +55,12 @@ def unknown_attribute_is_still_an_error() -> None:
 
 
 def related_manager_access_on_instance_is_allowed() -> None:
-    assert_type(Article().category_set, "RelatedManager[Category]")
+    assert_type(Article().category_set, RelatedManager[Category])
+
+
+def bare_manager_annotation_on_instance_is_banned() -> None:
+    # A reverse accessor annotated as `Manager` is unreachable from the instance that owns it
+    Article().mistyped_category_set  # type: ignore[arg-type]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-attribute-access]
 
 
 def empty_manager_access_through_property_is_allowed() -> None:
@@ -66,3 +71,4 @@ def empty_manager_access_through_property_is_allowed() -> None:
 def meta_manager_access_on_instance_is_allowed() -> None:
     # `Options` hands out managers from an instance the same way
     assert_type(Category()._meta.base_manager, models.Manager[Category])
+    assert_type(Category()._meta.default_manager, models.Manager[Category] | None)
