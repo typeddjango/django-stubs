@@ -1016,6 +1016,14 @@ class MetaclassAdjustments(ModelClassInitializer):
 
         Turn this setting off at your own risk.
         """
+        # Mypy does not properly support narrowing in `__getattr__` based on `Literal["objects"]`
+        # so the current `ModelBase.__getattr__` swallows every unknown attributes errors.
+        # `objects` is already inserted by the plugin, so the fallback is not necessary for mypy. We can drop it
+        # TODO: remove once https://github.com/python/mypy/issues/8203 is resolved
+        metaclass = ctx.cls.info.metaclass_type
+        if metaclass is not None and "__getattr__" in metaclass.type.names:
+            del metaclass.type.names["__getattr__"]
+
         if not plugin_config.strict_model_abstract_attrs:
             return
         if ctx.cls.fullname != fullnames.MODEL_CLASS_FULLNAME:
@@ -1025,13 +1033,6 @@ class MetaclassAdjustments(ModelClassInitializer):
             attr = ctx.cls.info.names.get(attr_name)
             if attr is not None and isinstance(attr.node, Var) and not attr.plugin_generated:
                 del ctx.cls.info.names[attr_name]
-
-        # `ModelBase.__getattr__` is the `objects` fallback for the other type checkers.
-        # mypy ignores its `Literal["objects"]` restriction (https://github.com/python/mypy/issues/8203),
-        # so it would swallow unknown attributes. `objects` is already inserted by the plugin.
-        metaclass = ctx.cls.info.metaclass_type
-        if metaclass is not None and "__getattr__" in metaclass.type.names:
-            del metaclass.type.names["__getattr__"]
 
     def get_exception_bases(self, name: str) -> list[Instance]:
         bases = []
