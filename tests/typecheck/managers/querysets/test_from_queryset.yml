@@ -80,9 +80,9 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "str"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "str"
         reveal_type(MyModel.objects.filter(id=1).queryset_method()) # N: Revealed type is "str"
         reveal_type(MyModel.objects.filter(id=1)) # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel]"
     installed_apps:
@@ -306,9 +306,9 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "str"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -424,9 +424,9 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "str"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "str"
     installed_apps:
         - myapp
     files:
@@ -449,10 +449,10 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.queryset_method)  # N: Revealed type is "def (param: str | None =) -> str | None"
-        reveal_type(MyModel().objects.queryset_method('str'))  # N: Revealed type is "str | None"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.queryset_method)  # N: Revealed type is "def (param: str | None =) -> str | None"
+        reveal_type(MyModel.objects.queryset_method('str'))  # N: Revealed type is "str | None"
     installed_apps:
         - myapp
     files:
@@ -479,10 +479,10 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.get())  # N: Revealed type is "myapp.models.MyModel"
-        reveal_type(MyModel().objects.base_queryset_method)  # N: Revealed type is "def (param: int | str) -> Never"
-        reveal_type(MyModel().objects.base_queryset_method(2))  # N: Revealed type is "Never"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.managers.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects.base_queryset_method)  # N: Revealed type is "def (param: int | str) -> Never"
+        reveal_type(MyModel.objects.base_queryset_method(2))  # N: Revealed type is "Never"
     installed_apps:
         - myapp
     files:
@@ -512,8 +512,8 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel().objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel().objects.queryset_method())  # N: Revealed type is "str"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "str"
         reveal_type(MyModel.objects.queryset_method_2())  # N: Revealed type is "int"
     installed_apps:
         - myapp
