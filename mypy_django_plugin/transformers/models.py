@@ -1021,10 +1021,17 @@ class MetaclassAdjustments(ModelClassInitializer):
         if ctx.cls.fullname != fullnames.MODEL_CLASS_FULLNAME:
             return
 
-        for attr_name in ["DoesNotExist", "NotUpdated", "MultipleObjectsReturned", "objects"]:
+        for attr_name in ["DoesNotExist", "NotUpdated", "MultipleObjectsReturned"]:
             attr = ctx.cls.info.names.get(attr_name)
             if attr is not None and isinstance(attr.node, Var) and not attr.plugin_generated:
                 del ctx.cls.info.names[attr_name]
+
+        # `ModelBase.__getattr__` is the `objects` fallback for the other type checkers.
+        # mypy ignores its `Literal["objects"]` restriction (https://github.com/python/mypy/issues/8203),
+        # so it would swallow unknown attributes. `objects` is already inserted by the plugin.
+        metaclass = ctx.cls.info.metaclass_type
+        if metaclass is not None and "__getattr__" in metaclass.type.names:
+            del metaclass.type.names["__getattr__"]
 
     def get_exception_bases(self, name: str) -> list[Instance]:
         bases = []
