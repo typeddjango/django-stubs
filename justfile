@@ -53,7 +53,14 @@ ty *files="tests/assert_type":
 
 # Run all typecheckers on test cases (default), or on the given files
 [group('typecheck')]
-typecheck-all *files="tests/assert_type": (pyrefly files) (ty files) (pyright files) (mypy files)
+typecheck-all *files="tests/assert_type":
+    #!/usr/bin/env bash
+    failed=()
+    for checker in pyrefly ty pyright mypy; do
+        printf '=================================== %s ===================================\n' "$checker"
+        just "$checker" {{ files }} || failed+=("$checker")
+    done
+    [[ ${#failed[@]} -eq 0 ]] || { echo "Failed: ${failed[*]}"; exit 1; }
 
 # Run pytest tests
 [group('test')]
