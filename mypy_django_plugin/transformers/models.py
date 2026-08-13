@@ -1024,9 +1024,20 @@ class MetaclassAdjustments(ModelClassInitializer):
         if metaclass is not None and "__getattr__" in metaclass.type.names:
             del metaclass.type.names["__getattr__"]
 
-        if not plugin_config.strict_model_abstract_attrs:
-            return
         if ctx.cls.fullname != fullnames.MODEL_CLASS_FULLNAME:
+            return
+
+        if not plugin_config.strict_model_abstract_attrs:
+            # `__getattr__` was the only source of `Model.objects`, redeclare it explicitly for this setting.
+            manager = helpers.lookup_fully_qualified_typeinfo(
+                helpers.get_semanal_api(ctx), fullnames.MANAGER_CLASS_FULLNAME
+            )
+            if manager is not None:
+                helpers.add_new_sym_for_info(
+                    ctx.cls.info,
+                    name="objects",
+                    sym_type=Instance(manager, [Instance(ctx.cls.info, [])]),
+                )
             return
 
         for attr_name in ["DoesNotExist", "NotUpdated", "MultipleObjectsReturned"]:
