@@ -419,7 +419,12 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
             return
         # A user override's return annotation may still be unanalyzed here, so
         # resolve it explicitly (a no-op if already analyzed); defer if incomplete.
-        base_as_manager_ret_type = semanal_api.anal_type(base_as_manager_type.ret_type)
+        # Suppress resolution errors: a not-yet-analyzed cross-module override may
+        # reference names private to its defining module — bail out, don't report.
+        with semanal_api.msg.filter_errors() as resolution_errors:
+            base_as_manager_ret_type = semanal_api.anal_type(base_as_manager_type.ret_type)
+        if resolution_errors.has_new_errors():
+            return
         if base_as_manager_ret_type is None:
             return _defer()
         base_as_manager_ret_type = get_proper_type(base_as_manager_ret_type)

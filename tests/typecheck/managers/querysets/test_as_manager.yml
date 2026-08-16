@@ -98,6 +98,42 @@
                 class MyModel(models.Model):
                     objects = MyQuerySet.as_manager()
 
+-   case: overridden_as_manager_in_other_module_with_module_private_typevar
+    main: |
+        from myapp.models import MyModel
+    installed_apps:
+        - django.contrib.contenttypes
+        - myapp
+    files:
+        -   path: lib/__init__.py
+        -   path: lib/query.py
+            content: |
+                from typing import TypeVar
+
+                from django.db import models
+                from typing_extensions import override
+
+                _T = TypeVar("_T", bound=models.Model)
+
+                class LibQuerySet(models.QuerySet[_T]):
+                    @classmethod
+                    @override
+                    def as_manager(cls) -> "models.Manager[_T]":
+                        return models.Manager.from_queryset(cls)()
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.contrib.contenttypes.models import ContentType
+                from django.db import models
+
+                from lib.query import LibQuerySet
+
+                class MyModel(models.Model):
+                    ctype = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+
+                class MyQuerySet(LibQuerySet):
+                    pass
+
 -   case: declares_manager_type_like_django
     main: |
         from typing_extensions import reveal_type
