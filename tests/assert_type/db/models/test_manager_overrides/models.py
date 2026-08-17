@@ -43,8 +43,7 @@ class BookManager(models.Manager["Book"]):
 
 
 class Book(models.Model):
-    # pyrefly doesn't solve `Self` in the `objects: ClassVar[Manager[Self]]` declaration
-    objects = BookManager()  # pyrefly: ignore[bad-assignment]
+    objects = BookManager()
 
 
 def override_manager_create_with_type_param() -> None:
@@ -64,7 +63,7 @@ class ReviewManager(models.Manager["Author"]):
 
 
 class Review(models.Model):
-    objects = ReviewManager()  # pyright: ignore[reportGeneralTypeIssues]  # pyrefly: ignore[bad-assignment]
+    objects = ReviewManager()  # pyright: ignore[reportGeneralTypeIssues]
 
 
 class Author(models.Model):
