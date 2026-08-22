@@ -351,6 +351,10 @@ class NewSemanalDjangoPlugin(Plugin):
         if info.has_base(fullnames.STR_PROMISE_FULLNAME):
             return resolve_str_promise_attribute
 
+        # Lookup of the '.fields' attribute on a Form instance
+        if info.has_base(fullnames.BASEFORM_CLASS_FULLNAME) and attr_name == "fields":
+            return partial(forms.transform_form_fields_attr_type, django_context=self.django_context)
+
         if (
             info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
             and attr_name in {"choices", "labels", "values", "__empty__"}
