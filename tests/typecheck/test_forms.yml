@@ -188,42 +188,76 @@
         from django import forms
         from typing_extensions import reveal_type
 
-        class BaseForm(forms.Form):
-            name = forms.CharField()
-
-        class MyForm(BaseForm):
+        class MyForm(forms.Form):
             age = forms.IntegerField()
-            name = forms.EmailField()  # override parent field with a different type
+
+            def __init__(self, *args: Any, **kwargs: Any) -> None:
+                super().__init__(*args, **kwargs)
+                # Dynamically add a field at runtime.
+                self.fields["dynamic"] = forms.CharField()
 
         form = MyForm()
+        reveal_type(form.fields)  # N: Revealed type is "main.MyForm_FieldsDict"
+
+        # Static field should be typed according to its declared type.
         reveal_type(form.fields["age"])  # N: Revealed type is "django.forms.fields.IntegerField"
-        reveal_type(form.fields["name"])  # N: Revealed type is "django.forms.fields.EmailField"
-        form.fields["missing"]  # E: "missing" is not a valid TypedDict key; expected one of ("age", "name")  [misc]
 
-        # dynamic reassignment of the whole dict is still allowed
-        form.fields = {}
+        # Dynamic key should fall back to the generic 'Field'.
+        reveal_type(form.fields["dynamic"])  # N: Revealed type is "django.forms.fields.Field"
 
-        # a plain, undeclared Form still falls back to the default 'dict[str, Field]' typing
+        # Undefined key should fall back to the generic 'Field'.
+        reveal_type(form.fields["undefined"])  # N: Revealed type is "django.forms.fields.Field"
+
+        # An undeclared Form falls back to the default 'dict[str, Field]' typing since it has no
+        # statically-known fields.
         plain_form = forms.Form()
         reveal_type(plain_form.fields)  # N: Revealed type is "dict[str, django.forms.fields.Field]"
 
--   case: form_fields_queryset_assignment_via_typed_dict
+-   case: form_fields_dict_subclass_supports_common_mutations
+    main: |
+        from django import forms
+        from typing_extensions import reveal_type
+
+        class MyForm(forms.Form):
+            age = forms.IntegerField()
+            name = forms.EmailField()
+
+        form = MyForm()
+
+        # Iterating should narrow the values type to 'Field'.
+        for field in form.fields.values():
+            reveal_type(field)  # N: Revealed type is "django.forms.fields.Field"
+
+        # Deletion and pop should be allowed.
+        del form.fields["age"]
+        form.fields.pop("name", None)
+
+        # Assigning through a non-literal key should be allowed too.
+        key: str = "age"
+        form.fields[key] = forms.IntegerField()
+
+        # Reassignment should be allowed.
+        form.fields = {}
+
+-   case: form_fields_queryset_assignment_via_dict_subclass
     main: |
         from typing import Any
         from django import forms
-        from django.db.models import QuerySet
         from myapp.models import Merchant
         from typing_extensions import reveal_type
 
         class MyForm(forms.Form):
-            brands = forms.ModelChoiceField(required=True, queryset=None)  # type: ignore[var-annotated]
+            merchant_1: forms.ModelChoiceField[Merchant] = forms.ModelChoiceField(required=True, queryset=None)
+            merchant_2 = forms.ModelChoiceField(required=True, queryset=Merchant.objects.none())
 
             def __init__(self, *args: Any, **kwargs: Any) -> None:
                 super().__init__(*args, **kwargs)
-                self.fields["brands"].queryset = Merchant.objects.all()
+                self.fields["merchant_1"].queryset = Merchant.objects.all()
+                self.fields["merchant_2"].queryset = Merchant.objects.all()
 
         form = MyForm()
-        reveal_type(form.fields["brands"])  # N: Revealed type is "django.forms.models.ModelChoiceField[Any]"
+        reveal_type(form.fields["merchant_1"])  # N: Revealed type is "django.forms.models.ModelChoiceField[myapp.models.Merchant]"
+        reveal_type(form.fields["merchant_2"])  # N: Revealed type is "django.forms.models.ModelChoiceField[myapp.models.Merchant]"
 
     installed_apps:
         -   myapp
@@ -234,4 +268,147 @@
                 from django.db import models
 
                 class Merchant(models.Model):
+                    name = models.CharField(max_length=128)
+
+-   case: form_fields_ignores_non_form_mixin_and_annotation_only_attrs
+    main: |
+        from django import forms
+        from typing_extensions import reveal_type
+
+        class Mixin:
+            # Not part of the form hierarchy, so it shouldn't be treated as a declared field.
+            age = forms.IntegerField()
+
+        class MyForm(Mixin, forms.Form):
+            name = forms.CharField()
+            # Annotation-only and never assigned, so it shouldn't be treated as a declared field.
+            other: forms.IntegerField
+
+        form = MyForm()
+        reveal_type(form.fields)  # N: Revealed type is "main.MyForm_FieldsDict"
+        reveal_type(form.fields["name"])  # N: Revealed type is "django.forms.fields.CharField"
+
+        reveal_type(form.fields["age"])  # N: Revealed type is "django.forms.fields.Field"
+        reveal_type(form.fields["other"])  # N: Revealed type is "django.forms.fields.Field"
+
+-   case: form_fields_model_form_resolves_implicit_fields
+    main: |
+        from django import forms
+        from myapp.models import User
+        from typing_extensions import reveal_type
+
+        class PartialForm(forms.ModelForm):
+            # 'name' and 'age' are inferred from Django's 'fields_for_model()'.
+            class Meta:
+                model = User
+                fields = ["name", "age"]
+
+        partial_form = PartialForm()
+        reveal_type(partial_form.fields)  # N: Revealed type is "main.PartialForm_FieldsDict"
+
+        reveal_type(partial_form.fields["name"])  # N: Revealed type is "django.forms.fields.CharField"
+        reveal_type(partial_form.fields["age"])  # N: Revealed type is "django.forms.fields.IntegerField"
+
+        # 'published' isn't statically defined in 'Meta.fields', so it falls back to 'Field'.
+        reveal_type(partial_form.fields["published"])  # N: Revealed type is "django.forms.fields.Field"
+
+        class AllFieldsForm(forms.ModelForm):
+            class Meta:
+                model = User
+                fields = "__all__"
+
+        all_form = AllFieldsForm()
+        reveal_type(all_form.fields["name"])  # N: Revealed type is "django.forms.fields.CharField"
+        reveal_type(all_form.fields["age"])  # N: Revealed type is "django.forms.fields.IntegerField"
+        reveal_type(all_form.fields["published"])  # N: Revealed type is "django.forms.fields.BooleanField"
+
+        class ExcludeForm(forms.ModelForm):
+            class Meta:
+                model = User
+                exclude = ["published"]
+
+        exclude_form = ExcludeForm()
+        reveal_type(exclude_form.fields["name"])  # N: Revealed type is "django.forms.fields.CharField"
+        reveal_type(exclude_form.fields["age"])  # N: Revealed type is "django.forms.fields.IntegerField"
+
+        # Excluded field falls back to the generic 'Field' type.
+        reveal_type(exclude_form.fields["published"])  # N: Revealed type is "django.forms.fields.Field"
+
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class User(models.Model):
+                    name = models.CharField(max_length=128)
+                    age = models.IntegerField()
+                    published = models.BooleanField(default=False)
+
+-   case: form_fields_overrides_declared_fields_and_model_derived_fields
+    main: |
+        from django import forms
+        from myapp.models import Article
+        from typing_extensions import reveal_type
+
+        class BaseForm(forms.Form):
+            name = forms.EmailField()
+
+        class OverrideForm(BaseForm):
+            name = forms.CharField()  # type: ignore[assignment]
+
+        form = OverrideForm()
+        reveal_type(form.fields["name"])  # N: Revealed type is "django.forms.fields.CharField"
+
+        class OverrideModelForm(forms.ModelForm):
+            # Explicitly declared on the form body. It should override the model-derived field of the same name.
+            name = forms.IntegerField()
+
+            class Meta:
+                model = Article
+                fields = ["name"]
+
+        model_form = OverrideModelForm()
+        reveal_type(model_form.fields["name"])  # N: Revealed type is "django.forms.fields.IntegerField"
+
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Article(models.Model):
+                    name = models.CharField(max_length=128)
+
+-   case: form_fields_model_form_falls_back_for_non_literal_meta_fields
+    main: |
+        from django import forms
+        from myapp.models import Article
+        from typing_extensions import reveal_type
+
+        fields_list = ["name"]
+
+        class ArticleForm(forms.ModelForm):
+            # 'fields_list' isn't a literal, so it can't be inferred statically and falls back to 'dict[str, Field]'.
+            class Meta:
+                model = Article
+                fields = fields_list
+
+        form = ArticleForm()
+        reveal_type(form.fields)  # N: Revealed type is "dict[str, django.forms.fields.Field]"
+        reveal_type(form.fields["name"])  # N: Revealed type is "django.forms.fields.Field"
+
+    installed_apps:
+        -   myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Article(models.Model):
                     name = models.CharField(max_length=128)

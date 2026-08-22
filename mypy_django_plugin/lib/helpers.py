@@ -79,6 +79,7 @@ class DjangoTypeMetadata(TypedDict, total=False):
     m2m_throughs: dict[str, str]
     m2m_managers: dict[str, str]
     manager_to_model: str
+    form_fields_dict_type: str
 
 
 def get_django_metadata(model_info: TypeInfo) -> DjangoTypeMetadata:
@@ -152,7 +153,7 @@ def lookup_fully_qualified_typeinfo(api: TypeChecker | SemanticAnalyzer, fullnam
     return node
 
 
-def lookup_class_typeinfo(api: TypeChecker, klass: type | None) -> TypeInfo | None:
+def lookup_class_typeinfo(api: TypeChecker | SemanticAnalyzer, klass: type | None) -> TypeInfo | None:
     if klass is None:
         return None
 
