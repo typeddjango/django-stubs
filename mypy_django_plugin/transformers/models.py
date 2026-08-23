@@ -23,6 +23,7 @@ from mypy.nodes import (
 )
 from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
+from mypy.semanal_shared import has_placeholder
 from mypy.typeanal import TypeAnalyser
 from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, TypeVarType, get_proper_type
 from mypy.types import Type as MypyType
@@ -971,6 +972,12 @@ class ProcessManyToManyFields(ModelClassInitializer):
         # class X_ManyRelatedManager(ManyRelatedManager[X, _Through], type(X._default_manager), Generic[_Through]): ...
         through_type_var = self.many_related_manager.defn.type_vars[1]
         assert isinstance(through_type_var, TypeVarType)
+        if has_placeholder(through_type_var):
+            # 'ManyRelatedManager' hasn't been fully analysed yet, so '_Through' still
+            # carries a 'PlaceholderType' bound. Copying it into the class we're about to
+            # create would store an unserializable type on a synthetic class that is never
+            # re-analysed, so defer instead and pick it up on a later iteration.
+            raise helpers.IncompleteDefnException()
         generic_to_many_related_manager = Instance(self.many_related_manager, [model, through_type_var.copy_modified()])
         related_manager_info = helpers.add_new_class_for_module(
             module=self.api.modules[model.type.module_name],
