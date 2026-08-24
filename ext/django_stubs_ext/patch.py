@@ -132,6 +132,24 @@ if VERSION >= (6, 0):
     )
 
 
+def _make_class_getitem(patched_cls: type) -> Any:
+    def __class_getitem__(cls: type, item: Any) -> Any:
+        # `cls` may be a subclass that also inherits from `typing.Generic`.
+        # In that case the patched class shadows `Generic.__class_getitem__` in
+        # the MRO, which would silently erase the runtime parametrization of
+        # `cls[...]` (https://github.com/typeddjango/django-stubs/issues/3609).
+        # Delegate to the next `__class_getitem__` in the MRO if there is one,
+        # and only fall back to the no-op behavior of returning `cls` as is.
+        mro = cls.__mro__
+        for base in mro[mro.index(patched_cls) + 1 :]:
+            getitem = base.__dict__.get("__class_getitem__")
+            if getitem is not None:
+                return getitem.__get__(None, cls)(item)
+        return cls
+
+    return classmethod(__class_getitem__)
+
+
 def monkeypatch(extra_classes: Iterable[type] | None = None) -> None:
     """Monkey patch django as necessary to work properly with mypy."""
     # Add the __class_getitem__ dunder.
@@ -140,7 +158,7 @@ def monkeypatch(extra_classes: Iterable[type] | None = None) -> None:
         _need_generic,
     )
     for el in suited_for_this_version:
-        el.cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)
+        el.cls.__class_getitem__ = _make_class_getitem(el.cls)
     if extra_classes:
         for cls in extra_classes:
-            cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore[attr-defined]
+            cls.__class_getitem__ = _make_class_getitem(cls)  # type: ignore[attr-defined]
