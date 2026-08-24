@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from contextlib import suppress
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Generic, Protocol, get_args, get_origin
 
 import pytest
 from django.db.models import Model
 from django.forms.models import ModelForm
+from django.views import View
+from typing_extensions import TypeVar
 
 import django_stubs_ext
 from django_stubs_ext import patch
@@ -81,6 +83,41 @@ def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasse
 
     class _TestGeneric(_NotGeneric[Model]):  # type: ignore[type-arg]
         pass
+
+
+def test_patched_class_real_generic_subclass(make_generic_classes: _MakeGenericClasses) -> None:
+    """Test that real `Generic` subclasses of patched classes keep runtime parametrization."""
+    make_generic_classes()
+
+    assert View[int] is View  # type: ignore[type-var, comparison-overlap]
+
+    _T = TypeVar("_T")
+
+    class _Controller(View, Generic[_T]):
+        pass
+
+    alias = _Controller[int]
+    assert get_origin(alias) is _Controller
+    assert get_args(alias) == (int,)
+
+    class _Concrete(_Controller[int]):
+        pass
+
+    assert _Concrete.__orig_bases__ == (_Controller[int],)  # type: ignore[attr-defined]
+
+    class _PlainView(View):
+        pass
+
+    assert _PlainView[int] is _PlainView  # type: ignore[misc]
+
+    class _CustomGetitem:
+        def __class_getitem__(cls, item: object) -> object:
+            return ("custom", cls, item)
+
+    class _WithCustom(View, _CustomGetitem):
+        pass
+
+    assert _WithCustom[int] == ("custom", _WithCustom, int)  # type: ignore[misc]
 
 
 @pytest.mark.parametrize(
