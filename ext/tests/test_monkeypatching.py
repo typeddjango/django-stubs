@@ -86,10 +86,10 @@ def test_patched_extra_classes_generics(make_generic_classes: _MakeGenericClasse
 
 
 def test_patched_class_real_generic_subclass(make_generic_classes: _MakeGenericClasses) -> None:
-    """Test that real `Generic` subclasses of patched classes keep runtime parametrization.    """
+    """Test that real `Generic` subclasses of patched classes keep runtime parametrization."""
     make_generic_classes()
 
-    assert View[int] is View
+    assert View[int] is View  # type: ignore[type-var, comparison-overlap]
 
     _T = TypeVar("_T")
 

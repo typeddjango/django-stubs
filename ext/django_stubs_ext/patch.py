@@ -134,14 +134,11 @@ if VERSION >= (6, 0):
 
 def _make_class_getitem(patched_cls: type) -> Any:
     def __class_getitem__(cls: type, item: Any) -> Any:
-        # `cls` may be a subclass that also inherits from `typing.Generic`.
-        # In that case the patched class shadows `Generic.__class_getitem__` in
-        # the MRO, which would silently erase the runtime parametrization of
-        # `cls[...]` (https://github.com/typeddjango/django-stubs/issues/3609).
-        # Delegate to the next `__class_getitem__` in the MRO if there is one,
-        # and only fall back to the no-op behavior of returning `cls` as is.
+        # A patched class may shadow `Generic.__class_getitem__` in a subclass MRO.
+        # Delegate to the next implementation when present, otherwise keep the
+        # existing no-op behavior.
         mro = cls.__mro__
-        for base in mro[mro.index(patched_cls) + 1 :]:
+        for base in mro[mro.index(patched_cls) + 1 : -1]:
             getitem = base.__dict__.get("__class_getitem__")
             if getitem is not None:
                 return getitem.__get__(None, cls)(item)
