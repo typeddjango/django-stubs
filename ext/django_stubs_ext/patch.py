@@ -132,6 +132,21 @@ if VERSION >= (6, 0):
     )
 
 
+def _make_class_getitem(patched_cls: type) -> Any:
+    def __class_getitem__(cls: type, item: Any) -> Any:
+        # A patched class may shadow `Generic.__class_getitem__` in a subclass MRO.
+        # Delegate to the next implementation when present, otherwise keep the
+        # existing no-op behavior.
+        mro = cls.__mro__
+        for base in mro[mro.index(patched_cls) + 1 : -1]:
+            getitem = base.__dict__.get("__class_getitem__")
+            if getitem is not None:
+                return getitem.__get__(None, cls)(item)
+        return cls
+
+    return classmethod(__class_getitem__)
+
+
 def monkeypatch(extra_classes: Iterable[type] | None = None) -> None:
     """Monkey patch django as necessary to work properly with mypy."""
     # Add the __class_getitem__ dunder.
@@ -140,7 +155,7 @@ def monkeypatch(extra_classes: Iterable[type] | None = None) -> None:
         _need_generic,
     )
     for el in suited_for_this_version:
-        el.cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)
+        el.cls.__class_getitem__ = _make_class_getitem(el.cls)
     if extra_classes:
         for cls in extra_classes:
-            cls.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore[attr-defined]
+            cls.__class_getitem__ = _make_class_getitem(cls)  # type: ignore[attr-defined]
