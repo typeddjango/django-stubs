@@ -275,6 +275,11 @@ django.contrib.contenttypes.forms.generic_inlineformset_factory
 django.forms.models.inlineformset_factory
 django.forms.models.modelformset_factory
 
+# Stub-only, replicates the runtime `ManagerDescriptor` behavior of raising when
+# a manager is accessed on a model instance rather than on the model class
+django.db.models.manager.BaseManager.__get__
+django.db.models.manager.EmptyManager.__get__
+
 # Field.__get__/__set__ are stub-only for the mypy plugin, they don't exist at runtime
 django.contrib.contenttypes.fields.GenericForeignKey.__get__
 django.db.models.fields.Field.__get__

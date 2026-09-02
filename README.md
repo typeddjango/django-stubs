@@ -417,6 +417,26 @@ you are using our mypy plugin.
 
 Use this setting on your own risk, because it can hide valid errors.
 
+### Do I need to annotate reverse relations?
+
+Not if you use our mypy plugin. It reads your app registry and declares every reverse accessor for you, as
+`RelatedManager[Model]`, or `ManyRelatedManager[Model, Through]` for a `ManyToManyField`.
+
+pyright, pyrefly and ty do not run the plugin, so under those you declare them yourself.
+Reach for `RelatedManager` rather than `Manager`: a reverse accessor is read from a model instance, whereas a regular manager such as `objects` only exists on the model class.
+
+```python
+from django.db import models
+from django_stubs_ext.db.models.manager import ManyRelatedManager, RelatedManager
+
+
+class Article(models.Model):
+    category_set: RelatedManager[Category]
+    tags: ManyRelatedManager[Tag, ArticleTag]
+```
+
+Make sure to import symbols from `django_stubs_ext.db.models.manager`. Django dynamically create these so they cannot be imported directly
+
 ### How to type a custom `models.Field`?
 
 > [!NOTE]

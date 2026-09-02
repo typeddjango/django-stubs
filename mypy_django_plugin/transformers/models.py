@@ -1023,12 +1023,31 @@ class MetaclassAdjustments(ModelClassInitializer):
 
         Turn this setting off at your own risk.
         """
-        if not plugin_config.strict_model_abstract_attrs:
-            return
+        # Mypy does not properly support narrowing in `__getattr__` based on `Literal["objects"]`
+        # so the current `ModelBase.__getattr__` swallows every unknown attributes errors.
+        # `objects` is already inserted by the plugin, so the fallback is not necessary for mypy. We can drop it
+        # TODO: remove once https://github.com/python/mypy/issues/8203 is resolved
+        metaclass = ctx.cls.info.metaclass_type
+        if metaclass is not None and "__getattr__" in metaclass.type.names:
+            del metaclass.type.names["__getattr__"]
+
         if ctx.cls.fullname != fullnames.MODEL_CLASS_FULLNAME:
             return
 
-        for attr_name in ["DoesNotExist", "NotUpdated", "MultipleObjectsReturned", "objects"]:
+        if not plugin_config.strict_model_abstract_attrs:
+            # `__getattr__` was the only source of `Model.objects`, redeclare it explicitly for this setting.
+            manager = helpers.lookup_fully_qualified_typeinfo(
+                helpers.get_semanal_api(ctx), fullnames.MANAGER_CLASS_FULLNAME
+            )
+            if manager is not None:
+                helpers.add_new_sym_for_info(
+                    ctx.cls.info,
+                    name="objects",
+                    sym_type=Instance(manager, [Instance(ctx.cls.info, [])]),
+                )
+            return
+
+        for attr_name in ["DoesNotExist", "NotUpdated", "MultipleObjectsReturned"]:
             attr = ctx.cls.info.names.get(attr_name)
             if attr is not None and isinstance(attr.node, Var) and not attr.plugin_generated:
                 del ctx.cls.info.names[attr_name]
