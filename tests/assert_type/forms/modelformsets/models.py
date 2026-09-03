@@ -26,7 +26,7 @@ def test_form_parameter_defaults_to_model_form() -> None:
     implicit: BaseModelFormSet[Author] = BaseModelFormSet()
     explicit: BaseModelFormSet[Author, AuthorForm] = BaseModelFormSet()
     # `ty` doesn't substitute `_M` in the default yet, it infers `list[ModelForm[Unknown]]`.
-    assert_type(implicit.saved_forms, "list[ModelForm[Author]]")  # ty: ignore[type-assertion-failure]
+    assert_type(implicit.saved_forms, "list[ModelForm[Author]]")
     assert_type(explicit.saved_forms, "list[AuthorForm]")
 
 
@@ -34,9 +34,9 @@ def test_inline_form_parameter_defaults_to_model_form(
     inline: BaseInlineFormSet[Book, Author],
     generic_inline: BaseGenericInlineFormSet[Book],
 ) -> None:
-    assert_type(inline.saved_forms, "list[ModelForm[Book]]")  # ty: ignore[type-assertion-failure]
+    assert_type(inline.saved_forms, "list[ModelForm[Book]]")
     assert_type(inline.save(), "list[Book]")
-    assert_type(generic_inline.saved_forms, "list[ModelForm[Book]]")  # ty: ignore[type-assertion-failure]
+    assert_type(generic_inline.saved_forms, "list[ModelForm[Book]]")
 
 
 def test_model_choice_iterator(field: ModelChoiceField[Author], iterator: ModelChoiceIterator[Author]) -> None:

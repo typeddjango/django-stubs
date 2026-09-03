@@ -53,8 +53,8 @@ class SimpleCreateView(CreateView[MyModel]):
 
 
 simple_create_view = SimpleCreateView()
-assert_type(simple_create_view.get_form_class(), type[forms.ModelForm[MyModel]])  # ty: ignore[type-assertion-failure]
-assert_type(simple_create_view.get_form(), forms.ModelForm[MyModel])  # ty: ignore[type-assertion-failure]
+assert_type(simple_create_view.get_form_class(), type[forms.ModelForm[MyModel]])
+assert_type(simple_create_view.get_form(), forms.ModelForm[MyModel])
 
 
 class SimpleUpdateView(UpdateView[MyModel]):
@@ -63,8 +63,8 @@ class SimpleUpdateView(UpdateView[MyModel]):
 
 
 simple_update_view = SimpleUpdateView()
-assert_type(simple_update_view.get_form_class(), type[forms.ModelForm[MyModel]])  # ty: ignore[type-assertion-failure]
-assert_type(simple_update_view.get_form(), forms.ModelForm[MyModel])  # ty: ignore[type-assertion-failure]
+assert_type(simple_update_view.get_form_class(), type[forms.ModelForm[MyModel]])
+assert_type(simple_update_view.get_form(), forms.ModelForm[MyModel])
 
 
 class SimpleDeleteView(DeleteView[MyModel]):
