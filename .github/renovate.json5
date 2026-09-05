@@ -33,9 +33,12 @@
       enabled: false,
     },
     {
-      // Django 6.0 dropped Python <3.12 support, keep the compat pin on 5.x
+      // Django 6.0 dropped Python <3.12 support, keep the compat pin on 5.x.
+      // Match the pyproject value, not the version: uv.lock has two django entries
+      // and renovate's lockfile lookup keeps only the last one (6.x), see
+      // https://github.com/renovatebot/renovate/blob/main/lib/modules/manager/pep621/schema.ts
       matchPackageNames: ["django"],
-      matchCurrentVersion: "/^5\\./",
+      matchCurrentValue: "/^==5\\./",
       allowedVersions: "<6.0.0",
     },
   ],
