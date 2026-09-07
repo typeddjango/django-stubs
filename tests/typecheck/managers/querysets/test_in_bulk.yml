@@ -27,6 +27,9 @@
         # Async variant with valid field
         async def test_async() -> None:
             await Article.objects.ain_bulk(field_name="slug")
+
+        # Non-unique, but already distinct() on exactly this field - allowed at runtime.
+        Article.objects.distinct("title").in_bulk(field_name="title")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -70,6 +73,15 @@
         async def test_async() -> None:
             await Article.objects.ain_bulk(field_name="nonexistent")  # E: Article has no field named 'nonexistent'  [misc]
             await Article.objects.ain_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # distinct() on a *different* field doesn't excuse title's non-uniqueness
+        Article.objects.distinct("category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # Multi-field distinct() doesn't match the single-field check either.
+        Article.objects.distinct("title", "category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # A later distinct() call replaces the fields, not merges - the earlier "title" no longer applies.
+        Article.objects.distinct("title").distinct("category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
