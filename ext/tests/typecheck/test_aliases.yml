@@ -14,3 +14,11 @@
 
                 class Blog(models.Model):
                     created_at = models.DateTimeField()
+
+-   case: mutable_http_request
+    main: |
+        from django_stubs_ext import MutableHttpRequest
+
+        request = MutableHttpRequest()
+        request.GET["foo"] = "bar"
+        request.POST.setdefault("foo", "bar")

@@ -9,12 +9,14 @@ from .annotations import Annotations as Annotations
 from .annotations import WithAnnotations as WithAnnotations
 from .patch import monkeypatch as monkeypatch
 from .types import AnyAttrAllowed as AnyAttrAllowed
+from .types import MutableHttpRequest as MutableHttpRequest
 
 __all__ = [
     "Annotations",
     "AnyAttrAllowed",
     "FieldOpts",
     "FieldsetSpec",
+    "MutableHttpRequest",
     "QuerySetAny",
     "StrOrPromise",
     "StrPromise",
