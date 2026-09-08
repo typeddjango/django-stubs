@@ -6,6 +6,8 @@ from typing import assert_type
 from django.http import QueryDict
 from django.http.request import _ImmutableQueryDict
 
+from django_stubs_ext import MutableHttpRequest
+
 q = QueryDict("", False)
 # Test constructor overloads -- Mutable
 assert_type(QueryDict("querystring", True), QueryDict)
@@ -34,3 +36,10 @@ mut_q["a"] = ["1", "2"]  # type: ignore[assignment]  # pyright: ignore[reportArg
 assert_type(mut_q.pop("a"), list[str])
 assert_type(mut_q.pop("a", 12), list[str] | int)  # ty: ignore[type-assertion-failure]
 assert_type(mut_q.popitem(), tuple[str, list[str]])
+
+
+# Test MutableHttpRequest helper
+request = MutableHttpRequest()
+assert_type(request, MutableHttpRequest)
+request.GET["foo"] = "bar"
+request.POST.setdefault("foo", "bar")

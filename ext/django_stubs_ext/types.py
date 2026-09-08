@@ -13,9 +13,10 @@ if TYPE_CHECKING:
         GET: QueryDict  # type: ignore[assignment]
         POST: QueryDict  # type: ignore[assignment]
 else:
-    # The runtime class is Django's regular HttpRequest; mutability is a
-    # type-checking distinction only.
-    from django.http import HttpRequest as MutableHttpRequest
+    # The runtime class is Django's regular HttpRequest; mutability is a type-checking distinction only.
+    from django.http import HttpRequest
+
+    MutableHttpRequest = HttpRequest
 
 
 # Used internally by mypy_django_plugin.
@@ -24,6 +25,3 @@ class AnyAttrAllowed(Protocol):
 
     @override
     def __setattr__(self, item: str, value: Any) -> None: ...
-
-
-__all__ = ["AnyAttrAllowed", "MutableHttpRequest"]
