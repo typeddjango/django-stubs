@@ -27,6 +27,11 @@
         # Async variant with valid field
         async def test_async() -> None:
             await Article.objects.ain_bulk(field_name="slug")
+
+        # Non-unique field, but the queryset was already made distinct on
+        # exactly that field - Django's own in_bulk() accepts this at
+        # runtime (self.query.distinct_fields == (field_name,)).
+        Article.objects.distinct("title").in_bulk(field_name="title")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -70,6 +75,19 @@
         async def test_async() -> None:
             await Article.objects.ain_bulk(field_name="nonexistent")  # E: Article has no field named 'nonexistent'  [misc]
             await Article.objects.ain_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # distinct() on a *different* field doesn't excuse title's non-uniqueness
+        Article.objects.distinct("category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # Multi-field distinct() doesn't match Django's own single-field
+        # distinct_fields == (field_name,) check either
+        Article.objects.distinct("title", "category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # A second .distinct() call replaces the first's fields at runtime
+        # (Query.add_distinct_fields does a plain assignment, not a merge),
+        # so an earlier .distinct("title") must not keep excusing "title"
+        # once the chain has moved on to distinct("category").
+        Article.objects.distinct("title").distinct("category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
