@@ -215,3 +215,21 @@
         from django.db import models
         class RenamedField(models.Model):
             modelname = models.IntegerField(name="fieldname", choices=((1, 'One'),))
+
+- case: test_fields_accept_db_collation
+  main: |
+        from myapp.models import CollationModel
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+
+        class CollationModel(models.Model):
+            char = models.CharField(max_length=255, db_collation="en-x-icu")
+            text = models.TextField(db_collation="en-x-icu")
+            slug = models.SlugField(max_length=255, db_collation="en-x-icu")
+            url = models.URLField(db_collation="en-x-icu")
+            email = models.EmailField(db_collation="en-x-icu")
