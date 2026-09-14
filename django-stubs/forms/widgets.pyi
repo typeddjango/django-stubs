@@ -5,6 +5,7 @@ from typing import Any, Literal, Protocol, Self, TypeAlias, type_check_only
 
 from _typeshed import Self as MetaclassSelf  # noqa: TID251
 from django.core.files.base import File
+from django.db.models.fields.files import FieldFile
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import _DataT, _FilesT
 from django.utils.choices import _Choices
@@ -79,7 +80,8 @@ class Widget(metaclass=MediaDefiningClass):
     @property
     def media(self) -> Media: ...
     def subwidgets(self, name: str, value: Any, attrs: _OptAttrs | None = None) -> Iterator[dict[str, Any]]: ...
-    def format_value(self, value: Any) -> str | None: ...
+    # format_value subclasses can return any value usable in a template
+    def format_value(self, value: Any) -> Any: ...
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     def render(
         self, name: str, value: Any, attrs: _OptAttrs | None = None, renderer: BaseRenderer | None = None
@@ -142,8 +144,9 @@ class MultipleHiddenInput(HiddenInput):
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
+    # ModelMultipleChoiceField causes format_value to return a list of PKs generally
     @override
-    def format_value(self, value: Any) -> list[str]: ...  # type: ignore[override]
+    def format_value(self, value: Any) -> list[Any]: ...
 
 class FileInput(Input):
     allow_multiple_selected: bool
@@ -170,8 +173,9 @@ class ClearableFileInput(FileInput):
     def clear_checkbox_name(self, name: str) -> str: ...
     def clear_checkbox_id(self, name: str) -> str: ...
     def is_initial(self, value: File[Any] | str | None) -> bool: ...
+    # ClearableFileInput.format_value violates the Liskov substitution principle
     @override
-    def format_value(self, value: Any) -> Any: ...
+    def format_value(self, value: Any) -> FieldFile | None: ...  # type: ignore[override]
     @override
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     @override
@@ -256,7 +260,7 @@ class ChoiceWidget(Widget):
     @override
     def value_from_datadict(self, data: _DataT, files: _FilesT, name: str) -> Any: ...
     @override
-    def format_value(self, value: Any) -> list[str]: ...  # type: ignore[override]
+    def format_value(self, value: Any) -> list[str]: ...
 
 class Select(ChoiceWidget):
     input_type: str | None
@@ -272,6 +276,7 @@ class Select(ChoiceWidget):
 
 class NullBooleanSelect(Select):
     def __init__(self, attrs: _OptAttrs | None = None) -> None: ...
+    # NullBooleanSelect.format_value violates the Liskov substitution principle
     @override
     def format_value(self, value: Any) -> str: ...  # type: ignore[override]
     @override
@@ -374,7 +379,7 @@ class SelectDateWidget(Widget):
     @override
     def get_context(self, name: str, value: Any, attrs: _OptAttrs | None) -> dict[str, Any]: ...
     @override
-    def format_value(self, value: Any) -> dict[str, str | int | None]: ...  # type: ignore[override]
+    def format_value(self, value: Any) -> dict[str, str | int | None]: ...
     @override
     def id_for_label(self, id_: str) -> str: ...
     @override
