@@ -1,6 +1,6 @@
 [project]
 name = "django-stubs"
-version = "6.1.0"
+version = "6.1.1"
 description = "Mypy stubs for Django"
 readme = "README.md"
 license = "MIT"
