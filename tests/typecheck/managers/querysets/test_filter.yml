@@ -428,3 +428,41 @@
                 class User(models.Model):
                     username = models.CharField(max_length=100)
                     age = models.IntegerField()
+-   case: transform_then_lookup_uses_transform_output_type
+    main: |
+        from datetime import date
+
+        from myapp.models import Event
+
+        def by_int_years(years: list[int]) -> None:
+            # `year` transform outputs an int, so lookups on it expect ints
+            Event.objects.filter(start_date__year__in=years)
+            Event.objects.filter(start_date__year__exact=2000)
+
+        def by_date_years(years: list[date]) -> None:
+            Event.objects.filter(start_date__year__in=years)  # E: Incompatible type for lookup 'start_date__year__in': (got "list[date]", expected "Iterable[str | int]")  [misc]
+
+        Event.objects.filter(start_date__year__in=range(5))
+        Event.objects.filter(start_date__year__in=123)  # E: Incompatible type for lookup 'start_date__year__in': (got "int", expected "Iterable[str | int]")  [misc]
+
+        def by_date(day: date) -> None:
+            Event.objects.filter(start_date__year__exact=day)  # E: Incompatible type for lookup 'start_date__year__exact': (got "date", expected "str | int")  [misc]
+
+        def by_days(days: list[date]) -> None:
+            # `date` truncates a datetime, so `created_at__date` outputs a date again
+            Event.objects.filter(created_at__date__in=days)
+
+        def by_numbers(numbers: list[int]) -> None:
+            Event.objects.filter(created_at__date__in=numbers)  # E: Incompatible type for lookup 'created_at__date__in': (got "list[int]", expected "Iterable[str | date]")  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Event(models.Model):
+                    start_date = models.DateField()
+                    created_at = models.DateTimeField()
+

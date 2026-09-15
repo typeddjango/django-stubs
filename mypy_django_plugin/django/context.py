@@ -570,6 +570,19 @@ class DjangoContext:
                 # unknown lookup
                 return AnyType(TypeOfAny.explicit)
 
+            # The lookup chain may contain intermediate transforms, e.g. 'year' in
+            # 'start_date__year__in'. The expected type must be resolved against the
+            # transform's output field rather than the original one, otherwise a
+            # DateField 'year' transform would incorrectly expect 'date' values
+            # instead of 'int'. If any transform in the chain cannot be resolved
+            # to a concrete output field, keep the original field as a fallback.
+            for transform_name in lookup_parts[:-1]:
+                transform_cls = field.get_transform(transform_name) if isinstance(field, Field) else None
+                output_field = getattr(transform_cls, "output_field", None)
+                if not isinstance(output_field, Field):
+                    break
+                field = output_field
+
         if lookup_cls is None or issubclass(lookup_cls, Exact):
             return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
 
