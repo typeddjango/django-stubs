@@ -465,4 +465,3 @@
                 class Event(models.Model):
                     start_date = models.DateField()
                     created_at = models.DateTimeField()
-
