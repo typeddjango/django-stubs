@@ -14,7 +14,7 @@ class EmailBackend(BaseEmailBackend):
     password: str
     use_tls: bool
     use_ssl: bool
-    timeout: int | None
+    timeout: float | None
     ssl_keyfile: StrOrBytesPath | None
     ssl_certfile: StrOrBytesPath | None
     connection: smtplib.SMTP_SSL | smtplib.SMTP | None
@@ -28,7 +28,7 @@ class EmailBackend(BaseEmailBackend):
         use_tls: bool | None = None,
         fail_silently: bool = False,
         use_ssl: bool | None = None,
-        timeout: int | None = None,
+        timeout: float | None = None,
         ssl_keyfile: StrOrBytesPath | None = None,
         ssl_certfile: StrOrBytesPath | None = None,
         **kwargs: Any,
