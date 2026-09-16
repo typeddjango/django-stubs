@@ -438,6 +438,8 @@
             # `year` transform outputs an int, so lookups on it expect ints
             Event.objects.filter(start_date__year__in=years)
             Event.objects.filter(start_date__year__exact=2000)
+            # a bare transform lookup (`__year`) is the same as `__year__exact`
+            Event.objects.filter(start_date__year=2000)
 
         def by_date_years(years: list[date]) -> None:
             Event.objects.filter(start_date__year__in=years)  # E: Incompatible type for lookup 'start_date__year__in': (got "list[date]", expected "Iterable[str | int]")  [misc]
