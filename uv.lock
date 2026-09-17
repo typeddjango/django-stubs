@@ -398,7 +398,7 @@ dev = [
     { name = "django", marker = "python_full_version >= '3.12'", specifier = "==6.1.1" },
     { name = "django-stubs", extras = ["compatible-mypy", "oracle", "redis"], editable = "." },
     { name = "jinja2", specifier = "==3.1.6" },
-    { name = "mysqlclient", specifier = "==2.2.8" },
+    { name = "mysqlclient", specifier = "==2.3.0" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.3.5" },
     { name = "psycopg2-binary" },
     { name = "psycopg2-binary", specifier = "==2.9.13" },
@@ -421,7 +421,7 @@ tests = [
     { name = "django", marker = "python_full_version >= '3.12'", specifier = "==6.1.1" },
     { name = "django-stubs", extras = ["compatible-mypy", "oracle", "redis"], editable = "." },
     { name = "jinja2", specifier = "==3.1.6" },
-    { name = "mysqlclient", specifier = "==2.2.8" },
+    { name = "mysqlclient", specifier = "==2.3.0" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.3.5" },
     { name = "psycopg2-binary", specifier = "==2.9.13" },
     { name = "pytest", specifier = "==9.1.1" },
@@ -769,15 +769,24 @@ wheels = [
 
 [[package]]
 name = "mysqlclient"
-version = "2.2.8"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/eb/b0/9df076488cb2e536d40ce6dbd4273c1f20a386e31ffe6e7cb613902b3c2a/mysqlclient-2.2.8.tar.gz", hash = "sha256:8ed20c5615a915da451bb308c7d0306648a4fd9a2809ba95c992690006306199", size = 92287, upload-time = "2026-02-10T10:58:37.405Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/8f/b9488795d21a76c1520905feba5afb6233f16510797a28b51f2b2688c93e/mysqlclient-2.3.0.tar.gz", hash = "sha256:bea8294964266f6486f1ca514ccfcdbc54d4fe0d32882b38c1d4594df870be8b", size = 102185, upload-time = "2026-09-14T15:38:30.784Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/f6/6253d116c024aeb11fb193ad14e2bae2bd3380690e885028abf798b1b0b4/mysqlclient-2.2.8-cp311-cp311-win_amd64.whl", hash = "sha256:60c9ed339dc09e3d5380cc2a9f42e86754fee25a661ced77a02df77990664c92", size = 206875, upload-time = "2026-02-10T10:58:42.223Z" },
-    { url = "https://files.pythonhosted.org/packages/db/1f/7d6b3fbfc8a317805fdb8bbfbc23af99f2090497090e82513daf491a29ce/mysqlclient-2.2.8-cp312-cp312-win_amd64.whl", hash = "sha256:000c7ec3d11e7c411db832e4cfcd7f05db47464326381f5d5ae991b4bb572f93", size = 207171, upload-time = "2026-02-10T10:58:39.827Z" },
-    { url = "https://files.pythonhosted.org/packages/e6/d5/76e369b0fdccd2eb9ed7d890e4e3e23aa1344fea62f0180d7f1574285e54/mysqlclient-2.2.8-cp313-cp313-win_amd64.whl", hash = "sha256:a81f5e12f8d05439709cb02fba97f9f76d1a6c528164f2260d8798fec969e300", size = 207158, upload-time = "2026-02-10T10:58:38.663Z" },
-    { url = "https://files.pythonhosted.org/packages/42/44/6ae21b4e8490eb5167d04fa7452c462ffd72a502b96bf531477ef044a380/mysqlclient-2.2.8-cp314-cp314-win_amd64.whl", hash = "sha256:9bed7c8d3b629bdc09e17fb628d5b3b0a5fd1f12b09432b464b9126c727bedc0", size = 211644, upload-time = "2026-02-10T10:58:45.022Z" },
-    { url = "https://files.pythonhosted.org/packages/66/e5/037d55623be9f681236e04abe12e1290847c06bd48270c3f19ac33493cbf/mysqlclient-2.2.8-cp314-cp314t-win_amd64.whl", hash = "sha256:260cce0e81446c83bf0a389e0fae38d68547d9f8fc0833bc733014e10ce28a99", size = 213067, upload-time = "2026-02-10T10:58:43.389Z" },
+    { url = "https://files.pythonhosted.org/packages/bd/9a/49c257f71e187f37ec24cc4a7c071b1788a819054ee3b3133332c074b2cb/mysqlclient-2.3.0-cp311-cp311-win_amd64.whl", hash = "sha256:6a691aab1a6d22fb04aa08977ced9ecf0c1c781d0d985f7814972c3626db9390", size = 217316, upload-time = "2026-09-14T15:38:15.847Z" },
+    { url = "https://files.pythonhosted.org/packages/87/91/cdf42e08f3188ec4efb5e89883afb78cda3db50cd68616bce5814a27b769/mysqlclient-2.3.0-cp311-cp311-win_arm64.whl", hash = "sha256:8b3a5ebc0a2983bc252116dd132ab4c746085fa727b5c98c09edcda09dc09d0f", size = 208447, upload-time = "2026-09-14T15:38:16.867Z" },
+    { url = "https://files.pythonhosted.org/packages/61/48/5474ffb47d1f27600737ae6b4860fc4bbc17b7e7f1dec9b8b765a75d66e5/mysqlclient-2.3.0-cp312-cp312-win_amd64.whl", hash = "sha256:effb81eb6d1f1df6c1d95f63f117bec5007e9c64487e9fa17d5696f2a5338358", size = 217531, upload-time = "2026-09-14T15:38:17.871Z" },
+    { url = "https://files.pythonhosted.org/packages/a3/37/9205f687a60196e77d9bc4dd94fdb3c88a24b5cb920fdaf1acf363791bdd/mysqlclient-2.3.0-cp312-cp312-win_arm64.whl", hash = "sha256:7c3c4b3edcc7dc50d23fb5634e0e82bce8ab7de5b83d03fddc1c9979c18607a4", size = 208548, upload-time = "2026-09-14T15:38:18.884Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/12/cf11b4df3ee7ca9957487a5e4c99f33611119b086b1d94e14a2ceb21797e/mysqlclient-2.3.0-cp313-cp313-win_amd64.whl", hash = "sha256:60365cce6765b94eeb621aa0f9505044ec9b4ea191cd68500f0a35b2d6d2758b", size = 217521, upload-time = "2026-09-14T15:38:19.87Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/ed/4ef9c56dd78a5b6f4ede1574629e532e3f2b97bdd764a6d172fb7ed20fc4/mysqlclient-2.3.0-cp313-cp313-win_arm64.whl", hash = "sha256:a6beb9ca67a9224ff4b45f7f9118f0932038fa38d59ca2e38ae35b5225984d7d", size = 208546, upload-time = "2026-09-14T15:38:21.073Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/5f/f62d1263a942e97ca34ea8bf151c13a638fea7a5a544aa9db3d6dad7671d/mysqlclient-2.3.0-cp314-cp314-win_amd64.whl", hash = "sha256:5d4c53eb9c5625dd68b6fed32c8cf00ba19cd1c3073645dec309a9d16bd029e2", size = 222543, upload-time = "2026-09-14T15:38:22.036Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/e5/1de3e1fc27009a6da30a52167e98f52ab4277d089eaff7152f6156745af9/mysqlclient-2.3.0-cp314-cp314-win_arm64.whl", hash = "sha256:cfe14103280d5a4968fe8a3ace2a8939ef68a1d881aec9872d06746106b49f7f", size = 213120, upload-time = "2026-09-14T15:38:23.063Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/ea/d7ebc53af9d3341e5c049795ec5e88946d83cbd26ee468475ae0c3b21d7f/mysqlclient-2.3.0-cp314-cp314t-win_amd64.whl", hash = "sha256:673891700dafbc66a6a8df12059b53a65905ec6e8dec615392fb984299880c0d", size = 222969, upload-time = "2026-09-14T15:38:24.168Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/42/9ff798c066e33df9f7b58822a3eaf26185c3cb7e61a8186a56243b006066/mysqlclient-2.3.0-cp314-cp314t-win_arm64.whl", hash = "sha256:fe27c63ba9088b28467bf276f93f0b4a9062beabaeeb9692593e774d1146cce2", size = 213680, upload-time = "2026-09-14T15:38:25.259Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/0f/29185111b7c0dd264e910c1250f2fd9a452ebad7fb272e750d8ffb18e67c/mysqlclient-2.3.0-cp315-cp315-win_amd64.whl", hash = "sha256:3c601984c286c51080e0d3e9a857bc014713e6338b5f9c0a5df453a341b14022", size = 222537, upload-time = "2026-09-14T15:38:26.308Z" },
+    { url = "https://files.pythonhosted.org/packages/32/7b/4a050453adb5d07ee5f979f17409f93be545baae786dd58698f82b08a3e1/mysqlclient-2.3.0-cp315-cp315-win_arm64.whl", hash = "sha256:3d39527a5525b4ebff99721d063f4fe9e459b9e437c7b7698374966d92d4355d", size = 213112, upload-time = "2026-09-14T15:38:27.329Z" },
+    { url = "https://files.pythonhosted.org/packages/a2/13/a046e9df6d69778b7de66f3d2ad83e563045992959efafb7b2ef62af0560/mysqlclient-2.3.0-cp315-cp315t-win_amd64.whl", hash = "sha256:24164ba592065ae5ff0149bb5707d05772335935059474fb75d864e5d0f94d63", size = 222969, upload-time = "2026-09-14T15:38:28.468Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/13/cf40c2957bebe95fa109feb8a28fe0871ba4bd5e37c77b6128114ec20712/mysqlclient-2.3.0-cp315-cp315t-win_arm64.whl", hash = "sha256:f1ec49f73dad7df8f2da4d9de0f875f03c8bd44fbe77878522204c0646822f63", size = 213723, upload-time = "2026-09-14T15:38:29.69Z" },
 ]
 
 [[package]]
