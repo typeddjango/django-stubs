@@ -18,7 +18,7 @@ def action(
     permissions: Sequence[str] | None = ...,
     description: _StrOrPromise | None = ...,
     description_plural: _StrOrPromise | None = ...,
-    location: ActionLocation = ...,
+    location: ActionLocation | Sequence[ActionLocation] = ...,
 ) -> _F: ...
 @overload
 def action(
@@ -27,7 +27,7 @@ def action(
     permissions: Sequence[str] | None = ...,
     description: _StrOrPromise | None = ...,
     description_plural: _StrOrPromise | None = ...,
-    location: ActionLocation = ...,
+    location: ActionLocation | Sequence[ActionLocation] = ...,
 ) -> Callable[[_F], _F]: ...
 @overload
 def display(
