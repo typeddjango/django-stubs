@@ -65,7 +65,7 @@ class TestForm(forms.Form):
         FIRST = 1, "bar"
         SECOND = 2, "bar"
 
-    char1 = forms.ChoiceField(choices=TextChoices)
+    char1 = forms.ChoiceField(choices=TextChoices)  # ty: ignore[invalid-argument-type]
     char2 = forms.ChoiceField(choices=str_tuple)
     char3 = forms.ChoiceField(choices=str_mapping)
     char4 = forms.ChoiceField(choices=str_tuple())
@@ -75,7 +75,7 @@ class TestForm(forms.Form):
     char8 = forms.ChoiceField(choices=to_named_seq(str_tuple)())
     char9 = forms.ChoiceField(choices=to_named_mapping(str_mapping)())
 
-    int1 = forms.ChoiceField(choices=IntegerChoices)
+    int1 = forms.ChoiceField(choices=IntegerChoices)  # ty: ignore[invalid-argument-type]
     int2 = forms.ChoiceField(choices=int_tuple)
     int3 = forms.ChoiceField(choices=int_mapping)
     int4 = forms.ChoiceField(choices=int_tuple())
