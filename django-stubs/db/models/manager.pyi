@@ -180,7 +180,3 @@ class ManagerDescriptor:
 
 class EmptyManager(Manager[_T]):
     def __init__(self, model: type[_T]) -> None: ...
-    # Unlike other managers, `EmptyManager` is exposed through properties of plain classes (e.g. `AnonymousUser.groups`)
-    # where instance access is legitimate.
-    @override
-    def __get__(self, instance: object, cls: type[Any] | None = None) -> Self: ...
