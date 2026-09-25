@@ -31,6 +31,7 @@ from mypy.nodes import (
 from mypy.types import (
     AnyType,
     CallableType,
+    ExtraAttrs,
     Instance,
     LiteralType,
     ProperType,
@@ -728,6 +729,14 @@ def _get_selected_fields_from_queryset_type(qs_type: Instance) -> set[str] | Non
     return None
 
 
+_DISTINCT_FIELD_ATTR_PREFIX = "__distinct_field__:"
+
+
+def _is_distinct_on_field(qs_type: Instance, field_name: str) -> bool:
+    # mirrors Django's in_bulk() carve-out: self.query.distinct_fields != (field_name,)
+    return bool(qs_type.extra_attrs and f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_name}" in qs_type.extra_attrs.attrs)
+
+
 def _get_annotated_fields_from_queryset_type(qs_type: Instance) -> set[str]:
     """
     Derive annotated field names from a QuerySet type.
@@ -1239,7 +1248,8 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
     selected_fields = _get_selected_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else None
     annotated_fields = _get_annotated_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else set()
 
-    for lookup_value in _extract_field_names_from_varargs(ctx):
+    field_lookups = _extract_field_names_from_varargs(ctx)
+    for lookup_value in field_lookups:
         parts = lookup_value.split(LOOKUP_SEP)
         if parts[0] in annotated_fields:
             # Skip validation for annotated fields
@@ -1248,6 +1258,22 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
             # Skip validation for fields selected via values()/values_list()
             continue
         _validate_lookup(ctx, django_model.cls, parts)
+
+    # tag with the distinct field for _is_distinct_on_field, replacing any earlier tag
+    # (Django replaces distinct_fields on each call rather than accumulating them)
+    default_return_type = get_proper_type(ctx.default_return_type)
+    if isinstance(default_return_type, Instance):
+        existing = default_return_type.extra_attrs
+        existing_attrs = existing.attrs if existing else {}
+        attrs = {k: v for k, v in existing_attrs.items() if not k.startswith(_DISTINCT_FIELD_ATTR_PREFIX)}
+        if len(field_lookups) == 1 and LOOKUP_SEP not in field_lookups[0]:
+            attrs[f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_lookups[0]}"] = AnyType(TypeOfAny.implementation_artifact)
+        if existing is None or attrs != existing.attrs:
+            tagged = default_return_type.copy_modified()
+            tagged.extra_attrs = ExtraAttrs(
+                attrs, existing.immutable.copy() if existing else None, existing.mod_name if existing else None
+            )
+            return tagged
 
     return ctx.default_return_type
 
@@ -1288,6 +1314,7 @@ def validate_in_bulk(ctx: MethodContext, django_context: DjangoContext) -> MypyT
     ):
         return ctx.default_return_type
 
-    check_field_unique(ctx, django_model.cls, field, field_name, method="in_bulk")
+    if not (isinstance(ctx.type, Instance) and _is_distinct_on_field(ctx.type, field_name)):
+        check_field_unique(ctx, django_model.cls, field, field_name, method="in_bulk")
 
     return ctx.default_return_type
