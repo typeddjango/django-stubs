@@ -17,7 +17,7 @@ repos:
         args: [--fix=lf]
       - id: check-case-conflict
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 2eeb5678de71a00c0902cbda7105d328432f72cb  # frozen: v0.16.8
+    rev: a56c0b927e6465d37cae3e97d35d4d18ab2b96cd  # frozen: v0.16.9
     hooks:
       - id: ruff-check
         args: ["--fix", "--exit-non-zero-on-fix"]
@@ -28,7 +28,7 @@ repos:
       - id: codespell
         args: ["-w"]
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 17a6b18b8006d390e476d419631aae885cadfa40  # frozen: 0.12.17
+    rev: 2aeb804518b4373dbf5adb8dddc5466d9a6e6b21  # frozen: 0.12.19
     hooks:
       - id: uv-lock
 
