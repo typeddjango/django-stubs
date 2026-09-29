@@ -39,6 +39,8 @@
 
         # accept arbitrary kwargs
         MyUser().get_next_by_date(arg1=1, arg2=2)
+
+        reveal_type(MyUser().get_next_by_date)  # N: Revealed type is "def (**kwargs: object) -> myapp.models.MyUser"
     installed_apps:
         - myapp
     files:
