@@ -681,14 +681,15 @@ class AddExtraFieldMethods(ModelClassInitializer):
         for field in self.django_context.get_model_fields(model_cls):
             if isinstance(field, DateField | DateTimeField) and not field.null:
                 return_type = helpers.model_instance(self.model_classdef.info)
+                kwargs_type = self.api.named_type("builtins.object")
                 add_method_to_class(
                     self.api,
                     self.model_classdef,
                     name=f"get_next_by_{field.attname}",
                     args=[
                         Argument(
-                            Var("kwargs", AnyType(TypeOfAny.implementation_artifact)),
-                            AnyType(TypeOfAny.implementation_artifact),
+                            Var("kwargs", kwargs_type),
+                            kwargs_type,
                             initializer=None,
                             kind=ARG_STAR2,
                         )
@@ -701,8 +702,8 @@ class AddExtraFieldMethods(ModelClassInitializer):
                     name=f"get_previous_by_{field.attname}",
                     args=[
                         Argument(
-                            Var("kwargs", AnyType(TypeOfAny.implementation_artifact)),
-                            AnyType(TypeOfAny.implementation_artifact),
+                            Var("kwargs", kwargs_type),
+                            kwargs_type,
                             initializer=None,
                             kind=ARG_STAR2,
                         )
