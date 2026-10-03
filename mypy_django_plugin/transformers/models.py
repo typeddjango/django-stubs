@@ -25,7 +25,18 @@ from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.typeanal import TypeAnalyser
-from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, TypeVarType, get_proper_type
+from mypy.types import (
+    AnyType,
+    Instance,
+    ProperType,
+    ReadOnlyType,
+    RequiredType,
+    TypedDictType,
+    TypeOfAny,
+    TypeType,
+    TypeVarType,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
 from typing_extensions import override
 
@@ -1145,7 +1156,10 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
     args = ctx.type.args
     if not args:
         return AnyType(TypeOfAny.from_omitted_generics) if is_with_annotations else ctx.type
-    type_arg = get_proper_type(ctx.api.analyze_type(args[0]))
+    analyzed_first_arg = ctx.api.analyze_type(args[0])
+    if isinstance(analyzed_first_arg, (RequiredType, ReadOnlyType)):
+        return analyzed_first_arg
+    type_arg = get_proper_type(analyzed_first_arg)
     if not isinstance(type_arg, Instance) or not helpers.is_model_type(type_arg.type):
         if isinstance(type_arg, TypeVarType):
             # When the first arg is a TypeVar bounded by a Model (e.g. WithAnnotations[_Model, BarDict]),

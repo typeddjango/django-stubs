@@ -30,3 +30,15 @@
                 from django.db import models
                 class Blog(models.Model):
                     text = models.CharField(max_length=100)
+
+
+# Regression test for #3658
+-   case: annotated_notrequired_typeddict_field
+    main: |
+        from typing_extensions import Annotated, NotRequired, TypedDict
+
+        def keep_last(left: list[str], right: list[str]) -> list[str]:
+            return right
+
+        class State(TypedDict):
+            items: Annotated[NotRequired[list[str]], keep_last]
