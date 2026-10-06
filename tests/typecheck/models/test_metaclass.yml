@@ -225,3 +225,50 @@
               class Other(MyModel): ...
               class This(MyModel):
                   field = models.ForeignKey(Other, on_delete=models.CASCADE)
+
+-   case: test_generic_model_with_type_variable_bound_to_forward_reference
+    main: |
+        from myapp.models import Something
+    installed_apps:
+        - myapp
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from abc import ABCMeta, abstractmethod
+
+              from django.db import models
+              from django.db.models.base import ModelBase
+
+              class AbstractModelMeta(ABCMeta, ModelBase): ...
+
+              class SomeClass[T: "Something"](models.Model, metaclass=AbstractModelMeta):
+                  @abstractmethod
+                  def send_something(self) -> None: ...
+
+              class Something(models.Model): ...
+
+-   case: test_generic_model_with_old_style_type_variable_bound_to_forward_reference
+    main: |
+        from myapp.models import Something
+    installed_apps:
+        - myapp
+    files:
+        - path: myapp/__init__.py
+        - path: myapp/models.py
+          content: |
+              from abc import ABCMeta, abstractmethod
+              from typing import Generic, TypeVar
+
+              from django.db import models
+              from django.db.models.base import ModelBase
+
+              T = TypeVar("T", bound="Something")
+
+              class AbstractModelMeta(ABCMeta, ModelBase): ...
+
+              class SomeClass(models.Model, Generic[T], metaclass=AbstractModelMeta):
+                  @abstractmethod
+                  def send_something(self) -> None: ...
+
+              class Something(models.Model): ...
