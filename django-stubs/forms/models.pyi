@@ -126,7 +126,9 @@ class BaseModelFormSet(BaseFormSet[_ModelFormT], AltersData, Generic[_M, _ModelF
         queryset: QuerySet[_M] | None = None,
         *,
         initial: Sequence[dict[str, Any]] | None = None,
-        **kwargs: Any,
+        error_class: type[ErrorList] = ...,
+        form_kwargs: dict[str, Any] | None = None,
+        error_messages: Mapping[str, str] | None = None,
     ) -> None: ...
     @override
     def initial_form_count(self) -> int: ...
