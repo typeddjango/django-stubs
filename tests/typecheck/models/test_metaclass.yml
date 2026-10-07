@@ -227,7 +227,7 @@
                   field = models.ForeignKey(Other, on_delete=models.CASCADE)
 
 -   case: test_generic_model_with_type_variable_bound_to_forward_reference
-    skip: __import__("sys").version_info < (3, 12)
+    skip: sys.version_info < (3, 12)
     main: |
         from typing_extensions import reveal_type
         from myapp.models import Something, SomeClass
