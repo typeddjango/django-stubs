@@ -1247,6 +1247,7 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
     selected_fields = _get_selected_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else None
     annotated_fields = _get_annotated_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else set()
 
+    raw_arg_count = len(ctx.arg_types[0]) if ctx.arg_types and ctx.arg_types[0] else 0
     field_lookups = _extract_field_names_from_varargs(ctx)
     for lookup_value in field_lookups:
         parts = lookup_value.split(LOOKUP_SEP)
@@ -1264,7 +1265,7 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
         existing = default_return_type.extra_attrs
         new_attrs = (
             {f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_lookups[0]}": AnyType(TypeOfAny.implementation_artifact)}
-            if len(field_lookups) == 1 and LOOKUP_SEP not in field_lookups[0]
+            if raw_arg_count == 1 and len(field_lookups) == 1 and LOOKUP_SEP not in field_lookups[0]
             else None
         )
         updated = helpers.merge_extra_attrs(existing, new_attrs=new_attrs, drop_prefix=_DISTINCT_FIELD_ATTR_PREFIX)

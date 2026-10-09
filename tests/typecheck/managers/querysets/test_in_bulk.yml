@@ -87,6 +87,9 @@
         # A non-literal (Any) distinct() argument can't be tracked, so it excuses nothing.
         distinct_field: Any = "title"
         Article.objects.distinct(distinct_field).in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # A literal plus a non-literal is still two distinct fields at runtime, not one.
+        Article.objects.distinct("title", distinct_field).in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
