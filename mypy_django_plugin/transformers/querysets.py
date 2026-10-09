@@ -31,7 +31,6 @@ from mypy.nodes import (
 from mypy.types import (
     AnyType,
     CallableType,
-    ExtraAttrs,
     Instance,
     LiteralType,
     ProperType,
@@ -1263,15 +1262,15 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
     default_return_type = get_proper_type(ctx.default_return_type)
     if isinstance(default_return_type, Instance):
         existing = default_return_type.extra_attrs
-        existing_attrs = existing.attrs if existing else {}
-        attrs = {k: v for k, v in existing_attrs.items() if not k.startswith(_DISTINCT_FIELD_ATTR_PREFIX)}
-        if len(field_lookups) == 1 and LOOKUP_SEP not in field_lookups[0]:
-            attrs[f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_lookups[0]}"] = AnyType(TypeOfAny.implementation_artifact)
-        if existing is None or attrs != existing.attrs:
+        new_attrs = (
+            {f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_lookups[0]}": AnyType(TypeOfAny.implementation_artifact)}
+            if len(field_lookups) == 1 and LOOKUP_SEP not in field_lookups[0]
+            else None
+        )
+        updated = helpers.merge_extra_attrs(existing, new_attrs=new_attrs, drop_prefix=_DISTINCT_FIELD_ATTR_PREFIX)
+        if existing is None or updated.attrs != existing.attrs:
             tagged = default_return_type.copy_modified()
-            tagged.extra_attrs = ExtraAttrs(
-                attrs, existing.immutable.copy() if existing else None, existing.mod_name if existing else None
-            )
+            tagged.extra_attrs = updated
             return tagged
 
     return ctx.default_return_type
