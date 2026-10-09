@@ -241,6 +241,9 @@ class DjangoContext:
                 ) or self.get_field_set_type(api, field, method=method)
                 expected_types[field_name] = field_set_type
 
+                if field.name != field_name and not isinstance(field, ForeignKey):
+                    expected_types.setdefault(field.name, AnyType(TypeOfAny.unannotated))
+
                 if isinstance(field, ForeignKey):
                     field_name = field.name
                     foreign_key_info = helpers.lookup_class_typeinfo(api, field.__class__)
