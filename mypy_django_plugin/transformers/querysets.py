@@ -729,11 +729,15 @@ def _get_selected_fields_from_queryset_type(qs_type: Instance) -> set[str] | Non
 
 
 _DISTINCT_FIELD_ATTR_PREFIX: Final = "__distinct_field__:"
+_DISTINCT_FIELD_UNKNOWN_ATTR: Final = f"{_DISTINCT_FIELD_ATTR_PREFIX}*"
 
 
 def _is_distinct_on_field(qs_type: Instance, field_name: str) -> bool:
     # mirrors Django's in_bulk() carve-out: self.query.distinct_fields != (field_name,)
-    return bool(qs_type.extra_attrs and f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_name}" in qs_type.extra_attrs.attrs)
+    if not qs_type.extra_attrs:
+        return False
+    attrs = qs_type.extra_attrs.attrs
+    return _DISTINCT_FIELD_UNKNOWN_ATTR in attrs or f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_name}" in attrs
 
 
 def _get_annotated_fields_from_queryset_type(qs_type: Instance) -> set[str]:
@@ -1247,7 +1251,8 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
     selected_fields = _get_selected_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else None
     annotated_fields = _get_annotated_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else set()
 
-    raw_arg_count = len(ctx.arg_types[0]) if ctx.arg_types and ctx.arg_types[0] else 0
+    raw_arg_types = ctx.arg_types[0] if ctx.arg_types and ctx.arg_types[0] else []
+    raw_arg_count = len(raw_arg_types)
     field_lookups = _extract_field_names_from_varargs(ctx)
     for lookup_value in field_lookups:
         parts = lookup_value.split(LOOKUP_SEP)
@@ -1263,11 +1268,14 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
     default_return_type = get_proper_type(ctx.default_return_type)
     if isinstance(default_return_type, Instance):
         existing = default_return_type.extra_attrs
-        new_attrs = (
-            {f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_lookups[0]}": AnyType(TypeOfAny.implementation_artifact)}
-            if raw_arg_count == 1 and len(field_lookups) == 1 and LOOKUP_SEP not in field_lookups[0]
-            else None
-        )
+        new_attrs: dict[str, MypyType] | None = None
+        if raw_arg_count == 1 and len(field_lookups) == 1 and LOOKUP_SEP not in field_lookups[0]:
+            new_attrs = {f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_lookups[0]}": AnyType(TypeOfAny.implementation_artifact)}
+        elif raw_arg_count == 1 and not field_lookups and isinstance(get_proper_type(raw_arg_types[0]), AnyType):
+            # An Any-typed distinct() argument could be anything at runtime, including the one
+            # field being checked - mypy's convention is not to flag errors that hinge solely on
+            # an unknowable Any value.
+            new_attrs = {_DISTINCT_FIELD_UNKNOWN_ATTR: AnyType(TypeOfAny.implementation_artifact)}
         updated = helpers.merge_extra_attrs(existing, new_attrs=new_attrs, drop_prefix=_DISTINCT_FIELD_ATTR_PREFIX)
         if existing is None or updated.attrs != existing.attrs:
             tagged = default_return_type.copy_modified()
