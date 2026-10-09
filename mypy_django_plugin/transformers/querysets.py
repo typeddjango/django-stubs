@@ -1272,9 +1272,7 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
         if raw_arg_count == 1 and len(field_lookups) == 1 and LOOKUP_SEP not in field_lookups[0]:
             new_attrs = {f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_lookups[0]}": AnyType(TypeOfAny.implementation_artifact)}
         elif raw_arg_count == 1 and not field_lookups and isinstance(get_proper_type(raw_arg_types[0]), AnyType):
-            # An Any-typed distinct() argument could be anything at runtime, including the one
-            # field being checked - mypy's convention is not to flag errors that hinge solely on
-            # an unknowable Any value.
+            # Any could be the field being checked - don't flag errors hinging on an unknowable value.
             new_attrs = {_DISTINCT_FIELD_UNKNOWN_ATTR: AnyType(TypeOfAny.implementation_artifact)}
         updated = helpers.merge_extra_attrs(existing, new_attrs=new_attrs, drop_prefix=_DISTINCT_FIELD_ATTR_PREFIX)
         if existing is None or updated.attrs != existing.attrs:
