@@ -54,6 +54,7 @@
     installed_apps:
         - myapp
     main: |
+        from typing import Any
         from myapp.models import Article
         from django.db.models import F
 
@@ -82,6 +83,10 @@
 
         # A later distinct() call replaces the fields, not merges - the earlier "title" no longer applies.
         Article.objects.distinct("title").distinct("category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # A non-literal (Any) distinct() argument can't be tracked, so it excuses nothing.
+        distinct_field: Any = "title"
+        Article.objects.distinct(distinct_field).in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
