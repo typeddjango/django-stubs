@@ -118,7 +118,7 @@ def freestanding_action_file_response(
 
 @admin.register(ActionModel)
 class ActionModelAdmin(admin.ModelAdmin[ActionModel]):
-    actions = [  # pyrefly: ignore[bad-assignment]
+    actions = [  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
         freestanding_action_bare,
         freestanding_action_fancy,
         "method_action_bare",
