@@ -29,7 +29,7 @@ class CustomCommonMiddleware(CommonMiddleware):
 
 
 class BrokenCustomCommonMiddleware(CommonMiddleware):
-    response_redirect_class = FileResponse  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
+    response_redirect_class = FileResponse  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
 
 
 class CustomLocaleMiddleware(LocaleMiddleware):
@@ -37,7 +37,7 @@ class CustomLocaleMiddleware(LocaleMiddleware):
 
 
 class BrokenCustomLocaleMiddleware(CommonMiddleware):
-    response_redirect_class = FileResponse  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
+    response_redirect_class = FileResponse  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
 
 
 class CustomRedirectFallbackMiddleware(RedirectFallbackMiddleware):
@@ -51,8 +51,8 @@ class CustomRedirectFallbackMiddleware2(RedirectFallbackMiddleware):
 
 
 class BrokenCustomRedirectFallbackMiddleware(RedirectFallbackMiddleware):
-    response_redirect_class = HttpResponse  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
-    response_gone_class = 12  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
+    response_redirect_class = HttpResponse  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
+    response_gone_class = 12  # type:ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
 
 
 class ResponseGoneFallbackMiddleware(RedirectFallbackMiddleware):

@@ -84,7 +84,7 @@ class FullModelAdmin(admin.ModelAdmin[FullAdminModel]):
     delete_selected_confirmation_template = "template"
     object_history_template = "template"
     popup_response_template = "template"
-    actions = (full_admin_action, "a_method_action")  # pyrefly: ignore[bad-assignment]
+    actions = (full_admin_action, "a_method_action")  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
     actions_on_top = True
     actions_on_bottom = False
     actions_selection_counter = True
@@ -133,21 +133,21 @@ class ViewOnSiteCallableAdmin(admin.ModelAdmin[Any]):
 
 
 class MissingFieldsetFieldsAdmin(admin.ModelAdmin[Any]):
-    fieldsets = [
-        (None, {}),  # type: ignore[typeddict-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-typed-dict-key]
+    fieldsets = [  # ty: ignore[invalid-assignment]
+        (None, {}),  # type: ignore[typeddict-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-typed-dict-key]  # ty: ignore[missing-typed-dict-key]
     ]
 
 
 class InvalidRadioFieldsValueAdmin(admin.ModelAdmin[Any]):
-    radio_fields = {"some_field": 0}  # type: ignore[dict-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
+    radio_fields = {"some_field": 0}  # type: ignore[dict-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
 
 
 class InvalidRadioFieldsKeyAdmin(admin.ModelAdmin[Any]):
-    radio_fields = {1: admin.VERTICAL}  # type: ignore[dict-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
+    radio_fields = {1: admin.VERTICAL}  # type: ignore[dict-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
 
 
 class InvalidFormfieldOverridesAdmin(admin.ModelAdmin[Any]):
-    formfield_overrides = {
+    formfield_overrides = {  # ty: ignore[invalid-assignment]
         "not a field": {  # type: ignore[dict-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
             "widget": Textarea,
         }
@@ -162,7 +162,7 @@ def invalid_action(modeladmin: None) -> None:
 
 
 class InvalidActionSignatureAdmin(admin.ModelAdmin[InvalidActionSignatureModel]):
-    actions = [invalid_action]  # type: ignore[list-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
+    actions = [invalid_action]  # type: ignore[list-item]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
 
 
 class InvalidGenericModel(models.Model):
@@ -170,7 +170,7 @@ class InvalidGenericModel(models.Model):
 
 
 class InvalidGenericModelAdmin(admin.ModelAdmin[InvalidGenericModel]):
-    model = int  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]
+    model = int  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
 
 
 class InlineParentModel(models.Model):
@@ -223,4 +223,4 @@ class ActionAdmin(admin.ModelAdmin[ValidActionModel]):
 
     # Normally a method would be passed by name as a string, but defining `actions` after the
     # method makes it possible to ensure that it is typed correctly.
-    actions = [valid_action_function, valid_action_method]
+    actions = [valid_action_function, valid_action_method]  # ty: ignore[invalid-assignment]
