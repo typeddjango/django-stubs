@@ -2,7 +2,7 @@
     installed_apps:
         - myapp
     main: |
-        from typing import Any
+        from typing import Any, Final, Literal
         from myapp.models import Article
 
         # Default (no field_name — uses pk)
@@ -35,6 +35,12 @@
         # A single Any-typed distinct() argument could be any field, including this one.
         distinct_field: Any = "title"
         Article.objects.distinct(distinct_field).in_bulk(field_name="title")
+
+        # Final/Literal-typed arguments are still resolvable to a literal, same as a plain string.
+        TITLE_FIELD: Final = "title"
+        Article.objects.distinct(TITLE_FIELD).in_bulk(field_name="title")
+        literal_field: Literal["title"] = "title"
+        Article.objects.distinct(literal_field).in_bulk(field_name="title")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
