@@ -721,15 +721,20 @@ def merge_extra_attrs(
     *,
     new_attrs: dict[str, MypyType] | None = None,
     new_immutable: set[str] | None = None,
+    drop_prefix: str | None = None,
 ) -> ExtraAttrs:
     """
     Create a new `ExtraAttrs` by merging new attributes/immutable fields into a base.
 
     If base_extra_attrs is None, creates a fresh ExtraAttrs with only the new values.
+    `drop_prefix`, if given, removes existing attrs whose key starts with it before merging in new_attrs.
     """
     if base_extra_attrs:
+        attrs = base_extra_attrs.attrs
+        if drop_prefix is not None:
+            attrs = {k: v for k, v in attrs.items() if not k.startswith(drop_prefix)}
         return ExtraAttrs(
-            attrs={**base_extra_attrs.attrs, **new_attrs} if new_attrs is not None else base_extra_attrs.attrs.copy(),
+            attrs={**attrs, **new_attrs} if new_attrs is not None else attrs.copy(),
             immutable=(
                 base_extra_attrs.immutable | new_immutable
                 if new_immutable is not None

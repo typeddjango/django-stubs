@@ -2,6 +2,7 @@
     installed_apps:
         - myapp
     main: |
+        from typing import Any, Final, Literal
         from myapp.models import Article
 
         # Default (no field_name — uses pk)
@@ -27,6 +28,19 @@
         # Async variant with valid field
         async def test_async() -> None:
             await Article.objects.ain_bulk(field_name="slug")
+
+        # Non-unique, but already distinct() on exactly this field - allowed at runtime.
+        Article.objects.distinct("title").in_bulk(field_name="title")
+
+        # A single Any-typed distinct() argument could be any field, including this one.
+        distinct_field: Any = "title"
+        Article.objects.distinct(distinct_field).in_bulk(field_name="title")
+
+        # Final/Literal-typed arguments are still resolvable to a literal, same as a plain string.
+        TITLE_FIELD: Final = "title"
+        Article.objects.distinct(TITLE_FIELD).in_bulk(field_name="title")
+        literal_field: Literal["title"] = "title"
+        Article.objects.distinct(literal_field).in_bulk(field_name="title")
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
@@ -51,6 +65,7 @@
     installed_apps:
         - myapp
     main: |
+        from typing import Any
         from myapp.models import Article
         from django.db.models import F
 
@@ -70,6 +85,20 @@
         async def test_async() -> None:
             await Article.objects.ain_bulk(field_name="nonexistent")  # E: Article has no field named 'nonexistent'  [misc]
             await Article.objects.ain_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # distinct() on a *different* field doesn't excuse title's non-uniqueness
+        Article.objects.distinct("category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # Multi-field distinct() doesn't match the single-field check either.
+        Article.objects.distinct("title", "category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        # A later distinct() call replaces the fields, not merges - the earlier "title" no longer applies.
+        Article.objects.distinct("title").distinct("category").in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
+
+        distinct_field: Any = "title"
+
+        # A literal plus a non-literal is still two distinct fields at runtime, not one.
+        Article.objects.distinct("title", distinct_field).in_bulk(field_name="title")  # E: "in_bulk()"'s field_name must be a unique field but "title" isn't  [misc]
     files:
         -   path: myapp/__init__.py
         -   path: myapp/models.py
