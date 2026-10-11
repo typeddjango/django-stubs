@@ -5,6 +5,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING, Any, cast
 
 from django.db.models.fields import DateField, DateTimeField, Field
+from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToManyRel, OneToOneRel
 from mypy.nodes import (
     ARG_STAR2,
@@ -351,6 +352,23 @@ class AddRelatedModelsId(ModelClassInitializer):
                 field_info, is_set_nullable=is_nullable, is_get_nullable=is_nullable
             )
             self.add_new_var_to_model_class(field.attname, Instance(field_info, [set_type, get_type]))
+
+
+class AddCustomAttnames(ModelClassInitializer):
+    @override
+    def run_with_model_cls(self, model_cls: type[Model]) -> None:
+        for field in self.django_context.get_model_fields(model_cls):
+            # Foreign keys get their attname attribute from `AddRelatedModelsId`
+            if field.attname == field.name or isinstance(field, ForeignKey):
+                continue
+
+            field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(field.__class__)
+            is_nullable = self.django_context.get_field_nullability(field, None)
+            set_type, get_type = get_field_descriptor_types(
+                field_info, is_set_nullable=is_nullable, is_get_nullable=is_nullable
+            )
+            base_field_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.FIELD_FULLNAME)
+            self.add_new_var_to_model_class(field.attname, Instance(base_field_info, [set_type, get_type]))
 
 
 class AddManagers(ModelClassInitializer):
@@ -1122,6 +1140,7 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
         AddDefaultPrimaryKey,
         AddPrimaryKeyAlias,
         AddRelatedModelsId,
+        AddCustomAttnames,
         AddManagers,
         AddDefaultManagerAttribute,
         AddReverseLookups,
