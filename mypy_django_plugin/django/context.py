@@ -188,8 +188,8 @@ class DjangoContext:
                 if field.related_model == "self" and model_cls._meta.abstract:  # type: ignore[comparison-overlap, unreachable]
                     continue  # type: ignore[unreachable]
 
-                # A FK registers both `field.attname` (`fk_name_id`) and `field.name` (`fk_name`)
-                names = [field_name, field.name] if isinstance(field, ForeignKey) else [field_name]
+                # Accept both `field.attname` and `field.name` when they differ (`fk_name_id` and `fk_name` for a FK)
+                names = [field_name, field.name] if field_name != field.name else [field_name]
                 for name in names:
                     set_type: MypyType = helpers.get_field_set_type(api, context, model_info, name)
                     if is_init and isinstance(field, ForeignKey):
