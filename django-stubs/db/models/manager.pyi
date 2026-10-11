@@ -41,9 +41,13 @@ class BaseManager(Generic[_T]):
     def get_queryset(self) -> QuerySet[_T]: ...
     def all(self) -> QuerySet[_T]: ...
     # At runtime, managers declared on a model are wrapped in a `ManagerDescriptor` which raises on instance access.
-    # TODO: pyrefly and ty don't hold `_M` to the receiver's model and pick the banning overload for every model instance.
-    # See ty: https://github.com/astral-sh/ty/issues/2799, pyrefly: not tracked upstream yet
+    # Only access from an instance of the manager's own model is banned, so a `Manager[Category]` stays reachable
+    # from a plain class, a protocol or another model's instance. `cls: type[Model]` keeps `Manager[Any]` out of
+    # the ban when it's declared on a plain class.
+    # pyrefly and ty don't bind `_M` from the receiver, so they also ban other models' instances,
+    # see https://github.com/astral-sh/ty/issues/2799
     @overload
+    # Listed first so class access on an unparametrized manager (`_M` is `Any`) isn't banned
     def __get__(self, instance: None, cls: type[Any] | None = None) -> Self: ...
     @overload
     @deprecated("Manager isn't accessible via model instances")
