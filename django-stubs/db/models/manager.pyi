@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, NoReturn, Self, final, overload, type_check_only
+from typing import Any, Generic, Literal, NoReturn, Protocol, Self, final, overload, type_check_only
 
 from django.core.checks.messages import CheckMessage
 from django.db.models.base import Model
@@ -15,6 +15,11 @@ _M = TypeVar("_M", bound=Model)
 @type_check_only
 class _ManagerIsNotAccessibleViaInstances:
     """Managers are only reachable from the model class, e.g. `MyModel.objects` rather than `my_model.objects`."""
+
+# `_T` is covariant, so `self: BaseManager[_M]` would let `_M` widen to a union of models. This binds it exactly.
+@type_check_only
+class _HasModel(Protocol[_M]):
+    model: type[_M]
 
 class BaseManager(Generic[_T]):
     creation_counter: int
@@ -40,18 +45,14 @@ class BaseManager(Generic[_T]):
     def db(self) -> str: ...
     def get_queryset(self) -> QuerySet[_T]: ...
     def all(self) -> QuerySet[_T]: ...
-    # At runtime, managers declared on a model are wrapped in a `ManagerDescriptor` which raises on instance access.
-    # Only access from an instance of the manager's own model is banned, so a `Manager[Category]` stays reachable
-    # from a plain class, a protocol or another model's instance. `cls: type[Model]` keeps `Manager[Any]` out of
-    # the ban when it's declared on a plain class.
-    # pyrefly and ty don't bind `_M` from the receiver, so they also ban other models' instances,
-    # see https://github.com/astral-sh/ty/issues/2799
+    # Mirrors `ManagerDescriptor`: a manager is unreachable from an instance of its own model, but stays reachable
+    # from anything else (plain classes, protocols, other models' instances). An unparametrized manager solves `_M`
+    # to `Any`, so the `None` overload keeps class access reachable and `cls: type[Model]` plain-class access.
     @overload
-    # Listed first so class access on an unparametrized manager (`_M` is `Any`) isn't banned
     def __get__(self, instance: None, cls: type[Any] | None = None) -> Self: ...
     @overload
     @deprecated("Manager isn't accessible via model instances")
-    def __get__(self: BaseManager[_M], instance: _M, cls: type[Model]) -> _ManagerIsNotAccessibleViaInstances: ...
+    def __get__(self: _HasModel[_M], instance: _M, cls: type[Model]) -> _ManagerIsNotAccessibleViaInstances: ...
     @overload
     def __get__(self, instance: object, cls: type[Any] | None = None) -> Self: ...
 

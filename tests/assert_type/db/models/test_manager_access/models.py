@@ -27,7 +27,6 @@ class Post(models.Model):
 
 
 class Article(models.Model):
-    # Reverse accessors are read from model instances, so a manager typed there must stay reachable
     category_set: RelatedManager[Category]  # pyright: ignore[reportUninitializedInstanceVariable]
     loosely_typed_category_set: models.Manager[Category]  # pyright: ignore[reportUninitializedInstanceVariable]
     custom_category_set: CategoryManager  # pyright: ignore[reportUninitializedInstanceVariable]
@@ -92,10 +91,8 @@ def related_manager_access_on_instance_is_allowed() -> None:
 
 
 def manager_of_another_model_on_instance_is_allowed() -> None:
-    # pyrefly and ty don't hold the self-type of `BaseManager.__get__` to the receiver
-    # TODO: drop the ignores once https://github.com/astral-sh/ty/issues/2799 is fixed and pyrefly follows
-    assert_type(Article().loosely_typed_category_set, models.Manager[Category])  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
-    assert_type(Article().custom_category_set, CategoryManager)  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    assert_type(Article().loosely_typed_category_set, models.Manager[Category])
+    assert_type(Article().custom_category_set, CategoryManager)
 
 
 def self_referential_manager_access_on_instance_is_banned() -> None:
