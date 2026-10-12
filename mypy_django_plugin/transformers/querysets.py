@@ -845,9 +845,7 @@ def check_valid_prefetch_related_lookup(
             try:
                 from django.contrib.contenttypes.fields import GenericForeignKeyDescriptor
             except ImportError:  # Django < 6.1
-                from django.contrib.contenttypes.fields import (  # type: ignore[assignment]
-                    GenericForeignKey as GenericForeignKeyDescriptor,
-                )
+                from django.contrib.contenttypes.fields import GenericForeignKey as GenericForeignKeyDescriptor  # type: ignore[assignment]
 
             if not isinstance(rel_obj_descriptor, GenericForeignKeyDescriptor):
                 # If current_model_cls is "self", we cannot use `__name__` and want "self".
@@ -879,9 +877,7 @@ def check_valid_prefetch_related_lookup(
                 try:
                     from django.contrib.contenttypes.fields import GenericForeignKeyDescriptor
                 except ImportError:  # Django < 6.1
-                    from django.contrib.contenttypes.fields import (  # type: ignore[assignment]
-                        GenericForeignKey as GenericForeignKeyDescriptor,
-                    )
+                    from django.contrib.contenttypes.fields import GenericForeignKey as GenericForeignKeyDescriptor  # type: ignore[assignment]
 
                 if isinstance(rel_obj_descriptor, GenericForeignKeyDescriptor):
                     # Generic foreign keys can point to any model, so we use Model as the base type
