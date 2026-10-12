@@ -6,10 +6,10 @@ from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ProjectState
 
 class Migration:
-    operations: ClassVar[Sequence[Operation]]
-    dependencies: ClassVar[Sequence[tuple[str, str]]]
-    run_before: ClassVar[Sequence[tuple[str, str]]]
-    replaces: ClassVar[Sequence[tuple[str, str]]]
+    operations: Sequence[Operation]
+    dependencies: Sequence[tuple[str, str]]
+    run_before: Sequence[tuple[str, str]]
+    replaces: Sequence[tuple[str, str]]
     initial: ClassVar[bool | None]
     atomic: ClassVar[bool]
     name: str

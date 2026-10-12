@@ -19,7 +19,7 @@ class Operation:
     reversible: ClassVar[bool]
     reduces_to_sql: ClassVar[bool]
     atomic: ClassVar[bool]
-    elidable: ClassVar[bool]
+    elidable: bool
     serialization_expand_args: ClassVar[list[str]]
     category: ClassVar[OperationCategory | None]
     def __new__(cls, *args: Any, **kwargs: Any) -> Self: ...
