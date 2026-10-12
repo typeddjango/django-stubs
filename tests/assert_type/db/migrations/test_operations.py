@@ -1,6 +1,13 @@
 from __future__ import annotations
 
 from django.db.migrations import RunSQL
+from django.db.migrations.operations.base import Operation
+
+
+class CustomOperation(Operation):
+    def __init__(self, elidable: bool) -> None:
+        self.elidable = elidable
+
 
 RunSQL(sql="SOME SQL")
 
