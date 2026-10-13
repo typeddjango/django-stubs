@@ -31,7 +31,7 @@ f.attr.func  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAcce
 class Bar(Foo):
     @property
     @override
-    def attr(self) -> list[str]:  # pyright: ignore[reportIncompatibleVariableOverride]
+    def attr(self) -> list[str]:  # pyright: ignore[reportIncompatibleVariableOverride]  # ty: ignore[invalid-property-type-override]
         raise NotImplementedError
 
 
