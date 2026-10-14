@@ -41,3 +41,11 @@ assert_type(test_task_with_context_and_priority, Task[[int], int])
 assert_type(test_task_with_context_and_priority.enqueue(1), TaskResult[[int], int])
 
 assert_type(test_task_with_context.get_backend().enqueue(test_task_with_context, [1], {}), TaskResult[[int], int])
+
+
+@task(timeout=60)
+def test_task_with_custom_task_class_kwarg(x: int) -> int:
+    return x + 1
+
+
+assert_type(test_task_with_custom_task_class_kwarg.call(1), int)
