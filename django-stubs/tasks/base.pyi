@@ -65,6 +65,7 @@ def task(
     queue_name: str | None = None,
     backend: str | None = None,
     takes_context: Literal[True],
+    **kwargs: Any,
 ) -> Task[_P, _R]: ...
 @overload
 def task(
@@ -74,6 +75,7 @@ def task(
     queue_name: str | None = None,
     backend: str | None = None,
     takes_context: Literal[False] = False,
+    **kwargs: Any,
 ) -> Task[_P, _R]: ...
 @overload
 def task(
@@ -82,6 +84,7 @@ def task(
     queue_name: str | None = None,
     backend: str | None = None,
     takes_context: Literal[True],
+    **kwargs: Any,
 ) -> Callable[[Callable[Concatenate[TaskContext[Any, Any], _P], _R]], Task[_P, _R]]: ...
 @overload
 def task(
@@ -90,6 +93,7 @@ def task(
     queue_name: str | None = None,
     backend: str | None = None,
     takes_context: Literal[False] = False,
+    **kwargs: Any,
 ) -> Callable[[Callable[_P, _R]], Task[_P, _R]]: ...
 
 @dataclass(kw_only=True)
