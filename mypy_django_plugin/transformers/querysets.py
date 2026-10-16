@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import TYPE_CHECKING, Final, Literal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
@@ -19,6 +20,7 @@ from mypy.nodes import (
     ARG_NAMED_OPT,
     ARG_POS,
     ARG_STAR,
+    ARG_STAR2,
     CallExpr,
     Decorator,
     Expression,
@@ -33,11 +35,13 @@ from mypy.types import (
     CallableType,
     Instance,
     LiteralType,
+    NoneType,
     ProperType,
     TupleType,
     TypedDictType,
     TypeOfAny,
     TypeVarType,
+    UnionType,
     get_proper_type,
 )
 from mypy.types import Type as MypyType
@@ -266,8 +270,12 @@ def _aggregate_default_alias(expr: Expression, expr_type: MypyType) -> str | Non
 def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
     kwargs: dict[str, MypyType] = {}
     named = (ARG_NAMED, ARG_NAMED_OPT)
+    typed_dicts = set()
+    merged_optional: dict[str, list[MypyType]] = defaultdict(list)
+
     for slot in zip(ctx.arg_kinds, ctx.arg_types, ctx.arg_names, ctx.args, strict=False):
         for kind, arg_type, name, arg in zip(*slot, strict=False):
+            arg_type = get_proper_type(arg_type)
             if kind in named:
                 assert name is not None
                 kwargs[name] = arg_type
@@ -275,6 +283,23 @@ def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
                 alias = _aggregate_default_alias(arg, arg_type)
                 if alias is not None:
                     kwargs[alias] = arg_type
+            elif kind == ARG_STAR2 and isinstance(arg_type, TypedDictType) and arg_type not in typed_dicts:
+                typed_dicts.add(arg_type)
+                for name, item_type in arg_type.items.items():
+                    item_type = get_proper_type(item_type)
+                    if name in arg_type.required_keys:
+                        # Mypy should be checking that TypedDicts do not overlap and leave any error reporting to it
+                        if name not in kwargs:
+                            kwargs[name] = item_type
+                            merged_optional.pop(name, None)
+                    else:
+                        merged_optional[name].append(item_type)
+
+    # add a union with all optional TypedDict items
+    kwargs |= {
+        k: UnionType.make_union(merged_optional[k] + [NoneType()]) for k in merged_optional.keys() - kwargs.keys()
+    }
+
     return kwargs
 
 
@@ -389,7 +414,22 @@ def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType]:
     # contain 'Any' and the ambiguity goes away.
     result: dict[str, MypyType] = {}
     for name, expr_type in kwargs.items():
-        resolved = _resolve_output_field_type(expr_type)
+        expr_type = get_proper_type(expr_type)
+        resolved = (
+            UnionType.make_union(
+                [
+                    value
+                    for item in expr_type.items
+                    if (
+                        value := item
+                        if isinstance(get_proper_type(item), NoneType)
+                        else _resolve_output_field_type(item)
+                    )
+                ]
+            )
+            if isinstance(expr_type, UnionType)
+            else _resolve_output_field_type(expr_type)
+        )
         if resolved is not None and not isinstance(get_proper_type(resolved), AnyType):
             result[name] = resolved
         else:
