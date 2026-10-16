@@ -635,6 +635,7 @@
 
 -   case: annotate_resolves_output_field_type_from_classvar
     main: |
+        from typing import TypedDict
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models import Count, Exists, OuterRef
@@ -668,6 +669,16 @@
         created_time = User.objects.annotate(created_time=TruncTime('created_at')).get().created_time
         reveal_type(created_time) # N: Revealed type is "datetime.time"
 
+        # Count has output_field: ClassVar[IntegerField] → int
+        class CountAnnotation(TypedDict):
+            user_count: Count
+
+        def annotated() -> CountAnnotation:
+            return CountAnnotation(user_count=Count('id'))
+
+        user_count = User.objects.annotate(**annotated()).get().user_count
+        reveal_type(user_count) # N: Revealed type is "int"
+
     installed_apps:
         - myapp
     files:
@@ -681,6 +692,7 @@
 
 -   case: annotate_resolves_output_field_from_property
     main: |
+        from typing import TypedDict
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.contrib.postgres.aggregates import ArrayAgg
@@ -694,6 +706,16 @@
         sub_ids = User.objects.annotate(sub_ids=ArraySubquery(User.objects.values('id'))).get().sub_ids
         reveal_type(sub_ids) # N: Revealed type is "list[Any]"
 
+        class ArrayAggAnnotation(TypedDict):
+            usernames: ArrayAgg
+
+        def annotated() -> ArrayAggAnnotation:
+            return ArrayAggAnnotation(usernames=ArrayAgg('username'))
+
+        # ArrayAgg has output_field as @property → ArrayField → list[Any]
+        usernames = User.objects.annotate(**annotated()).get().usernames
+        reveal_type(usernames) # N: Revealed type is "list[Any]"
+
     installed_apps:
         - myapp
     files:
@@ -706,6 +728,7 @@
 
 -   case: annotate_resolves_output_field_from_subquery_generic
     main: |
+        from typing import TypedDict
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models import Subquery, OuterRef, IntegerField, CharField, Exists
@@ -729,6 +752,19 @@
         plain_subquery = Subquery(User.objects.filter(pk=OuterRef('pk')).values('id')[:1])
         val_any = User.objects.annotate(val=plain_subquery).get().val
         reveal_type(val_any)  # N: Revealed type is "Any"
+
+        # Subquery with explicit output_field=IntegerField() → int
+        class SubqueryAnnotation(TypedDict):
+            val: IntegerField
+
+        def annotated() -> SubqueryAnnotation:
+            return SubstrAnnotation(
+                val=Subquery(User.objects.filter(pk=OuterRef('pk')).values('id')[:1], output_field=IntegerField())
+            )
+
+        val_int = User.objects.annotate(**annotated()).get().val
+        reveal_type(val_int)  # N: Revealed type is "int"
+
     installed_apps:
         - myapp
     files:
@@ -741,6 +777,7 @@
 
 -   case: annotate_resolves_output_field_from_func_generic
     main: |
+        from typing import TypedDict
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models import BinaryField
@@ -764,6 +801,18 @@
         right_expr = Right("username", 5, output_field=BinaryField())
         right_val = User.objects.annotate(suffix=right_expr).get().suffix
         reveal_type(right_val)  # N: Revealed type is "bytes | memoryview[int]"
+
+        # Substr with explicit output_field=BinaryField()
+        class SubstrAnnotation(TypedDict):
+            preview: Substr[BinaryField]
+
+        def annotated() -> SubstrAnnotation:
+            return SubstrAnnotation(
+                preview=Substr("username", 1, 100, output_field=BinaryField())
+            )
+
+        val = User.objects.annotate(**annotated()).get().preview
+        reveal_type(val)  # N: Revealed type is "bytes | memoryview[int]"
 
     installed_apps:
         - myapp

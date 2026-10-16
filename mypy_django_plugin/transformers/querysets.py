@@ -19,6 +19,7 @@ from mypy.nodes import (
     ARG_NAMED_OPT,
     ARG_POS,
     ARG_STAR,
+    ARG_STAR2,
     CallExpr,
     Decorator,
     Expression,
@@ -266,8 +267,11 @@ def _aggregate_default_alias(expr: Expression, expr_type: MypyType) -> str | Non
 def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
     kwargs: dict[str, MypyType] = {}
     named = (ARG_NAMED, ARG_NAMED_OPT)
+
+    merged_arg_star2 = False
     for slot in zip(ctx.arg_kinds, ctx.arg_types, ctx.arg_names, ctx.args, strict=False):
         for kind, arg_type, name, arg in zip(*slot, strict=False):
+            arg_type = get_proper_type(arg_type)
             if kind in named:
                 assert name is not None
                 kwargs[name] = arg_type
@@ -275,6 +279,9 @@ def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
                 alias = _aggregate_default_alias(arg, arg_type)
                 if alias is not None:
                     kwargs[alias] = arg_type
+            elif kind == ARG_STAR2 and isinstance(arg_type, TypedDictType) and not merged_arg_star2:
+                merged_arg_star2 = True
+                kwargs |= arg_type.items
     return kwargs
 
 
