@@ -300,7 +300,7 @@ class DjangoContext:
         return self._model_class_fullnames_by_label_lower.get(f"{app_label}.{model_name.lower()}")
 
     def get_field_nullability(self, field: _AnyField, method: str | None) -> bool:
-        if method in ("values", "values_list"):
+        if method in (None, "values", "values_list"):
             return field.null
 
         nullable = field.null
@@ -312,8 +312,6 @@ class DjangoContext:
         if method == "create":
             if isinstance(field, AutoField):
                 return True
-        if isinstance(field, Field) and field.has_default():
-            return True
         return nullable
 
     def get_field_set_type(self, api: TypeChecker, field: _AnyField, *, method: str) -> MypyType:
