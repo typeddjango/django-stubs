@@ -344,3 +344,30 @@
                 from django.db import models
                 class MyUser(models.Model):
                     pass
+
+-   case: init_accepts_name_and_custom_attname
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Article
+        article = Article(body="hello")
+        reveal_type(article.body)  # N: Revealed type is "str"
+        reveal_type(article.body_zlib)  # N: Revealed type is "bytes | memoryview[int]"
+        Article(body_zlib=b"hello")
+        Article(body=b"hello")  # E: Incompatible type for "body" of "Article" (got "bytes", expected "str")  [misc]
+    monkeypatch: true
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import override
+
+                class CompressedTextField(models.BinaryField[str, str]):
+                    @override
+                    def get_attname(self) -> str:
+                        return f"{self.name}_zlib"
+
+                class Article(models.Model):
+                    body = CompressedTextField()
