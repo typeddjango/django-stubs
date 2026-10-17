@@ -312,8 +312,6 @@ class DjangoContext:
         if method == "create":
             if isinstance(field, AutoField):
                 return True
-        if isinstance(field, Field) and field.has_default():
-            return True
         return nullable
 
     def get_field_set_type(self, api: TypeChecker, field: _AnyField, *, method: str) -> MypyType:
