@@ -6,7 +6,7 @@ from django.db import migrations
 
 
 class ExplicitMigration(migrations.Migration):
-    initial: ClassVar[bool] = True  # pyright: ignore[reportIncompatibleVariableOverride]
+    initial: ClassVar[bool] = True  # pyright: ignore[reportIncompatibleVariableOverride]  # ty: ignore[invalid-mutable-override]
 
 
 # initial remains a class-only default.
