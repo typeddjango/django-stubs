@@ -128,7 +128,7 @@ class FieldsetWorkaroundAdmin(admin.ModelAdmin[Any]):
 
 class ViewOnSiteCallableAdmin(admin.ModelAdmin[Any]):
     @override
-    def view_on_site(self, obj: ViewOnSiteCallableAdmin) -> str:  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override-mutable-attribute]
+    def view_on_site(self, obj: ViewOnSiteCallableAdmin) -> str:  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override-mutable-attribute]  # ty: ignore[invalid-mutable-override]
         return "http://example.org"
 
 
