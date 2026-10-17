@@ -1,15 +1,25 @@
 import datetime
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, NoReturn, Self, overload
+from typing import Any, Generic, Literal, NoReturn, Protocol, Self, final, overload, type_check_only
 
 from django.core.checks.messages import CheckMessage
 from django.db.models.base import Model
 from django.db.models.expressions import Combinable, OrderBy
-from django.db.models.options import Options
 from django.db.models.query import Prefetch, QuerySet, RawQuerySet, _LookupT, _PrefetchedQuerySetT, _ToAttrT
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar, deprecated
 
 _T = TypeVar("_T", bound=Model, covariant=True)
+_M = TypeVar("_M", bound=Model)
+
+@final
+@type_check_only
+class _ManagerIsNotAccessibleViaInstances:
+    """Managers are only reachable from the model class, e.g. `MyModel.objects` rather than `my_model.objects`."""
+
+# `_T` is covariant, so `self: BaseManager[_M]` would let `_M` widen to a union of models. This binds it exactly.
+@type_check_only
+class _HasModel(Protocol[_M]):
+    model: type[_M]
 
 class BaseManager(Generic[_T]):
     creation_counter: int
@@ -35,11 +45,16 @@ class BaseManager(Generic[_T]):
     def db(self) -> str: ...
     def get_queryset(self) -> QuerySet[_T]: ...
     def all(self) -> QuerySet[_T]: ...
-    # At runtime, managers declared on a model are wrapped in a `ManagerDescriptor` which raises on instance access.
-    # Accepting only `instance=None` makes `instance.objects` a type error.
-    # `Options` is accepted to work around https://github.com/python/mypy/issues/13608
-    # mypy re-applies `__get__` to the return type of `Options.base_manager`, passing the `Options` object as `instance`.
-    def __get__(self, instance: Options[Any] | None, cls: type[Any] | None = None) -> Self: ...
+    # Mirrors `ManagerDescriptor`: a manager is unreachable from an instance of its own model, but stays reachable
+    # from anything else (plain classes, protocols, other models' instances). An unparametrized manager solves `_M`
+    # to `Any`, so the `None` overload keeps class access reachable and `cls: type[Model]` plain-class access.
+    @overload
+    def __get__(self, instance: None, cls: type[Any] | None = None) -> Self: ...
+    @overload
+    @deprecated("Manager isn't accessible via model instances")
+    def __get__(self: _HasModel[_M], instance: _M, cls: type[Model]) -> _ManagerIsNotAccessibleViaInstances: ...
+    @overload
+    def __get__(self, instance: object, cls: type[Any] | None = None) -> Self: ...
 
 class Manager(BaseManager[_T]):
     # NOTE: The following methods are in common with QuerySet, but note that the use of QuerySet as a return type
@@ -180,7 +195,3 @@ class ManagerDescriptor:
 
 class EmptyManager(Manager[_T]):
     def __init__(self, model: type[_T]) -> None: ...
-    # Unlike other managers, `EmptyManager` is exposed through properties of plain classes (e.g. `AnonymousUser.groups`)
-    # where instance access is legitimate.
-    @override
-    def __get__(self, instance: object, cls: type[Any] | None = None) -> Self: ...
