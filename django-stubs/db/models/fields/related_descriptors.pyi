@@ -104,9 +104,9 @@ class ReverseManyToOneDescriptor(Generic[_To]):
 @type_check_only
 class RelatedManager(Manager[_To], Generic[_To]):
     related_val: tuple[int, ...]
-    # Related managers are bound to model instances, so we allow instance access.
+    # Reverse accessors live on instances, so lift the ban from `BaseManager.__get__` (hence the override ignore).
     @override
-    def __get__(self, instance: object, cls: type[Any] | None = None) -> Self: ...
+    def __get__(self, instance: object, cls: type[Any] | None = None) -> Self: ...  # type: ignore[override]
     def __call__(self, *, manager: str) -> RelatedManager[_To]: ...
     def add(self, *objs: _To | int, bulk: bool = ...) -> None: ...
     async def aadd(self, *objs: _To | int, bulk: bool = ...) -> None: ...
@@ -166,7 +166,7 @@ class ManyRelatedManager(Manager[_To], Generic[_To, _Through]):
     related_val: tuple[int, ...]
     # See `RelatedManager.__get__`
     @override
-    def __get__(self, instance: object, cls: type[Any] | None = None) -> Self: ...
+    def __get__(self, instance: object, cls: type[Any] | None = None) -> Self: ...  # type: ignore[override]
     through: type[_Through]
     def __call__(self, *, manager: str) -> ManyRelatedManager[_To, _Through]: ...
     def add(
