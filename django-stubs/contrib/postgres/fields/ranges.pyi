@@ -7,7 +7,7 @@ from django.db import models
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.lookups import PostgresOperatorLookup
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
-from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range  # type: ignore[import-untyped]
+from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
 from typing_extensions import TypeVar, override
 
 class RangeBoundary(models.Expression):

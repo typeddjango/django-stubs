@@ -28,7 +28,7 @@
         from myapp.models import Booking
         booking = Booking()
         reveal_type(booking.id)  # N: Revealed type is "int"
-        reveal_type(booking.time_range)  # N: Revealed type is "Any"
+        reveal_type(booking.time_range)  # N: Revealed type is "psycopg2._range.DateTimeTZRange"
         reveal_type(booking.some_decimal)  # N: Revealed type is "decimal.Decimal"
     installed_apps:
         - myapp
