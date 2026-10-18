@@ -57,17 +57,20 @@ tests = [
   "pyyaml==6.0.3",
   # typing:
   "django-stubs[compatible-mypy,oracle,redis]",
+  "types-psycopg2==2.9.21.20261008",
 ]
 pyright = [
   "pyright==1.1.414",
 ]
 pyrefly = [
-  "pyrefly==1.3.2",
-  "psycopg2-binary"
+  "pyrefly==1.4.0",
+  "psycopg2-binary",
+  "types-psycopg2",
 ]
 ty = [
   "ty==0.0.88",
-  "psycopg2-binary"
+  "psycopg2-binary",
+  "types-psycopg2",
 ]
 
 dev = [

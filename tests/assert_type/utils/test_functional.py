@@ -18,7 +18,7 @@ class Foo:
         raise NotImplementedError
 
     @cached_property  # type: ignore[misc]  # pyright: ignore[reportArgumentType]  # ty: ignore[invalid-argument-type]
-    def attr2(self, arg2: str) -> list[str]:
+    def attr2(self, arg2: str) -> list[str]:  # pyrefly: ignore[bad-function-definition]
         raise NotImplementedError
 
 
