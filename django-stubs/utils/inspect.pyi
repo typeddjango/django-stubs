@@ -10,8 +10,9 @@ from typing import Any, TypeGuard
 ARG_KINDS: frozenset[_ParameterKind]
 
 if sys.version_info >= (3, 14):
-    lock: threading.Lock
-    safe_signature_from_callable: functools.partial[Signature]
+    if sys.version_info < (3, 15):
+        lock: threading.Lock
+        safe_signature_from_callable: functools.partial[Signature]
 
 def get_func_args(func: Callable[..., Any]) -> list[str]: ...
 def get_func_full_args(func: Callable[..., Any]) -> list[tuple[str, str] | tuple[str]]: ...
