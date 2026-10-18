@@ -86,6 +86,34 @@
                 class Book(models.Model):
                     publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE, null=True)
 
+-   case: default_does_not_make_field_nullable
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Book
+        book = Book()
+        reveal_type(book.pages)  # N: Revealed type is "int"
+        reveal_type(book.publisher_id)  # N: Revealed type is "int"
+        reveal_type(book.editor_id)  # N: Revealed type is "int | None"
+        book.pages = None  # E: Incompatible types in assignment (expression has type "None", variable has type "float | int | str | Combinable")  [assignment]
+        book.publisher_id = None  # E: Incompatible types in assignment (expression has type "None", variable has type "float | int | str | Combinable")  [assignment]
+        book.editor_id = None
+        Book.objects.create(publisher=None)  # E: Incompatible type for "publisher" of "Book" (got "None", expected "Publisher | Combinable")  [misc]
+        Book.objects.create(editor=None)
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Publisher(models.Model):
+                    id = models.BigAutoField(primary_key=True)
+                class Book(models.Model):
+                    pages = models.IntegerField(default=1)
+                    publisher = models.ForeignKey(to=Publisher, on_delete=models.CASCADE, default=1)
+                    editor = models.ForeignKey(to=Publisher, on_delete=models.CASCADE, null=True, default=None, related_name="+")
+
 -   case: nullable_self_foreign_key
     main: |
         from typing_extensions import reveal_type
