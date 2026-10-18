@@ -365,10 +365,12 @@ dev = [
     { name = "pytest-xdist" },
     { name = "pyyaml" },
     { name = "ty" },
+    { name = "types-psycopg2" },
 ]
 pyrefly = [
     { name = "psycopg2-binary" },
     { name = "pyrefly" },
+    { name = "types-psycopg2" },
 ]
 pyright = [
     { name = "pyright" },
@@ -386,10 +388,12 @@ tests = [
     { name = "pytest-shard" },
     { name = "pytest-xdist" },
     { name = "pyyaml" },
+    { name = "types-psycopg2" },
 ]
 ty = [
     { name = "psycopg2-binary" },
     { name = "ty" },
+    { name = "types-psycopg2" },
 ]
 
 [package.metadata]
@@ -423,10 +427,13 @@ dev = [
     { name = "pytest-xdist", specifier = "==3.8.0" },
     { name = "pyyaml", specifier = "==6.0.3" },
     { name = "ty", specifier = "==0.0.88" },
+    { name = "types-psycopg2" },
+    { name = "types-psycopg2", specifier = "==2.9.21.20261008" },
 ]
 pyrefly = [
     { name = "psycopg2-binary" },
     { name = "pyrefly", specifier = "==1.4.0" },
+    { name = "types-psycopg2" },
 ]
 pyright = [{ name = "pyright", specifier = "==1.1.414" }]
 tests = [
@@ -442,10 +449,12 @@ tests = [
     { name = "pytest-shard", specifier = "==0.1.2" },
     { name = "pytest-xdist", specifier = "==3.8.0" },
     { name = "pyyaml", specifier = "==6.0.3" },
+    { name = "types-psycopg2", specifier = "==2.9.21.20261008" },
 ]
 ty = [
     { name = "psycopg2-binary" },
     { name = "ty", specifier = "==0.0.88" },
+    { name = "types-psycopg2" },
 ]
 
 [[package]]
@@ -1587,6 +1596,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/04/bb/dbb844365103e4dc6ea52cdae0946c3ca55a7b8587e6f351710d7ee5bb78/types_cffi-2.1.0.20260827.tar.gz", hash = "sha256:53d1604771ad4ff09a1a90d6f6980ab36bebb6c39476dcc5bbf4896fa510d736", size = 18150, upload-time = "2026-08-27T12:07:21.754Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0c/fc/690c243ddac627901f1448f5cb29ca3b5463774a00ac932862c60d7ce5cf/types_cffi-2.1.0.20260827-py3-none-any.whl", hash = "sha256:851b6ffa5b962c577a2330b98ac0b60c56c904d086726276946388f58a0cffaf", size = 20525, upload-time = "2026-08-27T12:07:20.836Z" },
+]
+
+[[package]]
+name = "types-psycopg2"
+version = "2.9.21.20261008"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7b/31/936ed138b7b891e5e7e281ae6850c9beb4f82d7631130e5094e7a038fd02/types_psycopg2-2.9.21.20261008.tar.gz", hash = "sha256:6211642ac3ed423de069669d2d4516dfd02451049201c3ecb2740f5083cfccaa", size = 27860, upload-time = "2026-10-08T08:06:21.143Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0e/1f/e46bf261dff17ee1b8e69bce5d2627583ab69754c204d8ecc4399d54280a/types_psycopg2-2.9.21.20261008-py3-none-any.whl", hash = "sha256:4fe092ebf1b61c8b63a376dd8fa41f9bc0c3876948c1d3c0a039d1a0e842df07", size = 25035, upload-time = "2026-10-08T08:06:20.24Z" },
 ]
 
 [[package]]
