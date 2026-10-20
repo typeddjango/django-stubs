@@ -346,9 +346,8 @@ class AddRelatedModelsId(ModelClassInitializer):
                     raise exc
                 continue
 
-            is_nullable = self.django_context.get_field_nullability(field, None)
             set_type, get_type = get_field_descriptor_types(
-                field_info, is_set_nullable=is_nullable, is_get_nullable=is_nullable
+                field_info, is_set_nullable=field.null, is_get_nullable=field.null
             )
             self.add_new_var_to_model_class(field.attname, Instance(field_info, [set_type, get_type]))
 

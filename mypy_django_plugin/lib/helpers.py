@@ -831,6 +831,15 @@ def _resolve_field_descriptor_type(
     )
 
 
+def get_field_set_type(api: TypeChecker, context: Context, info: TypeInfo | None, field_name: str) -> ProperType:
+    """Resolve `<model>.<field_name> = ...` rvalue type via Field's `__set__` overloads.
+
+    For `name = CharField()` -> `str | int | Combinable`.
+    For `name = CharField(null=True)` -> `str | int | Combinable | None`.
+    """
+    return _resolve_field_descriptor_type(api, info, field_name, context, is_lvalue=True)
+
+
 def get_field_get_type(api: TypeChecker, context: Context, info: TypeInfo | None, field_name: str) -> ProperType:
     """Resolve `<model_instance>.<field_name>` read type via Field's `__get__` overloads.
 

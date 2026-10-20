@@ -127,8 +127,8 @@
 
         from myapp.models import Publisher, PublisherDatetime, Book
         Book(publisher_id=1, publisher_dt_id=now)
-        Book(publisher_id=[], publisher_dt_id=now)  # E: Incompatible type for "publisher_id" of "Book" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
-        Book(publisher_id=1, publisher_dt_id=1)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "str | datetime | date | Combinable")  [misc]
+        Book(publisher_id=[], publisher_dt_id=now)  # E: Incompatible type for "publisher_id" of "Book" (got "list[Any]", expected "float | int | str | Combinable | None")  [misc]
+        Book(publisher_id=1, publisher_dt_id=1)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "str | datetime | date | Combinable | None")  [misc]
     installed_apps:
         - myapp
     files:
@@ -218,12 +218,20 @@
                 class MyModel(models.Model):
                     day = models.CharField(max_length=3, choices=((1, 'Fri'), (2, 'Sat')))
 
--   case: optional_id_fields_allowed_in_init
+-   case: fk_in_init
     main: |
-        from myapp.models import Book, Publisher
+        from myapp.models import Book
         Book(id=None)
+        # A required FK may be omitted at construction and assigned before save().
         Book(publisher=None)
         Book(publisher_id=None)
+        Book(optional_publisher=None)
+        Book(optional_publisher_id=None)
+        # create() writes immediately, so None is rejected for a required FK.
+        Book.objects.create(publisher=None)  # E: Incompatible type for "publisher" of "Book" (got "None", expected "Publisher | Combinable")  [misc]
+        Book.objects.create(publisher_id=None)  # E: Incompatible type for "publisher_id" of "Book" (got "None", expected "str | int | Combinable")  [misc]
+        Book.objects.create(optional_publisher=None)
+        Book.objects.create(optional_publisher_id=None)
     installed_apps:
         - myapp
     files:
@@ -234,7 +242,10 @@
                 class Publisher(models.Model):
                     name = models.CharField(primary_key=True, max_length=100)
                 class Book(models.Model):
-                    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, null=True)
+                    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
+                    optional_publisher = models.ForeignKey(
+                        Publisher, on_delete=models.CASCADE, null=True, related_name="optional_books"
+                    )
 
 
 -   case: init_in_abstract_model_classmethod_should_not_throw_error_for_valid_fields
@@ -282,6 +293,7 @@
             redefined_array_set_type=33,
             default_set_type=[],
             unset_set_type=[],
+            annotated_set_type="invalid",
         )
     out: |
         main:4: note: Revealed type is "int"
@@ -297,6 +309,7 @@
         main:15: error: Incompatible type for "redefined_union_set_type" of "MyModel" (got "str", expected "int | float | Combinable")  [misc]
         main:15: error: Incompatible type for "redefined_array_set_type" of "MyModel" (got "int", expected "Sequence[int | float] | Combinable")  [misc]
         main:15: error: Incompatible type for "default_set_type" of "MyModel" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
+        main:15: error: Incompatible type for "annotated_set_type" of "MyModel" (got "str", expected "int")  [misc]
     installed_apps:
         - myapp
     files:
@@ -317,6 +330,7 @@
                     )
                     default_set_type = models.IntegerField()
                     unset_set_type = cast("models.Field", models.IntegerField())
+                    annotated_set_type: int = models.CharField(max_length=10)  # type: ignore[assignment]
 
 -   case: too_many_positional_arguments_on_init
     main: |
