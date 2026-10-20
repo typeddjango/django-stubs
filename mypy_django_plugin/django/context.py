@@ -271,6 +271,10 @@ class DjangoContext:
                     model_set_type = helpers.convert_any_to_type(foreign_key_set_type, Instance(related_model_info, []))
 
                     expected_types[field_name] = model_set_type
+                elif field.name != field_name:
+                    expected_types[field.name] = (
+                        _get_field_set_type_from_model_type_info(model_info, field.name) or field_set_type
+                    )
 
         return expected_types
 

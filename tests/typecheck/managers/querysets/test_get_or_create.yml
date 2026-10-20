@@ -76,3 +76,25 @@
                 class MyModel(models.Model):
                     num = models.IntegerField()
                     name = models.CharField(max_length=100)
+
+-   case: get_or_create_accepts_name_and_custom_attname
+    main: |
+        from myapp.models import Article
+        Article.objects.get_or_create(body_zlib=b"hello", defaults={"body": "hello"})
+        Article.objects.get_or_create(body="hello", defaults={"body_zlib": b"hello"})
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import override
+
+                class CompressedTextField(models.BinaryField):
+                    @override
+                    def get_attname(self) -> str:
+                        return f"{self.name}_zlib"
+
+                class Article(models.Model):
+                    body = CompressedTextField()

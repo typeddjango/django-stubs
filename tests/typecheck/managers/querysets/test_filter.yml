@@ -467,3 +467,25 @@
                 class Event(models.Model):
                     start_date = models.DateField()
                     created_at = models.DateTimeField()
+
+-   case: filter_accepts_name_and_custom_attname
+    main: |
+        from myapp.models import Article
+        Article.objects.filter(body="hello")
+        Article.objects.filter(body_zlib=b"hello")
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import override
+
+                class CompressedTextField(models.BinaryField):
+                    @override
+                    def get_attname(self) -> str:
+                        return f"{self.name}_zlib"
+
+                class Article(models.Model):
+                    body = CompressedTextField()
