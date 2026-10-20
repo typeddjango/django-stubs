@@ -46,14 +46,6 @@ def _get_current_field_from_assignment(ctx: FunctionContext, django_context: Dja
         return None
 
 
-def reparametrize_related_field_type(related_field_type: Instance, set_type: MypyType, get_type: MypyType) -> Instance:
-    args = [
-        helpers.convert_any_to_type(related_field_type.args[0], set_type),
-        helpers.convert_any_to_type(related_field_type.args[1], get_type),
-    ]
-    return related_field_type.copy_modified(args=args)
-
-
 def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     current_field = _get_current_field_from_assignment(ctx, django_context)
     if current_field is None:
@@ -78,7 +70,7 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
                 derived_model_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), model_cls)
                 if derived_model_info is not None:
                     fk_ref_type = Instance(derived_model_info, [])
-                    derived_fk_type = reparametrize_related_field_type(
+                    derived_fk_type = helpers.reparametrize_field_type(
                         default_related_field_type, set_type=fk_ref_type, get_type=fk_ref_type
                     )
                     helpers.add_new_sym_for_info(derived_model_info, name=current_field.name, sym_type=derived_fk_type)
@@ -107,7 +99,7 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
         related_model_to_set_type = Instance(related_model_to_set_info, [])
 
     # replace Any with referred_to_type
-    return reparametrize_related_field_type(
+    return helpers.reparametrize_field_type(
         default_related_field_type, set_type=related_model_to_set_type, get_type=related_model_type
     )
 
