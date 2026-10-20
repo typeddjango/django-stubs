@@ -82,32 +82,15 @@ class LookupsAreUnsupported(Exception):
     pass
 
 
-def get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> Instance | None:
-    if info is None:
-        return None
-    field_node = info.get(field_name)
-    if field_node is None:
-        return None
-    field_type = get_proper_type(field_node.type)
-    if not isinstance(field_type, Instance):
-        return None
-    # Field declares a set and a get type arg. Fallback to `None` when we can't find any args.
-    # Not every model attribute is a field,
-    # a reverse o2o accessor is a two arg descriptor whose args would be misread as set/get types.
-    if len(field_type.args) != 2 or not field_type.type.has_base(fullnames.FIELD_FULLNAME):
-        return None
-    return field_type
-
-
 def _get_field_set_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
-    field_type = get_field_type_from_model_type_info(info, field_name)
+    field_type = helpers.get_field_type_from_model_type_info(info, field_name)
     if field_type is not None:
         return field_type.args[0]
     return None
 
 
 def _get_field_get_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
-    field_type = get_field_type_from_model_type_info(info, field_name)
+    field_type = helpers.get_field_type_from_model_type_info(info, field_name)
     if field_type is not None:
         return field_type.args[1]
     return None

@@ -385,6 +385,23 @@ def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is
     return AnyType(TypeOfAny.explicit)
 
 
+def get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> Instance | None:
+    if info is None:
+        return None
+    field_node = info.get(field_name)
+    if field_node is None:
+        return None
+    field_type = get_proper_type(field_node.type)
+    if not isinstance(field_type, Instance):
+        return None
+    # Field declares a set and a get type arg. Fallback to `None` when we can't find any args.
+    # Not every model attribute is a field,
+    # a reverse o2o accessor is a two arg descriptor whose args would be misread as set/get types.
+    if len(field_type.args) != 2 or not field_type.type.has_base(fullnames.FIELD_FULLNAME):
+        return None
+    return field_type
+
+
 class FieldTypeArgs(NamedTuple):
     set: ProperType
     get: ProperType
