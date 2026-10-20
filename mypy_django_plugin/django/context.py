@@ -170,7 +170,9 @@ class DjangoContext:
             primary_key_field = self.get_primary_key_field(related_model_cls)
             primary_key_type = self.get_field_get_type(api, rel_model_info, primary_key_field, method="init")
 
-            model_and_primary_key_type = UnionType.make_union([Instance(rel_model_info, []), primary_key_type])
+            model_and_primary_key_type = UnionType.make_union(
+                [helpers.model_instance(rel_model_info), primary_key_type]
+            )
             return make_optional_type(model_and_primary_key_type)
 
         field_info = helpers.lookup_class_typeinfo(api, field.__class__)
@@ -268,7 +270,9 @@ class DjangoContext:
                     foreign_key_set_type = helpers.get_private_descriptor_type(
                         foreign_key_info, "_pyi_private_set_type", is_nullable=is_nullable
                     )
-                    model_set_type = helpers.convert_any_to_type(foreign_key_set_type, Instance(related_model_info, []))
+                    model_set_type = helpers.convert_any_to_type(
+                        foreign_key_set_type, helpers.model_instance(related_model_info)
+                    )
 
                     expected_types[field_name] = model_set_type
 
@@ -376,7 +380,7 @@ class DjangoContext:
             if model_info is None:
                 return AnyType(TypeOfAny.unannotated)
 
-            return Instance(model_info, [])
+            return helpers.model_instance(model_info)
         return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
 
     def get_field_related_model_cls(self, field: RelatedField[Any, Any] | ForeignObjectRel) -> type[Model]:

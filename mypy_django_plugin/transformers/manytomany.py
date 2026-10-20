@@ -125,7 +125,7 @@ def get_m2m_arguments(
                 if through_model_fullname is not None:
                     through_model_info = helpers.lookup_fully_qualified_typeinfo(checker, through_model_fullname)
                     if through_model_info is not None:
-                        through = M2MThrough(arg=through_arg, model=Instance(through_model_info, []))
+                        through = M2MThrough(arg=through_arg, model=helpers.model_instance(through_model_info))
 
     return M2MArguments(to=to, through=through)
 

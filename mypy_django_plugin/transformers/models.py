@@ -371,7 +371,7 @@ class AddManagers(ModelClassInitializer):
 
         assert manager_info is not None
         # Reparameterize dynamically created manager with model type
-        manager_type = helpers.fill_manager(manager_info, Instance(self.model_classdef.info, []))
+        manager_type = helpers.fill_manager(manager_info, helpers.model_instance(self.model_classdef.info))
         self.add_new_var_to_model_class(manager_name, manager_type, is_classvar=True)
 
     @override
@@ -498,7 +498,7 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
                 return None
             default_manager_info = generated_manager_info
 
-        default_manager = helpers.fill_manager(default_manager_info, Instance(self.model_classdef.info, []))
+        default_manager = helpers.fill_manager(default_manager_info, helpers.model_instance(self.model_classdef.info))
         self.add_new_var_to_model_class("_default_manager", default_manager, is_classvar=True)
 
 
@@ -531,7 +531,7 @@ class AddReverseLookups(ModelClassInitializer):
                     attname,
                     Instance(
                         self.reverse_one_to_one_descriptor,
-                        [Instance(self.model_classdef.info, []), Instance(to_model_info, [])],
+                        [helpers.model_instance(self.model_classdef.info), helpers.model_instance(to_model_info)],
                     ),
                 )
             return
@@ -547,7 +547,8 @@ class AddReverseLookups(ModelClassInitializer):
                 self.add_new_var_to_model_class(
                     attname,
                     Instance(
-                        self.many_to_many_descriptor, [Instance(to_model_info, []), Instance(through_model_info, [])]
+                        self.many_to_many_descriptor,
+                        [helpers.model_instance(to_model_info), helpers.model_instance(through_model_info)],
                     ),
                     is_classvar=True,
                 )
@@ -555,7 +556,9 @@ class AddReverseLookups(ModelClassInitializer):
         if not reverse_lookup_declared:
             # ManyToOneRel
             self.add_new_var_to_model_class(
-                attname, Instance(self.reverse_many_to_one_descriptor, [Instance(to_model_info, [])]), is_classvar=True
+                attname,
+                Instance(self.reverse_many_to_one_descriptor, [helpers.model_instance(to_model_info)]),
+                is_classvar=True,
             )
 
         related_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.RELATED_MANAGER_CLASS)
@@ -597,7 +600,7 @@ class AddReverseLookups(ModelClassInitializer):
 
         # Create a reverse manager subclassed from the default manager of the related
         # model and 'RelatedManager'
-        related_manager = Instance(related_manager_info, [Instance(to_model_info, [])])
+        related_manager = Instance(related_manager_info, [helpers.model_instance(to_model_info)])
         # The reverse manager is based on the related model's manager, so it makes most sense to add the new
         # related manager in that module
         new_related_manager_info = helpers.add_new_class_for_module(
@@ -640,7 +643,7 @@ class AddExtraFieldMethods(ModelClassInitializer):
         # get_next_by, get_previous_by for Date, DateTime
         for field in self.django_context.get_model_fields(model_cls):
             if isinstance(field, DateField | DateTimeField) and not field.null:
-                return_type = Instance(self.model_classdef.info, [])
+                return_type = helpers.model_instance(self.model_classdef.info)
                 common.add_method(
                     self.ctx,
                     name=f"get_next_by_{field.attname}",
@@ -762,10 +765,10 @@ class ProcessManyToManyFields(ModelClassInitializer):
                     helpers.add_new_sym_for_info(
                         self.model_classdef.info,
                         name=m2m_field_name,
-                        sym_type=Instance(self.m2m_field, [args.to.model, Instance(through_model, [])]),
+                        sym_type=Instance(self.m2m_field, [args.to.model, helpers.model_instance(through_model)]),
                     )
                 # Create a 'ManyRelatedManager' class for the processed model
-                self.create_many_related_manager(Instance(self.model_classdef.info, []))
+                self.create_many_related_manager(helpers.model_instance(self.model_classdef.info))
                 if isinstance(args.to.model, Instance):
                     # Create a 'ManyRelatedManager' class for the related model
                     self.create_many_related_manager(args.to.model)
@@ -863,7 +866,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
         helpers.add_new_sym_for_info(through_model, name="id", sym_type=self.default_pk_instance.copy_modified())
         # Add the foreign key to the model containing the 'ManyToManyField' call:
         # <containing_model> or from_<model>
-        containing_model_type = Instance(self.model_classdef.info, [])
+        containing_model_type = helpers.model_instance(self.model_classdef.info)
         from_name = f"from_{self.model_classdef.name.lower()}" if m2m_args.to.self else self.model_classdef.name.lower()
         helpers.add_new_sym_for_info(
             through_model,
@@ -1037,7 +1040,7 @@ class MetaclassAdjustments(ModelClassInitializer):
                 helpers.add_new_sym_for_info(
                     ctx.cls.info,
                     name="objects",
-                    sym_type=Instance(manager, [Instance(ctx.cls.info, [])]),
+                    sym_type=Instance(manager, [helpers.model_instance(ctx.cls.info)]),
                 )
             return
 

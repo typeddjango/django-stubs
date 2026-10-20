@@ -962,7 +962,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
             try:
                 observed_model_cls = django_context.resolve_lookup_into_field(qs_model.cls, lookup)[1]
                 if model_info := helpers.lookup_class_typeinfo(api, observed_model_cls):
-                    elem_model = Instance(model_info, [])
+                    elem_model = helpers.model_instance(model_info)
             except (FieldError, LookupsAreUnsupported):
                 pass
 
