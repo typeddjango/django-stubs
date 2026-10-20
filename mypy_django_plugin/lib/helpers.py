@@ -701,6 +701,13 @@ def is_model_type(info: TypeInfo) -> bool:
     return info.metaclass_type is not None and info.metaclass_type.type.has_base(fullnames.MODEL_METACLASS_FULLNAME)
 
 
+def model_instance(model_info: TypeInfo) -> Instance:
+    """Instance of a model class, with `Any` for the type vars of a generic model."""
+    instance = fill_typevars_with_any(model_info)
+    assert isinstance(instance, Instance)
+    return instance
+
+
 def get_model_from_expression(
     expr: Expression,
     *,
@@ -714,10 +721,10 @@ def get_model_from_expression(
     """
     if isinstance(expr, RefExpr) and isinstance(expr.node, TypeInfo):
         if is_model_type(expr.node):
-            return Instance(expr.node, [])
+            return model_instance(expr.node)
 
     if isinstance(expr, StrExpr) and expr.value == "self":
-        return Instance(self_model, [])
+        return model_instance(self_model)
 
     lazy_reference = None
     if isinstance(expr, StrExpr):
@@ -732,7 +739,7 @@ def get_model_from_expression(
     if lazy_reference is not None:
         model_info = resolve_lazy_reference(lazy_reference, api=api, django_context=django_context, ctx=expr)
         if model_info is not None:
-            return Instance(model_info, [])
+            return model_instance(model_info)
     return None
 
 

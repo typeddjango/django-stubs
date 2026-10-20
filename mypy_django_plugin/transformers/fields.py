@@ -69,7 +69,7 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
             if issubclass(model_cls, current_model_cls) and not model_cls._meta.abstract:
                 derived_model_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), model_cls)
                 if derived_model_info is not None:
-                    fk_ref_type = Instance(derived_model_info, [])
+                    fk_ref_type = helpers.model_instance(derived_model_info)
                     derived_fk_type = helpers.reparametrize_field_type(
                         default_related_field_type, set_type=fk_ref_type, get_type=fk_ref_type
                     )
@@ -88,7 +88,7 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
         # maybe no type stub
         related_model_type = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_type = Instance(related_model_info, [])
+        related_model_type = helpers.model_instance(related_model_info)
 
     related_model_to_set_info = helpers.lookup_class_typeinfo(typechecker_api, related_model_to_set)
     related_model_to_set_type: ProperType
@@ -96,7 +96,7 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
         # maybe no type stub
         related_model_to_set_type = AnyType(TypeOfAny.unannotated)
     else:
-        related_model_to_set_type = Instance(related_model_to_set_info, [])
+        related_model_to_set_type = helpers.model_instance(related_model_to_set_info)
 
     # replace Any with referred_to_type
     return helpers.reparametrize_field_type(

@@ -1,0 +1,45 @@
+-   case: generic_model_references_fill_type_vars_with_any
+    main: |
+        from typing import reveal_type
+        from django.apps import apps
+        from myapp.models import Article, Author, Tag
+
+        article = Article[int]()
+        reveal_type(article.author)  # N: Revealed type is "myapp.models.Author[Any]"
+        reveal_type(article.parent)  # N: Revealed type is "myapp.models.Article[Any]"
+        reveal_type(article.author.value())  # N: Revealed type is "Any"
+        reveal_type(article.tags.get())  # N: Revealed type is "myapp.models.Tag[Any]"
+        reveal_type(article.get_next_by_published())  # N: Revealed type is "myapp.models.Article[Any]"
+        reveal_type(Author[int]().article_set.get())  # N: Revealed type is "myapp.models.Article[Any]"
+        reveal_type(Tag[int]().article_set.get())  # N: Revealed type is "myapp.models.Article[Any]"
+
+        # Implicit M2M through model
+        through = Article.tags.through.objects.get()
+        reveal_type(through.article)  # N: Revealed type is "myapp.models.Article[Any]"
+        reveal_type(through.tag)  # N: Revealed type is "myapp.models.Tag[Any]"
+
+        reveal_type(apps.get_model("myapp.Article"))  # N: Revealed type is "type[myapp.models.Article[Any]]"
+        reveal_type(Article.objects.prefetch_related("author").get().author)  # N: Revealed type is "myapp.models.Author[Any]"
+        Article(author=[])  # E: Incompatible type for "author" of "Article" (got "list[Any]", expected "Author[Any] | Combinable | None")  [misc]
+        Article.objects.filter(author=[])  # E: Incompatible type for lookup 'author': (got "list[Any]", expected "Author[Any] | int | None")  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Generic, TypeVar
+                from django.db import models
+
+                T = TypeVar("T")
+
+                class Tag(models.Model, Generic[T]): ...
+
+                class Author(models.Model, Generic[T]):
+                    def value(self) -> T: raise NotImplementedError
+
+                class Article(models.Model, Generic[T]):
+                    tags = models.ManyToManyField(Tag)
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+                    parent = models.ForeignKey("self", on_delete=models.CASCADE)
+                    published = models.DateField()

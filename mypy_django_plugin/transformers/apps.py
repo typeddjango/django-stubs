@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mypy.nodes import StrExpr
-from mypy.types import Instance, TypeType
 from mypy.types import Type as MypyType
+from mypy.types import TypeType
 
 from mypy_django_plugin.lib import helpers
 
@@ -52,5 +52,5 @@ def resolve_model_for_get_model(ctx: MethodContext, django_context: DjangoContex
             ctx=ctx.context,
         )
     ):
-        return TypeType(Instance(model_info, []))
+        return TypeType(helpers.model_instance(model_info))
     return ctx.default_return_type
