@@ -181,7 +181,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
     ) -> None: ...
-    def __set__(self, instance: Any, value: _ST) -> None: ...
+    def __set__(self, instance: Any, value: _ST | Combinable) -> None: ...
     # class access
     @overload
     def __get__(self, instance: None, owner: Any) -> _FieldDescriptor[Self]: ...
@@ -275,7 +275,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def slice_expression(self, expression: Expression, start: int, length: int | None) -> Func: ...
 
 class IntegerField(Field[_ST, _GT]):
-    _pyi_private_set_type: float | int | str | Combinable
+    _pyi_private_set_type: float | int | str
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
 
@@ -297,12 +297,12 @@ class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST
     integer_field_class: type[BigIntegerField[Any, Any]]
 
 class FloatField(Field[_ST, _GT]):
-    _pyi_private_set_type: float | int | str | Combinable
+    _pyi_private_set_type: float | int | str
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
 
 class DecimalField(Field[_ST, _GT]):
-    _pyi_private_set_type: str | float | decimal.Decimal | Combinable
+    _pyi_private_set_type: str | float | decimal.Decimal
     _pyi_private_get_type: decimal.Decimal
     _pyi_lookup_exact_type: str | int | decimal.Decimal
     # attributes
@@ -337,7 +337,7 @@ class DecimalField(Field[_ST, _GT]):
     def context(self) -> decimal.Context: ...
 
 class CharField(Field[_ST, _GT]):
-    _pyi_private_set_type: str | int | Combinable
+    _pyi_private_set_type: str | int
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
@@ -405,7 +405,7 @@ class SlugField(CharField[_ST, _GT]):
     ) -> None: ...
 
 class EmailField(CharField[_ST, _GT]):
-    _pyi_private_set_type: str | Combinable
+    _pyi_private_set_type: str
 
 class URLField(CharField[_ST, _GT]):
     def __init__(
@@ -439,7 +439,7 @@ class URLField(CharField[_ST, _GT]):
     ) -> None: ...
 
 class TextField(Field[_ST, _GT]):
-    _pyi_private_set_type: str | Combinable
+    _pyi_private_set_type: str
     _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
@@ -474,21 +474,21 @@ class TextField(Field[_ST, _GT]):
     ) -> None: ...
 
 class BooleanField(Field[_ST, _GT]):
-    _pyi_private_set_type: bool | Combinable
+    _pyi_private_set_type: bool
     _pyi_private_get_type: bool
     _pyi_lookup_exact_type: bool
 
 class NullBooleanField(BooleanField[_ST, _GT]):
-    _pyi_private_set_type: bool | Combinable | None  # type: ignore[assignment]
+    _pyi_private_set_type: bool | None  # type: ignore[assignment]
     _pyi_private_get_type: bool | None  # type: ignore[assignment]
     _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
 
 class IPAddressField(Field[_ST, _GT]):
-    _pyi_private_set_type: str | Combinable
+    _pyi_private_set_type: str
     _pyi_private_get_type: str
 
 class GenericIPAddressField(Field[_ST, _GT]):
-    _pyi_private_set_type: str | int | Callable[..., Any] | Combinable
+    _pyi_private_set_type: str | int | Callable[..., Any]
     _pyi_private_get_type: str
 
     default_error_messages: ClassVar[_ErrorMessagesDict]
@@ -523,7 +523,7 @@ class DateTimeCheckMixin:
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
 
 class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: str | date | Combinable
+    _pyi_private_set_type: str | date
     _pyi_private_get_type: date
     _pyi_lookup_exact_type: str | date
     auto_now: bool
@@ -558,7 +558,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
 
 class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: str | time | real_datetime | Combinable
+    _pyi_private_set_type: str | time | real_datetime
     _pyi_private_get_type: time
     auto_now: bool
     auto_now_add: bool
@@ -589,7 +589,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
     ) -> None: ...
 
 class DateTimeField(DateField[_ST, _GT]):
-    _pyi_private_set_type: str | real_datetime | date | Combinable
+    _pyi_private_set_type: str | real_datetime | date
     _pyi_private_get_type: real_datetime
     _pyi_lookup_exact_type: str | real_datetime
 
@@ -683,7 +683,7 @@ class AutoFieldMixin:
 class AutoFieldMeta(type): ...
 
 class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta):  # type: ignore[misc]
-    _pyi_private_set_type: Combinable | int | str
+    _pyi_private_set_type: int | str
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
 

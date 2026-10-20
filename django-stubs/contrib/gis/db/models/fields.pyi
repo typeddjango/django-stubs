@@ -14,7 +14,7 @@ from django.contrib.gis.geos import (
 )
 from django.core.validators import _ValidatorCallable
 from django.db.models import Model
-from django.db.models.expressions import Combinable, Expression
+from django.db.models.expressions import Expression
 from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping
 from django.db.models.sql.compiler import _AsSqlType
 from django.forms.widgets import Widget
@@ -147,7 +147,7 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
     ) -> forms.GeometryField | None: ...
 
 class PointField(GeometryField[_ST, _GT]):
-    _pyi_private_set_type: Point | Combinable
+    _pyi_private_set_type: Point
     _pyi_private_get_type: Point
     _pyi_lookup_exact_type: Point
 
@@ -155,7 +155,7 @@ class PointField(GeometryField[_ST, _GT]):
     form_class: type[forms.PointField]
 
 class LineStringField(GeometryField[_ST, _GT]):
-    _pyi_private_set_type: LineString | Combinable
+    _pyi_private_set_type: LineString
     _pyi_private_get_type: LineString
     _pyi_lookup_exact_type: LineString
 
@@ -163,7 +163,7 @@ class LineStringField(GeometryField[_ST, _GT]):
     form_class: type[forms.LineStringField]
 
 class PolygonField(GeometryField[_ST, _GT]):
-    _pyi_private_set_type: Polygon | Combinable
+    _pyi_private_set_type: Polygon
     _pyi_private_get_type: Polygon
     _pyi_lookup_exact_type: Polygon
 
@@ -171,7 +171,7 @@ class PolygonField(GeometryField[_ST, _GT]):
     form_class: type[forms.PolygonField]
 
 class MultiPointField(GeometryField[_ST, _GT]):
-    _pyi_private_set_type: MultiPoint | Combinable
+    _pyi_private_set_type: MultiPoint
     _pyi_private_get_type: MultiPoint
     _pyi_lookup_exact_type: MultiPoint
 
@@ -179,7 +179,7 @@ class MultiPointField(GeometryField[_ST, _GT]):
     form_class: type[forms.MultiPointField]
 
 class MultiLineStringField(GeometryField[_ST, _GT]):
-    _pyi_private_set_type: MultiLineString | Combinable
+    _pyi_private_set_type: MultiLineString
     _pyi_private_get_type: MultiLineString
     _pyi_lookup_exact_type: MultiLineString
 
@@ -187,7 +187,7 @@ class MultiLineStringField(GeometryField[_ST, _GT]):
     form_class: type[forms.MultiLineStringField]
 
 class MultiPolygonField(GeometryField[_ST, _GT]):
-    _pyi_private_set_type: MultiPolygon | Combinable
+    _pyi_private_set_type: MultiPolygon
     _pyi_private_get_type: MultiPolygon
     _pyi_lookup_exact_type: MultiPolygon
 
@@ -195,7 +195,7 @@ class MultiPolygonField(GeometryField[_ST, _GT]):
     form_class: type[forms.MultiPolygonField]
 
 class GeometryCollectionField(GeometryField[_ST, _GT]):
-    _pyi_private_set_type: GeometryCollection | Combinable
+    _pyi_private_set_type: GeometryCollection
     _pyi_private_get_type: GeometryCollection
     _pyi_lookup_exact_type: GeometryCollection
 
