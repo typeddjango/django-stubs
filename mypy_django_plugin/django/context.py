@@ -40,7 +40,7 @@ if TYPE_CHECKING:
     from django.db.models.expressions import Expression
     from django.db.models.options import _AnyField
     from mypy.checker import TypeChecker
-    from mypy.nodes import TypeInfo
+    from mypy.nodes import Context, TypeInfo
     from mypy.plugin import MethodContext
 
 
@@ -86,13 +86,6 @@ def _get_field_set_type_from_model_type_info(info: TypeInfo | None, field_name: 
     field_type = helpers.get_field_type_from_model_type_info(info, field_name)
     if field_type is not None:
         return field_type.args[0]
-    return None
-
-
-def _get_field_get_type_from_model_type_info(info: TypeInfo | None, field_name: str) -> MypyType | None:
-    field_type = helpers.get_field_type_from_model_type_info(info, field_name)
-    if field_type is not None:
-        return field_type.args[1]
     return None
 
 
@@ -143,7 +136,7 @@ class DjangoContext:
             if isinstance(field, ForeignObjectRel):
                 yield field
 
-    def get_field_lookup_exact_type(self, api: TypeChecker, field: _AnyField) -> MypyType:
+    def get_field_lookup_exact_type(self, api: TypeChecker, field: _AnyField, context: Context) -> MypyType:
         if isinstance(field, RelatedField | ForeignObjectRel):
             related_model_cls = self.get_field_related_model_cls(field)
             rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
@@ -151,7 +144,7 @@ class DjangoContext:
                 return AnyType(TypeOfAny.explicit)
 
             primary_key_field = self.get_primary_key_field(related_model_cls)
-            primary_key_type = self.get_field_get_type(api, rel_model_info, primary_key_field, method="init")
+            primary_key_type = helpers.get_field_get_type(api, context, rel_model_info, primary_key_field.attname)
 
             model_and_primary_key_type = UnionType.make_union(
                 [helpers.model_instance(rel_model_info), primary_key_type]
@@ -331,40 +324,6 @@ class DjangoContext:
             argument_field_type = self.get_field_set_type(api, target_field.base_field, method=method)
             field_set_type = helpers.convert_any_to_type(field_set_type, argument_field_type)
         return field_set_type
-
-    def get_field_get_type(
-        self,
-        api: TypeChecker,
-        model_info: TypeInfo | None,
-        field: _AnyField,
-        *,
-        method: str,
-    ) -> MypyType:
-        """Get a type of __get__ for this specific Django field."""
-        if isinstance(field, Field):
-            get_type = _get_field_get_type_from_model_type_info(model_info, getattr(field, "attname", field.name))
-            if get_type is not None:
-                return get_type
-
-        field_info = helpers.lookup_class_typeinfo(api, field.__class__)
-        if field_info is None:
-            return AnyType(TypeOfAny.unannotated)
-
-        is_nullable = self.get_field_nullability(field, method)
-        if isinstance(field, RelatedField):
-            related_model_cls = self.get_field_related_model_cls(field)
-            rel_model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
-
-            if method in ("values", "values_list"):
-                primary_key_field = self.get_primary_key_field(related_model_cls)
-                return self.get_field_get_type(api, rel_model_info, primary_key_field, method=method)
-
-            model_info = helpers.lookup_class_typeinfo(api, related_model_cls)
-            if model_info is None:
-                return AnyType(TypeOfAny.unannotated)
-
-            return helpers.model_instance(model_info)
-        return helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_nullable)
 
     def get_field_related_model_cls(self, field: RelatedField[Any, Any] | ForeignObjectRel) -> type[Model]:
         if isinstance(field, RelatedField):
@@ -577,10 +536,10 @@ class DjangoContext:
                 field = output_field
 
         if lookup_cls is None or issubclass(lookup_cls, Exact):
-            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            return self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field, ctx.context)
 
         if issubclass(lookup_cls, In):
-            exact_type = self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field)
+            exact_type = self.get_field_lookup_exact_type(helpers.get_typechecker_api(ctx), field, ctx.context)
             return ctx.api.named_generic_type("typing.Iterable", [exact_type])
 
         resolved_type = self._resolve_lookup_type_from_lookup_class(ctx, lookup_cls, field)

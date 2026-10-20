@@ -95,7 +95,6 @@ def get_field_type_from_lookup(
     django_context: DjangoContext,
     model_cls: type[Model],
     *,
-    method: str,
     lookup: str,
     silent_on_error: bool = False,
 ) -> MypyType | None:
@@ -110,15 +109,13 @@ def get_field_type_from_lookup(
 
     if lookup_field is None:
         return AnyType(TypeOfAny.implementation_artifact)
-    if (isinstance(lookup_field, RelatedField) and lookup_field.column == lookup) or isinstance(
-        lookup_field, ForeignObjectRel
-    ):
+    if isinstance(lookup_field, RelatedField | ForeignObjectRel):
         model_cls = django_context.get_field_related_model_cls(lookup_field)
         lookup_field = django_context.get_primary_key_field(model_cls)
 
     api = helpers.get_typechecker_api(ctx)
     model_info = helpers.lookup_class_typeinfo(api, model_cls)
-    return django_context.get_field_get_type(api, model_info, lookup_field, method=method)
+    return helpers.get_field_get_type(api, ctx.context, model_info, lookup_field.attname)
 
 
 def get_values_list_row_type(
@@ -139,17 +136,13 @@ def get_values_list_row_type(
     if len(field_lookups) == 0:
         if flat:
             primary_key_field = django_context.get_primary_key_field(model_cls)
-            lookup_type = get_field_type_from_lookup(
-                ctx, django_context, model_cls, lookup=primary_key_field.attname, method="values_list"
-            )
+            lookup_type = get_field_type_from_lookup(ctx, django_context, model_cls, lookup=primary_key_field.attname)
             assert lookup_type is not None
             return lookup_type
         if named:
             column_types: dict[str, MypyType] = {}
             for field in django_context.get_model_fields(model_cls):
-                column_type = django_context.get_field_get_type(
-                    typechecker_api, model_info, field, method="values_list"
-                )
+                column_type = helpers.get_field_get_type(typechecker_api, ctx.context, model_info, field.attname)
                 column_types[field.attname] = column_type
             column_types.update(annotation_types)
             return helpers.make_oneoff_named_tuple(typechecker_api, "Row", column_types)
@@ -175,7 +168,6 @@ def get_values_list_row_type(
             django_context,
             model_cls,
             lookup=field_lookup,
-            method="values_list",
             silent_on_error=bool(annotation_types),
         )
         if lookup_field_type is None:
@@ -579,7 +571,6 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
             django_context,
             django_model.cls,
             lookup=field_lookup,
-            method="values",
             silent_on_error=django_model.is_annotated,
         )
         if field_lookup_type is None:
