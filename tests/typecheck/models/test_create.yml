@@ -1,7 +1,14 @@
 -   case: default_manager_create_is_typechecked
     main: |
         from myapp.models import User
+        from django.db.models import F, Value
+        from django.db.models.functions import UUID4
         User.objects.create(pk=1, name='Max', age=10)
+        User.objects.create(name=Value("Max"), age=Value(10), token=UUID4())
+        User.objects.get_or_create(name="Max", defaults={"age": Value(10)})
+        user = User.objects.get(pk=1)
+        user.age = F("age") + 1
+        user.token = UUID4()
         User.objects.create(age=[])  # E: Incompatible type for "age" of "User" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
     installed_apps:
         - myapp
@@ -14,6 +21,7 @@
                 class User(models.Model):
                     name = models.CharField(max_length=100)
                     age = models.IntegerField()
+                    token = models.UUIDField()
 
 -   case: model_recognises_parent_attributes
     main: |

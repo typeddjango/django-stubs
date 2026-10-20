@@ -289,13 +289,13 @@
         main:6: note: Revealed type is "list[int]"
         main:7: note: Revealed type is "int"
         main:8: note: Revealed type is "Any"
-        main:9: error: Incompatible types in assignment (expression has type "str", variable has type "int")  [assignment]
-        main:10: error: Incompatible types in assignment (expression has type "str", variable has type "int | float")  [assignment]
-        main:12: error: Incompatible types in assignment (expression has type "list[str]", variable has type "Sequence[int | float]")  [assignment]
+        main:9: error: Incompatible types in assignment (expression has type "str", variable has type "int | Combinable")  [assignment]
+        main:10: error: Incompatible types in assignment (expression has type "str", variable has type "int | float | Combinable")  [assignment]
+        main:12: error: Incompatible types in assignment (expression has type "list[str]", variable has type "Sequence[int | float] | Combinable")  [assignment]
         main:13: error: Incompatible types in assignment (expression has type "list[Never]", variable has type "float | int | str | Combinable")  [assignment]
-        main:15: error: Incompatible type for "redefined_set_type" of "MyModel" (got "str", expected "int")  [misc]
-        main:15: error: Incompatible type for "redefined_union_set_type" of "MyModel" (got "str", expected "int | float")  [misc]
-        main:15: error: Incompatible type for "redefined_array_set_type" of "MyModel" (got "int", expected "Sequence[int | float]")  [misc]
+        main:15: error: Incompatible type for "redefined_set_type" of "MyModel" (got "str", expected "int | Combinable")  [misc]
+        main:15: error: Incompatible type for "redefined_union_set_type" of "MyModel" (got "str", expected "int | float | Combinable")  [misc]
+        main:15: error: Incompatible type for "redefined_array_set_type" of "MyModel" (got "int", expected "Sequence[int | float] | Combinable")  [misc]
         main:15: error: Incompatible type for "default_set_type" of "MyModel" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
     installed_apps:
         - myapp

@@ -9,7 +9,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable
 from django.db.models.manager import EmptyManager
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeVar
@@ -38,9 +37,9 @@ class Permission(models.Model):
     content_type_id: int
     objects: ClassVar[PermissionManager]
 
-    name: models.CharField[str | int | Combinable, str]
-    content_type: models.ForeignKey[ContentType | Combinable, ContentType]
-    codename: models.CharField[str | int | Combinable, str]
+    name: models.CharField[str | int, str]
+    content_type: models.ForeignKey[ContentType, ContentType]
+    codename: models.CharField[str | int, str]
     @property
     def user_perm_str(self) -> str: ...
     def natural_key(self) -> tuple[str, str, str]: ...
@@ -52,7 +51,7 @@ class GroupManager(models.Manager[Group]):
 class Group(models.Model):
     objects: ClassVar[GroupManager]
 
-    name: models.CharField[str | int | Combinable, str]
+    name: models.CharField[str | int, str]
     permissions = models.ManyToManyField(Permission)
     def natural_key(self) -> tuple[str]: ...
 
@@ -79,7 +78,7 @@ class UserManager(BaseUserManager[_UserType]):
     ) -> QuerySet[_UserType]: ...
 
 class PermissionsMixin(models.Model):
-    is_superuser: models.BooleanField[bool | Combinable, bool]
+    is_superuser: models.BooleanField[bool, bool]
     groups = models.ManyToManyField(Group)
     user_permissions = models.ManyToManyField(Permission)
 
@@ -107,13 +106,13 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         verbose_name: ClassVar[str]
         verbose_name_plural: ClassVar[str]
 
-    username: models.CharField[str | int | Combinable, str]
-    first_name: models.CharField[str | int | Combinable, str]
-    last_name: models.CharField[str | int | Combinable, str]
-    email: models.EmailField[str | Combinable, str]
-    is_staff: models.BooleanField[bool | Combinable, bool]
-    is_active: models.BooleanField[bool | Combinable, bool]
-    date_joined: models.DateTimeField[str | dt.datetime | dt.date | Combinable, dt.datetime]
+    username: models.CharField[str | int, str]
+    first_name: models.CharField[str | int, str]
+    last_name: models.CharField[str | int, str]
+    email: models.EmailField[str, str]
+    is_staff: models.BooleanField[bool, bool]
+    is_active: models.BooleanField[bool, bool]
+    date_joined: models.DateTimeField[str | dt.datetime | dt.date, dt.datetime]
 
     objects: ClassVar[UserManager[Self]]
 

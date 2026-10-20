@@ -6,7 +6,7 @@ from django import forms
 from django.core.validators import _ValidatorCallable
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable, Expression
+from django.db.models.expressions import Expression
 from django.db.models.fields import NOT_PROVIDED, Field, _AllLimitChoicesTo, _ErrorMessagesMapping, _LimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForeignKeyDeferredAttribute, ManyRelatedManager
@@ -179,7 +179,7 @@ class ForeignObject(RelatedField[_ST, _GT]):
     requires_unique_target: bool
 
 class ForeignKey(ForeignObject[_ST, _GT]):
-    _pyi_private_set_type: Any | Combinable
+    _pyi_private_set_type: Any
     _pyi_private_get_type: Any
 
     descriptor_class: type[ForeignKeyDeferredAttribute]
@@ -254,7 +254,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
     def get_attname_column(self) -> tuple[str, str]: ...  # type: ignore[override]
 
 class OneToOneField(ForeignKey[_ST, _GT]):
-    _pyi_private_set_type: Any | Combinable
+    _pyi_private_set_type: Any
     _pyi_private_get_type: Any
 
     remote_field: OneToOneRel

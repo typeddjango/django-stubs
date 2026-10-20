@@ -4,7 +4,6 @@ from typing import Any, Self, overload
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable
 from django.db.models.fields import Field, _AllLimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import ForeignObject
@@ -18,7 +17,7 @@ from typing_extensions import override
 
 class GenericForeignKey(FieldCacheMixin, Field[Any, Any]):
     # django-stubs implementation only fields
-    _pyi_private_set_type: Any | Combinable
+    _pyi_private_set_type: Any
     _pyi_private_get_type: Any
     # attributes
     hidden: bool

@@ -272,6 +272,14 @@ class DjangoContext:
 
                     expected_types[field_name] = model_set_type
 
+        # TODO: delete once expected types are read from `Field.__set__`, which already accepts `Combinable`.
+        # Like `Field.__set__`, model kwargs also accept expressions such as `Value()` or `Now()`
+        combinable_info = helpers.lookup_fully_qualified_typeinfo(api, fullnames.COMBINABLE_EXPRESSION_FULLNAME)
+        if combinable_info is not None:
+            combinable = Instance(combinable_info, [])
+            expected_types = {
+                name: UnionType.make_union([set_type, combinable]) for name, set_type in expected_types.items()
+            }
         return expected_types
 
     @cached_property

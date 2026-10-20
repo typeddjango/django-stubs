@@ -7,7 +7,7 @@ from django.core.checks import CheckMessage
 from django.core.validators import _ValidatorCallable
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Field
-from django.db.models.expressions import Combinable, Expression
+from django.db.models.expressions import Expression
 from django.db.models.fields import NOT_PROVIDED, _ErrorMessagesDict, _ErrorMessagesMapping
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Transform
@@ -22,7 +22,7 @@ _ST = TypeVar("_ST", contravariant=True)
 _GT = TypeVar("_GT", covariant=True)
 
 class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: Sequence[Any] | Combinable
+    _pyi_private_set_type: Sequence[Any]
     _pyi_private_get_type: list[Any]
 
     empty_strings_allowed: bool

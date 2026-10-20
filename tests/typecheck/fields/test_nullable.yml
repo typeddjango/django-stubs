@@ -145,7 +145,7 @@
         from myapp.models import Article
 
         field = models.IntegerField(null=True)
-        reveal_type(field)  # N: Revealed type is "django.db.models.fields.IntegerField[float | int | str | django.db.models.expressions.Combinable | None, int | None]"
+        reveal_type(field)  # N: Revealed type is "django.db.models.fields.IntegerField[float | int | str | None, int | None]"
         Article.objects.annotate(
             other_id=Subquery(
                 Article.objects.filter(id=OuterRef("id")).values_list("id", flat=True)[:1],

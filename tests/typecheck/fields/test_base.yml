@@ -118,7 +118,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyUser
-        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[str | int | django.db.models.expressions.Combinable, str]"
+        reveal_type(MyUser.name.field)  # N: Revealed type is "django.db.models.fields.CharField[str | int, str]"
     installed_apps:
         - myapp
     files:
@@ -168,7 +168,7 @@
             published = cast(models.Field[Year, Year], models.IntegerField())
         book = Book()
         reveal_type(book.published)  # N: Revealed type is "main.Year"
-        book.published = 2006  # E: Incompatible types in assignment (expression has type "int", variable has type "Year")  [assignment]
+        book.published = 2006  # E: Incompatible types in assignment (expression has type "int", variable has type "Year | Combinable")  [assignment]
         book.published = Year(2006)
         reveal_type(book.published)  # N: Revealed type is "main.Year"
         def accepts_int(arg: int) -> None: ...
