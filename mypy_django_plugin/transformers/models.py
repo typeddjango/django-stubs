@@ -33,7 +33,7 @@ from mypy_django_plugin.errorcodes import MANAGER_MISSING
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.lib.fullnames import ANNOTATIONS_FULLNAME
-from mypy_django_plugin.transformers.fields import FieldDescriptorTypes, get_field_descriptor_types
+from mypy_django_plugin.transformers.fields import get_field_descriptor_types
 from mypy_django_plugin.transformers.managers import (
     MANAGER_METHODS_RETURNING_QUERYSET,
     create_manager_info_from_from_queryset_call,
@@ -813,8 +813,9 @@ class ProcessManyToManyFields(ModelClassInitializer):
         return info
 
     @cached_property
-    def fk_field_types(self) -> FieldDescriptorTypes:
-        return get_field_descriptor_types(self.fk_field, is_set_nullable=False, is_get_nullable=False)
+    def fk_field_instance(self) -> Instance:
+        set_type, get_type = get_field_descriptor_types(self.fk_field, is_set_nullable=False, is_get_nullable=False)
+        return Instance(self.fk_field, [set_type, get_type])
 
     @cached_property
     def many_related_manager(self) -> TypeInfo:
@@ -862,16 +863,13 @@ class ProcessManyToManyFields(ModelClassInitializer):
         helpers.add_new_sym_for_info(through_model, name="id", sym_type=self.default_pk_instance.copy_modified())
         # Add the foreign key to the model containing the 'ManyToManyField' call:
         # <containing_model> or from_<model>
+        containing_model_type = Instance(self.model_classdef.info, [])
         from_name = f"from_{self.model_classdef.name.lower()}" if m2m_args.to.self else self.model_classdef.name.lower()
         helpers.add_new_sym_for_info(
             through_model,
             name=from_name,
-            sym_type=Instance(
-                self.fk_field,
-                [
-                    helpers.convert_any_to_type(self.fk_field_types.set, Instance(self.model_classdef.info, [])),
-                    helpers.convert_any_to_type(self.fk_field_types.get, Instance(self.model_classdef.info, [])),
-                ],
+            sym_type=helpers.reparametrize_field_type(
+                self.fk_field_instance, set_type=containing_model_type, get_type=containing_model_type
             ),
         )
         # Add the foreign key's '_id' field: <containing_model>_id or from_<model>_id
@@ -887,12 +885,8 @@ class ProcessManyToManyFields(ModelClassInitializer):
         helpers.add_new_sym_for_info(
             through_model,
             name=to_name,
-            sym_type=Instance(
-                self.fk_field,
-                [
-                    helpers.convert_any_to_type(self.fk_field_types.set, m2m_args.to.model),
-                    helpers.convert_any_to_type(self.fk_field_types.get, m2m_args.to.model),
-                ],
+            sym_type=helpers.reparametrize_field_type(
+                self.fk_field_instance, set_type=m2m_args.to.model, get_type=m2m_args.to.model
             ),
         )
         # Add the foreign key's '_id' field: <other_model>_id or to_<model>_id

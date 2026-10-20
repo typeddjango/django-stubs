@@ -530,6 +530,13 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
     return typ
 
 
+def reparametrize_field_type(field_type: Instance, set_type: MypyType, get_type: MypyType) -> Instance:
+    """Replace `Any` placeholders in the set/get type args of a Field Instance, preserving any additional args."""
+    new_set_type = convert_any_to_type(field_type.args[0], set_type)
+    new_get_type = convert_any_to_type(field_type.args[1], get_type)
+    return field_type.copy_modified(args=[new_set_type, new_get_type, *field_type.args[2:]])
+
+
 def _get_fallback_typeddict(api: SemanticAnalyzer | CheckerPluginInterface) -> Instance:
     if isinstance(api, CheckerPluginInterface):
         return api.named_generic_type("typing._TypedDict", [])
