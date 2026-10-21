@@ -31,6 +31,15 @@ repos:
     rev: d4acaec07ac3bc6017fba3c3b8e9810af1b615db  # frozen: 0.13.1
     hooks:
       - id: uv-lock
+  - repo: local
+    hooks:
+      - id: plugin-features-doc
+        name: generate mypy plugin features doc
+        entry: python -m scripts.plugin_features_doc
+        language: python
+        additional_dependencies: [django, mypy]
+        files: ^(mypy_django_plugin/|scripts/plugin_features_doc\.py$|docs/mypy-plugin-features\.md$)
+        pass_filenames: false
 
 ci:
   autofix_commit_msg: "[pre-commit.ci] auto fixes from pre-commit.com hooks"

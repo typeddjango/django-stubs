@@ -138,6 +138,9 @@ ignore-words-list = "aadd,acount,asend,indentity,nam"
 
 [tool.ruff]
 # Adds to default excludes: https://ruff.rs/docs/settings/#exclude
+# Generated from the plugin hook docstrings, formatting its code blocks would fight the generator.
+extend-exclude = ["docs/mypy-plugin-features.md"]
+force-exclude = true
 line-length = 120
 target-version = "py311"
 
