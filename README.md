@@ -9,6 +9,7 @@ This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) an
 ## Supported type checkers
 
 - mypy: full and complete support with multiple advanced features with our custom mypy plugin
+  (see [the list of plugin features](docs/mypy-plugin-features.md))
 - pyright: basic support, checked in CI
 - pyrefly: basic support, checked in CI
 - ty: basic support, checked in CI

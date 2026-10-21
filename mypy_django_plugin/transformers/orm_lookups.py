@@ -1,3 +1,5 @@
+"""Field lookups"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -16,6 +18,15 @@ if TYPE_CHECKING:
 
 
 def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Type-check lookups passed to `filter()`, `get()`, `exclude()` and friends
+
+    Also covers `get_or_create()`, `update_or_create()` and the async variants.
+
+    ```python
+    Book.objects.filter(nope=1)  # error: Cannot resolve keyword 'nope' into field. Choices are: id, title  [misc]
+    Book.objects.get(id=Book())  # error: Incompatible type for lookup 'id': (got "Book", expected "str | int")  [misc]
+    ```
+    """
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
         return ctx.default_return_type

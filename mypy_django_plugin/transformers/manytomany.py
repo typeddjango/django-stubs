@@ -1,3 +1,5 @@
+"""Many-to-many relations"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, NamedTuple
@@ -165,10 +167,19 @@ def get_related_manager_and_model(ctx: MethodContext) -> tuple[Instance, Instanc
 
 
 def refine_many_to_many_related_manager(ctx: MethodContext) -> MypyType:
+    """Add the related model's manager methods to `ManyToManyField` managers
+
+    Applies to both sides of the relation.
+
+    ```python
+    class Book(models.Model):
+        authors = models.ManyToManyField(Author)
+
+    reveal_type(Book().authors.active())  # AuthorQuerySet[Author, Author], from Author's default manager
+    ```
     """
-    Updates the 'ManyRelatedManager' returned by e.g. 'ManyToManyDescriptor' to be a subclass
-    of 'ManyRelatedManager' and the related model's default manager.
-    """
+    # Like Django, build the manager returned by `ManyToManyField.__get__` and `ManyToManyDescriptor.__get__`
+    # from the related model's `_default_manager`.
     related_objects = get_related_manager_and_model(ctx)
     if related_objects is None:
         return ctx.default_return_type

@@ -1,3 +1,5 @@
+"""Auth user model"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -24,6 +26,14 @@ def _get_abstract_base_user(api: SemanticAnalyzer) -> ProperType:
 
 
 def get_user_model(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> MypyType:
+    """Resolve `get_user_model()`, `request.user` and other auth APIs to `AUTH_USER_MODEL`
+
+    ```python
+    # settings.py: AUTH_USER_MODEL = "myapp.MyUser"
+    reveal_type(get_user_model())  # type[MyUser]
+    reveal_type(request.user)  # MyUser | AnonymousUser
+    ```
+    """
     assert isinstance(ctx.api, TypeAnalyser)
     assert isinstance(ctx.api.api, SemanticAnalyzer)
 

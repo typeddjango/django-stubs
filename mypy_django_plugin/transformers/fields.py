@@ -1,3 +1,5 @@
+"""Model fields"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, NamedTuple, cast
@@ -218,6 +220,19 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
 
 
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+    """Infer the value type of model fields from their arguments
+
+    `null=True` adds `None`, and related fields resolve their target model, even given as a string.
+
+    ```python
+    class Book(models.Model):
+        subtitle = models.CharField(max_length=100, null=True)
+        publisher = models.ForeignKey("Publisher", on_delete=models.CASCADE)
+
+    reveal_type(Book().subtitle)  # str | None
+    reveal_type(Book().publisher)  # Publisher
+    ```
+    """
     default_return_type = get_proper_type(ctx.default_return_type)
     assert isinstance(default_return_type, Instance)
 

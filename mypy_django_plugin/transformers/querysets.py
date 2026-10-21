@@ -1,3 +1,5 @@
+"""QuerySets"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final, Literal
@@ -63,18 +65,18 @@ if TYPE_CHECKING:
 
 
 def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
+    """Infer the model of a manager instantiated in a model body
+
+    So `objects = BookManager()` needs no annotation.
+
+    ```python
+    class Book(models.Model):
+        objects = BookManager()
+
+    reveal_type(Book.objects)  # BookManager[Book]
+    ```
     """
-    Fill the manager TypeVar on instantiation using the enclosing class.
-    For example:
-
-        class MyModel(Model):
-            objects = MyManager()
-
-    Is interpreted as:
-
-        class MyModel(Model):
-            objects: MyManager[MyModel] = MyManager()
-    """
+    # Fills the manager TypeVar with the enclosing model, as if written `objects: BookManager[Book] = BookManager()`.
     default_return_type = get_proper_type(ctx.default_return_type)
     assert isinstance(default_return_type, Instance)
 
@@ -192,6 +194,15 @@ def get_values_list_row_type(
 
 
 def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Infer the row type returned by `QuerySet.values_list()`
+
+    Including `flat=True` and `named=True`.
+
+    ```python
+    reveal_type(Book.objects.values_list("title", "pages").get())  # tuple[str, int]
+    reveal_type(Book.objects.values_list("title", flat=True).get())  # str
+    ```
+    """
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
         return ctx.default_return_type
@@ -271,13 +282,15 @@ def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
 
 
 def reparameterize_func_output_field(ctx: FunctionContext) -> MypyType:
-    """Reparameterize Func[_OutputField] from the output_field argument.
+    """Infer the output type of a `Func` expression from its `output_field`
 
-    When a generic Func subclass like Substr is nested directly inside a call with
-    **kwargs: Any (e.g., QuerySet.annotate()), mypy infers _OutputField=Any because
-    the target type is unconstrained. This hook corrects the return type by extracting
-    the actual output_field argument type.
+    ```python
+    book = Book.objects.annotate(raw=Substr("title", 1, 10, output_field=BinaryField())).get()
+    reveal_type(book.raw)  # bytes | memoryview[int]
+    ```
     """
+    # Nested in a `**kwargs: Any` call like `annotate()`, mypy infers `_OutputField=Any`
+    # because the target type is unconstrained, so fill it from the `output_field` argument.
     default = get_proper_type(ctx.default_return_type)
     if not isinstance(default, Instance) or not default.args:
         return ctx.default_return_type
@@ -430,6 +443,15 @@ def _resolve_annotate_row_type(
 
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Add the names given to `QuerySet.annotate()` and `alias()` to the model type
+
+    ```python
+    reveal_type(Book.objects.annotate(n=Count("id")).get().n)  # int
+    Book.objects.annotate(title=F("id"))  # error: Attribute "title" already defined on "Book"  [no-redef]
+    ```
+
+    `alias()` names are typed as instance attributes too, although Django doesn't set them.
+    """
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
         # When the queryset's model is a TypeVar (e.g. inside a generic queryset method body),
@@ -479,12 +501,19 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
 
 
 def merge_annotations_from_custom_method(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    """
-    Method hook for custom QuerySet/Manager methods that return annotated querysets.
+    """Keep annotations through custom `QuerySet` methods returning `WithAnnotations`
 
-    Ensures extra_attrs are set on annotated model Instances (so attribute access works)
-    and merges annotations from the caller queryset with annotations from the return type.
+    ```python
+    class BookQuerySet(models.QuerySet[_M]):
+        def with_price(self) -> "BookQuerySet[WithAnnotations[_M, PriceDict]]": ...
+
+    book = Book.objects.annotate(n=Count("id")).with_price().get()
+    reveal_type(book.price)  # int
+    reveal_type(book.n)  # int
+    ```
     """
+    # Rebuilds the annotated model so its `extra_attrs` allow attribute access,
+    # merging the caller queryset's annotations with the return type's.
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
         return ctx.default_return_type
@@ -533,11 +562,14 @@ def _get_annotation_field_types(model_type: Instance) -> dict[str, MypyType]:
 
 
 def extract_proper_type_queryset_values(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    """
-    Extract proper return type for QuerySet.values(*fields, **expressions) method calls.
+    """Infer the row type returned by `QuerySet.values()`
 
-    See https://docs.djangoproject.com/en/stable/ref/models/querysets/#values
+    ```python
+    reveal_type(Book.objects.values("title", n=Count("id")).get())  # TypedDict({'title': str, 'n': int})
+    Book.objects.values("nope")  # error: Cannot resolve keyword 'nope' into field. Choices are: ...  [misc]
+    ```
     """
+    # See https://docs.djangoproject.com/en/stable/ref/models/querysets/#values
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
         return ctx.default_return_type
@@ -658,7 +690,15 @@ def _specialize_string_arg_to_literal(
 
 
 def specialize_prefetch_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    """Function hook for `Prefetch(...)` to specialize its `lookup` and `to_attr` generic parameters."""
+    """Keep the `lookup` and `to_attr` of `Prefetch()` as literal types
+
+    So a `Prefetch` stored in a variable still adds its `to_attr` in `prefetch_related()`.
+
+    ```python
+    tags = Prefetch("tags", Tag.objects.all(), to_attr="tag_list")
+    reveal_type(tags)  # Prefetch[Literal['tags'], QuerySet[Tag, Tag], Literal['tag_list']]
+    ```
+    """
     default = get_proper_type(ctx.default_return_type)
     if not isinstance(default, Instance):
         return ctx.default_return_type
@@ -901,11 +941,15 @@ def check_conflicting_lookups(
 
 
 def extract_prefetch_related_annotations(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    """
-    Extract annotated attributes via `prefetch_related(Prefetch(..., to_attr=...))`
+    """Type-check `QuerySet.prefetch_related()` and add `Prefetch(to_attr=...)` attributes
 
-    See https://docs.djangoproject.com/en/stable/ref/models/querysets/#prefetch-objects
+    ```python
+    book = Book.objects.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="tag_list")).get()
+    reveal_type(book.tag_list)  # list[Tag]
+    Book.objects.prefetch_related("nope")  # error: Cannot find "nope" on "Book" object, ...  [misc]
+    ```
     """
+    # See https://docs.djangoproject.com/en/stable/ref/models/querysets/#prefetch-objects
     api = helpers.get_typechecker_api(ctx)
 
     if not (
@@ -1082,11 +1126,15 @@ def _validate_select_related_lookup(
 
 
 def validate_select_related(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    """
-    Validates that all lookup strings passed to select_related() resolve to actual model fields and relations.
+    """Report invalid `QuerySet.select_related()` lookups
 
-    Extracted and adapted from `django.db.models.sql.compiler.SQLCompiler.get_related_selections`
+    Lookups must follow foreign keys or one-to-one relations.
+
+    ```python
+    Book.objects.select_related("title")  # error: Invalid field name "title" in select_related lookup. ...  [misc]
+    ```
     """
+    # Adapted from `django.db.models.sql.compiler.SQLCompiler.get_related_selections`.
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
         return ctx.default_return_type
 
@@ -1099,12 +1147,15 @@ def validate_select_related(ctx: MethodContext, django_context: DjangoContext) -
 def validate_bulk_update(
     ctx: MethodContext, django_context: DjangoContext, method: Literal["bulk_update", "abulk_update"]
 ) -> MypyType:
-    """
-    Type check the `fields` argument passed to `QuerySet.bulk_update(...)`.
+    """Report invalid `fields` passed to `QuerySet.bulk_update()`
 
-    Extracted and adapted from `django.db.models.query.QuerySet.bulk_update`
-    Mirrors tests from `django/tests/queries/test_bulk_update.py`
+    ```python
+    Book.objects.bulk_update(books, ["nope"])  # error: Book has no field named 'nope'  [misc]
+    Book.objects.bulk_update(books, ["id"])  # error: "bulk_update()" does not support primary key fields. ...  [misc]
+    ```
     """
+    # Adapted from `django.db.models.query.QuerySet.bulk_update`,
+    # mirrors tests from `django/tests/queries/test_bulk_update.py`.
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None or (
         field_names := _extract_field_names_from_collection(ctx, django_context, arg_index=1)
     ) is None:
@@ -1134,11 +1185,13 @@ def _validate_bulk_create_unique_field(
 def validate_bulk_create(
     ctx: MethodContext, django_context: DjangoContext, method: Literal["bulk_create", "abulk_create"]
 ) -> MypyType:
-    """
-    Type check the `update_fields` and `unique_fields` arguments passed to `QuerySet.bulk_create(...)`.
+    """Report invalid `update_fields` and `unique_fields` of `QuerySet.bulk_create()`
 
-    Extracted and adapted from `django.db.models.query.QuerySet._check_bulk_create_options`
+    ```python
+    Book.objects.bulk_create(books, unique_fields=["nope"])  # error: Book has no field named 'nope'  [misc]
+    ```
     """
+    # Adapted from `django.db.models.query.QuerySet._check_bulk_create_options`.
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
         return ctx.default_return_type
 
@@ -1182,6 +1235,14 @@ def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts:
 
 
 def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Report unknown fields in `QuerySet.order_by()`, `earliest()` and `latest()`
+
+    Relations, transforms like `__year` and annotations are accepted.
+
+    ```python
+    Book.objects.latest("nope")  # error: Cannot resolve keyword 'nope' into field. Choices are: ...  [misc]
+    ```
+    """
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
         return ctx.default_return_type
 
@@ -1221,6 +1282,12 @@ def _validate_defer_only_fields(
 
 
 def validate_defer_only(ctx: MethodContext, django_context: DjangoContext, *, is_defer: bool) -> MypyType:
+    """Report unknown fields in `QuerySet.defer()` and `only()`
+
+    ```python
+    Book.objects.defer("nope")  # error: Invalid field in "defer()": Book has no field named 'nope'  [misc]
+    ```
+    """
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None or not (
         field_names := _extract_field_names_from_varargs(ctx)
     ):
@@ -1232,6 +1299,14 @@ def validate_defer_only(ctx: MethodContext, django_context: DjangoContext, *, is
 
 
 def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Report unknown fields in `QuerySet.distinct()`
+
+    Fields resolve like in `order_by()`, without the `-` prefix.
+
+    ```python
+    Book.objects.distinct("-title")  # error: Cannot resolve keyword '-title' into field. Choices are: ...  [misc]
+    ```
+    """
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None:
         return ctx.default_return_type
 
@@ -1283,6 +1358,13 @@ def gather_update_kwargs(ctx: MethodContext) -> dict[str, MypyType]:
 
 
 def validate_update(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Report unknown or non-concrete fields in `QuerySet.update()`
+
+    ```python
+    Book.objects.update(nope=1)  # error: Book has no field named 'nope'  [misc]
+    Book.objects.update(tags=1)  # error: "update()" can only be used with concrete fields. Got "tags"  [misc]
+    ```
+    """
     if (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None or not (
         kwargs := gather_update_kwargs(ctx)
     ):
@@ -1297,6 +1379,14 @@ def validate_update(ctx: MethodContext, django_context: DjangoContext) -> MypyTy
 
 
 def validate_in_bulk(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Report a non-unique `field_name` passed to `QuerySet.in_bulk()`
+
+    Unless the queryset is `distinct()` on that field.
+
+    ```python
+    Book.objects.in_bulk(field_name="title")  # error: "in_bulk()"'s field_name must be a unique field ...  [misc]
+    ```
+    """
     if (
         (django_model := helpers.get_model_info_from_qs_ctx(ctx, django_context)) is None
         or (field_name_expr := helpers.get_call_argument_by_name(ctx, "field_name")) is None

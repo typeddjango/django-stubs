@@ -1,3 +1,5 @@
+"""Saving models"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -16,8 +18,12 @@ if TYPE_CHECKING:
 
 
 def validate_save_update_fields(ctx: MethodContext, django_context: DjangoContext, method: str) -> MypyType:
-    """
-    Type check the keyword-only `update_fields` argument passed to `Model.save(...)` / `Model.asave(...)`.
+    """Type-check the `update_fields` of `Model.save()` and `Model.asave()`
+
+    ```python
+    book.save(update_fields=["nope"])  # error: Book has no field named 'nope'  [misc]
+    book.save(update_fields=["id"])  # error: "save()" does not support primary key fields. Got "id"  [misc]
+    ```
     """
     if not isinstance(ctx.type, Instance) or not helpers.is_model_type(ctx.type.type):
         return ctx.default_return_type
