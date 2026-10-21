@@ -46,7 +46,7 @@ if TYPE_CHECKING:
     from django.db.models import Manager, Model
     from mypy.checker import TypeChecker
     from mypy.nodes import MypyFile
-    from mypy.plugin import AnalyzeTypeContext, AttributeContext, ClassDefContext
+    from mypy.plugin import AnalyzeTypeContext, ClassDefContext
 
     from mypy_django_plugin.config import DjangoPluginConfig
     from mypy_django_plugin.django.context import DjangoContext
@@ -1131,12 +1131,6 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
         except helpers.IncompleteDefnException:
             if not ctx.api.final_iteration:
                 ctx.api.defer()
-
-
-def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
-    boolinfo = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), bool)
-    assert boolinfo is not None
-    return Instance(boolinfo, [])
 
 
 def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
