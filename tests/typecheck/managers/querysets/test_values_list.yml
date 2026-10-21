@@ -355,3 +355,22 @@
                 class A(models.Model):
                     b = models.ForeignKey(B, on_delete=models.CASCADE)
                     name = models.IntegerField()
+-   case: values_list_honors_annotated_field_type
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Blog
+        reveal_type(Blog.objects.values_list("kind", flat=True).get())  # N: Revealed type is "myapp.models.Kind"
+        reveal_type(Blog.objects.values("kind").get())  # N: Revealed type is "TypedDict({'kind': myapp.models.Kind})"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Kind(models.TextChoices):
+                    NEWS = "news"
+
+                class Blog(models.Model):
+                    kind: Kind = models.CharField(max_length=10, choices=Kind.choices)  # type: ignore[assignment]

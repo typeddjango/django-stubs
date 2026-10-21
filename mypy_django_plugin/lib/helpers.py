@@ -790,6 +790,7 @@ def analyze_member_access(
     is_operator: bool,
     original_type: MypyType,
     chk: TypeChecker,
+    suppress_errors: bool = False,
 ) -> MypyType:
     # TODO: [mypy 1.16+] Remove this workaround for passing `msg` to `analyze_member_access()`.
     extra: dict[str, Any] = {}
@@ -804,5 +805,45 @@ def analyze_member_access(
         is_operator=is_operator,
         original_type=original_type,
         chk=chk,
+        suppress_errors=suppress_errors,
         **extra,
     )
+
+
+def _resolve_field_descriptor_type(
+    api: TypeChecker, info: TypeInfo | None, field_name: str, context: Context, *, is_lvalue: bool
+) -> ProperType:
+    if info is None:
+        return AnyType(TypeOfAny.from_error)
+    instance = model_instance(info)
+    return get_proper_type(
+        analyze_member_access(
+            name=field_name,
+            typ=instance,
+            context=context,
+            is_lvalue=is_lvalue,
+            is_super=False,
+            is_operator=False,
+            original_type=instance,
+            chk=api,
+            suppress_errors=True,
+        )
+    )
+
+
+def get_field_set_type(api: TypeChecker, context: Context, info: TypeInfo | None, field_name: str) -> ProperType:
+    """Resolve `<model>.<field_name> = ...` rvalue type via Field's `__set__` overloads.
+
+    For `name = CharField()` -> `str | int | Combinable`.
+    For `name = CharField(null=True)` -> `str | int | Combinable | None`.
+    """
+    return _resolve_field_descriptor_type(api, info, field_name, context, is_lvalue=True)
+
+
+def get_field_get_type(api: TypeChecker, context: Context, info: TypeInfo | None, field_name: str) -> ProperType:
+    """Resolve `<model_instance>.<field_name>` read type via Field's `__get__` overloads.
+
+    For `name = CharField()` -> `str`.
+    For `name = CharField(null=True)` -> `str | None`.
+    """
+    return _resolve_field_descriptor_type(api, info, field_name, context, is_lvalue=False)

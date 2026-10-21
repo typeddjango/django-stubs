@@ -503,13 +503,13 @@
         reveal_type(Book().publisher_id)  # N: Revealed type is "str"
         Book(publisher_id=1)
         Book(publisher_id='hello')
-        Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "str | int | Combinable")  [misc]
+        Book(publisher_id=datetime.datetime.now())  # E: Incompatible type for "publisher_id" of "Book" (got "datetime", expected "str | int | Combinable | None")  [misc]
         Book.objects.create(publisher_id=1)
         Book.objects.create(publisher_id='hello')
 
         reveal_type(Book2().publisher_id)  # N: Revealed type is "int"
         Book2(publisher_id=1)
-        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
+        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "float | int | str | Combinable | None")  [misc]
         Book2.objects.create(publisher_id=1)
         Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
     installed_apps:
