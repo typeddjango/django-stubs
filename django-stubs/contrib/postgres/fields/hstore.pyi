@@ -24,9 +24,9 @@ class KeyTransformFactory:
     def __call__(self, *args: Any, **kwargs: Any) -> KeyTransform: ...
 
 class KeysTransform(Transform):
-    output_field: ClassVar[ArrayField[Any, Any]]
+    output_field: ClassVar[ArrayField]
 
 class ValuesTransform(Transform):
-    output_field: ClassVar[ArrayField[Any, Any]]
+    output_field: ClassVar[ArrayField]
 
 __all__ = ["HStoreField"]

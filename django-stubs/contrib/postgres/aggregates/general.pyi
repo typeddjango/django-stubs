@@ -15,7 +15,7 @@ from .mixins import OrderableAggMixin
 class ArrayAgg(OrderableAggMixin, Aggregate):
     @property
     @override
-    def output_field(self) -> ArrayField[Any, Any]: ...
+    def output_field(self) -> ArrayField: ...
     @override
     def resolve_expression(
         self,

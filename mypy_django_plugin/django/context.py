@@ -103,12 +103,12 @@ class DjangoContext:
             if isinstance(field, Field):
                 yield field
 
-    def get_model_foreign_keys(self, model_cls: type[Model]) -> Iterator[ForeignKey[Any, Any]]:
+    def get_model_foreign_keys(self, model_cls: type[Model]) -> Iterator[ForeignKey]:
         for field in model_cls._meta.get_fields():
             if isinstance(field, ForeignKey):
                 yield field
 
-    def get_model_related_fields(self, model_cls: type[Model]) -> Iterator[RelatedField[Any, Any]]:
+    def get_model_related_fields(self, model_cls: type[Model]) -> Iterator[RelatedField]:
         """Get model forward relations"""
         for field in model_cls._meta.get_fields():
             if isinstance(field, RelatedField):
@@ -140,9 +140,7 @@ class DjangoContext:
             return AnyType(TypeOfAny.explicit)
         return helpers.get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
 
-    def get_related_target_field(
-        self, related_model_cls: type[Model], field: ForeignKey[Any, Any]
-    ) -> Field[Any, Any] | None:
+    def get_related_target_field(self, related_model_cls: type[Model], field: ForeignKey) -> Field[Any, Any] | None:
         # ForeignKey only supports one `to_fields` item (ForeignObject supports many)
         assert len(field.to_fields) == 1
         to_field_name = field.to_fields[0]
@@ -226,7 +224,7 @@ class DjangoContext:
         app_label, _, model_name = label.partition(".")
         return self._model_class_fullnames_by_label_lower.get(f"{app_label}.{model_name.lower()}")
 
-    def get_field_related_model_cls(self, field: RelatedField[Any, Any] | ForeignObjectRel) -> type[Model]:
+    def get_field_related_model_cls(self, field: RelatedField | ForeignObjectRel) -> type[Model]:
         if isinstance(field, RelatedField):
             related_model_cls = field.remote_field.model
         else:

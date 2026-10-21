@@ -39,7 +39,7 @@ class GeoFunc(GeoFuncMixin, Func): ...  # type: ignore[misc]
 class GeomOutputGeoFunc(GeoFunc):
     @cached_property
     @override
-    def output_field(self) -> GeometryField[Any, Any]: ...
+    def output_field(self) -> GeometryField: ...
 
 class SQLiteDecimalToFloatMixin:
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
@@ -52,7 +52,7 @@ class Area(OracleToleranceMixin, GeoFunc):
     arity: int
     @cached_property
     @override
-    def output_field(self) -> AreaField[Any, Any]: ...
+    def output_field(self) -> AreaField: ...
     @override
     def as_sql(  # type: ignore[override]
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
@@ -112,7 +112,7 @@ class Difference(OracleToleranceMixin, GeomOutputGeoFunc):  # type: ignore[misc]
 
 class DistanceResultMixin:
     @cached_property
-    def output_field(self) -> DistanceField[Any, Any]: ...
+    def output_field(self) -> DistanceField: ...
     def source_is_geography(self) -> bool: ...
 
 class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):  # type: ignore[misc]

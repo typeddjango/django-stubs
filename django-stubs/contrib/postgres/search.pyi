@@ -14,9 +14,9 @@ from .utils import CheckPostgresInstalledMixin
 _Expression: TypeAlias = str | Combinable | SearchQueryCombinable
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True)
+_ST = TypeVar("_ST", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True)
+_GT = TypeVar("_GT", covariant=True, default=Any)
 
 class UTF8Dumper(Dumper):
     @override
@@ -52,7 +52,7 @@ class SearchVector(SearchVectorCombinable, Func):
     config: _Expression | None
     function: str
     arg_joiner: str
-    output_field: ClassVar[SearchVectorField[Any, Any]]
+    output_field: ClassVar[SearchVectorField]
     def __init__(
         self, *expressions: _Expression, config: _Expression | None = None, weight: Any | None = None
     ) -> None: ...
@@ -84,7 +84,7 @@ class SearchQueryCombinable:
     def __rand__(self, other: SearchQueryCombinable) -> Self: ...
 
 class SearchQuery(SearchQueryCombinable, Func):  # type: ignore[misc]
-    output_field: ClassVar[SearchQueryField[Any, Any]]
+    output_field: ClassVar[SearchQueryField]
     SEARCH_TYPES: dict[str, str]
     def __init__(
         self,
