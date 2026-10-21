@@ -231,6 +231,9 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
         return manytomany.fill_model_args_for_many_to_many_field(
             ctx=ctx, model_info=outer_model_info, django_context=django_context
         )
+    if default_return_type.type.has_base(fullnames.GENERIC_RELATION_FULLNAME):
+        # A to-many relation read through a manager, unlike the foreign keys it shares a base with.
+        return default_return_type
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)
 
