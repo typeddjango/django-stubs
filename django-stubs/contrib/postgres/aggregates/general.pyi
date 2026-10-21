@@ -48,13 +48,13 @@ class BitXor(Aggregate):
     def __init__(self, expression: Any, **extra: Any) -> None: ...
 
 class BoolAnd(Aggregate):
-    output_field: ClassVar[BooleanField[Any, Any]]
+    output_field: ClassVar[BooleanField]
 
 class BoolOr(Aggregate):
-    output_field: ClassVar[BooleanField[Any, Any]]
+    output_field: ClassVar[BooleanField]
 
 class JSONBAgg(OrderableAggMixin, Aggregate):
-    output_field: ClassVar[JSONField[Any, Any]]
+    output_field: ClassVar[JSONField]
     @override
     def resolve_expression(
         self,
@@ -68,7 +68,7 @@ class JSONBAgg(OrderableAggMixin, Aggregate):
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...  # type: ignore[override]
 
 class StringAgg(OrderableAggMixin, Aggregate):
-    output_field: ClassVar[TextField[Any, Any]]
+    output_field: ClassVar[TextField]
     @deprecated(
         "The PostgreSQL specific StringAgg function is deprecated. Use django.db.models.aggregates.StringAgg instead."
     )

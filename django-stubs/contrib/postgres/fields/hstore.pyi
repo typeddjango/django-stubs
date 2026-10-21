@@ -13,7 +13,7 @@ class HStoreField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[Any
     def get_transform(self, name: str) -> Any: ...
 
 class KeyTransform(Transform):
-    output_field: ClassVar[TextField[Any, Any]]
+    output_field: ClassVar[TextField]
 
     def __init__(self, key_name: str, *args: Any, **kwargs: Any) -> None: ...
     @override

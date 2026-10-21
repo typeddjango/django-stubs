@@ -15,9 +15,9 @@ if sys.version_info >= (3, 12):
     from django.contrib.contenttypes.fields import GenericForeignKeyDescriptor
 
     class TaggedItem(models.Model):
-        tag = models.SlugField()  # pyright: ignore[reportUnknownVariableType]
-        content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)  # pyright: ignore[reportUnknownVariableType]
-        object_id = models.PositiveBigIntegerField()  # pyright: ignore[reportUnknownVariableType]
+        tag = models.SlugField()
+        content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+        object_id = models.PositiveBigIntegerField()
         content_object = GenericForeignKey("content_type", "object_id")
 
     def test_generic_foreign_key_descriptor() -> None:

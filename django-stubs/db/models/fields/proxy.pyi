@@ -2,5 +2,5 @@ from typing import Any
 
 from django.db.models import fields
 
-class OrderWrt(fields.IntegerField[Any, Any]):
+class OrderWrt(fields.IntegerField):
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...

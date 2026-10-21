@@ -137,10 +137,10 @@ class BaseModelAdmin(Generic[_ModelT], metaclass=MediaDefiningClass):
         self, db_field: Field[Any, Any], request: HttpRequest, **kwargs: Any
     ) -> TypedChoiceField | None: ...
     def get_field_queryset(
-        self, db: str | None, db_field: RelatedField[Any, Any], request: HttpRequest
+        self, db: str | None, db_field: RelatedField, request: HttpRequest
     ) -> QuerySet[Any] | None: ...
     def formfield_for_foreignkey(
-        self, db_field: ForeignKey[Any, Any], request: HttpRequest, **kwargs: Any
+        self, db_field: ForeignKey, request: HttpRequest, **kwargs: Any
     ) -> ModelChoiceField[Any] | None: ...
     def formfield_for_manytomany(
         self, db_field: ManyToManyField[Any, Any], request: HttpRequest, **kwargs: Any

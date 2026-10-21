@@ -85,5 +85,5 @@ def deserialize_m2m_values(
     field: ManyToManyField[Any, Any], field_value: Iterable[Any], using: str | None, handle_forward_references: bool
 ) -> Sequence[Any] | object: ...
 def deserialize_fk_value(
-    field: ForeignKey[Any, Any], field_value: Any, using: str | None, handle_forward_references: bool
+    field: ForeignKey, field_value: Any, using: str | None, handle_forward_references: bool
 ) -> Any | object: ...

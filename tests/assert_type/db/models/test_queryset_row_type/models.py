@@ -10,7 +10,7 @@ from django.utils import timezone
 
 
 class Blog(models.Model):
-    created_at = models.DateTimeField()  # pyright: ignore[reportUnknownVariableType]
+    created_at = models.DateTimeField()
 
 
 def queryset_methods_keep_the_row_type(qs: QuerySet[Blog], manager: models.Manager[Blog]) -> None:

@@ -46,23 +46,23 @@ class ContinuousRangeField(RangeField[_RangeT]):
     def __init__(self, *args: Any, default_bounds: str = "[)", **kwargs: Any) -> None: ...
 
 class IntegerRangeField(RangeField[NumericRange]):
-    base_field: type[models.IntegerField[Any, Any]]
+    base_field: type[models.IntegerField]
     form_field: type[forms.IntegerRangeField]
 
 class BigIntegerRangeField(RangeField[NumericRange]):
-    base_field: type[models.BigIntegerField[Any, Any]]
+    base_field: type[models.BigIntegerField]
     form_field: type[forms.IntegerRangeField]
 
 class DecimalRangeField(ContinuousRangeField[NumericRange]):
-    base_field: type[models.DecimalField[Any, Any]]
+    base_field: type[models.DecimalField]
     form_field: type[forms.DecimalRangeField]
 
 class DateTimeRangeField(ContinuousRangeField[DateTimeTZRange]):
-    base_field: type[models.DateTimeField[Any, Any]]
+    base_field: type[models.DateTimeField]
     form_field: type[forms.DateTimeRangeField]
 
 class DateRangeField(RangeField[DateRange]):
-    base_field: type[models.DateField[Any, Any]]
+    base_field: type[models.DateField]
     form_field: type[forms.DateRangeField]
 
 class DateTimeRangeContains(PostgresOperatorLookup): ...
@@ -89,19 +89,19 @@ class RangeEndsWith(models.Transform):
     def output_field(self) -> models.Field[Any, Any]: ...
 
 class IsEmpty(models.Transform):
-    output_field: ClassVar[models.BooleanField[Any, Any]]
+    output_field: ClassVar[models.BooleanField]
 
 class LowerInclusive(models.Transform):
-    output_field: ClassVar[models.BooleanField[Any, Any]]
+    output_field: ClassVar[models.BooleanField]
 
 class LowerInfinite(models.Transform):
-    output_field: ClassVar[models.BooleanField[Any, Any]]
+    output_field: ClassVar[models.BooleanField]
 
 class UpperInclusive(models.Transform):
-    output_field: ClassVar[models.BooleanField[Any, Any]]
+    output_field: ClassVar[models.BooleanField]
 
 class UpperInfinite(models.Transform):
-    output_field: ClassVar[models.BooleanField[Any, Any]]
+    output_field: ClassVar[models.BooleanField]
 
 __all__ = [
     "BigIntegerRangeField",

@@ -183,7 +183,7 @@ class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT], Generic[_M, _ParentM,
     instance: _ParentM
     save_as_new: bool
     unique_fields: Collection[str]
-    fk: ForeignKey[Any, Any]  # set by inlineformset_set
+    fk: ForeignKey  # set by inlineformset_set
     def __init__(
         self,
         data: _DataT | None = None,
@@ -209,11 +209,11 @@ class BaseInlineFormSet(BaseModelFormSet[_M, _ModelFormT], Generic[_M, _ParentM,
 @overload
 def _get_foreign_key(
     parent_model: type[Model], model: type[Model], fk_name: str | None = None, can_fail: Literal[False] = ...
-) -> ForeignKey[Any, Any]: ...
+) -> ForeignKey: ...
 @overload
 def _get_foreign_key(
     parent_model: type[Model], model: type[Model], fk_name: str | None = None, can_fail: Literal[True] = ...
-) -> ForeignKey[Any, Any] | None: ...
+) -> ForeignKey | None: ...
 def inlineformset_factory(
     parent_model: type[_ParentM],
     model: type[_M],

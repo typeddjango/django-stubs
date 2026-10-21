@@ -90,7 +90,7 @@ class KeyTransform(Transform):
 class KeyTextTransform(KeyTransform):
     postgres_operator: str
     postgres_nested_operator: str
-    output_field: ClassVar[TextField[Any, Any]]
+    output_field: ClassVar[TextField]
     @override
     def as_mysql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
     @classmethod

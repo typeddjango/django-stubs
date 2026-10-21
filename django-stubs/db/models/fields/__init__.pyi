@@ -50,9 +50,9 @@ _ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
 _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True)
+_ST = TypeVar("_ST", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True)
+_GT = TypeVar("_GT", covariant=True, default=Any)
 
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     """
@@ -288,13 +288,13 @@ class BigIntegerField(IntegerField[_ST, _GT]):
     MAX_BIGINT: ClassVar[int]
 
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]):
-    integer_field_class: type[IntegerField[Any, Any]]
+    integer_field_class: type[IntegerField]
 
 class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST, _GT]):
-    integer_field_class: type[SmallIntegerField[Any, Any]]
+    integer_field_class: type[SmallIntegerField]
 
 class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST, _GT]):
-    integer_field_class: type[BigIntegerField[Any, Any]]
+    integer_field_class: type[BigIntegerField]
 
 class FloatField(Field[_ST, _GT]):
     _pyi_private_set_type: float | int | str

@@ -19,7 +19,7 @@ _Through = TypeVar("_Through", bound=Model, default=Model)
 _To = TypeVar("_To", bound=Model)
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):
-    field: RelatedField[Any, Any]
+    field: RelatedField
     def __set__(self, instance: Model, value: Any) -> None: ...
 
 class ForwardManyToOneDescriptor(Generic[_F]):

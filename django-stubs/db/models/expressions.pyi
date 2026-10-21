@@ -145,7 +145,7 @@ class DurationExpression(CombinedExpression):
     def compile(self, side: Combinable, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
 class TemporalSubtraction(CombinedExpression):
-    output_field: ClassVar[fields.DurationField[Any, Any]]
+    output_field: ClassVar[fields.DurationField]
     def __init__(self, lhs: Combinable, rhs: Combinable) -> None: ...
 
 class F(_Deconstructible, Combinable):
@@ -342,7 +342,7 @@ class Subquery(BaseExpression, Combinable, Generic[_OutputField]):
     ) -> _AsSqlType: ...
 
 class Exists(Subquery):
-    output_field: ClassVar[fields.BooleanField[Any, Any]]
+    output_field: ClassVar[fields.BooleanField]
     def __init__(self, queryset: Query | QuerySet[Any] | Subquery, **kwargs: Any) -> None: ...
 
 class OrderBy(Expression):

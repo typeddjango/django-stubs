@@ -117,7 +117,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: i
     ) -> None: ...
 
 class SearchRank(Func):
-    output_field: ClassVar[FloatField[Any, Any]]
+    output_field: ClassVar[FloatField]
     def __init__(
         self,
         vector: SearchVector | _Expression,
@@ -130,7 +130,7 @@ class SearchRank(Func):
 class SearchHeadline(Func):
     function: str
     template: str
-    output_field: ClassVar[TextField[Any, Any]]
+    output_field: ClassVar[TextField]
     def __init__(
         self,
         expression: _Expression,
@@ -156,11 +156,11 @@ class SearchHeadline(Func):
     ) -> _AsSqlType: ...
 
 class TrigramBase(Func):
-    output_field: ClassVar[FloatField[Any, Any]]
+    output_field: ClassVar[FloatField]
     def __init__(self, expression: _Expression, string: str, **extra: Any) -> None: ...
 
 class TrigramWordBase(Func):
-    output_field: ClassVar[FloatField[Any, Any]]
+    output_field: ClassVar[FloatField]
     def __init__(self, string: str, expression: _Expression, **extra: Any) -> None: ...
 
 class TrigramSimilarity(TrigramBase): ...
