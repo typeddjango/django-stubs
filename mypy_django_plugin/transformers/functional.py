@@ -1,3 +1,5 @@
+"""Lazy strings"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -14,6 +16,12 @@ if TYPE_CHECKING:
 
 
 def resolve_str_promise_attribute(ctx: AttributeContext) -> MypyType:
+    """Resolve `str` methods on lazy strings such as `gettext_lazy()` results
+
+    ```python
+    reveal_type(gettext_lazy("Hello").upper())  # str
+    ```
+    """
     if isinstance(ctx.context, MemberExpr):
         method_name = ctx.context.name
     elif isinstance(ctx.context, CallExpr) and isinstance(ctx.context.callee, MemberExpr):

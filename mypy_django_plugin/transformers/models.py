@@ -1,3 +1,5 @@
+"""Model classes"""
+
 from __future__ import annotations
 
 from collections import deque
@@ -993,32 +995,19 @@ class ProcessManyToManyFields(ModelClassInitializer):
 class MetaclassAdjustments(ModelClassInitializer):
     @classmethod
     def adjust_model_class(cls, ctx: ClassDefContext, plugin_config: DjangoPluginConfig) -> None:
+        """Report `objects` and `DoesNotExist` accessed where Django doesn't add them
+
+        Django adds `objects` to concrete models only, and `DoesNotExist` and friends to `Model` subclasses only.
+
+        ```python
+        def count(model: type[models.Model]) -> None:
+            model.objects.count()  # error: "type[Model]" has no attribute "objects"  [attr-defined]
+        ```
+
+        Set `strict_model_abstract_attrs = false` to allow it, at your own risk: `count(models.Model)` fails at runtime.
         """
-        For the sake of type checkers other than mypy, some attributes that are
-        dynamically added by Django's model metaclass has been annotated on
-        `django.db.models.base.Model`. We remove those attributes and will handle them
-        through the plugin.
-
-        Configurable with `strict_model_abstract_attrs = false` to skip removing any objects from models.
-
-        Basically, this code::
-
-            from django.db import models
-
-            def get_model_count(model_type: type[models.Model]) -> int:
-                return model_type.objects.count()
-
-        - Will raise an error
-          `"type[models.Model]" has no attribute "objects"  [attr-defined]`
-          when `strict_model_abstract_attrs = true` (default)
-        - Return without any type errors
-          when `strict_model_abstract_attrs = false`
-
-        But, beware that the code above can fail in runtime, as mypy correctly shows.
-        Example: `get_model_count(models.Model)`
-
-        Turn this setting off at your own risk.
-        """
+        # The stubs annotate these metaclass contributions on `Model` for type checkers other than mypy,
+        # the plugin removes them here and adds them back to concrete models only.
         # Mypy does not properly support narrowing in `__getattr__` based on `Literal["objects"]`
         # so the current `ModelBase.__getattr__` swallows every unknown attributes errors.
         # `objects` is already inserted by the plugin, so the fallback is not necessary for mypy. We can drop it
@@ -1105,6 +1094,18 @@ class MetaclassAdjustments(ModelClassInitializer):
 
 
 def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
+    """Add the attributes Django generates on model classes
+
+    Such as `id` and `pk`, `<fk>_id`, managers, reverse relations, `get_<field>_display()` and `DoesNotExist`.
+
+    ```python
+    class Book(models.Model):
+        publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
+
+    reveal_type(Book().publisher_id)  # int
+    reveal_type(Publisher().book_set)  # RelatedManager[Book]
+    ```
+    """
     # A generic model whose type variable is bounded by a not yet analysed class (e.g. a forward
     # reference) still has a `PlaceholderType` bound. Types built from it, such as the manager's
     # `Self`, would keep that placeholder and fail to serialize, so wait for a later iteration.
@@ -1134,15 +1135,26 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
 
 
 def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
+    """Infer `is_staff`, `is_active` and `is_superuser` of user models as `bool`
+
+    ```python
+    reveal_type(User().is_staff)  # bool
+    ```
+    """
     boolinfo = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), bool)
     assert boolinfo is not None
     return Instance(boolinfo, [])
 
 
 def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
-    """
-    Replaces the 'WithAnnotations' type with a type that can represent an annotated
-    model.
+    """Resolve `WithAnnotations[Model, TypedDict]` to the annotated model type
+
+    Use it to type instances returned by `annotate()`.
+
+    ```python
+    def f(book: WithAnnotations[Book, Pages]) -> None:
+        reveal_type(book.n_pages)  # int, from the `Pages` TypedDict
+    ```
     """
     is_with_annotations = fullname == fullnames.WITH_ANNOTATIONS_FULLNAME
     args = ctx.type.args

@@ -1,3 +1,5 @@
+"""Model instantiation"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -65,6 +67,13 @@ def typecheck_model_method(
 
 
 def typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
+    """Type-check the arguments of `Model(...)`
+
+    ```python
+    Book(pages=[])  # error: Incompatible type for "pages" of "Book" (got "list[Any]", ...)  [misc]
+    Book(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
+    ```
+    """
     default_return_type = get_proper_type(ctx.default_return_type)
     if (
         isinstance(default_return_type, Instance)
@@ -76,6 +85,12 @@ def typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) ->
 
 
 def typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Type-check the arguments of `QuerySet.create()`
+
+    ```python
+    Book.objects.create(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
+    ```
+    """
     default_return_type = get_proper_type(ctx.default_return_type)
     if (
         isinstance(default_return_type, Instance)
@@ -87,6 +102,12 @@ def typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) ->
 
 
 def typecheck_model_acreate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Type-check the arguments of `QuerySet.acreate()`
+
+    ```python
+    await Book.objects.acreate(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
+    ```
+    """
     default_return_type = get_proper_type(ctx.default_return_type)
     if (
         isinstance(default_return_type, Instance)

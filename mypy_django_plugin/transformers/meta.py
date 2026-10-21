@@ -1,3 +1,5 @@
+"""Model options (`_meta`)"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -17,6 +19,13 @@ if TYPE_CHECKING:
 
 
 def return_proper_field_type_from_get_field(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
+    """Infer the field returned by `Model._meta.get_field()`
+
+    ```python
+    reveal_type(Book._meta.get_field("publisher"))  # ForeignKey[Publisher, Publisher]
+    Book._meta.get_field("nope")  # error: Book has no field named 'nope'  [misc]
+    ```
+    """
     if not (
         isinstance(ctx.type, Instance)
         and ctx.type.args

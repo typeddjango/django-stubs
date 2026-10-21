@@ -1,3 +1,5 @@
+"""Forms"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -9,6 +11,14 @@ if TYPE_CHECKING:
 
 
 def make_meta_nested_class_inherit_from_any(ctx: ClassDefContext) -> None:
+    """Allow combining forms whose nested `Meta` classes differ
+
+    A form's `Meta` is typed as `Any`, so inheriting from several forms isn't reported as an incompatible definition.
+
+    ```python
+    class CompositeForm(ArticleForm, CategoryForm): ...  # no error
+    ```
+    """
     meta_node = helpers.get_nested_meta_node_for_current_class(ctx.cls.info)
     if meta_node is None:
         if not ctx.api.final_iteration:

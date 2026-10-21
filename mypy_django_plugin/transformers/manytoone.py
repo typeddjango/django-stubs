@@ -1,3 +1,5 @@
+"""Many-to-one relations"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -40,10 +42,18 @@ def get_model_of_related_manager(ctx: MethodContext) -> Instance | None:
 
 
 def refine_many_to_one_related_manager(ctx: MethodContext) -> MypyType:
+    """Add the related model's manager methods to reverse `ForeignKey` managers
+
+    ```python
+    class Book(models.Model):
+        author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="books")
+        objects = BookQuerySet.as_manager()
+
+    reveal_type(Author().books.published())  # BookQuerySet[Book, Book]
+    ```
     """
-    Updates the 'RelatedManager' returned by e.g. 'ReverseManyToOneDescriptor' to be a subclass
-    of 'RelatedManager' and the related model's default manager.
-    """
+    # Like Django, build the manager returned by `ReverseManyToOneDescriptor.__get__`
+    # from the related model's `_default_manager`.
     to_model_instance = get_model_of_related_manager(ctx)
     if to_model_instance is None:
         return ctx.default_return_type

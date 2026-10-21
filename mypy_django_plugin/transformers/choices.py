@@ -1,3 +1,5 @@
+"""Choices"""
+
 from __future__ import annotations
 
 from enum import Enum, auto
@@ -168,11 +170,19 @@ def _get_enum_type_from_union_of_literals(typ: UnionType) -> MypyType:
 
 
 def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
-    """
-    A `get_attribute_hook` to make `.choices` and `.values` optional if `__empty__` is defined.
+    """Narrow the value and label types of `Choices` enums
 
-    When the `__empty__` label is specified, the `choices` and `values` properties can return a
-    blank choice/value. This hook will amend the type returned by those properties.
+    `choices`, `values`, `labels`, `value` and `label` follow the enum definition,
+    and `__empty__` adds `None` to the values.
+
+    ```python
+    class Gender(models.TextChoices):
+        MALE = "M", "Male"
+        __empty__ = "(Undeclared)"
+
+    reveal_type(Gender.choices)  # list[tuple[str | None, str]]
+    reveal_type(Gender.MALE.label)  # str
+    ```
     """
     if isinstance(ctx.context, MemberExpr):
         expr = ctx.context.expr

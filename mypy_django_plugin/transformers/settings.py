@@ -1,3 +1,5 @@
+"""Settings"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -18,6 +20,17 @@ if TYPE_CHECKING:
 def get_type_of_settings_attribute(
     ctx: AttributeContext, django_context: DjangoContext, plugin_config: DjangoPluginConfig
 ) -> MypyType:
+    """Infer `django.conf.settings` attribute types from your settings module
+
+    Falling back to Django's defaults.
+
+    ```python
+    reveal_type(settings.BASE_DIR)  # Path
+    settings.NOT_EXISTING  # error: 'Settings' object has no attribute 'NOT_EXISTING'  [misc]
+    ```
+
+    Set `strict_settings = false` to type settings only created at runtime as `Any` instead of reporting them.
+    """
     if not isinstance(ctx.context, MemberExpr):
         return ctx.default_attr_type
 
