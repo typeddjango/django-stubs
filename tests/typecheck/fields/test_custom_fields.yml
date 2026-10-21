@@ -86,3 +86,31 @@
                     # test null=True on Any does not raise
                     my_custom_field_any3 = FieldImplicitAny(null=True)
                     my_custom_field_any4 = FieldExplicitAny(null=True)
+
+-   case: test_custom_field_subclassing_an_alias
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import User
+        user = User()
+        reveal_type(user.text)  # N: Revealed type is "str"
+        reveal_type(user.nullable_text)  # N: Revealed type is "str | None"
+        reveal_type(user.flag)  # N: Revealed type is "bool"
+    monkeypatch: true
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                TextFieldAlias = models.TextField
+                BoolFieldAlias = models.Field[bool, bool]
+
+                class AliasedTextField(TextFieldAlias): ...
+                class AliasedBoolField(BoolFieldAlias): ...
+
+                class User(models.Model):
+                    text = AliasedTextField()
+                    nullable_text = AliasedTextField(null=True)
+                    flag = AliasedBoolField()
