@@ -20,11 +20,11 @@ class Index:
     db_tablespace: str | None
     opclasses: Sequence[str]
     condition: Q | None
-    expressions: Sequence[BaseExpression | Combinable]
+    expressions: Sequence[BaseExpression | Combinable | Q]
     include: Sequence[str]
     def __init__(
         self,
-        *expressions: BaseExpression | Combinable | str,
+        *expressions: BaseExpression | Combinable | Q | str,
         fields: Sequence[str] = (),
         name: str | None = None,
         db_tablespace: str | None = None,
