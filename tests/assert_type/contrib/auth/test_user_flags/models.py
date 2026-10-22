@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, assert_type
+from typing import Literal, Never, assert_type
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AbstractUser, AnonymousUser, PermissionsMixin, User
@@ -73,3 +73,12 @@ def user_or_anonymous_user_flags_are_bool(user: User | AnonymousUser) -> None:
     assert_type(user.is_active, bool)
     assert_type(user.is_superuser, bool)
     assert_type(user.is_authenticated, bool)
+
+
+def anonymous_user_has_no_db_representation(user: AnonymousUser) -> None:
+    assert_type(user.check_password("x"), Never)
+
+
+def user_or_anonymous_user_methods(user: User | AnonymousUser) -> None:
+    assert_type(user.check_password("x"), bool)
+    assert_type(user.get_group_permissions(), set[str])
