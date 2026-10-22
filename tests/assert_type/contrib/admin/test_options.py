@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, assert_type
 
 from django.contrib import admin, messages
 from django.contrib.admin.sites import AdminSite
@@ -224,3 +224,9 @@ class ActionAdmin(admin.ModelAdmin[ValidActionModel]):
     # Normally a method would be passed by name as a string, but defining `actions` after the
     # method makes it possible to ensure that it is typed correctly.
     actions = [valid_action_function, valid_action_method]  # ty: ignore[invalid-assignment]
+
+
+def save_form_returns_the_admin_model(
+    model_admin: FullModelAdmin, request: HttpRequest, form: FullAdminModelForm
+) -> None:
+    assert_type(model_admin.save_form(request, form, True), FullAdminModel)
