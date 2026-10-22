@@ -60,6 +60,7 @@ assert_type(s.encode(), bytes)
 assert_type(s + "bar", str)
 assert_type("foo" + s, str)
 assert_type(s % "asd", str)
+assert_type(list(s), list[str])
 
 s.nonsense  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
 
