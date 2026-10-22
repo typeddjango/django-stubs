@@ -64,12 +64,15 @@ jobs:
       - name: Cache apt packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
-          path: /var/cache/apt/archives
+          path: /tmp/apt-cache
           key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
+        # apt's default cache is root-owned, so actions/cache can't save it.
         run: |
+          mkdir -p /tmp/apt-cache/partial
           sudo apt-get update || true
-          sudo apt-get install -y --no-install-recommends libgdal-dev libproj-dev
+          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives=/tmp/apt-cache gdal-bin
+          sudo chown -R "$(id -u)" /tmp/apt-cache
       - name: Install uv
         uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
       - name: Set up Python ${{ matrix.python-version }}
@@ -96,12 +99,15 @@ jobs:
       - name: Cache apt packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
-          path: /var/cache/apt/archives
+          path: /tmp/apt-cache
           key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
+        # apt's default cache is root-owned, so actions/cache can't save it.
         run: |
+          mkdir -p /tmp/apt-cache/partial
           sudo apt-get update || true
-          sudo apt-get install -y --no-install-recommends libgdal-dev libproj-dev
+          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives=/tmp/apt-cache gdal-bin
+          sudo chown -R "$(id -u)" /tmp/apt-cache
       - name: Install uv
         uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
       - name: Set up Python
@@ -132,12 +138,15 @@ jobs:
       - name: Cache apt packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
-          path: /var/cache/apt/archives
+          path: /tmp/apt-cache
           key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
+        # apt's default cache is root-owned, so actions/cache can't save it.
         run: |
+          mkdir -p /tmp/apt-cache/partial
           sudo apt-get update || true
-          sudo apt-get install -y --no-install-recommends libgdal-dev libproj-dev
+          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives=/tmp/apt-cache gdal-bin
+          sudo chown -R "$(id -u)" /tmp/apt-cache
       - name: Install uv
         uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
       - name: Set up Python ${{ matrix.python-version }}
