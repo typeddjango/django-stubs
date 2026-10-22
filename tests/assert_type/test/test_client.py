@@ -21,6 +21,8 @@ assert_type(response.content, bytes)
 assert_type(response.redirect_chain, list[tuple[str, int]])
 assert_type(response.text, str)
 response.json()
+# Only raises if the request recorded an exception
+assert_type(client.check_exception(response), None)
 
 
 # Async client response attributes
