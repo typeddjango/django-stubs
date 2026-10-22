@@ -627,7 +627,7 @@ class UUIDField(Field[_ST, _GT]):
     ) -> None: ...
 
 class FilePathField(Field[_ST, _GT]):
-    path: Any
+    path: str | Callable[..., str]
     match: str | None
     recursive: bool
     allow_files: bool
