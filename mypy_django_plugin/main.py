@@ -49,12 +49,7 @@ from mypy_django_plugin.transformers.managers import (
     reparametrize_any_queryset_hook,
     resolve_manager_method,
 )
-from mypy_django_plugin.transformers.models import (
-    MetaclassAdjustments,
-    handle_annotated_type,
-    process_model_class,
-    set_auth_user_model_boolean_fields,
-)
+from mypy_django_plugin.transformers.models import MetaclassAdjustments, handle_annotated_type, process_model_class
 from mypy_django_plugin.transformers.request import check_querydict_is_mutable
 
 if TYPE_CHECKING:
@@ -332,14 +327,6 @@ class NewSemanalDjangoPlugin(Plugin):
         info = self._get_typeinfo_or_none(class_name)
         if not info:
             return None
-
-        # Lookup of the '.is_superuser' attribute
-        if info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
-            return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
-
-        # Lookup of the 'user.is_staff' or 'user.is_active' attribute
-        if info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
-            return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
 
         # Lookup of a method on a dynamically generated manager class
         # i.e. a manager class only existing while mypy is running, not collected from the AST
