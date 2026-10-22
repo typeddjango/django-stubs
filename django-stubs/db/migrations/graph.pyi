@@ -7,8 +7,8 @@ from typing_extensions import override
 
 class Node:
     key: tuple[str, str]
-    children: set[Any]
-    parents: set[Any]
+    children: set[Node]
+    parents: set[Node]
     def __init__(self, key: tuple[str, str]) -> None: ...
     @override
     def __eq__(self, other: object) -> bool: ...
