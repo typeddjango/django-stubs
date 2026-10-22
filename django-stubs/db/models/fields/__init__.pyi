@@ -141,7 +141,7 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     choices: _ChoicesList | None
     db_column: str | None
     db_comment: str | None
-    db_default: type[NOT_PROVIDED] | Expression
+    db_default: type[NOT_PROVIDED] | Expression | Any
     column: str | None
     concrete: bool
     default: Any
