@@ -16,7 +16,9 @@ class GeneratedField(models.Field[Any, Any]):
     generated: ClassVar[Literal[True]]
     db_returning: Literal[True]
     _query: Query | None
+    expression: Expression
     output_field: models.Field[Any, Any] | None
+    db_persist: bool
 
     def __init__(
         self,
