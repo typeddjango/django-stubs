@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
@@ -17,14 +17,14 @@ class SitemapIndexItem:
 def x_robots_tag(func: _C) -> _C: ...
 def index(
     request: HttpRequest,
-    sitemaps: dict[str, type[Sitemap[Any]] | Sitemap[Any]],
+    sitemaps: Mapping[str, type[Sitemap[Any]] | Sitemap[Any]],
     template_name: str = ...,
     content_type: str = ...,
     sitemap_url_name: str = ...,
 ) -> TemplateResponse: ...
 def sitemap(
     request: HttpRequest,
-    sitemaps: dict[str, type[Sitemap[Any]] | Sitemap[Any]],
+    sitemaps: Mapping[str, type[Sitemap[Any]] | Sitemap[Any]],
     section: str | None = ...,
     template_name: str = ...,
     content_type: str = ...,
