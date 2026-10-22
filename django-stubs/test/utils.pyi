@@ -1,5 +1,5 @@
 import decimal
-from collections.abc import Callable, Iterable, Iterator, Mapping
+from collections.abc import Callable, Collection, Iterable, Iterator, Mapping
 from contextlib import AbstractContextManager
 from decimal import Decimal
 from io import StringIO
@@ -159,7 +159,7 @@ def dependency_ordered(
     test_databases: Iterable[tuple[_Signature, _TestDatabase]], dependencies: Mapping[str, list[str]]
 ) -> list[tuple[_Signature, _TestDatabase]]: ...
 def get_unique_databases_and_mirrors(
-    aliases: set[str] | None = ...,
+    aliases: Collection[str] | None = ...,
 ) -> tuple[dict[_Signature, _TestDatabase], dict[str, Any]]: ...
 def setup_databases(
     verbosity: int,
@@ -169,7 +169,7 @@ def setup_databases(
     keepdb: bool = ...,
     debug_sql: bool = ...,
     parallel: int = ...,
-    aliases: Mapping[str, Any] | None = ...,
+    aliases: Collection[str] | None = ...,
     serialized_aliases: Iterable[str] | None = ...,
     **kwargs: Any,
 ) -> list[tuple[BaseDatabaseWrapper, str, bool]]: ...
