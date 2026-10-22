@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, assert_type
 
-from django.test import override_settings
+from django.test import SimpleTestCase, override_settings
+from django.test.utils import isolate_apps
 
 if TYPE_CHECKING:
     from django.test.utils import CaptureQueriesContext
@@ -23,3 +24,11 @@ def test() -> None:
 
 
 assert_type(test(), None)
+
+
+class MyTests(SimpleTestCase): ...
+
+
+def test_decorate_class(cls: type[MyTests]) -> None:
+    assert_type(override_settings(FOO="bar").decorate_class(cls), type[MyTests])
+    assert_type(isolate_apps("myapp").decorate_class(cls), type[MyTests])
