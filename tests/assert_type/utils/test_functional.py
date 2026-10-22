@@ -52,17 +52,21 @@ class Baz(Quux):
 
 s = lazystr("asd")
 
-assert_type(s.format("asd"), str)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
-assert_type(s.capitalize(), str)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+assert_type(s.format("asd"), str)
+assert_type(s.capitalize(), str)
+assert_type(s.startswith("a"), bool)
+assert_type(s.split(), list[str])
+assert_type(s.encode(), bytes)
 assert_type(s + "bar", str)
 assert_type("foo" + s, str)
 assert_type(s % "asd", str)
+assert_type(list(s), list[str])
 
-s.nonsense  # type: ignore[attr-defined]
+s.nonsense  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
 
 
 def test_str_or_promise(f2: StrOrPromise) -> None:
-    assert_type(f2.format("asd"), str)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    assert_type(f2.format("asd"), str)
     assert_type(f2 + "asd", str)
     assert_type("asd" + f2, str)
 
