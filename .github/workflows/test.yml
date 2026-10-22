@@ -61,14 +61,11 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
-      - name: Get runner image OS
-        id: image
-        run: echo "os=$ImageOS" >> "$GITHUB_OUTPUT"
       - name: Cache apt packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
           path: /tmp/apt-cache
-          key: apt-gdal-${{ steps.image.outputs.os }}
+          key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
         # apt's default cache is root-owned, so actions/cache can't save it.
         run: |
@@ -99,14 +96,11 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
-      - name: Get runner image OS
-        id: image
-        run: echo "os=$ImageOS" >> "$GITHUB_OUTPUT"
       - name: Cache apt packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
           path: /tmp/apt-cache
-          key: apt-gdal-${{ steps.image.outputs.os }}
+          key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
         # apt's default cache is root-owned, so actions/cache can't save it.
         run: |
@@ -141,14 +135,11 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
-      - name: Get runner image OS
-        id: image
-        run: echo "os=$ImageOS" >> "$GITHUB_OUTPUT"
       - name: Cache apt packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
           path: /tmp/apt-cache
-          key: apt-gdal-${{ steps.image.outputs.os }}
+          key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
         # apt's default cache is root-owned, so actions/cache can't save it.
         run: |
