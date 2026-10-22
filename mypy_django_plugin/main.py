@@ -40,7 +40,6 @@ from mypy_django_plugin.transformers import (
     settings,
 )
 from mypy_django_plugin.transformers.auth import get_user_model
-from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
 from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
@@ -347,9 +346,6 @@ class NewSemanalDjangoPlugin(Plugin):
             fullnames.BASE_MANAGER_CLASS_FULLNAME
         ) and "from_queryset_manager" in helpers.get_django_metadata(info):
             return resolve_manager_method
-
-        if info.has_base(fullnames.STR_PROMISE_FULLNAME):
-            return resolve_str_promise_attribute
 
         if (
             info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)
