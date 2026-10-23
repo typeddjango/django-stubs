@@ -1,6 +1,6 @@
 import threading
 import unittest
-from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from contextlib import AbstractContextManager
 from types import TracebackType
 from typing import Any, Literal, Self, overload
@@ -11,8 +11,6 @@ from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.db import connections as connections
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.models.base import Model
-from django.db.models.query import QuerySet, RawQuerySet
 from django.forms import BaseForm, BaseFormSet
 from django.forms.fields import EmailField
 from django.http import HttpRequest
@@ -22,7 +20,9 @@ from django.test.client import AsyncClient, Client
 from django.test.html import Element
 from django.test.utils import CaptureQueriesContext, ContextList
 from django.utils.functional import _StrOrPromise, classproperty
-from typing_extensions import override
+from typing_extensions import TypeVar, override
+
+_T = TypeVar("_T")
 
 def to_list(value: Any) -> list[Any]: ...
 def assert_and_parse_html(self: Any, html: str, user_msg: str, msg: str) -> Element: ...
@@ -200,9 +200,9 @@ class TransactionTestCase(SimpleTestCase):
     serialized_rollback: bool
     def assertQuerySetEqual(
         self,
-        qs: Iterator[Any] | list[Model] | QuerySet[Any] | RawQuerySet[Any],
+        qs: Iterable[_T],
         values: Iterable[Any],
-        transform: Callable[[Model], Any] | type[str] | None = None,
+        transform: Callable[[_T], Any] | None = None,
         ordered: bool = True,
         msg: str | None = None,
     ) -> None: ...
