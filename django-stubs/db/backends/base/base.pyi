@@ -51,9 +51,12 @@ class BaseDatabaseWrapper:
     savepoint_ids: list[str]
     commit_on_exit: bool
     needs_rollback: bool
+    rollback_exc: Exception | None
     close_at: float | None
     closed_in_transaction: bool
     errors_occurred: bool
+    health_check_enabled: bool
+    health_check_done: bool
     run_on_commit: list[tuple[set[str], Callable[[], None]]]
     run_commit_hooks_on_set_autocommit_on: bool
     execute_wrappers: list[_ExecuteWrapper]
