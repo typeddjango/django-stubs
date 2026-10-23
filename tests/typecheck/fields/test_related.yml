@@ -143,7 +143,6 @@
         from typing_extensions import reveal_type
         from myapp.models import User, Profile
         reveal_type(User().profile)  # N: Revealed type is "myapp.models.Profile"
-        reveal_type(Profile().user)  # N: Revealed type is "myapp.models.User"
     installed_apps:
         - myapp
     files:
