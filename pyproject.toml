@@ -191,7 +191,9 @@ ignore = [
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead. If you type a metaclass, add a noqa"
-"typing.TypeVar".msg = "Only support the `default` parameter in Python 3.13 and above. Use `typing_extensions.TypeVar` instead."
+"typing.NoReturn".msg = "Use `typing.Never` instead."
+"typing_extensions.NoReturn".msg = "Use `typing.Never` instead."
+"typing.TypeVar".msg ="Only support the `default` parameter in Python 3.13 and above. Use `typing_extensions.TypeVar` instead."
 
 [tool.ruff.lint.isort]
 known-first-party = ["django_stubs_ext", "mypy_django_plugin"]

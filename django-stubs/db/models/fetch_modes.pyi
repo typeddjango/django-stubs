@@ -1,4 +1,4 @@
-from typing import Any, NoReturn
+from typing import Any, Never
 
 from django.db.models import Model
 from typing_extensions import override
@@ -28,7 +28,7 @@ FETCH_PEERS: FetchPeers
 
 class FetchRaise(FetchMode):
     @override
-    def fetch(self, fetcher: Any, instance: Model) -> NoReturn: ...
+    def fetch(self, fetcher: Any, instance: Model) -> Never: ...
     @override
     def __reduce__(self) -> str: ...
 
