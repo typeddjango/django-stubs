@@ -56,6 +56,25 @@ def test_custom_model_fields_with_generic_type() -> None:
     assert_type(user.my_custom_field11, bool)  # pyrefly: ignore[assert-type]
 
 
+def custom_value_field_set_type() -> None:
+    user = User()
+    user.my_custom_field2 = CustomFieldValue()
+    user.my_custom_field2 = 12
+    user.my_custom_field2 = "NoNo"  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]
+
+
+class TwoTypeVarAnnotation(models.Model):
+    field: models.Field[CustomFieldValue | int, CustomFieldValue] = CustomValueField()
+
+
+def field_two_typevar_form_in_user_annotation() -> None:
+    instance = TwoTypeVarAnnotation()
+    assert_type(instance.field, CustomFieldValue)
+    instance.field = CustomFieldValue()
+    instance.field = 12
+    instance.field = "no"  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-assignment]
+
+
 # null=True on generic type arguments
 
 
@@ -85,6 +104,27 @@ def custom_fields_with_null_true() -> None:
     assert_type(user.my_custom_field13, CustomFieldValue | None)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field14, bool | None)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field15, None)
+
+
+class ConcreteField(fields.Field[str, str]): ...
+
+
+class AlreadyOptionalField(fields.Field[str | None, str | None]): ...
+
+
+class ConcreteNull(models.Model):
+    ok = ConcreteField()
+    # A fully-bound field can't fold `| None` into a concrete get type, so the plugin flags it.
+    # Widen the get type instead.
+    bad = ConcreteField(null=True)  # type: ignore[misc]
+    already_optional = AlreadyOptionalField(null=True)
+
+
+def concrete_custom_field_null_requires_optional_get_type() -> None:
+    instance = ConcreteNull()
+    assert_type(instance.ok, str)  # pyrefly: ignore[assert-type]
+    assert_type(instance.bad, str | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.already_optional, str | None)  # pyrefly: ignore[assert-type]
 
 
 # Any type arguments
