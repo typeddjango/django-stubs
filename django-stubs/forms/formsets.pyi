@@ -5,8 +5,8 @@ from django.db.models.fields import _ErrorMessagesDict
 from django.db.models.query import _SupportsContains
 from django.forms.forms import BaseForm, Form
 from django.forms.renderers import BaseRenderer
-from django.forms.utils import ErrorList, RenderableFormMixin, _DataT, _FilesT
-from django.forms.widgets import Media, MediaDefiningClass, Widget
+from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin, _DataT, _FilesT
+from django.forms.widgets import Media, Widget
 from django.utils.functional import cached_property
 from typing_extensions import TypeVar, override
 
@@ -47,8 +47,8 @@ class BaseFormSet(_SupportsContains[_F], Sized, RenderableFormMixin, Generic[_F]
     initial: Sequence[Mapping[str, Any]] | None
     form_kwargs: dict[str, Any]
     error_class: type[ErrorList]
-    deletion_widget: MediaDefiningClass
-    ordering_widget: MediaDefiningClass
+    deletion_widget: type[Widget]
+    ordering_widget: type[Widget]
     default_error_messages: ClassVar[_ErrorMessagesDict]
     template_name_div: str
     template_name_p: str
@@ -97,7 +97,7 @@ class BaseFormSet(_SupportsContains[_F], Sized, RenderableFormMixin, Generic[_F]
     def get_ordering_widget(cls) -> type[Widget]: ...
     def non_form_errors(self) -> ErrorList: ...
     @property
-    def errors(self) -> list[ErrorList]: ...
+    def errors(self) -> list[ErrorDict]: ...
     def total_error_count(self) -> int: ...
     def is_valid(self) -> bool: ...
     def full_clean(self) -> None: ...
