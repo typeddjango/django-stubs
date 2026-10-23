@@ -90,7 +90,7 @@ class GenericRel(ForeignObjectRel):
         limit_choices_to: _AllLimitChoicesTo | None = None,
     ) -> None: ...
 
-class GenericRelation(ForeignObject[Any, Any]):
+class GenericRelation(ForeignObject):
     rel_class: type[GenericRel]
     mti_inherited: bool
     object_id_field_name: str

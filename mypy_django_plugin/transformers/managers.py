@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Final
 from mypy.nodes import (
     GDEF,
     CallExpr,
+    ClassDef,
     Decorator,
     FuncBase,
     FuncDef,
@@ -15,6 +16,7 @@ from mypy.nodes import (
     RefExpr,
     StrExpr,
     SymbolTableNode,
+    TypeAlias,
     TypeInfo,
 )
 from mypy.plugins.common import add_method_to_class
@@ -464,10 +466,20 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
     )
 
 
-def _is_omitted_generic(arg: MypyType) -> bool:
-    """True if ``arg`` is the ``Any`` mypy substitutes for an unparametrized generic."""
-    proper_arg = get_proper_type(arg)
-    return isinstance(proper_arg, AnyType) and proper_arg.type_of_any is TypeOfAny.from_omitted_generics
+def _omits_type_args(cls: ClassDef, parent: TypeInfo) -> bool:
+    """Whether `cls` subclasses `parent` without type args, directly or through an alias like `QS = QuerySet`.
+
+    Omitted args are indistinguishable from explicit ones once mypy has filled in the PEP 696 defaults,
+    so this reads omission off the source: https://github.com/python/mypy/blob/v2.4.0/mypy/typeanal.py#L2180
+    """
+    for expr in cls.base_type_exprs:
+        node = expr.node if isinstance(expr, RefExpr) else None
+        if isinstance(node, TypeAlias) and node.no_args:
+            target = get_proper_type(node.target)
+            node = target.type if isinstance(target, Instance) else None
+        if node is parent:
+            return True
+    return False
 
 
 def reparametrize_generic_class(
@@ -506,31 +518,23 @@ def reparametrize_generic_class(
     if parent_class is None or not parent_class.args:
         return
 
-    # Bind explicit args only when the direct parent is the canonical base class
-    is_direct_parent = parent_class.type.fullname == base_class_fullname
-    if not (bind_explicit_args and is_direct_parent):
-        if not _is_omitted_generic(parent_class.args[0]):
-            return
-        type_vars = list(parent_class.type.defn.type_vars)
+    parent_info = parent_class.type
+    if _omits_type_args(ctx.cls, parent_info):
+        # Args were omitted -- reuse the parent's TypeVars so their existing
+        # PEP 696 defaults (e.g. `_Row = TypeVar(default=_Model)`) are preserved.
+        type_vars = list(parent_info.defn.type_vars)
+    elif bind_explicit_args and parent_info.fullname == base_class_fullname:
+        # Args were supplied explicitly on the canonical base class -- synthesize TypeVars bounded by
+        # the user's args so the subclass stays effectively concrete in user-facing contexts
+        # (defaults + bound + covariance) while still being generic enough for the plugin
+        # to flow annotation row types through.
+        type_vars = [
+            type_var.copy_modified(id=type_var.id, upper_bound=arg, default=arg)
+            for type_var, arg in zip(parent_info.defn.type_vars, parent_class.args, strict=True)
+        ]
     else:
-        type_vars = []
-        for type_var, parent_type_var in zip(parent_class.type.defn.type_vars, parent_class.args, strict=True):
-            if _is_omitted_generic(parent_type_var):
-                # Arg was omitted -- reuse the parent's TypeVar so its existing
-                # PEP 696 default (e.g. ``_Row = TypeVar(default=_Model)``) is preserved.
-                type_vars.append(type_var)
-            else:
-                # Arg was supplied explicitly -- synthesize a TypeVar bounded by the
-                # user's arg so the subclass stays effectively concrete in user-facing
-                # contexts (defaults + bound + covariance) while still being generic
-                # enough for the plugin to flow annotation row types through.
-                type_vars.append(
-                    type_var.copy_modified(
-                        id=type_var.id,
-                        upper_bound=parent_type_var,
-                        default=parent_type_var,
-                    )
-                )
+        # Explicit args elsewhere (e.g. `Manager[Book]`, `TextField[str, str]`) are left as written.
+        return
 
     # If we end up with placeholders we need to defer so the placeholders are
     # resolved in a future iteration

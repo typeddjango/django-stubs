@@ -92,10 +92,10 @@ class RelatedFieldListFilter(FieldListFilter):
     @property
     def include_empty_choice(self) -> bool: ...
     def field_admin_ordering(
-        self, field: RelatedField[Any, Any], request: HttpRequest, model_admin: ModelAdmin[Any]
+        self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin[Any]
     ) -> _ListOrTuple[str]: ...
     def field_choices(
-        self, field: RelatedField[Any, Any], request: HttpRequest, model_admin: ModelAdmin[Any]
+        self, field: RelatedField, request: HttpRequest, model_admin: ModelAdmin[Any]
     ) -> list[tuple[str, _StrOrPromise]]: ...
 
 class BooleanFieldListFilter(FieldListFilter):

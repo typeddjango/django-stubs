@@ -5,9 +5,9 @@ from django.db import models
 from typing_extensions import TypeVar, override
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True)
+_ST = TypeVar("_ST", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True)
+_GT = TypeVar("_GT", covariant=True, default=Any)
 
 class AreaField(models.FloatField[_ST, _GT]):
     _pyi_private_get_type: Area  # type: ignore[assignment]
