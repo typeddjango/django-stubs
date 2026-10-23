@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from typing import Any, assert_type
 
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -23,3 +23,9 @@ if sys.version_info >= (3, 12):
     def test_generic_foreign_key_descriptor() -> None:
         assert_type(TaggedItem().content_object, Any | None)  # pyrefly: ignore[assert-type]
         assert_type(TaggedItem.content_object, GenericForeignKeyDescriptor)  # pyrefly: ignore[assert-type]
+
+    class Bookmark(models.Model):
+        tags = GenericRelation(TaggedItem)
+
+    def test_generic_relation() -> None:
+        assert_type(Bookmark().tags, Any)
