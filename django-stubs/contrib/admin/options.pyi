@@ -6,6 +6,7 @@ from typing import Any, ClassVar, Generic, Literal, Self, TypeAlias, cast, type_
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
+from django.contrib.admin.helpers import ActionForm
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.views.main import ChangeList
@@ -198,7 +199,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     object_history_template: ClassVar[_TemplateForResponseT | None]
     popup_response_template: ClassVar[_TemplateForResponseT | None]
     actions: Sequence[_ActionCallable[Self, _ModelT] | str] | None
-    action_form: ClassVar[Any]
+    action_form: ClassVar[type[ActionForm]]
     actions_on_top: ClassVar[bool]
     actions_on_bottom: ClassVar[bool]
     actions_selection_counter: ClassVar[bool]
@@ -290,7 +291,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
         extra_tags: str = ...,
         fail_silently: bool = ...,
     ) -> None: ...
-    def save_form(self, request: HttpRequest, form: Any, change: Any) -> Any: ...
+    def save_form(self, request: HttpRequest, form: Any, change: bool) -> _ModelT: ...
     def save_model(self, request: HttpRequest, obj: _ModelT, form: Any, change: Any) -> None: ...
     def delete_model(self, request: HttpRequest, obj: _ModelT) -> None: ...
     def delete_queryset(self, request: HttpRequest, queryset: QuerySet[Any]) -> None: ...
