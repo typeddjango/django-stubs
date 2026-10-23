@@ -72,7 +72,7 @@ class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
         connector: str,
         rhs: Combinable,
         config: _Expression | None,
-        output_field: Field[Any, Any] | None = None,
+        output_field: Field | None = None,
     ) -> None: ...
 
 class SearchQueryCombinable:
@@ -89,7 +89,7 @@ class SearchQuery(SearchQueryCombinable, Func):  # type: ignore[misc]
     def __init__(
         self,
         value: _Expression,
-        output_field: Field[Any, Any] | None = None,
+        output_field: Field | None = None,
         *,
         config: _Expression | None = None,
         invert: bool = False,
@@ -113,7 +113,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):  # type: i
         connector: str,
         rhs: Combinable,
         config: _Expression | None,
-        output_field: Field[Any, Any] | None = None,
+        output_field: Field | None = None,
     ) -> None: ...
 
 class SearchRank(Func):

@@ -13,7 +13,7 @@ from django.utils.functional import cached_property
 from typing_extensions import TypeVar, override
 
 _M = TypeVar("_M", bound=Model)
-_F = TypeVar("_F", bound=Field[Any, Any])
+_F = TypeVar("_F", bound=Field)
 _From = TypeVar("_From", bound=Model)
 _Through = TypeVar("_Through", bound=Model, default=Model)
 _To = TypeVar("_To", bound=Model)
@@ -72,7 +72,7 @@ class ReverseOneToOneDescriptor(Generic[_From, _To]):
     # For compatibility with the fetcher protocol. While `self.related` is really a `OneToOneRel`,
     # it quacks enough like a `Field` to work.
     @property
-    def field(self) -> Field[Any, Any]: ...
+    def field(self) -> Field: ...
     def fetch_one(self, instance: Model) -> None: ...
     def fetch_many(self, instances: Iterable[Model]) -> None: ...
     def __set__(self, instance: _From, value: _To | None) -> None: ...

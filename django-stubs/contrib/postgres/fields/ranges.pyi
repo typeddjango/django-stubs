@@ -31,7 +31,7 @@ _RangeT = TypeVar("_RangeT", bound=Range[Any])
 
 class RangeField(CheckPostgresInstalledMixin, models.Field[Any, _RangeT]):
     empty_strings_allowed: bool
-    base_field: type[models.Field[Any, Any]]
+    base_field: type[models.Field]
     range_type: type[_RangeT]
     def get_placeholder_sql(self, value: Unused, compiler: Unused, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
     @override
@@ -81,12 +81,12 @@ class AdjacentToLookup(PostgresOperatorLookup): ...
 class RangeStartsWith(models.Transform):
     @property
     @override
-    def output_field(self) -> models.Field[Any, Any]: ...
+    def output_field(self) -> models.Field: ...
 
 class RangeEndsWith(models.Transform):
     @property
     @override
-    def output_field(self) -> models.Field[Any, Any]: ...
+    def output_field(self) -> models.Field: ...
 
 class IsEmpty(models.Transform):
     output_field: ClassVar[models.BooleanField]

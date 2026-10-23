@@ -93,10 +93,10 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 _FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
 _ListFilterT: TypeAlias = (
     type[ListFilter]
-    | Field[Any, Any]
+    | Field
     | str
-    | tuple[Field[Any, Any] | str, type[FieldListFilter]]
-    | list[Field[Any, Any] | str | type[FieldListFilter]]
+    | tuple[Field | str, type[FieldListFilter]]
+    | list[Field | str | type[FieldListFilter]]
 )
 
 # Generic type specifically for models, for use in BaseModelAdmin and subclasses
@@ -118,7 +118,7 @@ class BaseModelAdmin(Generic[_ModelT], metaclass=MediaDefiningClass):
     filter_horizontal: ClassVar[_ListOrTuple[str]]
     radio_fields: ClassVar[Mapping[str, _Direction]]
     prepopulated_fields: ClassVar[dict[str, Sequence[str]]]
-    formfield_overrides: ClassVar[Mapping[type[Field[Any, Any]], Mapping[str, Any]]]
+    formfield_overrides: ClassVar[Mapping[type[Field], Mapping[str, Any]]]
     readonly_fields: ClassVar[_ListOrTuple[str]]
     ordering: ClassVar[_ListOrTuple[_OrderByFieldName] | None]
     sortable_by: ClassVar[_ListOrTuple[str] | None]
@@ -130,11 +130,9 @@ class BaseModelAdmin(Generic[_ModelT], metaclass=MediaDefiningClass):
     admin_site: AdminSite
     def __init__(self) -> None: ...
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
-    def formfield_for_dbfield(
-        self, db_field: Field[Any, Any], request: HttpRequest, **kwargs: Any
-    ) -> FormField | None: ...
+    def formfield_for_dbfield(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> FormField | None: ...
     def formfield_for_choice_field(
-        self, db_field: Field[Any, Any], request: HttpRequest, **kwargs: Any
+        self, db_field: Field, request: HttpRequest, **kwargs: Any
     ) -> TypedChoiceField | None: ...
     def get_field_queryset(
         self, db: str | None, db_field: RelatedField, request: HttpRequest
