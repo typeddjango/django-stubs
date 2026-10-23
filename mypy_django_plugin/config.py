@@ -6,7 +6,7 @@ import textwrap
 import tomllib
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, NoReturn
+from typing import TYPE_CHECKING, Any, Never
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -40,7 +40,7 @@ MISSING_DJANGO_SETTINGS = (
 INVALID_BOOL_SETTING = "invalid {key!r}: the setting must be a boolean"
 
 
-def exit_with_error(msg: str, is_toml: bool = False) -> NoReturn:
+def exit_with_error(msg: str, is_toml: bool = False) -> Never:
     """Using mypy's argument parser, raise `SystemExit` to fail hard if validation fails.
 
     Considering that the plugin's startup duration is around double as long as mypy's, this aims to
@@ -76,7 +76,7 @@ class DjangoPluginConfig:
             self.parse_ini_file(filepath)
 
     def parse_toml_file(self, filepath: Path) -> None:
-        toml_exit: Callable[[str], NoReturn] = partial(exit_with_error, is_toml=True)
+        toml_exit: Callable[[str], Never] = partial(exit_with_error, is_toml=True)
         try:
             with filepath.open(mode="rb") as f:
                 data = tomllib.load(f)

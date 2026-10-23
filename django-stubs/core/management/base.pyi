@@ -1,6 +1,6 @@
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Literal, NoReturn, TextIO
+from typing import Any, Literal, Never, TextIO
 
 from django.apps.config import AppConfig
 from django.core.management.color import Style
@@ -22,7 +22,7 @@ class CommandParser(ArgumentParser):
         self, *, missing_args_message: str | None = None, called_from_command_line: bool | None = None, **kwargs: Any
     ) -> None: ...
     @override
-    def error(self, message: str) -> NoReturn: ...
+    def error(self, message: str) -> Never: ...
 
 def handle_default_options(options: Namespace) -> None: ...
 def no_translations(handle_func: Callable[..., Any]) -> Callable[..., Any]: ...

@@ -502,10 +502,10 @@
                 NewManager = models.Manager.from_queryset(ModelQuerySet)
         -   path: myapp/base_queryset.py
             content: |
-                from typing import NoReturn
+                from typing import Never
                 from django.db import models
                 class BaseQuerySet(models.QuerySet):
-                    def base_queryset_method(self, param: int | str) -> NoReturn:
+                    def base_queryset_method(self, param: int | str) -> Never:
                         raise ValueError
 
 -   case: from_queryset_with_decorated_queryset_methods

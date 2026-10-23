@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import AsyncIterator, Collection, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, NoReturn, Protocol, Self, final, overload, type_check_only
+from typing import Any, Generic, Literal, Never, Protocol, Self, final, overload, type_check_only
 
 from django.core.checks.messages import CheckMessage
 from django.db.models.base import Model
@@ -191,7 +191,7 @@ class ManagerDescriptor:
     @overload
     def __get__(self, instance: None, cls: type[Model] | None = None) -> BaseManager[Any]: ...
     @overload
-    def __get__(self, instance: Model, cls: type[Model] | None = None) -> NoReturn: ...
+    def __get__(self, instance: Model, cls: type[Model] | None = None) -> Never: ...
 
 class EmptyManager(Manager[_T]):
     def __init__(self, model: type[_T]) -> None: ...
