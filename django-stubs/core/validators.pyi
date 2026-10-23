@@ -135,7 +135,7 @@ class MaxLengthValidator(BaseValidator):
     def clean(self, x: Sized) -> int: ...
 
 class DecimalValidator(_Deconstructible):
-    messages: dict[str, str]
+    messages: dict[str, _StrOrPromise]
     max_digits: int | None
     decimal_places: int | None
     def __init__(self, max_digits: int | None, decimal_places: int | None) -> None: ...

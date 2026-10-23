@@ -73,7 +73,7 @@ class SimpleTestCase(unittest.TestCase):
     def assertRedirects(
         self,
         response: HttpResponseBase,
-        expected_url: str,
+        expected_url: _StrOrPromise,
         status_code: int = 302,
         target_status_code: int = 200,
         msg_prefix: str = "",
