@@ -80,7 +80,7 @@ class Options(Generic[_M]):
     related_fkey_lookups: list[Any]
     apps: Apps
     default_related_name: str | None
-    model: type[Model]
+    model: type[_M]
     original_attrs: dict[str, Any]
     def __init__(self, meta: type | None, app_label: str | None = None) -> None: ...
     @property
