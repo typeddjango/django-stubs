@@ -27,13 +27,10 @@ class CustomValueField(fields.Field[CustomFieldValue | int, CustomFieldValue]): 
 class AdditionalTypeVarField(fields.Field[_ST, _GT], Generic[_ST, _GT, T]): ...
 
 
+# Generic type arguments
+
+
 class CustomSmallIntegerField(fields.SmallIntegerField[_ST, _GT]): ...
-
-
-class FieldImplicitAny(fields.Field): ...
-
-
-class FieldExplicitAny(fields.Field[Any, Any]): ...
 
 
 class User(models.Model):
@@ -42,29 +39,10 @@ class User(models.Model):
     my_custom_field2 = CustomValueField()
     my_custom_field3 = SingleTypeField[bool]()
     my_custom_field4 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool]()
-    my_custom_field_any1 = FieldImplicitAny()
-    my_custom_field_any2 = FieldExplicitAny()
-
-    # test null=True on fields with non-optional generic types throw error
-    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)  # type: ignore[misc]
-    my_custom_field6 = CustomValueField(null=True)  # type: ignore[misc]
-    my_custom_field7 = SingleTypeField[bool](null=True)  # type: ignore[misc]
-    my_custom_field8 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool](null=True)  # type: ignore[misc]
-    my_custom_field9 = fields.Field[CustomFieldValue | int, CustomFieldValue](null=True)  # type: ignore[misc]
 
     # test overriding fields that set _pyi_private_set_type or _pyi_private_get_type
     my_custom_field10 = fields.SmallIntegerField[bool, bool]()
     my_custom_field11 = CustomSmallIntegerField[bool, bool]()
-
-    # test null=True on fields with non-optional generic types throw no errors
-    my_custom_field12 = fields.Field[CustomFieldValue | int, CustomFieldValue | None](null=True)
-    my_custom_field13 = GenericField[CustomFieldValue | int, CustomFieldValue | None](null=True)
-    my_custom_field14 = SingleTypeField[bool | None](null=True)
-    my_custom_field15 = fields.Field[None, None](null=True)
-
-    # test null=True on Any does not raise
-    my_custom_field_any3 = FieldImplicitAny(null=True)
-    my_custom_field_any4 = FieldExplicitAny(null=True)
 
 
 def test_custom_model_fields_with_generic_type() -> None:
@@ -74,22 +52,68 @@ def test_custom_model_fields_with_generic_type() -> None:
     assert_type(user.my_custom_field2, CustomFieldValue)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field3, bool)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field4, CustomFieldValue)  # pyrefly: ignore[assert-type]
+    assert_type(user.my_custom_field10, bool)  # pyrefly: ignore[assert-type]
+    assert_type(user.my_custom_field11, bool)  # pyrefly: ignore[assert-type]
+
+
+# null=True on generic type arguments
+
+
+class NullableUser(models.Model):
+    # test null=True on fields with non-optional generic types throw error
+    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)  # type: ignore[misc]
+    my_custom_field6 = CustomValueField(null=True)  # type: ignore[misc]
+    my_custom_field7 = SingleTypeField[bool](null=True)  # type: ignore[misc]
+    my_custom_field8 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool](null=True)  # type: ignore[misc]
+    my_custom_field9 = fields.Field[CustomFieldValue | int, CustomFieldValue](null=True)  # type: ignore[misc]
+
+    # test null=True on fields with non-optional generic types throw no errors
+    my_custom_field12 = fields.Field[CustomFieldValue | int, CustomFieldValue | None](null=True)
+    my_custom_field13 = GenericField[CustomFieldValue | int, CustomFieldValue | None](null=True)
+    my_custom_field14 = SingleTypeField[bool | None](null=True)
+    my_custom_field15 = fields.Field[None, None](null=True)
+
+
+def custom_fields_with_null_true() -> None:
+    user = NullableUser()
     assert_type(user.my_custom_field5, CustomFieldValue)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field6, CustomFieldValue)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field7, bool)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field8, CustomFieldValue)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field9, CustomFieldValue)
-    assert_type(user.my_custom_field10, bool)  # pyrefly: ignore[assert-type]
-    assert_type(user.my_custom_field11, bool)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field12, CustomFieldValue | None)
     assert_type(user.my_custom_field13, CustomFieldValue | None)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field14, bool | None)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field15, None)
 
+
+# Any type arguments
+
+
+class FieldImplicitAny(fields.Field): ...
+
+
+class FieldExplicitAny(fields.Field[Any, Any]): ...
+
+
+class AnyUser(models.Model):
+    my_custom_field_any1 = FieldImplicitAny()
+    my_custom_field_any2 = FieldExplicitAny()
+
+    # test null=True on Any does not raise
+    my_custom_field_any3 = FieldImplicitAny(null=True)
+    my_custom_field_any4 = FieldExplicitAny(null=True)
+
+
+def custom_fields_with_any_type_args() -> None:
+    user = AnyUser()
     assert_type(user.my_custom_field_any1, Any)
     assert_type(user.my_custom_field_any2, Any)
     assert_type(user.my_custom_field_any3, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(user.my_custom_field_any4, Any)  # pyrefly: ignore[assert-type]
+
+
+# Aliased base fields
 
 
 TextFieldAlias = models.TextField
