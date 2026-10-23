@@ -284,7 +284,7 @@ class AddDefaultPrimaryKey(ModelClassInitializer):
 
     def create_autofield(
         self,
-        auto_field: Field[Any, Any],
+        auto_field: Field,
         dest_name: str,
         existing_field: bool,
     ) -> None:

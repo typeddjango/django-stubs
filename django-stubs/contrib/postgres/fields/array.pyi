@@ -27,13 +27,13 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST,
 
     empty_strings_allowed: bool
     default_error_messages: ClassVar[_ErrorMessagesDict]
-    base_field: Field[Any, Any]
+    base_field: Field
     size: int | None
     default_validators: list[_ValidatorCallable]
     from_db_value: Any
     def __init__(
         self,
-        base_field: Field[Any, Any],
+        base_field: Field,
         size: int | None = None,
         *,
         verbose_name: _StrOrPromise | None = ...,
