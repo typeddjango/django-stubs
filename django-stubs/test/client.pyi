@@ -4,7 +4,7 @@ from http.cookies import SimpleCookie
 from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
-from typing import Any, Generic, Literal, NoReturn, TypeAlias, TypedDict, type_check_only
+from typing import Any, Generic, Literal, TypeAlias, TypedDict, type_check_only
 
 from _typeshed import ExcInfo
 from asgiref.typing import ASGIVersions
@@ -259,7 +259,7 @@ class _MonkeyPatchedASGIResponse(_ASGIResponse):
 
 class ClientMixin:
     def store_exc_info(self, **kwargs: object) -> None: ...
-    def check_exception(self, response: HttpResponseBase) -> NoReturn: ...
+    def check_exception(self, response: HttpResponseBase) -> None: ...
     @property
     def session(self) -> SessionBase: ...
     async def asession(self) -> SessionBase: ...
