@@ -43,3 +43,12 @@ request = MutableHttpRequest()
 assert_type(request, MutableHttpRequest)
 request.GET["foo"] = "bar"
 request.POST.setdefault("foo", "bar")
+
+# get_signed_cookie raises unless a default is given
+assert_type(request.get_signed_cookie("k"), str)
+assert_type(request.get_signed_cookie("k", salt="s"), str)
+assert_type(request.get_signed_cookie("k", None), str | None)
+
+
+def signed_cookie_default(default: int) -> None:
+    assert_type(request.get_signed_cookie("k", default=default, salt="s"), str | int)
