@@ -297,3 +297,6 @@ django.utils.functional.LazyObject.__hash__
 django.utils.functional.LazyObject.__iter__
 django.utils.functional.LazyObject.__len__
 django.utils.functional.LazyObject.__str__
+
+# Added at runtime by `django_stubs_ext.monkeypatch()` in `scripts/django_tests_settings.py`
+.*\.__class_getitem__
