@@ -12,7 +12,7 @@ from django.db.models.fields import Field, reverse_related
 from django.db.models.options import Options
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import Q
-from django.forms.forms import BaseForm, Form
+from django.forms.forms import BaseForm
 from django.forms.formsets import BaseFormSet
 from django.http.request import HttpRequest
 from django.utils.datastructures import _IndexableCollection
@@ -113,5 +113,5 @@ def get_model_from_relation(field: Field[Any, Any] | reverse_related.ForeignObje
 def reverse_field_path(model: type[Model], path: str) -> tuple[type[Model], str]: ...
 def get_fields_from_path(model: type[Model], path: str) -> list[Field[Any, Any]]: ...
 def construct_change_message(
-    form: Form, formsets: Iterable[BaseFormSet[Any]], add: bool
+    form: BaseForm, formsets: Iterable[BaseFormSet[Any]] | None, add: bool
 ) -> list[dict[str, dict[str, list[str]]]]: ...
