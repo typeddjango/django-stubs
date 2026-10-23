@@ -22,6 +22,14 @@ def nullable_field_with_strict_optional_true() -> None:
     MyModel().text_nullable = None
 
 
+class BlankNotNull(models.Model):
+    notnulltext = models.CharField(max_length=1, blank=True, null=False)
+
+
+def blank_and_not_null_charfield_does_not_allow_none() -> None:
+    BlankNotNull(notnulltext=None)  # type: ignore[misc]
+
+
 class HtmlField(models.TextField[_ST, _GT]): ...
 
 
