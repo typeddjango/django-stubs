@@ -59,8 +59,8 @@ class PermissionAware(Protocol):
 
 
 def declared_manager_access_on_instance_is_banned() -> None:
-    assert_type(Category().objects, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]
-    assert_type(Category().secondary, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]
+    assert_type(Category().objects, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # pyrefly: ignore[deprecated]
+    assert_type(Category().secondary, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # pyrefly: ignore[deprecated]
 
 
 def default_manager_access_on_instance_is_banned() -> None:
@@ -97,7 +97,7 @@ def manager_of_another_model_on_instance_is_allowed() -> None:
 
 def self_referential_manager_access_on_instance_is_banned() -> None:
     # Indistinguishable from `Node().objects`, annotate it as `RelatedManager[Node]` instead
-    assert_type(Node().children, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # ty: ignore[type-assertion-failure]
+    assert_type(Node().children, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # pyrefly: ignore[deprecated]  # ty: ignore[type-assertion-failure]
 
 
 def manager_on_plain_class_is_allowed() -> None:

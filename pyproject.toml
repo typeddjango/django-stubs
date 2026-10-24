@@ -125,6 +125,7 @@ reportMissingModuleSource = "none"
 enabled-ignores = ["pyrefly"]
 [tool.pyrefly.errors]
 unused-ignore = true
+deprecated = "error"
 
 [tool.ty.terminal]
 error-on-warning = true
