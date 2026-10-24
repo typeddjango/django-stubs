@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, ClassVar, Generic, Protocol, Self, TypeAlias, overload, type_check_only
+from typing import Any, ClassVar, Generic, Literal, Protocol, Self, TypeAlias, overload, type_check_only
 
 from django import forms
 from django.core.checks import CheckMessage
@@ -287,28 +287,196 @@ class IntegerField(Field[_ST, _GT]):
     _pyi_private_set_type: float | int | str
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
+    @overload
+    def __init__(
+        self: IntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
-class SmallIntegerField(IntegerField[_ST, _GT]): ...
+class SmallIntegerField(IntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: SmallIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class BigIntegerField(IntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: BigIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     MAX_BIGINT: ClassVar[int]
 
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: PositiveIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     integer_field_class: type[IntegerField]
 
 class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: PositiveSmallIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     integer_field_class: type[SmallIntegerField]
 
 class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: PositiveBigIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     integer_field_class: type[BigIntegerField]
 
 class FloatField(Field[_ST, _GT]):
     _pyi_private_set_type: float | int | str
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
+    @overload
+    def __init__(
+        self: FloatField[float | int | str | None, float | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class DecimalField(Field[_ST, _GT]):
     _pyi_private_set_type: str | float | decimal.Decimal
@@ -317,6 +485,20 @@ class DecimalField(Field[_ST, _GT]):
     # attributes
     max_digits: int
     decimal_places: int
+    @overload
+    def __init__(
+        self: DecimalField[str | float | decimal.Decimal | None, decimal.Decimal | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        max_digits: int | None = None,
+        decimal_places: int | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -338,6 +520,20 @@ class CharField(Field[_ST, _GT]):
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
     db_collation: str | None
+    @overload
+    def __init__(
+        self: CharField[str | int | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -351,9 +547,50 @@ class CharField(Field[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
+class CommaSeparatedIntegerField(CharField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: CommaSeparatedIntegerField[str | int | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class SlugField(CharField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: SlugField[str | int | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        allow_unicode: bool = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 50,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -370,8 +607,48 @@ class SlugField(CharField[_ST, _GT]):
 
 class EmailField(CharField[_ST, _GT]):
     _pyi_private_set_type: str
+    @overload
+    def __init__(
+        self: EmailField[str | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class URLField(CharField[_ST, _GT]):
+    @overload
+    def __init__(
+        self: URLField[str | int | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 200,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -391,6 +668,20 @@ class TextField(Field[_ST, _GT]):
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
     db_collation: str | None
+    @overload
+    def __init__(
+        self: TextField[str | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -408,6 +699,30 @@ class BooleanField(Field[_ST, _GT]):
     _pyi_private_set_type: bool
     _pyi_private_get_type: bool
     _pyi_lookup_exact_type: bool
+    @overload
+    def __init__(
+        self: BooleanField[bool | None, bool | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class NullBooleanField(BooleanField[_ST, _GT]):
     _pyi_private_set_type: bool | None  # type: ignore[assignment]
@@ -417,6 +732,30 @@ class NullBooleanField(BooleanField[_ST, _GT]):
 class IPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str
     _pyi_private_get_type: str
+    @overload
+    def __init__(
+        self: IPAddressField[str | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class GenericIPAddressField(Field[_ST, _GT]):
     _pyi_private_set_type: str | int | Callable[..., Any]
@@ -425,6 +764,20 @@ class GenericIPAddressField(Field[_ST, _GT]):
     default_error_messages: ClassVar[_ErrorMessagesDict]
     unpack_ipv4: bool
     protocol: str
+    @overload
+    def __init__(
+        self: GenericIPAddressField[str | int | Callable[..., Any] | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: Any | None = None,
+        protocol: str = "both",
+        unpack_ipv4: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -447,6 +800,21 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_lookup_exact_type: str | date
     auto_now: bool
     auto_now_add: bool
+    @overload
+    def __init__(
+        self: DateField[str | date | None, date | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -468,6 +836,20 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
     _pyi_private_get_type: time
     auto_now: bool
     auto_now_add: bool
+    @overload
+    def __init__(
+        self: TimeField[str | time | real_datetime | None, time | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -485,11 +867,52 @@ class DateTimeField(DateField[_ST, _GT]):
     _pyi_private_set_type: str | real_datetime | date
     _pyi_private_get_type: real_datetime
     _pyi_lookup_exact_type: str | real_datetime
+    @overload
+    def __init__(
+        self: DateTimeField[str | real_datetime | date | None, real_datetime | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class UUIDField(Field[_ST, _GT]):
     _pyi_private_set_type: str | uuid.UUID
     _pyi_private_get_type: uuid.UUID
     _pyi_lookup_exact_type: uuid.UUID | str
+    @overload
+    def __init__(
+        self: UUIDField[str | uuid.UUID | None, uuid.UUID | None],
+        verbose_name: _StrOrPromise | None = None,
+        *,
+        name: str | None = None,  # unlike other fields, keyword-only at runtime
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -527,10 +950,58 @@ class FilePathField(Field[_ST, _GT]):
 
 class BinaryField(Field[_ST, _GT]):
     _pyi_private_get_type: bytes | memoryview
+    @overload
+    def __init__(
+        self: BinaryField[bytes | bytearray | memoryview | None, bytes | memoryview | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     def get_placeholder_sql(self, value: Any, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
 class DurationField(Field[_ST, _GT]):
     _pyi_private_get_type: timedelta
+    @overload
+    def __init__(
+        self: DurationField[str | timedelta | None, timedelta | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class AutoFieldMixin:
     db_returning: bool

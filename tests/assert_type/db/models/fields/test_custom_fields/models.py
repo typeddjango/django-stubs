@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from typing import Any, Generic, assert_type
+from typing import TYPE_CHECKING, Any, Generic, Literal, assert_type, overload
 
 from django.db import models
 from django.db.models import fields
 from django.db.models.expressions import F
-from typing_extensions import TypeVar
+from typing_extensions import TypeVar, Unpack
+
+if TYPE_CHECKING:
+    from django.db.models.fields import FieldInitKwargs
 
 _ST = TypeVar("_ST", contravariant=True)
 _GT = TypeVar("_GT", covariant=True)
@@ -211,7 +214,7 @@ class DefaultedTypeVars(models.Model):
 def custom_fields_with_defaulted_type_vars() -> None:
     instance = DefaultedTypeVars()
     assert_type(instance.small_int, int)
-    assert_type(instance.null_small_int, int | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.null_small_int, int | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
     assert_type(instance.additional, CustomFieldValue)  # type: ignore[assert-type]  # pyrefly: ignore[assert-type]
     assert_type(instance.null_additional, CustomFieldValue | None)  # type: ignore[assert-type]  # pyrefly: ignore[assert-type]
     assert_type(instance.html, str)
@@ -221,3 +224,47 @@ def custom_fields_with_defaulted_type_vars() -> None:
     instance.small_int = "12"  # pyrefly: ignore[bad-assignment]
     instance.small_int = F("id")  # pyrefly: ignore[bad-assignment]
     instance.small_int = CustomFieldValue()  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
+
+
+# Constructor overloads, as documented in the README
+
+
+class MyIntegerField(models.IntegerField[_ST_Int, _GT_Int]):
+    @overload
+    def __init__(
+        self: MyIntegerField[float | int | str | None, int | None],
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
+
+class OverloadedInit(models.Model):
+    custom_int = MyIntegerField(null=False)
+    custom_int_nullable = MyIntegerField(null=True)
+
+
+def custom_model_field_override_init_via_overloads() -> None:
+    # a bad kwarg is rejected through the Unpack'd TypedDict, on every checker
+    MyIntegerField(nul=True)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[no-matching-overload]
+    assert_type(OverloadedInit().custom_int, int)
+    assert_type(OverloadedInit().custom_int_nullable, int | None)

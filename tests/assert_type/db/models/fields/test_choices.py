@@ -51,7 +51,7 @@ def field_choices() -> None:
     models.CharField(choices=grouped_pairs)
     models.CharField(choices=grouped_mapping)
     models.CharField(choices=choices_class)
-    models.CharField(choices="ab")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+    models.CharField(choices="ab")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]
 
 
 # Fields redeclaring `choices` accept the same input.
