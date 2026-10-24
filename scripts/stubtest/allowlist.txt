@@ -301,8 +301,20 @@ django.utils.functional.LazyObject.__str__
 # Added at runtime by `django_stubs_ext.monkeypatch()` in `scripts/django_tests_settings.py`
 .*\.__class_getitem__
 
-# The shared Field kwargs live in `**kwargs: Unpack[FieldInitKwargs]`, which makes them keyword-only
-# in the stub while Django still accepts them positionally. Only `Field` spells them out at runtime.
+# Field constructor overloads share `**kwargs: Unpack[FieldInitKwargs]`,
+# which stubtest doesn't expand in overloads: https://github.com/python/mypy/issues/22238
+# Only classes whose runtime __init__ spells the kwargs out trip this.
+# They also report `null` as not keyword-only, which the nullable overloads need.
 django.db.models.fields.Field.__init__
+django.db.models.fields.BigIntegerField.__init__
+django.db.models.fields.BooleanField.__init__
+django.db.models.fields.DurationField.__init__
+django.db.models.fields.FloatField.__init__
+django.db.models.fields.IntegerField.__init__
+django.db.models.fields.PositiveBigIntegerField.__init__
+django.db.models.fields.PositiveIntegerField.__init__
+django.db.models.fields.PositiveSmallIntegerField.__init__
+django.db.models.fields.SlugField.__init__
+django.db.models.fields.SmallIntegerField.__init__
 # runtime has a *args passthrough the stub deliberately narrows away
 django.db.models.fields.GenericIPAddressField.__init__
