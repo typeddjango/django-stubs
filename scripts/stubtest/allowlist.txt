@@ -300,3 +300,9 @@ django.utils.functional.LazyObject.__str__
 
 # Added at runtime by `django_stubs_ext.monkeypatch()` in `scripts/django_tests_settings.py`
 .*\.__class_getitem__
+
+# The shared Field kwargs live in `**kwargs: Unpack[FieldInitKwargs]`, which makes them keyword-only
+# in the stub while Django still accepts them positionally. Only `Field` spells them out at runtime.
+django.db.models.fields.Field.__init__
+# runtime has a *args passthrough the stub deliberately narrows away
+django.db.models.fields.GenericIPAddressField.__init__

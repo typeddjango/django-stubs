@@ -15,12 +15,11 @@ from django.contrib.gis.geos import (
 from django.core.validators import _ValidatorCallable
 from django.db.models import Model
 from django.db.models.expressions import Expression
-from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping
+from django.db.models.fields import NOT_PROVIDED, Field, FieldInitKwargs, _ErrorMessagesMapping
 from django.db.models.sql.compiler import _AsSqlType
 from django.forms.widgets import Widget
-from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar, Unpack, override
 
 # __set__ value type
 _ST = TypeVar("_ST", contravariant=True, default=Any)
@@ -48,28 +47,12 @@ class BaseSpatialField(Field[_ST, _GT]):
         srid: int = 4326,
         spatial_index: bool = True,
         *,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @override
     def db_type(self, connection: Any) -> Any: ...
@@ -98,28 +81,12 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         max_geom_collections: int | None = ...,
         srid: int = 4326,
         spatial_index: bool = True,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]

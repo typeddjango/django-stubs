@@ -19,7 +19,7 @@ from django.forms.widgets import Widget
 from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
-from typing_extensions import TypeVar, override
+from typing_extensions import TypedDict, TypeVar, Unpack, override
 
 class Empty: ...
 class NOT_PROVIDED: ...
@@ -53,6 +53,30 @@ _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 _ST = TypeVar("_ST", contravariant=True, default=Any)
 # __get__ return type
 _GT = TypeVar("_GT", covariant=True, default=Any)
+
+# Keyword arguments shared by every Field constructor, factored out so subclass constructors stay short.
+# `primary_key`, `max_length` and `db_default` vary per field, so each constructor spells them out.
+# Custom fields can reuse it; it only exists in the stubs.
+# `closed=True` (PEP 728) makes ty reject unknown keys passed through `**kwargs`.
+@type_check_only
+class FieldInitKwargs(TypedDict, total=False, closed=True):
+    unique: bool
+    blank: bool
+    db_index: bool
+    default: Any
+    editable: bool
+    serialize: bool
+    unique_for_date: str | None
+    unique_for_month: str | None
+    unique_for_year: str | None
+    choices: _ChoicesInput | None
+    help_text: _StrOrPromise
+    db_column: str | None
+    db_tablespace: str | None
+    auto_created: bool
+    validators: Iterable[_ValidatorCallable]
+    error_messages: _ErrorMessagesMapping | None
+    db_comment: str | None
 
 class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     """
@@ -158,28 +182,13 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         self,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
+        *,
+        null: bool = False,
+        rel: ForeignObjectRel | None = None,
         primary_key: bool = False,
         max_length: int | None = None,
-        unique: bool = False,
-        blank: bool = False,
-        null: bool = False,
-        db_index: bool = False,
-        rel: ForeignObjectRel | None = None,
-        default: Any = ...,
-        editable: bool = True,
-        serialize: bool = True,
-        unique_for_date: str | None = None,
-        unique_for_month: str | None = None,
-        unique_for_year: str | None = None,
-        choices: _ChoicesInput | None = None,
-        help_text: _StrOrPromise = "",
-        db_column: str | None = None,
-        db_tablespace: str | None = None,
-        auto_created: bool = False,
-        validators: Iterable[_ValidatorCallable] = (),
-        error_messages: _ErrorMessagesMapping | None = None,
-        db_comment: str | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     def __set__(self, instance: Any, value: _ST | Combinable) -> None: ...
     # class access
@@ -315,23 +324,10 @@ class DecimalField(Field[_ST, _GT]):
         max_digits: int | None = None,
         decimal_places: int | None = None,
         *,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        null: bool = False,
+        primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @cached_property
     def context(self) -> decimal.Context: ...
@@ -344,31 +340,15 @@ class CharField(Field[_ST, _GT]):
     db_collation: str | None
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
         *,
+        null: bool = False,
         db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
 class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
@@ -376,32 +356,16 @@ class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
 class SlugField(CharField[_ST, _GT]):
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
         *,
-        max_length: int | None = 50,
-        db_index: bool = True,
+        null: bool = False,
         allow_unicode: bool = False,
         db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 50,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
 class EmailField(CharField[_ST, _GT]):
@@ -413,29 +377,12 @@ class URLField(CharField[_ST, _GT]):
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
         *,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        rel: ForeignObjectRel | None = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        auto_created: bool = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        null: bool = False,
         db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 200,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
 class TextField(Field[_ST, _GT]):
@@ -446,31 +393,15 @@ class TextField(Field[_ST, _GT]):
     db_collation: str | None
     def __init__(
         self,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
         *,
+        null: bool = False,
         db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
 class BooleanField(Field[_ST, _GT]):
@@ -500,23 +431,11 @@ class GenericIPAddressField(Field[_ST, _GT]):
         name: Any | None = None,
         protocol: str = "both",
         unpack_ipv4: bool = False,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
 class DateTimeCheckMixin:
@@ -535,24 +454,11 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         auto_now: bool = False,
         auto_now_add: bool = False,
         *,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
@@ -569,23 +475,10 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         auto_now: bool = False,
         auto_now_add: bool = False,
         *,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        null: bool = False,
+        primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
 class DateTimeField(DateField[_ST, _GT]):
@@ -601,29 +494,12 @@ class UUIDField(Field[_ST, _GT]):
         self,
         verbose_name: _StrOrPromise | None = None,
         *,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        rel: ForeignObjectRel | None = ...,
-        default: Any = ...,
+        name: str | None = None,  # unlike other fields, keyword-only at runtime
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        auto_created: bool = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
 class FilePathField(Field[_ST, _GT]):
@@ -642,24 +518,11 @@ class FilePathField(Field[_ST, _GT]):
         allow_files: bool = True,
         allow_folders: bool = False,
         *,
-        primary_key: bool = ...,
-        max_length: int = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int = 100,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _ChoicesInput | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
 class BinaryField(Field[_ST, _GT]):

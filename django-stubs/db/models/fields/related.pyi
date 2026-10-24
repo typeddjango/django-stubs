@@ -7,7 +7,14 @@ from django.core.validators import _ValidatorCallable
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
-from django.db.models.fields import NOT_PROVIDED, Field, _AllLimitChoicesTo, _ErrorMessagesMapping, _LimitChoicesTo
+from django.db.models.fields import (
+    NOT_PROVIDED,
+    Field,
+    FieldInitKwargs,
+    _AllLimitChoicesTo,
+    _ErrorMessagesMapping,
+    _LimitChoicesTo,
+)
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForeignKeyDeferredAttribute, ManyRelatedManager
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
@@ -24,7 +31,7 @@ from django.db.models.sql.where import WhereNode
 from django.forms.widgets import Widget
 from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise, cached_property
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar, Unpack, override
 
 RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 
@@ -53,30 +60,13 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
         related_query_name: str | None = None,
         limit_choices_to: _AllLimitChoicesTo | None = None,
         *,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        rel: ForeignObjectRel | None = ...,
-        default: Any = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_tablespace: str | None = ...,
-        auto_created: bool = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        db_comment: str | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @cached_property
     @override
@@ -113,25 +103,12 @@ class ForeignObject(RelatedField[_ST, _GT]):
         parent_link: bool = False,
         swappable: bool = True,
         *,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        db_comment: str | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     # class access
     @overload
@@ -197,30 +174,14 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         to_field: str | None = None,
         db_constraint: bool = True,
         *,
-        swappable: bool = ...,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        swappable: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        db_comment: str | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @classmethod
     def __class_getitem__(cls, *args: Any, **kwargs: Any) -> type[Self]: ...
@@ -265,35 +226,19 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         on_delete: Callable[..., None],
         to_field: str | None = None,
         *,
-        swappable: bool = ...,
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
-        parent_link: bool = ...,
-        db_constraint: bool = ...,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        swappable: bool = True,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        db_constraint: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        db_comment: str | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     # class access
     @overload
