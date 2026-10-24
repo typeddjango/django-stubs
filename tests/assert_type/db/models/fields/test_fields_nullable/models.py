@@ -19,7 +19,7 @@ class MyModel(models.Model):
 
 def nullable_field_with_strict_optional_true() -> None:
     assert_type(MyModel().text, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(MyModel().text_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(MyModel().text_nullable, str | None)
     MyModel().text = None  # type: ignore[assignment]  # pyrefly: ignore[bad-assignment]
     MyModel().text_nullable = None
 
@@ -47,9 +47,9 @@ class Article(models.Model):
 
 def nullable_subclass_inherits_null_overload() -> None:
     assert_type(Article().body, str)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]
-    assert_type(Article().body_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]
+    assert_type(Article().body_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]
     assert_type(Article().count, int)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]
-    assert_type(Article().count_nullable, int | None)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]
+    assert_type(Article().count_nullable, int | None)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]
 
 
 class SubqueryArticle(models.Model):
@@ -58,7 +58,7 @@ class SubqueryArticle(models.Model):
 
 def direct_field_null_true_does_not_trigger_nullability_check() -> None:
     field = models.IntegerField(null=True)
-    assert_type(field, IntegerField[float | int | str | None, int | None])  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    assert_type(field, IntegerField[float | int | str | None, int | None])
     not_null_field = models.IntegerField(null=False)
     assert_type(not_null_field, IntegerField[float | int | str, int])  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     SubqueryArticle.objects.annotate(
@@ -113,8 +113,8 @@ class PositionalArgs(models.Model):
 
 def positional_overload_args_with_null_true_select_nullable_overload() -> None:
     instance = PositionalArgs()
-    assert_type(instance.amount, decimal.Decimal | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.day, datetime.date | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.moment, datetime.time | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.stamp, datetime.datetime | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.addr, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.amount, decimal.Decimal | None)
+    assert_type(instance.day, datetime.date | None)
+    assert_type(instance.moment, datetime.time | None)
+    assert_type(instance.stamp, datetime.datetime | None)
+    assert_type(instance.addr, str | None)

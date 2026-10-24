@@ -14,7 +14,7 @@ class MyUser(AbstractUser):
 
 
 class NullableActiveUser(AbstractUser):
-    is_active = models.BooleanField(null=True)  # type: ignore[assignment]  # pyrefly: ignore[bad-override-mutable-attribute]
+    is_active = models.BooleanField(null=True)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-override-mutable-attribute]  # ty: ignore[invalid-assignment]
 
 
 class PropertyStaffUser(AbstractUser):
@@ -25,7 +25,7 @@ class PropertyStaffUser(AbstractUser):
 
 
 def overridden_flags_keep_their_declared_type() -> None:
-    # pyright and ty don't apply `null=True` yet: https://github.com/typeddjango/django-stubs/pull/3317
+    # pyright and ty reject the override above and keep `AbstractUser`'s non-null field type
     assert_type(NullableActiveUser().is_active, bool | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(PropertyStaffUser().is_staff, Literal[True])
 

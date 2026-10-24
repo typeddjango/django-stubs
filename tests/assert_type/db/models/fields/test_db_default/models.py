@@ -10,5 +10,5 @@ class Book(models.Model):
 
 
 def db_default_does_not_narrow_set_type(book: Book) -> None:
-    assert_type(book.pages, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(book.pages, int | None)
     book.pages = 1
