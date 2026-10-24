@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+import decimal
 from typing import assert_type
 
 from django.db import models
@@ -57,6 +59,8 @@ class SubqueryArticle(models.Model):
 def direct_field_null_true_does_not_trigger_nullability_check() -> None:
     field = models.IntegerField(null=True)
     assert_type(field, IntegerField[float | int | str | None, int | None])  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    not_null_field = models.IntegerField(null=False)
+    assert_type(not_null_field, IntegerField[float | int | str, int])  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     SubqueryArticle.objects.annotate(
         other_id=Subquery(
             SubqueryArticle.objects.filter(id=OuterRef("id")).values_list("id", flat=True)[:1],
@@ -79,13 +83,38 @@ class HTMLField(models.TextField): ...
 class BareIntWrap(models.IntegerField): ...
 
 
+class FieldMixin: ...
+
+
+class MySlugField(models.SlugField, FieldMixin): ...
+
+
 class BareArticle(models.Model):
     body = HTMLField()
     body_nullable = HTMLField(null=True)
     count_nullable = BareIntWrap(null=True)
+    slug_nullable = MySlugField(null=True)
 
 
 def nullable_field_subclass_without_explicit_type_vars() -> None:
     assert_type(BareArticle().body, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(BareArticle().body_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(BareArticle().count_nullable, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(BareArticle().slug_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+
+
+class PositionalArgs(models.Model):
+    amount = models.DecimalField(None, None, 10, 2, null=True)  # max_digits/decimal_places positional
+    day = models.DateField(None, None, False, False, null=True)  # auto_now/auto_now_add positional
+    moment = models.TimeField(None, None, False, False, null=True)
+    stamp = models.DateTimeField(None, None, False, False, null=True)
+    addr = models.GenericIPAddressField(None, None, "both", False, null=True)  # protocol/unpack_ipv4
+
+
+def positional_overload_args_with_null_true_select_nullable_overload() -> None:
+    instance = PositionalArgs()
+    assert_type(instance.amount, decimal.Decimal | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.day, datetime.date | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.moment, datetime.time | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.stamp, datetime.datetime | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.addr, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]

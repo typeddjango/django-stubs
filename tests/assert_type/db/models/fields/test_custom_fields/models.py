@@ -4,6 +4,7 @@ from typing import Any, Generic, assert_type
 
 from django.db import models
 from django.db.models import fields
+from django.db.models.expressions import F
 from typing_extensions import TypeVar
 
 _ST = TypeVar("_ST", contravariant=True)
@@ -177,3 +178,46 @@ def test_custom_field_subclassing_an_alias() -> None:
     assert_type(user.text, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(user.nullable_text, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(user.flag, bool)  # pyrefly: ignore[assert-type]
+
+
+# Generic subclasses default their type vars like the parent field, so bare calls resolve without the plugin
+_ST_Int = TypeVar("_ST_Int", contravariant=True, default=float | int | str)
+_GT_Int = TypeVar("_GT_Int", covariant=True, default=int)
+_ST_Custom = TypeVar("_ST_Custom", contravariant=True, default=CustomFieldValue | int)
+_GT_Custom = TypeVar("_GT_Custom", covariant=True, default=CustomFieldValue)
+_ST_Text = TypeVar("_ST_Text", contravariant=True, default=str)
+_GT_Text = TypeVar("_GT_Text", covariant=True, default=str)
+
+
+class DefaultedSmallIntegerField(fields.SmallIntegerField[_ST_Int, _GT_Int]): ...
+
+
+class DefaultedAdditionalTypeVarField(fields.Field[_ST_Custom, _GT_Custom], Generic[T, _ST_Custom, _GT_Custom]): ...
+
+
+class DefaultedHtmlField(models.TextField[_ST_Text, _GT_Text]): ...
+
+
+class DefaultedTypeVars(models.Model):
+    small_int = DefaultedSmallIntegerField()
+    null_small_int = DefaultedSmallIntegerField(null=True)  # type: ignore[misc]
+    additional = DefaultedAdditionalTypeVarField[bool]()
+    null_additional = DefaultedAdditionalTypeVarField[bool, CustomFieldValue | int | None, CustomFieldValue | None]()
+    html = DefaultedHtmlField()
+    # The cross-checker recipe for a nullable custom field: widen the generic parameters with `| None`
+    null_html = DefaultedHtmlField[str | None, str | None]()
+
+
+def custom_fields_with_defaulted_type_vars() -> None:
+    instance = DefaultedTypeVars()
+    assert_type(instance.small_int, int)
+    assert_type(instance.null_small_int, int | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.additional, CustomFieldValue)  # type: ignore[assert-type]  # pyrefly: ignore[assert-type]
+    assert_type(instance.null_additional, CustomFieldValue | None)  # type: ignore[assert-type]  # pyrefly: ignore[assert-type]
+    assert_type(instance.html, str)
+    assert_type(instance.null_html, str | None)  # pyrefly: ignore[assert-type]
+    instance.small_int = 1.2  # pyrefly: ignore[bad-assignment]
+    instance.small_int = 12
+    instance.small_int = "12"  # pyrefly: ignore[bad-assignment]
+    instance.small_int = F("id")  # pyrefly: ignore[bad-assignment]
+    instance.small_int = CustomFieldValue()  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]

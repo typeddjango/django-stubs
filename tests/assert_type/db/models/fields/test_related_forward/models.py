@@ -26,5 +26,10 @@ if sys.version_info >= (3, 12):
         author = models.OneToOneField(Author, on_delete=models.DB_SET_NULL)
 
 
+def test_related() -> None:
+    assert_type(Book().author, Author)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(Profile().user, Author)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+
+
 def single_type_arg_is_also_the_get_type(fk: models.ForeignKey[Author], book: Book) -> None:
     assert_type(fk.__get__(book, Book), Author)
