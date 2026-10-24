@@ -1,10 +1,12 @@
 from collections.abc import Iterator
 from typing import Any, Never
 
+from django.http.request import HttpRequest
 from django.template.base import Origin
 from django.template.base import Template as _BaseTemplate
 from django.template.engine import Engine
 from django.template.exceptions import TemplateDoesNotExist
+from django.utils.safestring import SafeString
 from typing_extensions import override
 
 from .base import BaseEngine, _EngineTemplate
@@ -29,3 +31,5 @@ class Template(_EngineTemplate):
     def __init__(self, template: _BaseTemplate, backend: BaseEngine) -> None: ...
     @property
     def origin(self) -> Origin: ...
+    @override
+    def render(self, context: dict[str, Any] | None = None, request: HttpRequest | None = None) -> SafeString: ...
