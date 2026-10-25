@@ -13,7 +13,7 @@ class MyModel(models.Model):
     redefined_set_type = cast("models.Field[int, int]", models.IntegerField())
     redefined_union_set_type = cast("models.Field[int | float, int]", models.IntegerField())
     redefined_array_set_type = cast(
-        "ArrayField[Sequence[int | float], list[int]]",
+        "ArrayField[Sequence[int | float], int]",
         ArrayField(base_field=models.IntegerField()),
     )
     default_set_type = models.IntegerField()
@@ -26,13 +26,13 @@ def field_set_type_honors_type_redefinition() -> None:
     assert_type(non_init.redefined_set_type, int)
     assert_type(non_init.redefined_union_set_type, int)
     assert_type(non_init.redefined_array_set_type, list[int])  # pyrefly: ignore[assert-type]
-    assert_type(non_init.default_set_type, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(non_init.default_set_type, int)
     assert_type(non_init.unset_set_type, Any)
     non_init.redefined_set_type = "invalid"  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-assignment]
     non_init.redefined_union_set_type = "invalid"  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-assignment]
     array_val: list[str] = ["invalid"]
     non_init.redefined_array_set_type = array_val  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]
-    non_init.default_set_type = []  # type: ignore[assignment]  # pyrefly: ignore[bad-assignment]
+    non_init.default_set_type = []  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
     non_init.unset_set_type = []
     MyModel(  # type: ignore[misc]
         redefined_set_type="invalid",

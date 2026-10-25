@@ -34,30 +34,30 @@ class Geo(models.Model):
 
 def fields_getter_and_setter() -> None:
     geo = Geo()
-    assert_type(geo.point, Point)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(geo.point, Point)
     geo.point = Point()
-    assert_type(geo.line_string, LineString)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(geo.line_string, LineString)
     geo.line_string = LineString()
-    assert_type(geo.polygon, Polygon)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(geo.polygon, Polygon)
     geo.polygon = Polygon()
-    assert_type(geo.multi_point, MultiPoint)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(geo.multi_point, MultiPoint)
     geo.multi_point = MultiPoint()
-    assert_type(geo.multi_line_string, MultiLineString)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(geo.multi_line_string, MultiLineString)
     geo.multi_line_string = MultiLineString()
-    assert_type(geo.multi_polygon, MultiPolygon)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(geo.multi_polygon, MultiPolygon)
     geo.multi_polygon = MultiPolygon()
-    assert_type(geo.geometry_collection, GeometryCollection)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(geo.geometry_collection, GeometryCollection)
     geo.geometry_collection = GeometryCollection()
 
 
 def nullable_geometry_fields_read_optional() -> None:
     geo = Geo()
-    assert_type(geo.null_point, Point | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(geo.null_line_string, LineString | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(geo.null_polygon, Polygon | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(geo.null_multi_point, MultiPoint | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(geo.null_multi_line_string, MultiLineString | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(geo.null_multi_polygon, MultiPolygon | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(geo.null_geometry_collection, GeometryCollection | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(geo.null_point, Point | None)
+    assert_type(geo.null_line_string, LineString | None)
+    assert_type(geo.null_polygon, Polygon | None)
+    assert_type(geo.null_multi_point, MultiPoint | None)
+    assert_type(geo.null_multi_line_string, MultiLineString | None)
+    assert_type(geo.null_multi_polygon, MultiPolygon | None)
+    assert_type(geo.null_geometry_collection, GeometryCollection | None)
     geo.null_point = None
-    geo.point = None  # type: ignore[assignment]  # pyrefly: ignore[bad-assignment]
+    geo.point = None  # type: ignore[assignment]  # pyrefly: ignore[bad-assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]

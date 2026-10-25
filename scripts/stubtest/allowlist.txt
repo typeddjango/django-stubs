@@ -282,7 +282,6 @@ django.db.models.manager.BaseManager.__get__
 # Field.__get__/__set__ are stub-only for the mypy plugin, they don't exist at runtime
 django.contrib.contenttypes.fields.GenericForeignKey.__get__
 django.db.models.fields.Field.__get__
-django.db.models.fields.Field.__set__
 django.db.models.fields.files.FileField.__get__
 django.db.models.fields.files.ImageField.__get__
 django.db.models.fields.related.ForeignObject.__get__

@@ -5,21 +5,17 @@ from typing import Any, ClassVar, Self
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model, lookups
 from django.db.models.expressions import Expression
-from django.db.models.fields import NOT_PROVIDED, FieldInitKwargs, TextField
+from django.db.models.fields import NOT_PROVIDED, Field, FieldInitKwargs, TextField
+from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import FieldGetDbPrepValueMixin, PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeVar, Unpack, override
 
-from . import Field
-from .mixins import CheckFieldDefaultMixin
+_ST_JSON = TypeVar("_ST_JSON", contravariant=True, default=Any)
+_GT_JSON = TypeVar("_GT_JSON", covariant=True, default=Any)
 
-# __set__ value type
-_ST = TypeVar("_ST", contravariant=True, default=Any)
-# __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=Any)
-
-class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT]):
+class JSONField(CheckFieldDefaultMixin, Field[_ST_JSON, _GT_JSON]):
     encoder: type[json.JSONEncoder] | None
     decoder: type[json.JSONDecoder] | None
     def __init__(

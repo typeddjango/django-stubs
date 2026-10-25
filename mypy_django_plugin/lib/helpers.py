@@ -394,10 +394,10 @@ def get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) 
     field_type = get_proper_type(field_node.type)
     if not isinstance(field_type, Instance):
         return None
-    # Field declares a set and a get type arg. Fallback to `None` when we can't find any args.
-    # Not every model attribute is a field,
+    # Field declares a set and a get type arg, wrappers like ArrayField add their own after them.
+    # Fallback to `None` when we can't find any args. Not every model attribute is a field,
     # a reverse o2o accessor is a two arg descriptor whose args would be misread as set/get types.
-    if len(field_type.args) != 2 or not field_type.type.has_base(fullnames.FIELD_FULLNAME):
+    if len(field_type.args) < 2 or not field_type.type.has_base(fullnames.FIELD_FULLNAME):
         return None
     return field_type
 

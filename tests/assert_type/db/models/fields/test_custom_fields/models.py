@@ -51,7 +51,7 @@ class User(models.Model):
 
 def test_custom_model_fields_with_generic_type() -> None:
     user = User()
-    assert_type(user.id, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(user.id, int)
     assert_type(user.my_custom_field1, CustomFieldValue)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field2, CustomFieldValue)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field3, bool)  # pyrefly: ignore[assert-type]
@@ -84,11 +84,11 @@ def field_two_typevar_form_in_user_annotation() -> None:
 
 class NullableUser(models.Model):
     # test null=True on fields with non-optional generic types throw error
-    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)  # type: ignore[misc]
+    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)
     my_custom_field6 = CustomValueField(null=True)  # type: ignore[misc]
     my_custom_field7 = SingleTypeField[bool](null=True)  # type: ignore[misc]
     my_custom_field8 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool](null=True)  # type: ignore[misc]
-    my_custom_field9 = fields.Field[CustomFieldValue | int, CustomFieldValue](null=True)  # type: ignore[misc]
+    my_custom_field9 = fields.Field[CustomFieldValue | int, CustomFieldValue](null=True)
 
     # test null=True on fields with optional generic types throw no errors
     my_custom_field12 = fields.Field[CustomFieldValue | int, CustomFieldValue | None](null=True)
@@ -99,11 +99,11 @@ class NullableUser(models.Model):
 
 def custom_fields_with_null_true() -> None:
     user = NullableUser()
-    assert_type(user.my_custom_field5, CustomFieldValue | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    assert_type(user.my_custom_field5, CustomFieldValue | None)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     assert_type(user.my_custom_field6, CustomFieldValue | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     assert_type(user.my_custom_field7, bool | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     assert_type(user.my_custom_field8, CustomFieldValue | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
-    assert_type(user.my_custom_field9, CustomFieldValue | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    assert_type(user.my_custom_field9, CustomFieldValue | None)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     assert_type(user.my_custom_field12, CustomFieldValue | None)
     assert_type(user.my_custom_field13, CustomFieldValue | None)  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field14, bool | None)  # pyrefly: ignore[assert-type]
@@ -178,7 +178,7 @@ class AliasUser(models.Model):
 
 def test_custom_field_subclassing_an_alias() -> None:
     user = AliasUser()
-    assert_type(user.text, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(user.text, str)
     assert_type(user.nullable_text, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(user.flag, bool)  # pyrefly: ignore[assert-type]
 
@@ -203,7 +203,7 @@ class DefaultedHtmlField(models.TextField[_ST_Text, _GT_Text]): ...
 
 class DefaultedTypeVars(models.Model):
     small_int = DefaultedSmallIntegerField()
-    null_small_int = DefaultedSmallIntegerField(null=True)  # type: ignore[misc]
+    null_small_int = DefaultedSmallIntegerField(null=True)
     additional = DefaultedAdditionalTypeVarField[bool]()
     null_additional = DefaultedAdditionalTypeVarField[bool, CustomFieldValue | int | None, CustomFieldValue | None]()
     html = DefaultedHtmlField()
@@ -214,9 +214,9 @@ class DefaultedTypeVars(models.Model):
 def custom_fields_with_defaulted_type_vars() -> None:
     instance = DefaultedTypeVars()
     assert_type(instance.small_int, int)
-    assert_type(instance.null_small_int, int | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]
-    assert_type(instance.additional, CustomFieldValue)  # type: ignore[assert-type]  # pyrefly: ignore[assert-type]
-    assert_type(instance.null_additional, CustomFieldValue | None)  # type: ignore[assert-type]  # pyrefly: ignore[assert-type]
+    assert_type(instance.null_small_int, int | None)  # pyright: ignore[reportAssertTypeFailure]
+    assert_type(instance.additional, CustomFieldValue)  # pyrefly: ignore[assert-type]
+    assert_type(instance.null_additional, CustomFieldValue | None)  # pyrefly: ignore[assert-type]
     assert_type(instance.html, str)
     assert_type(instance.null_html, str | None)  # pyrefly: ignore[assert-type]
     instance.small_int = 1.2  # pyrefly: ignore[bad-assignment]
