@@ -742,3 +742,29 @@
                 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
                 class UserProfile(AbstractBaseUser, PermissionsMixin):
                     pass
+
+-   case: base_manager_direct_subclass_keeps_reverse_fk_accessor
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Parent
+        p = Parent()
+        reveal_type(p.child_set)  # N: Revealed type is "myapp.models.Child_RelatedManager"
+        reveal_type(p.child_set.all())  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Child, myapp.models.Child]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from django.db.models.manager import BaseManager
+
+                class ChildManager(BaseManager["Child"]):
+                    pass
+
+                class Parent(models.Model):
+                    pass
+
+                class Child(models.Model):
+                    parent = models.ForeignKey(Parent, on_delete=models.CASCADE)
+                    objects = ChildManager()

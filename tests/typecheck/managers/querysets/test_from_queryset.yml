@@ -1115,3 +1115,59 @@
 
                 class MyModel(models.Model):
                     objects = MyManager()
+
+# Regression test for https://github.com/typeddjango/django-stubs/issues/2602
+-   case: custom_manager_and_from_queryset_for_untyped_custom_queryset
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import MyModel
+        reveal_type(MyModel.objects_my_manager.all())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects_my_manager.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects_my_manager.all().get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects_from_queryset.all())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects_from_queryset.get())  # N: Revealed type is "myapp.models.MyModel"
+        reveal_type(MyModel.objects_from_queryset.all().get())  # N: Revealed type is "myapp.models.MyModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing_extensions import override
+                from django.db import models
+
+                class MyQuerySet(models.QuerySet):
+                    pass
+
+                class MyManager(models.Manager["MyModel", MyQuerySet["MyModel"]]):
+                    @override
+                    def get_queryset(self) -> MyQuerySet["MyModel"]:
+                        return MyQuerySet(self.model, using=self._db)
+
+                class MyModel(models.Model):
+                    objects_my_manager = MyManager()
+                    objects_from_queryset = models.Manager.from_queryset(MyQuerySet)()
+
+# Regression test for https://github.com/typeddjango/django-stubs/issues/1067
+-   case: custom_queryset_method_available_on_manager
+    main: |
+        from myapp.models import Attachment
+        Attachment.objects.load(1)
+        Attachment.objects.load("12") # E: Argument 1 to "load" of "AttachmentQS" has incompatible type "str"; expected "int"  [arg-type]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class AttachmentQS(models.QuerySet['Attachment']):
+                     def load(self, pk: int) -> 'Attachment':
+                         raise NotImplementedError
+
+                AttachmentManager = models.Manager.from_queryset(AttachmentQS)
+
+                class Attachment(models.Model):
+                     # ...
+                     objects = AttachmentManager()
