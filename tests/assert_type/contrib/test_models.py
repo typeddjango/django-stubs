@@ -16,8 +16,8 @@ def log_entry_fields_are_inferred() -> None:
     entry = LogEntry()
     assert_type(entry.action_time, datetime)
     assert_type(entry.user, User)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
-    assert_type(entry.content_type, ContentType | None)  # pyrefly: ignore[assert-type]
-    assert_type(entry.object_id, str | None)  # pyrefly: ignore[assert-type]
+    assert_type(entry.content_type, ContentType | None)
+    assert_type(entry.object_id, str | None)
     assert_type(entry.object_repr, str)
     assert_type(entry.action_flag, int)
     assert_type(entry.change_message, str)
@@ -36,7 +36,7 @@ def flatpage_fields_are_inferred() -> None:
 
 def redirect_fields_are_inferred() -> None:
     redirect = Redirect()
-    assert_type(redirect.site, Site)  # pyrefly: ignore[assert-type]
+    assert_type(redirect.site, Site)
     assert_type(redirect.old_path, str)
     assert_type(redirect.new_path, str)
 
@@ -63,7 +63,7 @@ def session_fields_are_inferred() -> None:
 def permission_fields_are_inferred() -> None:
     permission = Permission()
     assert_type(permission.name, str)
-    assert_type(permission.content_type, ContentType)  # pyrefly: ignore[assert-type]
+    assert_type(permission.content_type, ContentType)
     assert_type(permission.codename, str)
 
 
@@ -76,7 +76,7 @@ def group_fields_are_inferred() -> None:
 def user_fields_are_inferred() -> None:
     user = User()
     assert_type(user.password, str)
-    assert_type(user.last_login, datetime | None)  # pyrefly: ignore[assert-type]
+    assert_type(user.last_login, datetime | None)
     assert_type(user.username, str)
     assert_type(user.first_name, str)
     assert_type(user.last_name, str)

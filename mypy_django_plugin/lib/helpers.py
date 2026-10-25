@@ -40,7 +40,7 @@ from mypy.plugin import (
 )
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder, parse_bool
-from mypy.typeanal import make_optional_type
+from mypy.typeanal import fix_instance, make_optional_type
 from mypy.typeops import try_getting_str_literals_from_type
 from mypy.types import (
     AnyType,
@@ -389,6 +389,26 @@ def get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) 
 class FieldTypeArgs(NamedTuple):
     set: ProperType
     get: ProperType
+
+
+def fill_field_defaults(
+    field_info: TypeInfo,
+    api: TypeChecker | SemanticAnalyzer,
+    *,
+    is_set_nullable: bool = False,
+    is_get_nullable: bool = False,
+) -> Instance:
+    """Build an Instance of `field_info` with PEP 696 defaults; fold `| None` into set/get args if asked."""
+    inst = Instance(field_info, ())
+    fix_instance(inst, api.fail, api.note, disallow_any=False, options=api.options, use_generic_error=True)
+    if inst.args:
+        args = list(inst.args)
+        if is_set_nullable:
+            args[0] = make_optional_type(args[0])
+        if is_get_nullable and len(args) > 1:
+            args[1] = make_optional_type(args[1])
+        inst = inst.copy_modified(args=args)
+    return inst
 
 
 def get_field_type_args(field_type: Instance) -> FieldTypeArgs | None:
