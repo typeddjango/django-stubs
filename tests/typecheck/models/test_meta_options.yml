@@ -48,8 +48,8 @@
 
         MyModel._meta.get_field('non_existant')  # E: MyModel has no field named 'non_existant'  [misc]
 
-        reveal_type(MyModel._meta.get_field('field'))  # N: Revealed type is "django.contrib.postgres.fields.array.ArrayField[typing.Sequence[float | int | str], list[int]]"
-        reveal_type(MyModel._meta.get_field('null_field'))  # N: Revealed type is "django.contrib.postgres.fields.array.ArrayField[typing.Sequence[float | int | str] | None, list[int] | None]"
+        reveal_type(MyModel._meta.get_field('field'))  # N: Revealed type is "django.contrib.postgres.fields.array.ArrayField[float | int | str, int, Never]"
+        reveal_type(MyModel._meta.get_field('null_field'))  # N: Revealed type is "django.contrib.postgres.fields.array.ArrayField[float | int | str, int, None]"
 
         field: str
         reveal_type(MyModel._meta.get_field(field))  # N: Revealed type is "django.db.models.fields.Field[Any, Any] | django.db.models.fields.reverse_related.ForeignObjectRel"
