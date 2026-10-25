@@ -13,7 +13,7 @@ class MyModel(models.Model):
     redefined_set_type = cast("models.Field[int, int]", models.IntegerField())
     redefined_union_set_type = cast("models.Field[int | float, int]", models.IntegerField())
     redefined_array_set_type = cast(
-        "ArrayField[Sequence[int | float], int]",
+        "ArrayField[Sequence[int | float], list[int]]",
         ArrayField(base_field=models.IntegerField()),
     )
     default_set_type = models.IntegerField()
