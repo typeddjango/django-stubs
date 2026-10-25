@@ -136,8 +136,6 @@ class Field(RegisterLookupMixin, Generic[_ST_contra, _GT_co]):
     It is required to enhance parts like ``filter`` queries.
     """
 
-    _pyi_private_set_type: Any
-    _pyi_private_get_type: Any
     _pyi_lookup_exact_type: Any
 
     help_text: _StrOrPromise
@@ -293,8 +291,6 @@ _ST_Int_contra = TypeVar("_ST_Int_contra", contravariant=True, default=float | i
 _GT_Int_co = TypeVar("_GT_Int_co", covariant=True, default=int)
 
 class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
-    _pyi_private_set_type: float | int | str
-    _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
     @overload
     def __init__(
@@ -462,8 +458,6 @@ _ST_Float_contra = TypeVar("_ST_Float_contra", contravariant=True, default=float
 _GT_Float_co = TypeVar("_GT_Float_co", covariant=True, default=float)
 
 class FloatField(Field[_ST_Float_contra, _GT_Float_co]):
-    _pyi_private_set_type: float | int | str
-    _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
     @overload
     def __init__(
@@ -494,8 +488,6 @@ _ST_Decimal_contra = TypeVar("_ST_Decimal_contra", contravariant=True, default=s
 _GT_Decimal_co = TypeVar("_GT_Decimal_co", covariant=True, default=decimal.Decimal)
 
 class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
-    _pyi_private_set_type: str | float | decimal.Decimal
-    _pyi_private_get_type: decimal.Decimal
     _pyi_lookup_exact_type: str | int | decimal.Decimal
     # attributes
     max_digits: int
@@ -533,8 +525,6 @@ _ST_Char_contra = TypeVar("_ST_Char_contra", contravariant=True, default=str | i
 _GT_Char_co = TypeVar("_GT_Char_co", covariant=True, default=str)
 
 class CharField(Field[_ST_Char_contra, _GT_Char_co]):
-    _pyi_private_set_type: str | int
-    _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
     @overload
@@ -625,7 +615,6 @@ class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
 _ST_Email_contra = TypeVar("_ST_Email_contra", contravariant=True, default=str)
 
 class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
-    _pyi_private_set_type: str
     @overload
     def __init__(
         self: EmailField[str | None, str | None],
@@ -685,8 +674,6 @@ _ST_Text_contra = TypeVar("_ST_Text_contra", contravariant=True, default=str)
 _GT_Text_co = TypeVar("_GT_Text_co", covariant=True, default=str)
 
 class TextField(Field[_ST_Text_contra, _GT_Text_co]):
-    _pyi_private_set_type: str
-    _pyi_private_get_type: str
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
     @overload
@@ -720,8 +707,6 @@ _ST_Bool_contra = TypeVar("_ST_Bool_contra", contravariant=True, default=bool)
 _GT_Bool_co = TypeVar("_GT_Bool_co", covariant=True, default=bool)
 
 class BooleanField(Field[_ST_Bool_contra, _GT_Bool_co]):
-    _pyi_private_set_type: bool
-    _pyi_private_get_type: bool
     _pyi_lookup_exact_type: bool
     @overload
     def __init__(
@@ -752,16 +737,12 @@ _ST_NBool_contra = TypeVar("_ST_NBool_contra", contravariant=True, default=bool 
 _GT_NBool_co = TypeVar("_GT_NBool_co", covariant=True, default=bool | None)
 
 class NullBooleanField(BooleanField[_ST_NBool_contra, _GT_NBool_co]):
-    _pyi_private_set_type: bool | None  # type: ignore[assignment]
-    _pyi_private_get_type: bool | None  # type: ignore[assignment]
     _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
 
 _ST_IP_contra = TypeVar("_ST_IP_contra", contravariant=True, default=str)
 _GT_IP_co = TypeVar("_GT_IP_co", covariant=True, default=str)
 
 class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
-    _pyi_private_set_type: str
-    _pyi_private_get_type: str
     @overload
     def __init__(
         self: IPAddressField[str | None, str | None],
@@ -790,8 +771,6 @@ class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
 _ST_GenIP_contra = TypeVar("_ST_GenIP_contra", contravariant=True, default=str | int | Callable[..., Any])
 
 class GenericIPAddressField(Field[_ST_GenIP_contra, _GT_IP_co]):
-    _pyi_private_set_type: str | int | Callable[..., Any]
-    _pyi_private_get_type: str
     default_error_messages: ClassVar[_ErrorMessagesDict]
     unpack_ipv4: bool
     protocol: str
@@ -829,8 +808,6 @@ _ST_Date_contra = TypeVar("_ST_Date_contra", contravariant=True, default=str | d
 _GT_Date_co = TypeVar("_GT_Date_co", covariant=True, default=date)
 
 class DateField(DateTimeCheckMixin, Field[_ST_Date_contra, _GT_Date_co]):
-    _pyi_private_set_type: str | date
-    _pyi_private_get_type: date
     _pyi_lookup_exact_type: str | date
     auto_now: bool
     auto_now_add: bool
@@ -869,8 +846,6 @@ _ST_Time_contra = TypeVar("_ST_Time_contra", contravariant=True, default=str | t
 _GT_Time_co = TypeVar("_GT_Time_co", covariant=True, default=time)
 
 class TimeField(DateTimeCheckMixin, Field[_ST_Time_contra, _GT_Time_co]):
-    _pyi_private_set_type: str | time | real_datetime
-    _pyi_private_get_type: time
     auto_now: bool
     auto_now_add: bool
     @overload
@@ -904,8 +879,6 @@ _ST_DateTime_contra = TypeVar("_ST_DateTime_contra", contravariant=True, default
 _GT_DateTime_co = TypeVar("_GT_DateTime_co", covariant=True, default=real_datetime)
 
 class DateTimeField(DateField[_ST_DateTime_contra, _GT_DateTime_co]):
-    _pyi_private_set_type: str | real_datetime | date
-    _pyi_private_get_type: real_datetime
     _pyi_lookup_exact_type: str | real_datetime
     @overload
     def __init__(
@@ -940,8 +913,6 @@ _ST_UUID_contra = TypeVar("_ST_UUID_contra", contravariant=True, default=str | u
 _GT_UUID_co = TypeVar("_GT_UUID_co", covariant=True, default=uuid.UUID)
 
 class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
-    _pyi_private_set_type: str | uuid.UUID
-    _pyi_private_get_type: uuid.UUID
     _pyi_lookup_exact_type: uuid.UUID | str
     @overload
     def __init__(
@@ -995,7 +966,6 @@ _ST_Binary_contra = TypeVar("_ST_Binary_contra", contravariant=True, default=byt
 _GT_Binary_co = TypeVar("_GT_Binary_co", covariant=True, default=bytes | memoryview)
 
 class BinaryField(Field[_ST_Binary_contra, _GT_Binary_co]):
-    _pyi_private_get_type: bytes | memoryview
     @overload
     def __init__(
         self: BinaryField[bytes | bytearray | memoryview | None, bytes | memoryview | None],
@@ -1026,7 +996,6 @@ _ST_Duration_contra = TypeVar("_ST_Duration_contra", contravariant=True, default
 _GT_Duration_co = TypeVar("_GT_Duration_co", covariant=True, default=timedelta)
 
 class DurationField(Field[_ST_Duration_contra, _GT_Duration_co]):
-    _pyi_private_get_type: timedelta
     @overload
     def __init__(
         self: DurationField[str | timedelta | None, timedelta | None],
@@ -1069,8 +1038,6 @@ _ST_Auto_contra = TypeVar("_ST_Auto_contra", contravariant=True, default=int | s
 _GT_Auto_co = TypeVar("_GT_Auto_co", covariant=True, default=int)
 
 class AutoField(AutoFieldMixin, IntegerField[_ST_Auto_contra, _GT_Auto_co], metaclass=AutoFieldMeta):  # type: ignore[misc]
-    _pyi_private_set_type: int | str
-    _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
 
 class BigAutoField(AutoFieldMixin, BigIntegerField[_ST_Auto_contra, _GT_Auto_co]): ...  # type: ignore[misc]

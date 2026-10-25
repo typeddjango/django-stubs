@@ -14,4 +14,4 @@ def db_default_does_not_narrow_set_type(book: Book) -> None:
     assert_type(book.pages, int | None)
     book.pages = 1
     assert_type(book.chapters, int)
-    book.chapters = "1"  # pyrefly: ignore[bad-assignment]
+    book.chapters = "1"

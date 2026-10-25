@@ -20,7 +20,7 @@ class MyModel(models.Model):
 def nullable_field_with_strict_optional_true() -> None:
     assert_type(MyModel().text, str)
     assert_type(MyModel().text_nullable, str | None)
-    MyModel().text = None  # type: ignore[assignment]  # pyrefly: ignore[bad-assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]
+    MyModel().text = None  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
     MyModel().text_nullable = None
 
 
@@ -46,9 +46,9 @@ class Article(models.Model):
 
 
 def nullable_subclass_inherits_null_overload() -> None:
-    assert_type(Article().body, str)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]
+    assert_type(Article().body, str)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(Article().body_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]
-    assert_type(Article().count, int)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]
+    assert_type(Article().count, int)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(Article().count_nullable, int | None)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]
 
 
@@ -98,9 +98,9 @@ class BareArticle(models.Model):
 
 def nullable_field_subclass_without_explicit_type_vars() -> None:
     assert_type(BareArticle().body, str)
-    assert_type(BareArticle().body_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(BareArticle().count_nullable, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(BareArticle().slug_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(BareArticle().body_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
+    assert_type(BareArticle().count_nullable, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
+    assert_type(BareArticle().slug_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
 
 
 class PositionalArgs(models.Model):

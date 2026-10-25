@@ -60,4 +60,4 @@ def nullable_geometry_fields_read_optional() -> None:
     assert_type(geo.null_multi_polygon, MultiPolygon | None)
     assert_type(geo.null_geometry_collection, GeometryCollection | None)
     geo.null_point = None
-    geo.point = None  # type: ignore[assignment]  # pyrefly: ignore[bad-assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]
+    geo.point = None  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]

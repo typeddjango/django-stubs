@@ -112,8 +112,6 @@ _ST_Point_contra = TypeVar("_ST_Point_contra", contravariant=True, default=Point
 _GT_Point_co = TypeVar("_GT_Point_co", covariant=True, default=Point)
 
 class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
-    _pyi_private_set_type: Point
-    _pyi_private_get_type: Point
     _pyi_lookup_exact_type: Point
     @overload
     def __init__(
@@ -161,8 +159,6 @@ _ST_LineString_contra = TypeVar("_ST_LineString_contra", contravariant=True, def
 _GT_LineString_co = TypeVar("_GT_LineString_co", covariant=True, default=LineString)
 
 class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
-    _pyi_private_set_type: LineString
-    _pyi_private_get_type: LineString
     _pyi_lookup_exact_type: LineString
     @overload
     def __init__(
@@ -210,8 +206,6 @@ _ST_Polygon_contra = TypeVar("_ST_Polygon_contra", contravariant=True, default=P
 _GT_Polygon_co = TypeVar("_GT_Polygon_co", covariant=True, default=Polygon)
 
 class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
-    _pyi_private_set_type: Polygon
-    _pyi_private_get_type: Polygon
     _pyi_lookup_exact_type: Polygon
     @overload
     def __init__(
@@ -259,8 +253,6 @@ _ST_MultiPoint_contra = TypeVar("_ST_MultiPoint_contra", contravariant=True, def
 _GT_MultiPoint_co = TypeVar("_GT_MultiPoint_co", covariant=True, default=MultiPoint)
 
 class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
-    _pyi_private_set_type: MultiPoint
-    _pyi_private_get_type: MultiPoint
     _pyi_lookup_exact_type: MultiPoint
     @overload
     def __init__(
@@ -308,8 +300,6 @@ _ST_MultiLineString_contra = TypeVar("_ST_MultiLineString_contra", contravariant
 _GT_MultiLineString_co = TypeVar("_GT_MultiLineString_co", covariant=True, default=MultiLineString)
 
 class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLineString_co]):
-    _pyi_private_set_type: MultiLineString
-    _pyi_private_get_type: MultiLineString
     _pyi_lookup_exact_type: MultiLineString
     @overload
     def __init__(
@@ -357,8 +347,6 @@ _ST_MultiPolygon_contra = TypeVar("_ST_MultiPolygon_contra", contravariant=True,
 _GT_MultiPolygon_co = TypeVar("_GT_MultiPolygon_co", covariant=True, default=MultiPolygon)
 
 class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_co]):
-    _pyi_private_set_type: MultiPolygon
-    _pyi_private_get_type: MultiPolygon
     _pyi_lookup_exact_type: MultiPolygon
     @overload
     def __init__(
@@ -406,8 +394,6 @@ _ST_GeometryCollection_contra = TypeVar("_ST_GeometryCollection_contra", contrav
 _GT_GeometryCollection_co = TypeVar("_GT_GeometryCollection_co", covariant=True, default=GeometryCollection)
 
 class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_GeometryCollection_co]):
-    _pyi_private_set_type: GeometryCollection
-    _pyi_private_get_type: GeometryCollection
     _pyi_lookup_exact_type: GeometryCollection
     @overload
     def __init__(
