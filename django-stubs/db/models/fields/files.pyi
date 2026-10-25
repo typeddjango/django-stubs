@@ -1,19 +1,17 @@
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 from typing import Any, Protocol, Self, overload, type_check_only
 
 from _typeshed import StrPath
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
-from django.core.validators import _ValidatorCallable
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
-from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping
+from django.db.models.fields import NOT_PROVIDED, Field, FieldInitKwargs
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData
-from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar, Unpack, override
 
 class FieldFile(File[Any], AltersData):
     instance: Model
@@ -68,26 +66,10 @@ class FileField(Field[Any, Any]):
         upload_to: StrPath | _UploadToCallable[Any] = "",
         storage: Storage | Callable[[], Storage] | None = None,
         *,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
+        null: bool = False,
+        max_length: int | None = 100,
         db_default: type[NOT_PROVIDED] | Expression | str = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     # class access
     @overload
@@ -126,7 +108,13 @@ class ImageField(FileField):
         name: str | None = None,
         width_field: str | None = None,
         height_field: str | None = None,
-        **kwargs: Any,
+        *,
+        upload_to: StrPath | _UploadToCallable[Any] = "",
+        storage: Storage | Callable[[], Storage] | None = None,
+        null: bool = False,
+        max_length: int | None = 100,
+        db_default: type[NOT_PROVIDED] | Expression | str = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     # class access
     @overload

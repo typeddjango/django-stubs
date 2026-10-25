@@ -5,11 +5,11 @@ from typing import Any, ClassVar, Self
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Model, lookups
 from django.db.models.expressions import Expression
-from django.db.models.fields import TextField
+from django.db.models.fields import NOT_PROVIDED, FieldInitKwargs, TextField
 from django.db.models.lookups import FieldGetDbPrepValueMixin, PostgresOperatorLookup, Transform
 from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar, Unpack, override
 
 from . import Field
 from .mixins import CheckFieldDefaultMixin
@@ -28,7 +28,12 @@ class JSONField(CheckFieldDefaultMixin, Field[_ST, _GT]):
         name: str | None = None,
         encoder: type[json.JSONEncoder] | None = None,
         decoder: type[json.JSONDecoder] | None = None,
-        **kwargs: Any,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     def from_db_value(self, value: str | None, expression: Expression, connection: BaseDatabaseWrapper) -> Any: ...
     @override
