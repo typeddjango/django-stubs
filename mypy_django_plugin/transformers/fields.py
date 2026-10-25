@@ -125,8 +125,9 @@ def get_field_descriptor_types(
     set_type: MypyType = AnyType(TypeOfAny.from_omitted_generics)
     get_type: MypyType = set_type
     for info in field_info.mro:
+        # Skip mixins listed before the Django field (`class MyField(MyMixin, IntegerField[_ST, _GT])`).
         if not info.has_base(fullnames.FIELD_FULLNAME):
-            break
+            continue
         field_args = helpers.get_field_type_args(helpers.fill_field_defaults(info, api))
         if field_args is None:
             break
