@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from collections.abc import Sequence
 from typing import Any, assert_type
 
 from django.contrib.postgres.fields import ArrayField
@@ -33,7 +34,7 @@ class MyModel(models.Model):
 
 def nullable_array_field() -> None:
     assert_type(MyModel().lst, list[str] | None)
-    assert_type(MyModel.lst.field.base_field, models.Field[str | int, str])
+    assert_type(MyModel.lst.field, ArrayField[Sequence[str | int] | None, list[str] | None])
 
 
 class ArrayAssignments(models.Model):

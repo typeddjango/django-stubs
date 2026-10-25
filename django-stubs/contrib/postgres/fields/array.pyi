@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any, ClassVar, Generic, Literal, Never, overload
+from typing import Any, ClassVar, Literal, overload
 
 from _typeshed import Unused
 from django.contrib.postgres.utils import CheckPostgresInstalledMixin
@@ -7,7 +7,7 @@ from django.core.checks import CheckMessage
 from django.core.validators import _ValidatorCallable
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models import Field
-from django.db.models.expressions import Combinable, Expression
+from django.db.models.expressions import Expression
 from django.db.models.fields import NOT_PROVIDED, FieldInitKwargs, _ErrorMessagesDict
 from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Transform
@@ -15,28 +15,25 @@ from django.db.models.sql.compiler import _AsSqlType
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeVar, Unpack, override
 
-_ST_Array = TypeVar("_ST_Array", contravariant=True, default=Any)
-_GT_Array = TypeVar("_GT_Array", covariant=True, default=Any)
-# Column-level nullability. The element type parameters can't carry it (`list[T | None]` would mean
-# nullable elements), so `null=True` binds this slot to `None`; the `Never` default vanishes from the unions.
-_NullT = TypeVar("_NullT", None, Never, default=Never)
+# The column's set and get types, like every other field. The `__init__` overloads fill them
+# from `base_field`'s own type parameters, so the element type never needs spelling out.
+_ST_Array = TypeVar("_ST_Array", contravariant=True, default=Sequence[Any])
+_GT_Array = TypeVar("_GT_Array", covariant=True, default=list[Any])
+# Element set and get types, solved from the `base_field` argument.
+_ElemST = TypeVar("_ElemST")
+_ElemGT = TypeVar("_ElemGT")
 
-class ArrayField(
-    CheckPostgresInstalledMixin,
-    CheckFieldDefaultMixin,
-    Field[Sequence[_ST_Array] | Combinable | _NullT, list[_GT_Array] | _NullT],
-    Generic[_ST_Array, _GT_Array, _NullT],
-):
+class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_Array, _GT_Array]):
     empty_strings_allowed: bool
     default_error_messages: ClassVar[_ErrorMessagesDict]
-    base_field: Field[_ST_Array, _GT_Array]
+    base_field: Field[Any, Any]
     size: int | None
     default_validators: list[_ValidatorCallable]
     from_db_value: Any
     @overload
     def __init__(
-        self: ArrayField[_ST_Array, _GT_Array, None],
-        base_field: Field[_ST_Array, _GT_Array],
+        self: ArrayField[Sequence[_ElemST] | None, list[_ElemGT] | None],
+        base_field: Field[_ElemST, _ElemGT],
         size: int | None = None,
         *,
         verbose_name: _StrOrPromise | None = None,
@@ -49,8 +46,8 @@ class ArrayField(
     ) -> None: ...
     @overload
     def __init__(
-        self,
-        base_field: Field[_ST_Array, _GT_Array],
+        self: ArrayField[Sequence[_ElemST], list[_ElemGT]],
+        base_field: Field[_ElemST, _ElemGT],
         size: int | None = None,
         *,
         verbose_name: _StrOrPromise | None = None,

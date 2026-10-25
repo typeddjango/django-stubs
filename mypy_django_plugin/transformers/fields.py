@@ -178,14 +178,18 @@ def set_descriptor_types_for_field(
     is_nullable = helpers.get_bool_call_argument_by_name(ctx, "null", default=False)
 
     if len(default_return_type.args) != 2:
-        # A fully bound field (`class F(Field[str, str])`) or a wrapper with its own type parameters
-        # (`ArrayField[_ST, _GT, _NullT]`) has no set/get slot to widen: the stub's answer stands.
+        # A fully bound field (`class F(Field[str, str])`) or a field with extra type parameters
+        # has no set/get slot to widen: the stub's answer stands.
         if is_nullable:
             _warn_if_nullable_get_not_optional(ctx, default_return_type)
         return default_return_type
 
     # FileDescriptor.__get__ always returns a FieldFile and its __set__ accepts None; the stub is authoritative.
     if default_return_type.type.has_base(fullnames.FILE_FIELD_FULLNAME):
+        return default_return_type
+
+    # The ArrayField overloads derive the column types from `base_field`, nullability included.
+    if default_return_type.type.has_base(fullnames.ARRAY_FIELD_FULLNAME):
         return default_return_type
 
     is_primary_key = helpers.get_bool_call_argument_by_name(ctx, "primary_key", default=False)
