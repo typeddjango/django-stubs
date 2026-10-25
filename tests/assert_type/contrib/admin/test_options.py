@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Any, assert_type
 
 from django.contrib import admin, messages
@@ -230,3 +231,25 @@ def save_form_returns_the_admin_model(
     model_admin: FullModelAdmin, request: HttpRequest, form: FullAdminModelForm
 ) -> None:
     assert_type(model_admin.save_form(request, form, True), FullAdminModel)
+
+
+# `Action` and `action_location` are Django 6.0+, which requires Python 3.12
+if sys.version_info >= (3, 12):
+
+    class OverrideActionsAdmin(admin.ModelAdmin[ValidActionModel]):
+        @admin.action(description="Archive")
+        def archive(self, request: HttpRequest, queryset: QuerySet[ValidActionModel]) -> None: ...
+
+        @override
+        def get_actions(
+            self, request: HttpRequest, action_location: admin.ActionLocation = admin.ActionLocation.CHANGE_LIST
+        ) -> dict[str, admin.Action]:
+            actions = super().get_actions(request, action_location)
+            actions["archive"] = admin.Action(
+                func=OverrideActionsAdmin.archive,
+                name="archive",
+                description="Archive",
+                plural_description="Archive",
+                locations=[action_location],
+            )
+            return actions
