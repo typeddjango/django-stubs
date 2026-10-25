@@ -21,7 +21,7 @@ class Booking(models.Model):
 def test_model_field_classes_from_existing_locations() -> None:
     booking = Booking()
     assert_type(booking.id, int)
-    assert_type(booking.time_range, DateTimeTZRange)  # pyrefly: ignore[assert-type]
+    assert_type(booking.time_range, DateTimeTZRange)
     assert_type(booking.some_decimal, Decimal)
 
 
@@ -30,7 +30,7 @@ class NoPrimaryKey(models.Model):
 
 
 def test_add_id_field_if_no_primary_key_defined() -> None:
-    assert_type(NoPrimaryKey().id, int)  # pyright: ignore[reportAssertTypeFailure, reportAttributeAccessIssue, reportUnknownMemberType]  # ty: ignore[type-assertion-failure, unresolved-attribute]
+    assert_type(NoPrimaryKey().id, int)  # pyright: ignore[reportAssertTypeFailure, reportAttributeAccessIssue, reportUnknownMemberType]  # ty: ignore[type-assertion-failure, unresolved-attribute]  # pyrefly: ignore[assert-type, missing-attribute]
 
 
 class CustomPrimaryKey(models.Model):
@@ -60,7 +60,7 @@ class NotNullText(models.Model):
 def blank_and_not_null_charfield_does_not_allow_none() -> None:
     NotNullText(notnulltext=None)  # type: ignore[misc]
     NotNullText(notnulltext="")
-    NotNullText().notnulltext = None  # type: ignore[assignment]  # pyrefly: ignore[bad-assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]
+    NotNullText().notnulltext = None  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
     assert_type(NotNullText().notnulltext, str)
 
 
@@ -69,7 +69,7 @@ class MyUser(models.Model):
 
 
 def if_field_called_on_class_return_field_itself() -> None:
-    assert_type(MyUser.name.field, CharField[str | int, str])  # pyrefly: ignore[assert-type, missing-attribute]
+    assert_type(MyUser.name.field, CharField[str | int, str])
 
 
 class AuthMixin(models.Model):
@@ -271,11 +271,11 @@ def every_builtin_field_reads_null_true_as_optional() -> None:
     assert_type(instance.null_blob, bytes | memoryview[int] | None)
 
     assert_type(instance.payload, Any)
-    assert_type(instance.null_payload, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.null_payload, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(instance.payload_with_db_default, Any)
     assert_type(instance.path, Any)
-    assert_type(instance.null_path, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.null_path, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
 
 
 def if_field_called_on_class_keeps_null_in_its_type() -> None:
-    assert_type(AllFields.null_name.field, CharField[str | int | None, str | None])  # pyrefly: ignore[assert-type, missing-attribute]
+    assert_type(AllFields.null_name.field, CharField[str | int | None, str | None])

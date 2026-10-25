@@ -44,7 +44,7 @@ class User(models.Model):
     my_custom_field3 = SingleTypeField[bool]()
     my_custom_field4 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool]()
 
-    # test overriding fields that set _pyi_private_set_type or _pyi_private_get_type
+    # test overriding the parent's defaulted type parameters
     my_custom_field10 = fields.SmallIntegerField[bool, bool]()
     my_custom_field11 = CustomSmallIntegerField[bool, bool]()
 
@@ -52,19 +52,19 @@ class User(models.Model):
 def test_custom_model_fields_with_generic_type() -> None:
     user = User()
     assert_type(user.id, int)
-    assert_type(user.my_custom_field1, CustomFieldValue)  # pyrefly: ignore[assert-type]
-    assert_type(user.my_custom_field2, CustomFieldValue)  # pyrefly: ignore[assert-type]
-    assert_type(user.my_custom_field3, bool)  # pyrefly: ignore[assert-type]
-    assert_type(user.my_custom_field4, CustomFieldValue)  # pyrefly: ignore[assert-type]
-    assert_type(user.my_custom_field10, bool)  # pyrefly: ignore[assert-type]
-    assert_type(user.my_custom_field11, bool)  # pyrefly: ignore[assert-type]
+    assert_type(user.my_custom_field1, CustomFieldValue)
+    assert_type(user.my_custom_field2, CustomFieldValue)
+    assert_type(user.my_custom_field3, bool)
+    assert_type(user.my_custom_field4, CustomFieldValue)
+    assert_type(user.my_custom_field10, bool)
+    assert_type(user.my_custom_field11, bool)
 
 
 def custom_value_field_set_type() -> None:
     user = User()
     user.my_custom_field2 = CustomFieldValue()
     user.my_custom_field2 = 12
-    user.my_custom_field2 = "NoNo"  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]
+    user.my_custom_field2 = "NoNo"  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
 
 
 class TwoTypeVarAnnotation(models.Model):
@@ -105,8 +105,8 @@ def custom_fields_with_null_true() -> None:
     assert_type(user.my_custom_field8, CustomFieldValue | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     assert_type(user.my_custom_field9, CustomFieldValue | None)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     assert_type(user.my_custom_field12, CustomFieldValue | None)
-    assert_type(user.my_custom_field13, CustomFieldValue | None)  # pyrefly: ignore[assert-type]
-    assert_type(user.my_custom_field14, bool | None)  # pyrefly: ignore[assert-type]
+    assert_type(user.my_custom_field13, CustomFieldValue | None)
+    assert_type(user.my_custom_field14, bool | None)
     assert_type(user.my_custom_field15, None)
 
 
@@ -126,9 +126,9 @@ class ConcreteNull(models.Model):
 
 def concrete_custom_field_null_requires_optional_get_type() -> None:
     instance = ConcreteNull()
-    assert_type(instance.ok, str)  # pyrefly: ignore[assert-type]
+    assert_type(instance.ok, str)
     assert_type(instance.bad, str | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.already_optional, str | None)  # pyrefly: ignore[assert-type]
+    assert_type(instance.already_optional, str | None)
 
 
 # Any type arguments
@@ -153,8 +153,8 @@ def custom_fields_with_any_type_args() -> None:
     user = AnyUser()
     assert_type(user.my_custom_field_any1, Any)
     assert_type(user.my_custom_field_any2, Any)
-    assert_type(user.my_custom_field_any3, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(user.my_custom_field_any4, Any)  # pyrefly: ignore[assert-type]
+    assert_type(user.my_custom_field_any3, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
+    assert_type(user.my_custom_field_any4, Any)
 
 
 # Aliased base fields
@@ -179,8 +179,8 @@ class AliasUser(models.Model):
 def test_custom_field_subclassing_an_alias() -> None:
     user = AliasUser()
     assert_type(user.text, str)
-    assert_type(user.nullable_text, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(user.flag, bool)  # pyrefly: ignore[assert-type]
+    assert_type(user.nullable_text, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
+    assert_type(user.flag, bool)
 
 
 # Generic subclasses default their type vars like the parent field, so bare calls resolve without the plugin
@@ -215,15 +215,15 @@ def custom_fields_with_defaulted_type_vars() -> None:
     instance = DefaultedTypeVars()
     assert_type(instance.small_int, int)
     assert_type(instance.null_small_int, int | None)  # pyright: ignore[reportAssertTypeFailure]
-    assert_type(instance.additional, CustomFieldValue)  # pyrefly: ignore[assert-type]
-    assert_type(instance.null_additional, CustomFieldValue | None)  # pyrefly: ignore[assert-type]
+    assert_type(instance.additional, CustomFieldValue)
+    assert_type(instance.null_additional, CustomFieldValue | None)
     assert_type(instance.html, str)
-    assert_type(instance.null_html, str | None)  # pyrefly: ignore[assert-type]
-    instance.small_int = 1.2  # pyrefly: ignore[bad-assignment]
+    assert_type(instance.null_html, str | None)
+    instance.small_int = 1.2
     instance.small_int = 12
-    instance.small_int = "12"  # pyrefly: ignore[bad-assignment]
-    instance.small_int = F("id")  # pyrefly: ignore[bad-assignment]
-    instance.small_int = CustomFieldValue()  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[bad-assignment]  # ty: ignore[invalid-assignment]
+    instance.small_int = "12"
+    instance.small_int = F("id")
+    instance.small_int = CustomFieldValue()  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
 
 
 # Constructor overloads, as documented in the README

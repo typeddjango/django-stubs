@@ -14,7 +14,7 @@ class MyUser(AbstractUser):
 
 
 class NullableActiveUser(AbstractUser):
-    is_active = models.BooleanField(null=True)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-override-mutable-attribute]  # ty: ignore[invalid-assignment]
+    is_active = models.BooleanField(null=True)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]  # ty: ignore[invalid-assignment]
 
 
 class PropertyStaffUser(AbstractUser):
@@ -26,14 +26,14 @@ class PropertyStaffUser(AbstractUser):
 
 def overridden_flags_keep_their_declared_type() -> None:
     # pyright and ty reject the override above and keep `AbstractUser`'s non-null field type
-    assert_type(NullableActiveUser().is_active, bool | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(NullableActiveUser().is_active, bool | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(PropertyStaffUser().is_staff, Literal[True])
 
 
 def flags_accept_expressions(user: User) -> None:
     # pyrefly types field assignments without `Combinable`: https://github.com/facebook/pyrefly/issues/5322
-    user.is_active = F("is_staff")  # pyrefly: ignore[bad-assignment]
-    user.is_staff = Value(True)  # pyrefly: ignore[bad-assignment]
+    user.is_active = F("is_staff")
+    user.is_staff = Value(True)
 
 
 class MyBaseUser(AbstractBaseUser, PermissionsMixin):

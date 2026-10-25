@@ -16,7 +16,9 @@ from mypy_django_plugin.transformers import manytomany
 
 if TYPE_CHECKING:
     from django.db.models.options import _AnyField
+    from mypy.checker import TypeChecker
     from mypy.plugin import FunctionContext
+    from mypy.semanal import SemanticAnalyzer
 
     from mypy_django_plugin.django.context import DjangoContext
 
@@ -113,10 +115,28 @@ class FieldDescriptorTypes(NamedTuple):
 
 
 def get_field_descriptor_types(
-    field_info: TypeInfo, *, is_set_nullable: bool, is_get_nullable: bool
+    field_info: TypeInfo, api: TypeChecker | SemanticAnalyzer, *, is_set_nullable: bool, is_get_nullable: bool
 ) -> FieldDescriptorTypes:
-    set_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_set_type", is_nullable=is_set_nullable)
-    get_type = helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=is_get_nullable)
+    """The set/get types a bare `field_info()` call resolves to, from its PEP 696 defaults.
+
+    A subclass that forwards the base type vars without its own defaults (`MyText(TextField[_ST, _GT])`)
+    resolves to `Any`, so fall back to the nearest base whose defaults are concrete.
+    """
+    set_type: MypyType = AnyType(TypeOfAny.from_omitted_generics)
+    get_type: MypyType = set_type
+    for info in field_info.mro:
+        if not info.has_base(fullnames.FIELD_FULLNAME):
+            break
+        field_args = helpers.get_field_type_args(helpers.fill_field_defaults(info, api))
+        if field_args is None:
+            break
+        if not (isinstance(field_args.set, AnyType) and isinstance(field_args.get, AnyType)):
+            set_type, get_type = field_args.set, field_args.get
+            break
+    if is_set_nullable:
+        set_type = make_optional_type(set_type)
+    if is_get_nullable:
+        get_type = make_optional_type(get_type)
     return FieldDescriptorTypes(set=set_type, get=get_type)
 
 
@@ -167,6 +187,7 @@ def set_descriptor_types_for_field(
 
     set_type, get_type = get_field_descriptor_types(
         default_return_type.type,
+        helpers.get_typechecker_api(ctx),
         is_set_nullable=is_set_nullable or is_nullable,
         is_get_nullable=is_get_nullable or is_nullable,
     )

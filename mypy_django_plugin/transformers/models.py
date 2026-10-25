@@ -294,6 +294,7 @@ class AddDefaultPrimaryKey(ModelClassInitializer):
 
             set_type, get_type = get_field_descriptor_types(
                 auto_field_info,
+                self.api,
                 is_set_nullable=True,
                 is_get_nullable=False,
             )
@@ -347,7 +348,7 @@ class AddRelatedModelsId(ModelClassInitializer):
                 continue
 
             set_type, get_type = get_field_descriptor_types(
-                field_info, is_set_nullable=field.null, is_get_nullable=field.null
+                field_info, self.api, is_set_nullable=field.null, is_get_nullable=field.null
             )
             self.add_new_var_to_model_class(field.attname, Instance(field_info, [set_type, get_type]))
 
@@ -779,7 +780,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
             raise helpers.IncompleteDefnException()
         return Instance(
             default_pk_field,
-            list(get_field_descriptor_types(default_pk_field, is_set_nullable=True, is_get_nullable=False)),
+            list(get_field_descriptor_types(default_pk_field, self.api, is_set_nullable=True, is_get_nullable=False)),
         )
 
     @cached_property
@@ -816,7 +817,9 @@ class ProcessManyToManyFields(ModelClassInitializer):
 
     @cached_property
     def fk_field_instance(self) -> Instance:
-        set_type, get_type = get_field_descriptor_types(self.fk_field, is_set_nullable=False, is_get_nullable=False)
+        set_type, get_type = get_field_descriptor_types(
+            self.fk_field, self.api, is_set_nullable=False, is_get_nullable=False
+        )
         return Instance(self.fk_field, [set_type, get_type])
 
     @cached_property

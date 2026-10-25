@@ -59,7 +59,7 @@
         reveal_type(book.publisher_id)  # N: Revealed type is "int"
         reveal_type(book.editor_id)  # N: Revealed type is "int | None"
         book.pages = None  # E: Incompatible types in assignment (expression has type "None", variable has type "float | int | str | Combinable")  [assignment]
-        book.publisher_id = None  # E: Incompatible types in assignment (expression has type "None", variable has type "float | int | str | Combinable")  [assignment]
+        book.publisher_id = None  # E: Incompatible types in assignment (expression has type "None", variable has type "int | str | Combinable")  [assignment]
         book.editor_id = None
         Book.objects.create(publisher=None)  # E: Incompatible type for "publisher" of "Book" (got "None", expected "Publisher | Combinable")  [misc]
         Book.objects.create(editor=None)
