@@ -6,6 +6,8 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
+from mypy.semanal import SemanticAnalyzer
+from mypy.semanal_shared import has_placeholder
 from mypy.typeanal import make_optional_type
 from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, get_proper_type
 from mypy.types import Type as MypyType
@@ -18,7 +20,6 @@ if TYPE_CHECKING:
     from django.db.models.options import _AnyField
     from mypy.checker import TypeChecker
     from mypy.plugin import FunctionContext
-    from mypy.semanal import SemanticAnalyzer
 
     from mypy_django_plugin.django.context import DjangoContext
 
@@ -134,6 +135,13 @@ def get_field_descriptor_types(
         if not (isinstance(field_args.set, AnyType) and isinstance(field_args.get, AnyType)):
             set_type, get_type = field_args.set, field_args.get
             break
+    if isinstance(api, SemanticAnalyzer) and (has_placeholder(set_type) or has_placeholder(get_type)):
+        # A default can name a class not analysed yet when the stubs and the models share an import
+        # cycle (`ImageFieldFile` for an `ImageField` subclass). Stored on the model, that placeholder
+        # fails to serialize into the cache, so defer and pick it up on a later iteration.
+        if not api.final_iteration:
+            raise helpers.IncompleteDefnException()
+        set_type = get_type = AnyType(TypeOfAny.from_error)
     if is_set_nullable:
         set_type = make_optional_type(set_type)
     if is_get_nullable:
