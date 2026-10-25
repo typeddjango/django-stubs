@@ -27,8 +27,6 @@ class ArrayField(
     Field[Sequence[_ST_Array_contra] | Combinable | _NullT, list[_GT_Array_co] | _NullT],
     Generic[_ST_Array_contra, _GT_Array_co, _NullT],
 ):
-    _pyi_private_set_type: Sequence[Any]
-    _pyi_private_get_type: list[Any]
     empty_strings_allowed: bool
     default_error_messages: ClassVar[_ErrorMessagesDict]
     base_field: Field[_ST_Array_contra, _GT_Array_co]

@@ -16,9 +16,6 @@ from django.utils.functional import cached_property
 from typing_extensions import override
 
 class GenericForeignKey(FieldCacheMixin, Field[Any, Any]):
-    # django-stubs implementation only fields
-    _pyi_private_set_type: Any
-    _pyi_private_get_type: Any
     # attributes
     hidden: bool
     is_relation: bool
