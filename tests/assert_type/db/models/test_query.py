@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, assert_type
 
-from django.db.models import Model
+from django.contrib.auth.models import Group, Permission
+from django.db.models import Model, Prefetch
 from django.db.models.query import QuerySet, RawQuerySet, aprefetch_related_objects, prefetch_related_objects
 
 if TYPE_CHECKING:
@@ -55,3 +56,15 @@ def test_in_operator(
 
 def test_class_getitem_returns_the_class(qs_class: type[QuerySet[Model]]) -> None:
     assert_type(qs_class.__class_getitem__(Model), type[QuerySet[Model]])
+
+
+def prefetch_related_keeps_the_queryset_type(groups: QuerySet[Group], perms: QuerySet[Permission]) -> None:
+    prefetch = Prefetch("permissions", queryset=perms)
+    assert_type(prefetch.queryset, QuerySet[Permission] | None)
+    assert_type(groups.prefetch_related(prefetch), QuerySet[Group])
+    assert_type(perms.prefetch_related("content_type"), QuerySet[Permission])
+    assert_type(groups.prefetch_related(None), QuerySet[Group])
+    assert_type(Group.objects.prefetch_related(prefetch), QuerySet[Group])
+    groups.prefetch_related(1)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue, reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[no-matching-overload]
+    # `None` clears the lookups, so it can't be mixed with other lookups
+    groups.prefetch_related(None, "permissions")  # type: ignore[call-overload]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import assert_type
+from typing import Any, assert_type
 
 from django.db import connection, connections
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -26,3 +26,15 @@ for sids, func, robust in connection.run_on_commit:
     assert_type(sids, set[str])
     assert_type(func, Callable[[], object])
     assert_type(robust, bool)
+
+
+def blocker(
+    execute: Callable[[str, Any, bool, dict[str, Any]], Any], sql: str, params: Any, many: bool, context: dict[str, Any]
+) -> Any:
+    return execute(sql, params, many, context)
+
+
+with connection.execute_wrapper(blocker) as entered:
+    assert_type(entered, None)
+with connection.constraint_checks_disabled() as disabled:
+    assert_type(disabled, None)

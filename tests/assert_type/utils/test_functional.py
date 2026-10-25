@@ -4,7 +4,9 @@ import copy
 from typing import TYPE_CHECKING, Any, ClassVar, assert_type
 
 from django.contrib.auth.models import User
-from django.utils.functional import Promise, SimpleLazyObject, cached_property, classproperty, lazystr
+from django.utils.functional import Promise, SimpleLazyObject, cached_property, classproperty, keep_lazy_text, lazystr
+from django.utils.html import format_html
+from django.utils.safestring import SafeString
 from typing_extensions import override
 
 if TYPE_CHECKING:
@@ -102,3 +104,8 @@ assert_type(Bam.attr, str)
 class Sub(Bam):
     def method(self) -> None:
         assert_type(self.attr, str)
+
+
+# keep_lazy_text keeps the wrapped function signature
+format_html_lazy = keep_lazy_text(format_html)
+assert_type(format_html_lazy("<b>{}</b>", "x"), SafeString)
