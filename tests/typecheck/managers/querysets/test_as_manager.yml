@@ -104,6 +104,8 @@
     installed_apps:
         - django.contrib.contenttypes
         - myapp
+    out: |
+        lib/query:11: error: Return type "Manager[_T, QuerySet[_T, _T]]" of "as_manager" incompatible with return type "Manager[_T, LibQuerySet[_T]]" in supertype "django.db.models.query.QuerySet"  [override]
     files:
         -   path: lib/__init__.py
         -   path: lib/query.py
@@ -541,7 +543,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel, FromQuerySet
-        reveal_type(FromQuerySet)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = django.db.models.query.QuerySet[_T, _T]] () -> myapp.models.ManagerFromModelQuerySet[_T, _QS]"
+        reveal_type(FromQuerySet)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T, _T]] () -> myapp.models.ManagerFromModelQuerySet[_T, _QS]"
         reveal_type(MyModel.from_queryset)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(MyModel.as_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
