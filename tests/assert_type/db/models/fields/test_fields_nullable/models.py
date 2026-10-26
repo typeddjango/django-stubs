@@ -24,6 +24,14 @@ def nullable_field_with_strict_optional_true() -> None:
     MyModel().text_nullable = None
 
 
+def nullable() -> bool:
+    return True
+
+
+class NullFromBool(models.Model):
+    text = models.CharField(max_length=100, null=nullable())  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # ty: ignore[deprecated]  # pyrefly: ignore[deprecated]
+
+
 class BlankNotNull(models.Model):
     notnulltext = models.CharField(max_length=1, blank=True, null=False)
 
