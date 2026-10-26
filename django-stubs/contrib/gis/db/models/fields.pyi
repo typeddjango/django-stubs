@@ -19,7 +19,7 @@ from django.db.models.fields import NOT_PROVIDED, Field, FieldInitKwargs, _Error
 from django.db.models.sql.compiler import _AsSqlType
 from django.forms.widgets import Widget
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeVar, Unpack, override
+from typing_extensions import TypeVar, Unpack, deprecated, override
 
 class SRIDCacheEntry(NamedTuple):
     units: Any
@@ -115,6 +115,25 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
     _pyi_lookup_exact_type: Point
     @overload
     def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
         self: PointField[Point | None, Point | None],
         verbose_name: _StrOrPromise | None = None,
         dim: int = 2,
@@ -145,7 +164,27 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
         srid: int = 4326,
         spatial_index: bool = True,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -160,6 +199,25 @@ _GT_LineString_co = TypeVar("_GT_LineString_co", covariant=True, default=LineStr
 
 class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
     _pyi_lookup_exact_type: LineString
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     @overload
     def __init__(
         self: LineStringField[LineString | None, LineString | None],
@@ -192,7 +250,27 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
         srid: int = 4326,
         spatial_index: bool = True,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -207,6 +285,25 @@ _GT_Polygon_co = TypeVar("_GT_Polygon_co", covariant=True, default=Polygon)
 
 class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
     _pyi_lookup_exact_type: Polygon
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     @overload
     def __init__(
         self: PolygonField[Polygon | None, Polygon | None],
@@ -239,7 +336,27 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
         srid: int = 4326,
         spatial_index: bool = True,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -254,6 +371,25 @@ _GT_MultiPoint_co = TypeVar("_GT_MultiPoint_co", covariant=True, default=MultiPo
 
 class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
     _pyi_lookup_exact_type: MultiPoint
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     @overload
     def __init__(
         self: MultiPointField[MultiPoint | None, MultiPoint | None],
@@ -286,7 +422,27 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
         srid: int = 4326,
         spatial_index: bool = True,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -301,6 +457,25 @@ _GT_MultiLineString_co = TypeVar("_GT_MultiLineString_co", covariant=True, defau
 
 class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLineString_co]):
     _pyi_lookup_exact_type: MultiLineString
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     @overload
     def __init__(
         self: MultiLineStringField[MultiLineString | None, MultiLineString | None],
@@ -333,7 +508,27 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
         srid: int = 4326,
         spatial_index: bool = True,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -348,6 +543,25 @@ _GT_MultiPolygon_co = TypeVar("_GT_MultiPolygon_co", covariant=True, default=Mul
 
 class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_co]):
     _pyi_lookup_exact_type: MultiPolygon
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     @overload
     def __init__(
         self: MultiPolygonField[MultiPolygon | None, MultiPolygon | None],
@@ -380,7 +594,27 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
         srid: int = 4326,
         spatial_index: bool = True,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -395,6 +629,25 @@ _GT_GeometryCollection_co = TypeVar("_GT_GeometryCollection_co", covariant=True,
 
 class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_GeometryCollection_co]):
     _pyi_lookup_exact_type: GeometryCollection
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     @overload
     def __init__(
         self: GeometryCollectionField[GeometryCollection | None, GeometryCollection | None],
@@ -427,7 +680,27 @@ class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_G
         srid: int = 4326,
         spatial_index: bool = True,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
