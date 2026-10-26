@@ -13,7 +13,7 @@ from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Transform
 from django.db.models.sql.compiler import _AsSqlType
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeVar, Unpack, override
+from typing_extensions import TypeVar, Unpack, deprecated, override
 
 # The column's set and get types, like every other field. The `__init__` overloads fill them
 # from `base_field`'s own type parameters, so the element type never needs spelling out.
@@ -32,6 +32,20 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_
     from_db_value: Any
     @overload
     def __init__(
+        self: ArrayField[Sequence[_ElemST], list[_ElemGT]],
+        base_field: Field[_ElemST, _ElemGT],
+        size: int | None = None,
+        *,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
         self: ArrayField[Sequence[_ElemST] | None, list[_ElemGT] | None],
         base_field: Field[_ElemST, _ElemGT],
         size: int | None = None,
@@ -45,6 +59,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
         self: ArrayField[Sequence[_ElemST], list[_ElemGT]],
         base_field: Field[_ElemST, _ElemGT],
@@ -52,7 +67,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_
         *,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
-        null: bool = False,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
