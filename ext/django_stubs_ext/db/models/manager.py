@@ -12,16 +12,18 @@ if TYPE_CHECKING:
     from django.db.models.fields.related_descriptors import RelatedManager as RelatedManager
 
 else:
-    from typing import Protocol
+    from typing import Any, Protocol
 
     from typing_extensions import TypeVar
 
     _T = TypeVar("_T")
+    # Mirrors the stub's optional queryset param so `RelatedManager[Model, MyQuerySet]` evaluates at runtime.
+    _QS = TypeVar("_QS", default=Any)
     _Through = TypeVar("_Through")
 
     # Define as `Protocol` to prevent them being used with `isinstance()`.
     # These actually inherit from `BaseManager`.
-    class RelatedManager(Protocol[_T]):
+    class RelatedManager(Protocol[_T, _QS]):
         pass
 
     class ManyRelatedManager(Protocol[_T, _Through]):
