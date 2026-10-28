@@ -229,6 +229,11 @@ def create_manager_info_from_from_queryset_call(
         # so this isn't a problem.
         return None  # type: ignore[unreachable]
 
+    if not api.final_iteration and any(has_placeholder(tv) for tv in queryset_info.defn.type_vars):
+        # Let the queryset's `as_manager` hook, which defers on the same condition, create the manager first,
+        # it subclasses the parent queryset's manager so `as_manager` overrides stay compatible.
+        return None
+
     if len(call_expr.args) == 2 and isinstance(call_expr.args[1], StrExpr):
         manager_name = call_expr.args[1].value
     else:
