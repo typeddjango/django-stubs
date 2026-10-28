@@ -57,7 +57,7 @@ class BaseDatabaseWrapper:
     errors_occurred: bool
     health_check_enabled: bool
     health_check_done: bool
-    run_on_commit: list[tuple[set[str], Callable[[], None]]]
+    run_on_commit: list[tuple[set[str], Callable[[], object], bool]]
     run_commit_hooks_on_set_autocommit_on: bool
     execute_wrappers: list[_ExecuteWrapper]
     client: BaseDatabaseClient
