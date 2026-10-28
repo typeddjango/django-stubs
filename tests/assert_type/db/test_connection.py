@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import assert_type
 
 from django.db import connection, connections
@@ -20,3 +21,8 @@ assert_type(connections["test"], BaseDatabaseWrapper)
 for conn in connections.all():
     with conn.cursor() as cursor:
         assert_type(cursor, CursorWrapper)
+
+for sids, func, robust in connection.run_on_commit:
+    assert_type(sids, set[str])
+    assert_type(func, Callable[[], object])
+    assert_type(robust, bool)
