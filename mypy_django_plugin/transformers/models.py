@@ -370,8 +370,8 @@ class AddManagers(ModelClassInitializer):
             return
 
         assert manager_info is not None
-        # Reparameterize dynamically created manager with model type
-        manager_type = helpers.fill_instance(manager_info, [helpers.model_instance(self.model_classdef.info)])
+        assert self.model_classdef.info.self_type is not None
+        manager_type = helpers.fill_instance(manager_info, [self.model_classdef.info.self_type])
         self.add_new_var_to_model_class(manager_name, manager_type, is_classvar=True)
 
     @override

@@ -1171,3 +1171,33 @@
                 class Attachment(models.Model):
                      # ...
                      objects = AttachmentManager()
+
+-   case: from_queryset_manager_is_self_typed_on_the_model_class
+    main: |
+        from typing import reveal_type
+        from myapp.models import MyModel, SubModel
+        reveal_type(SubModel.recent())  # N: Revealed type is "myapp.models.MyQuerySet[myapp.models.SubModel, myapp.models.SubModel]"
+        reveal_type(MyModel.recent().get())  # N: Revealed type is "myapp.models.MyModel"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from typing import Self
+                from django.db import models
+
+                class MyQuerySet(models.QuerySet):
+                    pass
+
+                MyManager = models.Manager.from_queryset(MyQuerySet)
+
+                class MyModel(models.Model):
+                    objects = MyManager()
+
+                    @classmethod
+                    def recent(cls) -> MyQuerySet[Self]:
+                        return cls.objects.filter(pk__gt=0)
+
+                class SubModel(MyModel):
+                    pass
