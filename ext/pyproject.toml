@@ -32,7 +32,8 @@ classifiers = [
 ]
 dependencies = [
   "django",
-  "typing-extensions",
+  # `TypeVar(default=...)` (PEP 696) landed in 4.4.0
+  "typing-extensions>=4.4.0",
 ]
 
 [project.urls]

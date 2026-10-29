@@ -164,7 +164,7 @@ option to get extra information about the error.
 ### I cannot use QuerySet or Manager with type annotations
 
 You can get a `TypeError: 'type' object is not subscriptable`
-when you will try to use `QuerySet[MyModel]`, `Manager[MyModel]` or some other Django-based Generic types.
+when you will try to use `QuerySet[MyModel]`, `Manager[MyModel, MyQuerySet]` or some other Django-based Generic types.
 
 This happens because these Django classes do not support [`__class_getitem__`](https://www.python.org/dev/peps/pep-0560/#class-getitem) magic method in runtime.
 
@@ -206,7 +206,7 @@ This happens because these Django classes do not support [`__class_getitem__`](h
     ```
 
 
-2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
+2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel, MyQuerySet]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?
 
@@ -235,7 +235,7 @@ something like this:
 from django.db import models
 
 
-class MyManager(model.Manager):
+class MyManager(models.Manager):
     def create(self, **kwargs) -> "MyModel":
         pass
 ```
@@ -252,6 +252,63 @@ should declare your manager with your model as the type variable:
 ```python
 class MyManager(models.Manager["MyModel"]): ...
 ```
+
+The same applies to a manager that overrides `get_queryset` with a custom queryset, which is
+also generic. Declared without generics:
+
+```python
+class MyQuerySet(models.QuerySet): ...
+
+
+class MyManager(models.Manager):
+    def get_queryset(self) -> MyQuerySet:
+        return MyQuerySet(self.model, using=self._db)
+```
+
+you get a similar error:
+
+> error: Return type "MyQuerySet[Any, Any]" of "get_queryset" incompatible with return type "_QS" in supertype "django.db.models.manager.BaseManager"
+
+To fix this issue, pass the model to **both** the queryset and the manager, and the queryset to the manager:
+
+```python
+class MyQuerySet(models.QuerySet["MyModel"]): ...
+
+
+class MyManager(models.Manager["MyModel", MyQuerySet]):
+    def get_queryset(self) -> MyQuerySet:
+        return MyQuerySet(self.model, using=self._db)
+```
+
+If one manager is shared by several models, keep the model as a type variable and bind it
+in a per-model subclass, which every type checker understands without the plugin:
+
+```python
+from typing import TypeVar
+
+_M = TypeVar("_M", bound=models.Model)
+
+
+class MyQuerySet(models.QuerySet[_M]): ...
+
+
+class MyManager(models.Manager[_M, MyQuerySet[_M]]):
+    def get_queryset(self) -> MyQuerySet[_M]:
+        return MyQuerySet(self.model, using=self._db)
+
+
+class BookManager(MyManager["Book"]): ...
+
+
+class Book(models.Model):
+    objects = BookManager()  # Book.objects.filter() is MyQuerySet[Book]
+```
+
+> [!NOTE]
+> More generally, specifying generics is **required** to get proper type-checking around django's ORM.
+> Once your managers are parametrized, chains such as `Book.objects.filter(...)` become precisely typed,
+> so code that used to go through `Any` (for instance attributes added by `annotate` inside a queryset
+> method) may now report errors that were previously hidden.
 
 ### How do I annotate cases where I called QuerySet.annotate?
 
@@ -294,6 +351,10 @@ func(MyModel.objects.annotate(bar=Value("")).get(id=1))  # Error
 
 You can also use `WithAnnotations` in custom `QuerySet` methods by making the queryset generic over a
 model `TypeVar`. This way the return type stays accurate through chained calls and manager access:
+
+> [!NOTE]
+> This example relies on the mypy plugin, which types `Manager.from_queryset` and `WithAnnotations`.
+> pyright, pyrefly and ty see `Product.objects` as an unparametrized `Manager` here.
 
 ```python
 from typing import TypeVar, TypedDict
@@ -439,6 +500,19 @@ class Article(models.Model):
 ```
 
 Make sure to import symbols from `django_stubs_ext.db.models.manager`. Django dynamically create these so they cannot be imported directly
+
+If the related model's default manager uses a custom queryset, pass it as the second argument so that
+`article.category_set.filter()` returns it rather than a plain `QuerySet`. The mypy plugin does this for you.
+
+```python
+class CategoryQuerySet(models.QuerySet["Category"]): ...
+
+
+class Article(models.Model):
+    category_set: RelatedManager[Category, CategoryQuerySet]
+```
+
+`ManyRelatedManager` does not take a queryset argument: a `ManyToManyField` accessor always returns a plain `QuerySet`.
 
 ### How to type a custom `models.Field`?
 

@@ -470,7 +470,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "django" },
-    { name = "typing-extensions" },
+    { name = "typing-extensions", specifier = ">=4.4.0" },
 ]
 
 [[package]]

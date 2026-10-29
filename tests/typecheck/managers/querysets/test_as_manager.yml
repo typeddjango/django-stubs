@@ -46,7 +46,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel, myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -60,7 +60,7 @@
                 class MyQuerySet(models.QuerySet):
                     @classmethod
                     @override
-                    def as_manager(cls) -> "models.Manager[Any]":
+                    def as_manager(cls) -> "models.Manager[Any, Any]":
                         return super().as_manager()
 
                 class MyModel(models.Model):
@@ -70,7 +70,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.CustomManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.CustomManagerFromMyQuerySet[myapp.models.MyModel, myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(MyModel.objects.manager_method())  # N: Revealed type is "str"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "int"
     installed_apps:
@@ -92,7 +92,7 @@
 
                     @classmethod
                     @override
-                    def as_manager(cls) -> "CustomManager":
+                    def as_manager(cls) -> "CustomManager":  # E: Return type "CustomManager[Any, QuerySet[Any, Any]]" of "as_manager" incompatible with return type "Manager[_Model, MyQuerySet[_Model, _Row]]" in supertype "django.db.models.query.QuerySet"  [override]
                         return CustomManager.from_queryset(cls)()
 
                 class MyModel(models.Model):
@@ -104,6 +104,8 @@
     installed_apps:
         - django.contrib.contenttypes
         - myapp
+    out: |
+        lib/query:11: error: Return type "Manager[_T, QuerySet[_T, _T]]" of "as_manager" incompatible with return type "Manager[_T, LibQuerySet[_T]]" in supertype "django.db.models.query.QuerySet"  [override]
     files:
         -   path: lib/__init__.py
         -   path: lib/query.py
@@ -138,7 +140,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel, myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -181,9 +183,9 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(MyModel.objects.queryset_method())  # N: Revealed type is "str"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -204,8 +206,8 @@
         from typing_extensions import reveal_type
         from myapp.models import MyModel, ManagerFromModelQuerySet
         reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "int"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
-        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
+        reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -290,8 +292,8 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel, MyModelManager
-        reveal_type(MyModelManager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[Any]"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModelManager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[Any, Any]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
     installed_apps:
         - myapp
@@ -312,8 +314,8 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel, ManagerFromModelQuerySet
-        reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[Any]"
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
+        reveal_type(ManagerFromModelQuerySet)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[Any, Any]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(MyModel.objects.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
     installed_apps:
         - myapp
@@ -494,8 +496,8 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects_1)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.objects_2)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects_1)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
+        reveal_type(MyModel.objects_2)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(MyModel.objects_1.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects_2.all())  # N: Revealed type is "myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
     installed_apps:
@@ -517,7 +519,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet1[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(MyModel.objects.custom_method())  # N: Revealed type is "int"
     installed_apps:
         - myapp
@@ -541,9 +543,9 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel, FromQuerySet
-        reveal_type(FromQuerySet)  # N: Revealed type is "def [_T <: django.db.models.base.Model] () -> myapp.models.ManagerFromModelQuerySet[_T]"
-        reveal_type(MyModel.from_queryset)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
-        reveal_type(MyModel.as_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel]"
+        reveal_type(FromQuerySet)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T, _T]] () -> myapp.models.ManagerFromModelQuerySet[_T, _QS]"
+        reveal_type(MyModel.from_queryset)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
+        reveal_type(MyModel.as_manager)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -564,7 +566,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel]"
+        reveal_type(MyModel.objects)  # N: Revealed type is "myapp.models.ManagerFromMyQuerySet[myapp.models.MyModel, myapp.models.MyModel.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
         - myapp
     files:
@@ -581,7 +583,7 @@
     main: |
         from typing_extensions import reveal_type
         from payments.models import Payout
-        reveal_type(Payout.objects)  # N: Revealed type is "payments.models.ManagerFromPayoutQuerySet[payments.models.Payout]"
+        reveal_type(Payout.objects)  # N: Revealed type is "payments.models.ManagerFromPayoutQuerySet[payments.models.Payout, payments.models.PayoutQuerySet[payments.models.Payout, payments.models.Payout]]"
 
     custom_settings: |
         INSTALLED_APPS = ("django.contrib.contenttypes", "django.contrib.auth", "payments", "accounts")
@@ -621,3 +623,42 @@
                 from django.contrib.auth.models import AbstractUser
 
                 class Account(AbstractUser): pass
+
+# Regression test for https://github.com/typeddjango/django-stubs/issues/1023
+-   case: queryset_as_manager_from_untyped_custom_queryset
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import AbstractNotification, Notification
+        reveal_type(AbstractNotification.objects) # N: Revealed type is "myapp.models.ManagerFromNotificationQuerySet[myapp.models.AbstractNotification, myapp.models.NotificationQuerySet[myapp.models.AbstractNotification, myapp.models.AbstractNotification]]"
+        reveal_type(Notification.objects) # N: Revealed type is "myapp.models.ManagerFromNotificationQuerySet[myapp.models.Notification, myapp.models.NotificationQuerySet[myapp.models.Notification, myapp.models.Notification]]"
+        reveal_type(Notification.objects.all()) # N: Revealed type is "myapp.models.NotificationQuerySet[myapp.models.Notification, myapp.models.Notification]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import Self
+
+                class NotificationQuerySet(models.query.QuerySet):
+                    ''' Notification QuerySet '''
+                    def unsent(self) -> Self:
+                        return self.filter(emailed=False)
+
+                    def sent(self) -> Self:
+                        return self.filter(emailed=True)
+
+                class AbstractNotification(models.Model):
+                    actor_object_id = models.CharField('actor object id', max_length=255)
+
+                    objects = NotificationQuerySet.as_manager()
+
+                    class Meta:
+                        abstract = True
+                        verbose_name = 'Notification'
+                        verbose_name_plural = 'Notifications'
+
+                class Notification(AbstractNotification):
+                    class Meta(AbstractNotification.Meta):
+                        abstract = False

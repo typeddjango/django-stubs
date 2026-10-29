@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToManyRel, OneToOneRel
+from mypy.maptype import map_instance_to_supertype
 from mypy.nodes import (
     ARG_STAR2,
     MDEF,
@@ -369,8 +370,8 @@ class AddManagers(ModelClassInitializer):
             return
 
         assert manager_info is not None
-        # Reparameterize dynamically created manager with model type
-        manager_type = helpers.fill_manager(manager_info, helpers.model_instance(self.model_classdef.info))
+        assert self.model_classdef.info.self_type is not None
+        manager_type = helpers.fill_instance(manager_info, [self.model_classdef.info.self_type])
         self.add_new_var_to_model_class(manager_name, manager_type, is_classvar=True)
 
     @override
@@ -397,7 +398,7 @@ class AddManagers(ModelClassInitializer):
                 continue
 
             assert self.model_classdef.info.self_type is not None
-            manager_type = helpers.fill_manager(manager_info, self.model_classdef.info.self_type)
+            manager_type = helpers.fill_instance(manager_info, [self.model_classdef.info.self_type])
             self.add_new_var_to_model_class(manager_name, manager_type, is_classvar=True)
 
         if incomplete_manager_defs:
@@ -414,7 +415,7 @@ class AddManagers(ModelClassInitializer):
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
                 if fallback_manager_info is not None:
                     assert self.model_classdef.info.self_type is not None
-                    manager_type = helpers.fill_manager(fallback_manager_info, self.model_classdef.info.self_type)
+                    manager_type = helpers.fill_instance(fallback_manager_info, [self.model_classdef.info.self_type])
                     self.add_new_var_to_model_class(manager_name, manager_type, is_classvar=True)
 
                 # Find expression for e.g. `objects = SomeManager()`
@@ -497,7 +498,9 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
                 return None
             default_manager_info = generated_manager_info
 
-        default_manager = helpers.fill_manager(default_manager_info, helpers.model_instance(self.model_classdef.info))
+        default_manager = helpers.fill_instance(
+            default_manager_info, [helpers.model_instance(self.model_classdef.info)]
+        )
         self.add_new_var_to_model_class("_default_manager", default_manager, is_classvar=True)
 
 
@@ -556,7 +559,7 @@ class AddReverseLookups(ModelClassInitializer):
             # ManyToOneRel
             self.add_new_var_to_model_class(
                 attname,
-                Instance(self.reverse_many_to_one_descriptor, [helpers.model_instance(to_model_info)]),
+                helpers.fill_instance(self.reverse_many_to_one_descriptor, [helpers.model_instance(to_model_info)]),
                 is_classvar=True,
             )
 
@@ -598,8 +601,15 @@ class AddReverseLookups(ModelClassInitializer):
             return
 
         # Create a reverse manager subclassed from the default manager of the related
-        # model and 'RelatedManager'
-        related_manager = Instance(related_manager_info, [helpers.model_instance(to_model_info)])
+        # model and 'RelatedManager', sharing the default manager's queryset so both bases agree on `_QS`
+        base_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+        default_manager_queryset = map_instance_to_supertype(default_manager_type, base_manager_info).args[1]
+        if has_placeholder(default_manager_queryset):
+            # The default manager's bases still hold a forward reference, e.g. `Manager["MyModel"]`.
+            raise helpers.IncompleteDefnException()
+        related_manager = Instance(
+            related_manager_info, [helpers.model_instance(to_model_info), default_manager_queryset]
+        )
         # The reverse manager is based on the related model's manager, so it makes most sense to add the new
         # related manager in that module
         new_related_manager_info = helpers.add_new_class_for_module(
@@ -903,7 +913,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
                 helpers.add_new_sym_for_info(
                     through_model,
                     name=name,
-                    sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
+                    sym_type=helpers.fill_instance(self.manager_info, [Instance(through_model, [])]),
                     is_classvar=True,
                 )
 
@@ -1036,11 +1046,13 @@ class MetaclassAdjustments(ModelClassInitializer):
                 helpers.get_semanal_api(ctx), fullnames.MANAGER_CLASS_FULLNAME
             )
             if manager is not None:
-                helpers.add_new_sym_for_info(
-                    ctx.cls.info,
-                    name="objects",
-                    sym_type=Instance(manager, [helpers.model_instance(ctx.cls.info)]),
-                )
+                try:
+                    objects = helpers.fill_instance(manager, [helpers.model_instance(ctx.cls.info)])
+                except helpers.IncompleteDefnException:
+                    if not ctx.api.final_iteration:
+                        ctx.api.defer()
+                    return
+                helpers.add_new_sym_for_info(ctx.cls.info, name="objects", sym_type=objects)
             return
 
         for attr_name in ["DoesNotExist", "NotUpdated", "MultipleObjectsReturned"]:
