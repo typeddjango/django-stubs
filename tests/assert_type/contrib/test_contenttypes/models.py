@@ -21,8 +21,8 @@ if sys.version_info >= (3, 12):
         content_object = GenericForeignKey("content_type", "object_id")
 
     def test_generic_foreign_key_descriptor() -> None:
-        assert_type(TaggedItem().content_object, Any | None)  # pyrefly: ignore[assert-type]
-        assert_type(TaggedItem.content_object, GenericForeignKeyDescriptor)  # pyrefly: ignore[assert-type]
+        assert_type(TaggedItem().content_object, Any | None)
+        assert_type(TaggedItem.content_object, GenericForeignKeyDescriptor)
 
     class Bookmark(models.Model):
         tags = GenericRelation(TaggedItem)

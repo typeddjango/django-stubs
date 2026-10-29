@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Literal, overload
 
 from _typeshed import Unused
 from django.contrib.postgres.utils import CheckPostgresInstalledMixin
@@ -13,31 +13,61 @@ from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Transform
 from django.db.models.sql.compiler import _AsSqlType
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeVar, Unpack, override
+from typing_extensions import TypeVar, Unpack, deprecated, override
 
-# __set__ value type
-_ST = TypeVar("_ST", contravariant=True, default=Any)
-# __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=Any)
+# The column's set and get types, like every other field. The `__init__` overloads fill them
+# from `base_field`'s own type parameters, so the element type never needs spelling out.
+_ST_Array = TypeVar("_ST_Array", contravariant=True, default=Sequence[Any])
+_GT_Array = TypeVar("_GT_Array", covariant=True, default=list[Any])
+# Element set and get types, solved from the `base_field` argument.
+_ElemST = TypeVar("_ElemST")
+_ElemGT = TypeVar("_ElemGT")
 
-class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: Sequence[Any]
-    _pyi_private_get_type: list[Any]
-
+class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_Array, _GT_Array]):
     empty_strings_allowed: bool
     default_error_messages: ClassVar[_ErrorMessagesDict]
-    base_field: Field
+    base_field: Field[Any, Any]
     size: int | None
     default_validators: list[_ValidatorCallable]
     from_db_value: Any
+    @overload
     def __init__(
-        self,
-        base_field: Field,
+        self: ArrayField[Sequence[_ElemST], list[_ElemGT]],
+        base_field: Field[_ElemST, _ElemGT],
         size: int | None = None,
         *,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: ArrayField[Sequence[_ElemST] | None, list[_ElemGT] | None],
+        base_field: Field[_ElemST, _ElemGT],
+        size: int | None = None,
+        *,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self: ArrayField[Sequence[_ElemST], list[_ElemGT]],
+        base_field: Field[_ElemST, _ElemGT],
+        size: int | None = None,
+        *,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,

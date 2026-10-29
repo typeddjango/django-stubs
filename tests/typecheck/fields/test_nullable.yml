@@ -59,7 +59,7 @@
         reveal_type(book.publisher_id)  # N: Revealed type is "int"
         reveal_type(book.editor_id)  # N: Revealed type is "int | None"
         book.pages = None  # E: Incompatible types in assignment (expression has type "None", variable has type "float | int | str | Combinable")  [assignment]
-        book.publisher_id = None  # E: Incompatible types in assignment (expression has type "None", variable has type "float | int | str | Combinable")  [assignment]
+        book.publisher_id = None  # E: Incompatible types in assignment (expression has type "None", variable has type "int | str | Combinable")  [assignment]
         book.editor_id = None
         Book.objects.create(publisher=None)  # E: Incompatible type for "publisher" of "Book" (got "None", expected "Publisher | Combinable")  [misc]
         Book.objects.create(editor=None)
@@ -97,3 +97,33 @@
                 from django.db import models
                 class Inventory(models.Model):
                     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+
+-   case: generic_subclass_with_mixin_before_the_field_resolves_the_defaults
+    main: |
+        from typing import reveal_type
+
+        from myapp.models import MyModel
+        reveal_type(MyModel().count)  # N: Revealed type is "int"
+        reveal_type(MyModel().maybe)  # N: Revealed type is "int | None"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                import django_stubs_ext
+                from django.db import models
+                from typing_extensions import TypeVar
+
+                django_stubs_ext.monkeypatch()
+
+                _ST = TypeVar("_ST", contravariant=True)
+                _GT = TypeVar("_GT", covariant=True)
+
+                class MyMixin: ...
+
+                class MixedIntegerField(MyMixin, models.IntegerField[_ST, _GT]): ...
+
+                class MyModel(models.Model):
+                    count = MixedIntegerField()
+                    maybe = MixedIntegerField(null=True)

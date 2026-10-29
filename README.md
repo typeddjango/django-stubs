@@ -450,51 +450,70 @@ Django `models.Field` (and subclasses) are generic types with two parameters:
 - `_ST`: type that can be used when setting a value
 - `_GT`: type that will be returned when getting a value
 
-When you create a subclass, you have two options depending on how strict you want
-the type to be for consumers of your custom field.
+The `null=...` flag is resolved at the call site by the fields' constructor overloads. For ex:
+- `IntegerField()` and `IntegerField(null=False)` are an `IntegerField[float | int | str, int]`.
+- `IntegerField(null=True)` is an `IntegerField[float | int | str | None, int | None]`.
 
-1. Generic subclass:
-
+A custom field subclass has to declare both the type parameters' defaults and the constructor overloads.
 ```python
-from typing import TypeVar, reveal_type
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Literal, overload
+from typing_extensions import TypeVar, Unpack, assert_type
 from django.db import models
 
-_ST = TypeVar("_ST", contravariant=True)
-_GT = TypeVar("_GT", covariant=True)
+if TYPE_CHECKING:
+    # A type-check-only `TypedDict` of the keyword arguments shared by every `Field`
+    from django.db.models.fields import FieldInitKwargs
+
+# PEP 696 defaults: what a bare `MyIntegerField()` resolves to, on every type checker
+_ST = TypeVar("_ST", contravariant=True, default=float | int | str)
+_GT = TypeVar("_GT", covariant=True, default=int)
 
 
-class MyIntegerField(models.IntegerField[_ST, _GT]): ...
+class MyIntegerField(models.IntegerField[_ST, _GT]):
+    @overload
+    def __init__(
+        # Self-annotation: what `MyIntegerField(null=True)` resolves to
+        self: MyIntegerField[float | int | str | None, int | None],
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        # These vary per field, so they are not part of `FieldInitKwargs`
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(  # Fallback, keeps the defaults
+        self,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `@overload` needs an implementation outside stub files, this one just forwards to the parent
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
 
 
 class User(models.Model):
-    my_field = MyIntegerField()
+    custom_int = MyIntegerField()
+    custom_int_nullable = MyIntegerField(null=True)
 
 
-reveal_type(User().my_field)  # N: Revealed type is "int"
-User().my_field = "12"  # OK (because Django IntegerField allows str and will try to coerce it)
+assert_type(User().custom_int, int)
+assert_type(User().custom_int_nullable, int | None)
+User().custom_int = "12"  # OK (because Django IntegerField allows str and will try to coerce it)
 ```
 
-2. Non-generic subclass (more strict):
-
-```python
-from typing import reveal_type
-from django.db import models
-
-
-# This is a non-generic subclass being very explicit
-# that it expects only int when setting values.
-class MyStrictIntegerField(models.IntegerField[int, int]): ...
-
-
-class User(models.Model):
-    my_field = MyStrictIntegerField()
-
-
-reveal_type(User().my_field)  # N: Revealed type is "int"
-User().my_field = "12"  # E: Incompatible types in assignment (expression has type "str", variable has type "int")
-```
-
-See mypy section on [generic classes subclasses](https://mypy.readthedocs.io/en/stable/generics.html#defining-subclasses-of-generic-classes).
+If your field adds its own constructor arguments, declare them explicitly next to `null` in both overloads.
 
 ## Related projects
 

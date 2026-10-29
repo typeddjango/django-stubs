@@ -38,7 +38,7 @@ from mypy.plugin import (
     MethodContext,
 )
 from mypy.semanal import SemanticAnalyzer
-from mypy.typeanal import make_optional_type
+from mypy.typeanal import fix_instance, make_optional_type
 from mypy.types import (
     AnyType,
     CallableType,
@@ -394,10 +394,10 @@ def get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) 
     field_type = get_proper_type(field_node.type)
     if not isinstance(field_type, Instance):
         return None
-    # Field declares a set and a get type arg. Fallback to `None` when we can't find any args.
-    # Not every model attribute is a field,
+    # Field declares a set and a get type arg, wrappers like ArrayField add their own after them.
+    # Fallback to `None` when we can't find any args. Not every model attribute is a field,
     # a reverse o2o accessor is a two arg descriptor whose args would be misread as set/get types.
-    if len(field_type.args) != 2 or not field_type.type.has_base(fullnames.FIELD_FULLNAME):
+    if len(field_type.args) < 2 or not field_type.type.has_base(fullnames.FIELD_FULLNAME):
         return None
     return field_type
 
@@ -405,6 +405,26 @@ def get_field_type_from_model_type_info(info: TypeInfo | None, field_name: str) 
 class FieldTypeArgs(NamedTuple):
     set: ProperType
     get: ProperType
+
+
+def fill_field_defaults(
+    field_info: TypeInfo,
+    api: TypeChecker | SemanticAnalyzer,
+    *,
+    is_set_nullable: bool = False,
+    is_get_nullable: bool = False,
+) -> Instance:
+    """Build an Instance of `field_info` with PEP 696 defaults; fold `| None` into set/get args if asked."""
+    inst = Instance(field_info, ())
+    fix_instance(inst, api.fail, api.note, disallow_any=False, options=api.options, use_generic_error=True)
+    if inst.args:
+        args = list(inst.args)
+        if is_set_nullable:
+            args[0] = make_optional_type(args[0])
+        if is_get_nullable and len(args) > 1:
+            args[1] = make_optional_type(args[1])
+        inst = inst.copy_modified(args=args)
+    return inst
 
 
 def get_field_type_args(field_type: Instance) -> FieldTypeArgs | None:

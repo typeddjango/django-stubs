@@ -20,9 +20,9 @@ class Booking(models.Model):
 
 def test_model_field_classes_from_existing_locations() -> None:
     booking = Booking()
-    assert_type(booking.id, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(booking.time_range, DateTimeTZRange)  # pyrefly: ignore[assert-type]
-    assert_type(booking.some_decimal, Decimal)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(booking.id, int)
+    assert_type(booking.time_range, DateTimeTZRange)
+    assert_type(booking.some_decimal, Decimal)
 
 
 class NoPrimaryKey(models.Model):
@@ -30,7 +30,7 @@ class NoPrimaryKey(models.Model):
 
 
 def test_add_id_field_if_no_primary_key_defined() -> None:
-    assert_type(NoPrimaryKey().id, int)  # pyright: ignore[reportAssertTypeFailure, reportAttributeAccessIssue, reportUnknownMemberType]  # ty: ignore[type-assertion-failure, unresolved-attribute]
+    assert_type(NoPrimaryKey().id, int)  # pyright: ignore[reportAssertTypeFailure, reportAttributeAccessIssue, reportUnknownMemberType]  # ty: ignore[type-assertion-failure, unresolved-attribute]  # pyrefly: ignore[assert-type, missing-attribute]
 
 
 class CustomPrimaryKey(models.Model):
@@ -38,7 +38,7 @@ class CustomPrimaryKey(models.Model):
 
 
 def test_do_not_add_id_if_field_with_primary_key_True_defined() -> None:
-    assert_type(CustomPrimaryKey().my_pk, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(CustomPrimaryKey().my_pk, int)
     CustomPrimaryKey().id  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
 
 
@@ -50,7 +50,7 @@ def blank_and_null_char_field_allows_none() -> None:
     MyModel(nulltext="")
     MyModel(nulltext=None)
     MyModel().nulltext = None
-    assert_type(MyModel().nulltext, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(MyModel().nulltext, str | None)
 
 
 class NotNullText(models.Model):
@@ -60,8 +60,8 @@ class NotNullText(models.Model):
 def blank_and_not_null_charfield_does_not_allow_none() -> None:
     NotNullText(notnulltext=None)  # type: ignore[misc]
     NotNullText(notnulltext="")
-    NotNullText().notnulltext = None  # type: ignore[assignment]  # pyrefly: ignore[bad-assignment]
-    assert_type(NotNullText().notnulltext, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    NotNullText().notnulltext = None  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
+    assert_type(NotNullText().notnulltext, str)
 
 
 class MyUser(models.Model):
@@ -69,7 +69,7 @@ class MyUser(models.Model):
 
 
 def if_field_called_on_class_return_field_itself() -> None:
-    assert_type(MyUser.name.field, CharField[str | int, str])  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type, missing-attribute]  # ty: ignore[type-assertion-failure]
+    assert_type(MyUser.name.field, CharField[str | int, str])
 
 
 class AuthMixin(models.Model):
@@ -84,7 +84,7 @@ class MixinModel(AuthMixin, models.Model):
 
 
 def fields_inside_mixins_used_in_model_subclasses_resolved_as_primitives() -> None:
-    assert_type(MixinModel().username, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(MixinModel().username, str)
 
 
 Year = NewType("Year", int)
@@ -112,7 +112,7 @@ class EncodedMessage(models.Model):
 
 def test_binary_field_return_types() -> None:
     obj = EncodedMessage(message=b"\x010")
-    assert_type(obj.message, bytes | memoryview[int])  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(obj.message, bytes | memoryview[int])
 
 
 class SmallAuto(models.Model):
@@ -121,7 +121,7 @@ class SmallAuto(models.Model):
 
 def test_small_auto_field_class_presents_as_int() -> None:
     obj = SmallAuto()
-    assert_type(obj.small, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(obj.small, int)
 
 
 class RenamedField(models.Model):
@@ -133,7 +133,7 @@ def test_ignores_renamed_field() -> None:
     # Django modifies the model so it doesn't have 'modelname', but we don't follow
     # along. But the 'name=' argument to a field isn't a documented feature.
     instance = RenamedField()
-    assert_type(instance.modelname, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.modelname, int)
     instance.fieldname  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
     instance.modelname = 1
     instance.fieldname = 1  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
@@ -214,68 +214,68 @@ class AllFields(models.Model):
 
 def every_builtin_field_reads_null_true_as_optional() -> None:
     instance = AllFields()
-    assert_type(instance.id, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.id, int)
 
-    assert_type(instance.integer, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_integer, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.small_int, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_small_int, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.big_int, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_big_int, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.pos_int, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_pos_int, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.pos_small_int, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_pos_small_int, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.pos_big_int, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_pos_big_int, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.integer, int)
+    assert_type(instance.null_integer, int | None)
+    assert_type(instance.small_int, int)
+    assert_type(instance.null_small_int, int | None)
+    assert_type(instance.big_int, int)
+    assert_type(instance.null_big_int, int | None)
+    assert_type(instance.pos_int, int)
+    assert_type(instance.null_pos_int, int | None)
+    assert_type(instance.pos_small_int, int)
+    assert_type(instance.null_pos_small_int, int | None)
+    assert_type(instance.pos_big_int, int)
+    assert_type(instance.null_pos_big_int, int | None)
 
-    assert_type(instance.flt, float)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_flt, float | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.dec, decimal.Decimal)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_dec, decimal.Decimal | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.flt, float)
+    assert_type(instance.null_flt, float | None)
+    assert_type(instance.dec, decimal.Decimal)
+    assert_type(instance.null_dec, decimal.Decimal | None)
 
-    assert_type(instance.name, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_name, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.slug, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_slug, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.text, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_text, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.csv_int, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_csv_int, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.email, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_email, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.url, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_url, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.name, str)
+    assert_type(instance.null_name, str | None)
+    assert_type(instance.slug, str)
+    assert_type(instance.null_slug, str | None)
+    assert_type(instance.text, str)
+    assert_type(instance.null_text, str | None)
+    assert_type(instance.csv_int, str)
+    assert_type(instance.null_csv_int, str | None)
+    assert_type(instance.email, str)
+    assert_type(instance.null_email, str | None)
+    assert_type(instance.url, str)
+    assert_type(instance.null_url, str | None)
 
-    assert_type(instance.flag, bool)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_flag, bool | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.flag, bool)
+    assert_type(instance.null_flag, bool | None)
 
-    assert_type(instance.ip, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_ip, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.gen_ip, str)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_gen_ip, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.ip, str)
+    assert_type(instance.null_ip, str | None)
+    assert_type(instance.gen_ip, str)
+    assert_type(instance.null_gen_ip, str | None)
 
-    assert_type(instance.day, datetime.date)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_day, datetime.date | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.moment, datetime.datetime)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_moment, datetime.datetime | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.clock, datetime.time)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_clock, datetime.time | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.duration, datetime.timedelta)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_duration, datetime.timedelta | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.day, datetime.date)
+    assert_type(instance.null_day, datetime.date | None)
+    assert_type(instance.moment, datetime.datetime)
+    assert_type(instance.null_moment, datetime.datetime | None)
+    assert_type(instance.clock, datetime.time)
+    assert_type(instance.null_clock, datetime.time | None)
+    assert_type(instance.duration, datetime.timedelta)
+    assert_type(instance.null_duration, datetime.timedelta | None)
 
-    assert_type(instance.uid, uuid.UUID)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_uid, uuid.UUID | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.uid, uuid.UUID)
+    assert_type(instance.null_uid, uuid.UUID | None)
 
-    assert_type(instance.blob, bytes | memoryview[int])  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    assert_type(instance.null_blob, bytes | memoryview[int] | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.blob, bytes | memoryview[int])
+    assert_type(instance.null_blob, bytes | memoryview[int] | None)
 
     assert_type(instance.payload, Any)
-    assert_type(instance.null_payload, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.null_payload, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(instance.payload_with_db_default, Any)
     assert_type(instance.path, Any)
-    assert_type(instance.null_path, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
+    assert_type(instance.null_path, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
 
 
 def if_field_called_on_class_keeps_null_in_its_type() -> None:
-    assert_type(AllFields.null_name.field, CharField[str | int | None, str | None])  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type, missing-attribute]  # ty: ignore[type-assertion-failure]
+    assert_type(AllFields.null_name.field, CharField[str | int | None, str | None])

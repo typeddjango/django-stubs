@@ -1,12 +1,12 @@
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Generic, Literal, Self, overload
+from typing import Any, Generic, Literal, Self, overload, type_check_only
 from uuid import UUID
 
 from django import forms
 from django.core.validators import _ValidatorCallable
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
-from django.db.models.expressions import Expression
+from django.db.models.expressions import Combinable, Expression
 from django.db.models.fields import (
     NOT_PROVIDED,
     Field,
@@ -110,16 +110,22 @@ class ForeignObject(RelatedField[_ST, _GT]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    @type_check_only
+    @override
+    def __set__(self, instance: Any, value: _ST | Combinable) -> None: ...
     # class access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: None, owner: Any) -> ForwardManyToOneDescriptor[Self]: ...
     # Model instance access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
@@ -156,9 +162,6 @@ class ForeignObject(RelatedField[_ST, _GT]):
     requires_unique_target: bool
 
 class ForeignKey(ForeignObject[_ST, _GT]):
-    _pyi_private_set_type: Any
-    _pyi_private_get_type: Any
-
     descriptor_class: type[ForeignKeyDeferredAttribute]
     remote_field: ManyToOneRel
     rel_class: type[ManyToOneRel]
@@ -215,9 +218,6 @@ class ForeignKey(ForeignObject[_ST, _GT]):
     def get_attname_column(self) -> tuple[str, str]: ...  # type: ignore[override]
 
 class OneToOneField(ForeignKey[_ST, _GT]):
-    _pyi_private_set_type: Any
-    _pyi_private_get_type: Any
-
     remote_field: OneToOneRel
     rel_class: type[OneToOneRel]
     def __init__(
@@ -240,16 +240,22 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    @type_check_only
+    @override
+    def __set__(self, instance: Any, value: _ST | Combinable) -> None: ...
     # class access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: None, owner: Any) -> ForwardOneToOneDescriptor[Self]: ...
     # Model instance access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     forward_related_accessor_class: type[ForwardOneToOneDescriptor[Any]]

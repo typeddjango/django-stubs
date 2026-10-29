@@ -2,15 +2,9 @@ from typing import Any
 
 from django.contrib.gis.measure import Area, Distance
 from django.db import models
-from typing_extensions import TypeVar, override
+from typing_extensions import override
 
-# __set__ value type
-_ST = TypeVar("_ST", contravariant=True, default=Any)
-# __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=Any)
-
-class AreaField(models.FloatField[_ST, _GT]):
-    _pyi_private_get_type: Area  # type: ignore[assignment]
+class AreaField(models.FloatField[Any, Area]):
     geo_field: Any
     def __init__(self, geo_field: Any) -> None: ...
     @override
@@ -21,8 +15,7 @@ class AreaField(models.FloatField[_ST, _GT]):
     @override
     def get_internal_type(self) -> Any: ...
 
-class DistanceField(models.FloatField[_ST, _GT]):
-    _pyi_private_get_type: Distance  # type: ignore[assignment]
+class DistanceField(models.FloatField[Any, Distance]):
     geo_field: Any
     def __init__(self, geo_field: Any) -> None: ...
     @override

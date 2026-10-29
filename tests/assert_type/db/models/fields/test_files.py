@@ -18,10 +18,10 @@ class MyModel(models.Model):
 instance = MyModel()
 # `FileDescriptor.__get__` always returns a `FieldFile`, even for a NULL value,
 # which is wrapped as `FieldFile(instance, field, name=None)`.
-assert_type(instance.file, FieldFile)  # pyrefly: ignore[assert-type]
-assert_type(instance.image, ImageFieldFile)  # pyrefly: ignore[assert-type]
-assert_type(instance.null_file, FieldFile)  # pyrefly: ignore[assert-type]
-assert_type(instance.null_image, ImageFieldFile)  # pyrefly: ignore[assert-type]
+assert_type(instance.file, FieldFile)
+assert_type(instance.image, ImageFieldFile)
+assert_type(instance.null_file, FieldFile)
+assert_type(instance.null_image, ImageFieldFile)
 
 
 def image_field_accepts_file_field_kwargs() -> None:
@@ -31,8 +31,8 @@ def image_field_accepts_file_field_kwargs() -> None:
         cover = models.ImageField(upload_to="covers/", storage=Storage())
 
     instance = WithKwargs()
-    assert_type(instance.avatar, ImageFieldFile)  # pyrefly: ignore[assert-type]
-    assert_type(instance.cover, ImageFieldFile)  # pyrefly: ignore[assert-type]
+    assert_type(instance.avatar, ImageFieldFile)
+    assert_type(instance.cover, ImageFieldFile)
 
 
 def file_and_image_class_access_returns_specific_descriptor() -> None:
@@ -41,5 +41,5 @@ def file_and_image_class_access_returns_specific_descriptor() -> None:
         doc = models.FileField()
         pic = models.ImageField()
 
-    assert_type(WithFiles.doc, FileDescriptor)  # pyrefly: ignore[assert-type]
-    assert_type(WithFiles.pic, ImageFileDescriptor)  # pyrefly: ignore[assert-type]
+    assert_type(WithFiles.doc, FileDescriptor)
+    assert_type(WithFiles.pic, ImageFileDescriptor)
