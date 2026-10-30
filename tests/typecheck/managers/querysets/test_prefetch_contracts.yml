@@ -1,0 +1,39 @@
+-   case: prefetch_heterogeneous_generic_querysets
+    main: |
+        from typing import TypeVar, assert_type
+        from django.db.models import Prefetch, QuerySet
+        from django.db.models.query import RawQuerySet
+        from myapp.models import Audit, Pair, Person
+
+        P = TypeVar("P", bound=Person)
+
+        def check(rows: QuerySet[Pair], people: QuerySet[P], audits: QuerySet[Audit], unscoped: bool) -> None:
+            result = rows.prefetch_related(
+                Prefetch("audit_set", queryset=audits, to_attr="audit_rows"),
+                *(Prefetch(side, queryset=people.all()) for side in ("left", "right") if not unscoped),
+                *(Prefetch(side, queryset=people) for side in ("left", "right") if unscoped),
+            )
+            assert_type(result.get().audit_rows, list[Audit])
+            rows.prefetch_related(Prefetch("audit_set", queryset=audits), Prefetch("left", queryset=people))
+
+        def raw(rows: RawQuerySet[Pair], people: QuerySet[P], audits: QuerySet[Audit]) -> None:
+            rows.prefetch_related(Prefetch("audit_set", queryset=audits), Prefetch("left", queryset=people))
+
+        Prefetch("left", queryset=1)  # E: Argument "queryset" to "Prefetch" has incompatible type "int"; expected "QuerySet[Model, Model] | None"  [arg-type]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Person(models.Model):
+                    pass
+
+                class Pair(models.Model):
+                    left = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="+")
+                    right = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="+")
+
+                class Audit(models.Model):
+                    pair = models.ForeignKey(Pair, on_delete=models.CASCADE)
