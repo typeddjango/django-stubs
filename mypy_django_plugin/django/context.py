@@ -345,9 +345,13 @@ class DjangoContext:
                     field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
                     if field_info is None:
                         return None
-                    return get_proper_type(
-                        helpers.get_private_descriptor_type(field_info, "_pyi_private_get_type", is_nullable=field.null)
+                    defaults = helpers.fill_field_defaults(
+                        field_info, helpers.get_typechecker_api(ctx), is_get_nullable=field.null
                     )
+                    field_type_args = helpers.get_field_type_args(defaults)
+                    if field_type_args is None:
+                        return AnyType(TypeOfAny.explicit)
+                    return field_type_args.get
                 return lookup_type
 
         return None

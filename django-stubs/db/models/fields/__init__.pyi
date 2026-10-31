@@ -3,7 +3,7 @@ import uuid
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import date, time, timedelta
 from datetime import datetime as real_datetime
-from typing import Any, ClassVar, Generic, Protocol, Self, TypeAlias, overload, type_check_only
+from typing import Any, ClassVar, Generic, Literal, Protocol, Self, TypeAlias, overload, type_check_only
 
 from django import forms
 from django.core.checks import CheckMessage
@@ -19,7 +19,7 @@ from django.forms.widgets import Widget
 from django.utils.choices import BlankChoiceIterator, _Choice, _ChoiceNamedGroup, _ChoicesCallable, _ChoicesInput
 from django.utils.datastructures import DictWrapper
 from django.utils.functional import _Getter, _StrOrPromise, cached_property
-from typing_extensions import TypedDict, TypeVar, Unpack, override
+from typing_extensions import TypedDict, TypeVar, Unpack, deprecated, override
 
 class Empty: ...
 class NOT_PROVIDED: ...
@@ -132,13 +132,10 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
 
     Notice, that this is not magic. This is how descriptors work with ``mypy``.
 
-    We also need ``_pyi_private_set_type`` attributes
-    and friends to help inside our plugin.
+    We also need ``_pyi_lookup_exact_type`` to help inside our plugin.
     It is required to enhance parts like ``filter`` queries.
     """
 
-    _pyi_private_set_type: Any
-    _pyi_private_get_type: Any
     _pyi_lookup_exact_type: Any
 
     help_text: _StrOrPromise
@@ -190,15 +187,19 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    @type_check_only
     def __set__(self, instance: Any, value: _ST | Combinable) -> None: ...
     # class access
     @overload
+    @type_check_only
     def __get__(self, instance: None, owner: Any) -> _FieldDescriptor[Self]: ...
     # Model instance access
     @overload
+    @type_check_only
     def __get__(self, instance: Model, owner: Any) -> _GT: ...
     # non-Model instances
     @overload
+    @type_check_only
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
     def get_col(self, alias: str, output_field: Field | None = None) -> Col: ...
@@ -283,40 +284,387 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
     def value_from_object(self, obj: Model) -> _GT: ...
     def slice_expression(self, expression: Expression, start: int, length: int | None) -> Func: ...
 
-class IntegerField(Field[_ST, _GT]):
-    _pyi_private_set_type: float | int | str
-    _pyi_private_get_type: int
+_ST_Int = TypeVar("_ST_Int", contravariant=True, default=float | int | str)
+_GT_Int = TypeVar("_GT_Int", covariant=True, default=int)
+
+class IntegerField(Field[_ST_Int, _GT_Int]):
     _pyi_lookup_exact_type: str | int
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: IntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
-class SmallIntegerField(IntegerField[_ST, _GT]): ...
+class SmallIntegerField(IntegerField[_ST_Int, _GT_Int]):
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: SmallIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
-class BigIntegerField(IntegerField[_ST, _GT]):
+class BigIntegerField(IntegerField[_ST_Int, _GT_Int]):
     MAX_BIGINT: ClassVar[int]
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: BigIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
-class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]):
-    integer_field_class: type[IntegerField]
+class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int, _GT_Int]):
+    integer_field_class: type[IntegerField[Any, Any]]
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: PositiveIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
-class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST, _GT]):
-    integer_field_class: type[SmallIntegerField]
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST_Int, _GT_Int]):
+    integer_field_class: type[SmallIntegerField[Any, Any]]
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: PositiveSmallIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
-class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST, _GT]):
-    integer_field_class: type[BigIntegerField]
+class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST_Int, _GT_Int]):
+    integer_field_class: type[BigIntegerField[Any, Any]]
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: PositiveBigIntegerField[float | int | str | None, int | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
-class FloatField(Field[_ST, _GT]):
-    _pyi_private_set_type: float | int | str
-    _pyi_private_get_type: float
+_ST_Float = TypeVar("_ST_Float", contravariant=True, default=float | int | str)
+_GT_Float = TypeVar("_GT_Float", covariant=True, default=float)
+
+class FloatField(Field[_ST_Float, _GT_Float]):
     _pyi_lookup_exact_type: float
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: FloatField[float | int | str | None, float | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
-class DecimalField(Field[_ST, _GT]):
-    _pyi_private_set_type: str | float | decimal.Decimal
-    _pyi_private_get_type: decimal.Decimal
+_ST_Decimal = TypeVar("_ST_Decimal", contravariant=True, default=str | float | decimal.Decimal)
+_GT_Decimal = TypeVar("_GT_Decimal", covariant=True, default=decimal.Decimal)
+
+class DecimalField(Field[_ST_Decimal, _GT_Decimal]):
     _pyi_lookup_exact_type: str | int | decimal.Decimal
     # attributes
     max_digits: int
     decimal_places: int
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -324,7 +672,47 @@ class DecimalField(Field[_ST, _GT]):
         max_digits: int | None = None,
         decimal_places: int | None = None,
         *,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: DecimalField[str | float | decimal.Decimal | None, decimal.Decimal | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        max_digits: int | None = None,
+        decimal_places: int | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        max_digits: int | None = None,
+        decimal_places: int | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        max_digits: int | None = None,
+        decimal_places: int | None = None,
+        *,
+        null: bool,
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
@@ -332,18 +720,59 @@ class DecimalField(Field[_ST, _GT]):
     @cached_property
     def context(self) -> decimal.Context: ...
 
-class CharField(Field[_ST, _GT]):
-    _pyi_private_set_type: str | int
-    _pyi_private_get_type: str
+_ST_Char = TypeVar("_ST_Char", contravariant=True, default=str | int)
+_GT_Char = TypeVar("_GT_Char", covariant=True, default=str)
+
+class CharField(Field[_ST_Char, _GT_Char]):
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
-    db_collation: str | None
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
         *,
-        null: bool = False,
+        null: Literal[False] = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: CharField[str | int | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
         db_collation: str | None = None,
         primary_key: bool = False,
         max_length: int | None = None,
@@ -351,15 +780,112 @@ class CharField(Field[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
-
-class SlugField(CharField[_ST, _GT]):
+class CommaSeparatedIntegerField(CharField[_ST_Char, _GT_Char]):
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
         *,
-        null: bool = False,
+        null: Literal[False] = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: CommaSeparatedIntegerField[str | int | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+
+class SlugField(CharField[_ST_Char, _GT_Char]):
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        allow_unicode: bool = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 50,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: SlugField[str | int | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        allow_unicode: bool = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 50,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        allow_unicode: bool = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 50,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
         allow_unicode: bool = False,
         db_collation: str | None = None,
         primary_key: bool = False,
@@ -368,35 +894,56 @@ class SlugField(CharField[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class EmailField(CharField[_ST, _GT]):
-    _pyi_private_set_type: str
+_ST_Email = TypeVar("_ST_Email", contravariant=True, default=str)
 
-class URLField(CharField[_ST, _GT]):
+class EmailField(CharField[_ST_Email, _GT_Char]):
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
         *,
-        null: bool = False,
+        null: Literal[False] = False,
         db_collation: str | None = None,
         primary_key: bool = False,
-        max_length: int | None = 200,
+        max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
-
-class TextField(Field[_ST, _GT]):
-    _pyi_private_set_type: str
-    _pyi_private_get_type: str
-    # objects are converted to string before comparison
-    _pyi_lookup_exact_type: Any
-    db_collation: str | None
+    @overload
+    def __init__(
+        self: EmailField[str | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
         *,
-        null: bool = False,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
         db_collation: str | None = None,
         primary_key: bool = False,
         max_length: int | None = None,
@@ -404,35 +951,291 @@ class TextField(Field[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class BooleanField(Field[_ST, _GT]):
-    _pyi_private_set_type: bool
-    _pyi_private_get_type: bool
-    _pyi_lookup_exact_type: bool
-
-class NullBooleanField(BooleanField[_ST, _GT]):
-    _pyi_private_set_type: bool | None  # type: ignore[assignment]
-    _pyi_private_get_type: bool | None  # type: ignore[assignment]
-    _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
-
-class IPAddressField(Field[_ST, _GT]):
-    _pyi_private_set_type: str
-    _pyi_private_get_type: str
-
-class GenericIPAddressField(Field[_ST, _GT]):
-    _pyi_private_set_type: str | int | Callable[..., Any]
-    _pyi_private_get_type: str
-
-    default_error_messages: ClassVar[_ErrorMessagesDict]
-    unpack_ipv4: bool
-    protocol: str
+class URLField(CharField[_ST_Char, _GT_Char]):
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
-        name: Any | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 200,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: URLField[str | int | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 200,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 200,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = 200,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+
+_ST_Text = TypeVar("_ST_Text", contravariant=True, default=str)
+_GT_Text = TypeVar("_GT_Text", covariant=True, default=str)
+
+class TextField(Field[_ST_Text, _GT_Text]):
+    # objects are converted to string before comparison
+    _pyi_lookup_exact_type: Any
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: TextField[str | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        db_collation: str | None = None,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+
+_ST_Bool = TypeVar("_ST_Bool", contravariant=True, default=bool)
+_GT_Bool = TypeVar("_GT_Bool", covariant=True, default=bool)
+
+class BooleanField(Field[_ST_Bool, _GT_Bool]):
+    _pyi_lookup_exact_type: bool
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: BooleanField[bool | None, bool | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+
+_ST_NBool = TypeVar("_ST_NBool", contravariant=True, default=bool | None)
+_GT_NBool = TypeVar("_GT_NBool", covariant=True, default=bool | None)
+
+class NullBooleanField(BooleanField[_ST_NBool, _GT_NBool]):
+    _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
+
+_ST_IP = TypeVar("_ST_IP", contravariant=True, default=str)
+_GT_IP = TypeVar("_GT_IP", covariant=True, default=str)
+
+class IPAddressField(Field[_ST_IP, _GT_IP]):
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: IPAddressField[str | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+
+_ST_GenIP = TypeVar("_ST_GenIP", contravariant=True, default=str | int | Callable[..., Any])
+
+class GenericIPAddressField(Field[_ST_GenIP, _GT_IP]):
+    default_error_messages: ClassVar[_ErrorMessagesDict]
+    unpack_ipv4: bool
+    protocol: str
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
         protocol: str = "both",
         unpack_ipv4: bool = False,
         *,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: GenericIPAddressField[str | int | Callable[..., Any] | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        protocol: str = "both",
+        unpack_ipv4: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        protocol: str = "both",
+        unpack_ipv4: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        protocol: str = "both",
+        unpack_ipv4: bool = False,
+        *,
+        null: bool,
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
@@ -441,12 +1244,14 @@ class GenericIPAddressField(Field[_ST, _GT]):
 class DateTimeCheckMixin:
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
 
-class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: str | date
-    _pyi_private_get_type: date
+_ST_Date = TypeVar("_ST_Date", contravariant=True, default=str | date)
+_GT_Date = TypeVar("_GT_Date", covariant=True, default=date)
+
+class DateField(DateTimeCheckMixin, Field[_ST_Date, _GT_Date]):
     _pyi_lookup_exact_type: str | date
     auto_now: bool
     auto_now_add: bool
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -454,7 +1259,50 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
         auto_now: bool = False,
         auto_now_add: bool = False,
         *,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: DateField[str | date | None, date | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -463,11 +1311,13 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
 
-class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
-    _pyi_private_set_type: str | time | real_datetime
-    _pyi_private_get_type: time
+_ST_Time = TypeVar("_ST_Time", contravariant=True, default=str | time | real_datetime)
+_GT_Time = TypeVar("_GT_Time", covariant=True, default=time)
+
+class TimeField(DateTimeCheckMixin, Field[_ST_Time, _GT_Time]):
     auto_now: bool
     auto_now_add: bool
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -475,27 +1325,164 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         auto_now: bool = False,
         auto_now_add: bool = False,
         *,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: TimeField[str | time | real_datetime | None, time | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: bool,
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class DateTimeField(DateField[_ST, _GT]):
-    _pyi_private_set_type: str | real_datetime | date
-    _pyi_private_get_type: real_datetime
-    _pyi_lookup_exact_type: str | real_datetime
+_ST_DateTime = TypeVar("_ST_DateTime", contravariant=True, default=str | real_datetime | date)
+_GT_DateTime = TypeVar("_GT_DateTime", covariant=True, default=real_datetime)
 
-class UUIDField(Field[_ST, _GT]):
-    _pyi_private_set_type: str | uuid.UUID
-    _pyi_private_get_type: uuid.UUID
+class DateTimeField(DateField[_ST_DateTime, _GT_DateTime]):
+    _pyi_lookup_exact_type: str | real_datetime
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: DateTimeField[str | real_datetime | date | None, real_datetime | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        auto_now: bool = False,
+        auto_now_add: bool = False,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+
+_ST_UUID = TypeVar("_ST_UUID", contravariant=True, default=str | uuid.UUID)
+_GT_UUID = TypeVar("_GT_UUID", covariant=True, default=uuid.UUID)
+
+class UUIDField(Field[_ST_UUID, _GT_UUID]):
     _pyi_lookup_exact_type: uuid.UUID | str
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
         *,
         name: str | None = None,  # unlike other fields, keyword-only at runtime
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: UUIDField[str | uuid.UUID | None, uuid.UUID | None],
+        verbose_name: _StrOrPromise | None = None,
+        *,
+        name: str | None = None,  # unlike other fields, keyword-only at runtime
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        *,
+        name: str | None = None,  # unlike other fields, keyword-only at runtime
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        *,
+        name: str | None = None,  # unlike other fields, keyword-only at runtime
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -525,12 +1512,114 @@ class FilePathField(Field[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class BinaryField(Field[_ST, _GT]):
-    _pyi_private_get_type: bytes | memoryview
+_ST_Binary = TypeVar("_ST_Binary", contravariant=True, default=bytes | bytearray | memoryview)
+_GT_Binary = TypeVar("_GT_Binary", covariant=True, default=bytes | memoryview)
+
+class BinaryField(Field[_ST_Binary, _GT_Binary]):
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: BinaryField[bytes | bytearray | memoryview | None, bytes | memoryview | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     def get_placeholder_sql(self, value: Any, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
-class DurationField(Field[_ST, _GT]):
-    _pyi_private_get_type: timedelta
+_ST_Duration = TypeVar("_ST_Duration", contravariant=True, default=str | timedelta)
+_GT_Duration = TypeVar("_GT_Duration", covariant=True, default=timedelta)
+
+class DurationField(Field[_ST_Duration, _GT_Duration]):
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self: DurationField[str | timedelta | None, timedelta | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
 
 class AutoFieldMixin:
     db_returning: bool
@@ -545,13 +1634,14 @@ class AutoFieldMixin:
 
 class AutoFieldMeta(type): ...
 
-class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta):  # type: ignore[misc]
-    _pyi_private_set_type: int | str
-    _pyi_private_get_type: int
+_ST_Auto = TypeVar("_ST_Auto", contravariant=True, default=int | str)
+_GT_Auto = TypeVar("_GT_Auto", covariant=True, default=int)
+
+class AutoField(AutoFieldMixin, IntegerField[_ST_Auto, _GT_Auto], metaclass=AutoFieldMeta):  # type: ignore[misc]
     _pyi_lookup_exact_type: str | int
 
-class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]): ...  # type: ignore[misc]
-class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...  # type: ignore[misc]
+class BigAutoField(AutoFieldMixin, BigIntegerField[_ST_Auto, _GT_Auto]): ...  # type: ignore[misc]
+class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST_Auto, _GT_Auto]): ...  # type: ignore[misc]
 
 __all__ = [
     "BLANK_CHOICE_DASH",

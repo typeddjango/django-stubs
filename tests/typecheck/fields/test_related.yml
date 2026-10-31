@@ -1327,13 +1327,13 @@
         main:34: note: Revealed type is "django.db.models.manager.Manager[myapp.models.MyModel_auto_through]"
         main:36: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_auto_through]"
         main:37: note: Revealed type is "type[myapp.models.MyModel_auto_through]"
-        main:38: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[float | int | str | None, int]]"
+        main:38: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[int | str | None, int]]"
         main:39: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.MyModel_other_again]"
         main:40: note: Revealed type is "type[myapp.models.MyModel_other_again]"
-        main:41: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[float | int | str | None, int]]"
+        main:41: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[int | str | None, int]]"
         main:42: note: Revealed type is "myapp.models.Other_ManyRelatedManager[myapp.models.CustomThrough]"
         main:43: note: Revealed type is "type[myapp.models.CustomThrough]"
-        main:44: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[float | int | str, int]]"
+        main:44: note: Revealed type is "django.db.models.fields._FieldDescriptor[django.db.models.fields.BigAutoField[int | str, int]]"
     installed_apps:
         -   myapp
     files:
