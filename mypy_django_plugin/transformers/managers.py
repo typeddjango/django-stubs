@@ -22,8 +22,19 @@ from mypy.nodes import (
 from mypy.plugins.common import add_method_to_class
 from mypy.semanal_shared import has_placeholder
 from mypy.subtypes import find_member
-from mypy.types import AnyType, CallableType, Instance, ProperType, TypeOfAny, TypeType, UnionType, get_proper_type
+from mypy.types import (
+    AnyType,
+    CallableType,
+    Instance,
+    ProperType,
+    TypeOfAny,
+    TypeType,
+    TypeVarType,
+    UnionType,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
+from mypy.typevars import fill_typevars_with_any
 
 from mypy_django_plugin.lib import fullnames, helpers
 
@@ -287,6 +298,15 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
     django_metadata = helpers.get_django_metadata(manager_info)
     django_metadata["from_queryset_manager"] = queryset_info.fullname
 
+    # Default the queryset type var to the queryset the manager is built from, so a bare
+    # `ManagerFromMyQuerySet[MyModel]` fills in as `ManagerFromMyQuerySet[MyModel, MyQuerySet[MyModel, MyModel]]`.
+    # ponytail: only the `[_T, _QS]` layout inherited from `Manager`, a user-generic manager keeps its own defaults.
+    if len(manager_info.defn.type_vars) == 2:
+        model_type_var, queryset_type_var = manager_info.defn.type_vars
+        if isinstance(queryset_type_var, TypeVarType):
+            queryset_default = Instance(queryset_info, [model_type_var] * len(queryset_info.type_vars))
+            manager_info.defn.type_vars = [model_type_var, queryset_type_var.copy_modified(default=queryset_default)]
+
     # We collect and mark up all methods before django.db.models.query.QuerySet as class members
     for class_mro_info in queryset_info.mro:
         if class_mro_info.fullname == fullnames.QUERYSET_CLASS_FULLNAME:
@@ -461,7 +481,7 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         ctx.cls,
         "as_manager",
         args=[],
-        return_type=Instance(new_manager_info, [AnyType(TypeOfAny.from_omitted_generics)]),
+        return_type=fill_typevars_with_any(new_manager_info),
         is_classmethod=True,
     )
 
