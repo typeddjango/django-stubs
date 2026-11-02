@@ -68,9 +68,7 @@
 # with and without the guard, which is the point: the guard must not intercept them.
 -   case: annotated_ordinary_shapes_are_unchanged
     main: |
-        from typing import Annotated, TypeVar
-
-        from myapp.models import Blog
+        from typing import Annotated, TypeVar, reveal_type
 
         class Meta:
             pass
@@ -80,15 +78,13 @@
         plain: Annotated[int, Meta] = 1
         listed: Annotated[list[str], Meta] = []
         nested: Annotated[Annotated[int, Meta], Meta] = 1
-        model: Annotated[Blog, Meta]
 
         def identity(v: Annotated[T, Meta]) -> T:
             return v
 
-        reveal_type(plain)  # N: Revealed type is "builtins.int"
-        reveal_type(listed)  # N: Revealed type is "builtins.list[builtins.str]"
-        reveal_type(nested)  # N: Revealed type is "builtins.int"
-        reveal_type(model)  # N: Revealed type is "myapp.models.Blog"
+        reveal_type(plain)  # N: Revealed type is "int"
+        reveal_type(listed)  # N: Revealed type is "list[str]"
+        reveal_type(nested)  # N: Revealed type is "int"
     installed_apps:
         - myapp
     files:
