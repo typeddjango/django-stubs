@@ -1144,13 +1144,13 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
                 ctx.api.defer()
 
 
-def _analyze_and_unwrap(ctx: AnalyzeTypeContext, type_expr: MypyType) -> MypyType:
+def _analyze_and_unwrap(ctx: AnalyzeTypeContext, type_expr: MypyType) -> ProperType | ReadOnlyType | RequiredType:
     """
     Analyses a type argument, unwrapping it to a `ProperType` where that is safe.
 
     `RequiredType` and `ReadOnlyType` are transient wrappers around TypedDict items and are
-    not proper types, so `get_proper_type` raises on them. mypy's own TypedDict analyser is
-    what consumes those wrappers, so they are returned untouched.
+    not proper types, so `get_proper_type` raises on them. They are also not expanded, hence
+    the explicit union: mypy refuses `isinstance` on an unexpanded `Type`.
     """
     analyzed_type = ctx.api.analyze_type(type_expr)
     if isinstance(analyzed_type, (ReadOnlyType, RequiredType)):
@@ -1188,6 +1188,10 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
     fields_dict = None
     if len(args) > 1:
         second_arg_type = _analyze_and_unwrap(ctx, args[1])
+        if isinstance(second_arg_type, (ReadOnlyType, RequiredType)):
+            # A TypedDict item modifier cannot be the annotations argument; mypy reports
+            # the misplaced modifier itself.
+            return type_arg
         if isinstance(second_arg_type, TypedDictType) and is_with_annotations:
             fields_dict = second_arg_type
         elif isinstance(second_arg_type, Instance) and second_arg_type.type.fullname == ANNOTATIONS_FULLNAME:
