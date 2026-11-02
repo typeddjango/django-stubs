@@ -37,7 +37,7 @@
 # INTERNAL ERROR. The plugin now leaves those wrappers alone.
 -   case: annotated_typeddict_items_do_not_crash
     main: |
-        from typing import Annotated, NotRequired, Required, TypedDict
+        from typing import Annotated, NotRequired, Required, TypedDict, reveal_type
 
         from typing_extensions import ReadOnly
 
@@ -53,7 +53,13 @@
         class ReadOnlyState(TypedDict):
             items: Annotated[ReadOnly[list[str]], keep_last]
 
-        def read(a: NotRequiredState, b: RequiredState, c: ReadOnlyState) -> None: ...
+        a: NotRequiredState
+        b: RequiredState
+        c: ReadOnlyState
+
+        reveal_type(a)  # N: Revealed type is "TypedDict(main.NotRequiredState, {'items'?: list[str]})"
+        reveal_type(b)  # N: Revealed type is "TypedDict(main.RequiredState, {'items': list[str]})"
+        reveal_type(c)  # N: Revealed type is "TypedDict(main.ReadOnlyState, {'items'=: list[str]})"
     installed_apps:
         - myapp
     files:
