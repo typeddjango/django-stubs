@@ -1144,6 +1144,20 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
                 ctx.api.defer()
 
 
+def _analyze_and_unwrap(ctx: AnalyzeTypeContext, type_expr: MypyType) -> MypyType:
+    """
+    Analyses a type argument, unwrapping it to a `ProperType` where that is safe.
+
+    `RequiredType` and `ReadOnlyType` are transient wrappers around TypedDict items and are
+    not proper types, so `get_proper_type` raises on them. mypy's own TypedDict analyser is
+    what consumes those wrappers, so they are returned untouched.
+    """
+    analyzed_type = ctx.api.analyze_type(type_expr)
+    if isinstance(analyzed_type, (ReadOnlyType, RequiredType)):
+        return analyzed_type
+    return get_proper_type(analyzed_type)
+
+
 def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
     """
     Replaces the 'WithAnnotations' type with a type that can represent an annotated
@@ -1153,13 +1167,11 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
     args = ctx.type.args
     if not args:
         return AnyType(TypeOfAny.from_omitted_generics) if is_with_annotations else ctx.type
-    analyzed_type = ctx.api.analyze_type(args[0])
-    if isinstance(analyzed_type, (ReadOnlyType, RequiredType)):
-        # TypedDict item modifiers are transient wrappers and not ``ProperType``s, so
-        # ``get_proper_type`` raises on them. mypy's own TypedDict analyser is what
-        # consumes them, so the type is handed back unchanged.
-        return analyzed_type
-    type_arg = get_proper_type(analyzed_type)
+    type_arg = _analyze_and_unwrap(ctx, args[0])
+    if isinstance(type_arg, (ReadOnlyType, RequiredType)):
+        # TypedDict item modifiers are not model types; they belong to mypy's TypedDict
+        # analyser and are returned as they came in.
+        return type_arg
     if not isinstance(type_arg, Instance) or not helpers.is_model_type(type_arg.type):
         if isinstance(type_arg, TypeVarType):
             # When the first arg is a TypeVar bounded by a Model (e.g. WithAnnotations[_Model, BarDict]),
@@ -1175,7 +1187,7 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
 
     fields_dict = None
     if len(args) > 1:
-        second_arg_type = get_proper_type(ctx.api.analyze_type(args[1]))
+        second_arg_type = _analyze_and_unwrap(ctx, args[1])
         if isinstance(second_arg_type, TypedDictType) and is_with_annotations:
             fields_dict = second_arg_type
         elif isinstance(second_arg_type, Instance) and second_arg_type.type.fullname == ANNOTATIONS_FULLNAME:
