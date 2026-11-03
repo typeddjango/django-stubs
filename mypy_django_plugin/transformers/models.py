@@ -1144,16 +1144,20 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
                 ctx.api.defer()
 
 
-def _analyze_and_unwrap(ctx: AnalyzeTypeContext, type_expr: MypyType) -> ProperType | ReadOnlyType | RequiredType:
+# The transient wrappers mypy puts around TypedDict items. They are not proper types, so
+# `get_proper_type` raises on them, and mypy's own TypedDict analyser is what consumes them.
+TYPED_DICT_ITEM_TYPES = (ReadOnlyType, RequiredType)
+
+
+def _analyze_and_unwrap(ctx: AnalyzeTypeContext, type_expr: MypyType) -> MypyType:
     """
     Analyses a type argument, unwrapping it to a `ProperType` where that is safe.
 
-    `RequiredType` and `ReadOnlyType` are transient wrappers around TypedDict items and are
-    not proper types, so `get_proper_type` raises on them. They are also not expanded, hence
-    the explicit union: mypy refuses `isinstance` on an unexpanded `Type`.
+    TypedDict item modifiers are left to mypy's own TypedDict analyser, so they are returned
+    untouched instead of being passed to `get_proper_type`, which raises on them.
     """
     analyzed_type = ctx.api.analyze_type(type_expr)
-    if isinstance(analyzed_type, (ReadOnlyType, RequiredType)):
+    if isinstance(analyzed_type, TYPED_DICT_ITEM_TYPES):
         return analyzed_type
     return get_proper_type(analyzed_type)
 
@@ -1168,7 +1172,7 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
     if not args:
         return AnyType(TypeOfAny.from_omitted_generics) if is_with_annotations else ctx.type
     type_arg = _analyze_and_unwrap(ctx, args[0])
-    if isinstance(type_arg, (ReadOnlyType, RequiredType)):
+    if not isinstance(type_arg, ProperType):
         # TypedDict item modifiers are not model types; they belong to mypy's TypedDict
         # analyser and are returned as they came in.
         return type_arg
@@ -1187,11 +1191,10 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
 
     fields_dict = None
     if len(args) > 1:
-        second_arg_type = _analyze_and_unwrap(ctx, args[1])
-        if isinstance(second_arg_type, (ReadOnlyType, RequiredType)):
-            # A TypedDict item modifier cannot be the annotations argument; mypy reports
-            # the misplaced modifier itself.
-            return type_arg
+        # `args[1]` is the annotations argument. A TypedDict item modifier cannot appear
+        # there: mypy reports it as "valid-type" and analyses it as `Any`, so it never
+        # arrives as a wrapper and the cast is sound.
+        second_arg_type = cast("ProperType", _analyze_and_unwrap(ctx, args[1]))
         if isinstance(second_arg_type, TypedDictType) and is_with_annotations:
             fields_dict = second_arg_type
         elif isinstance(second_arg_type, Instance) and second_arg_type.type.fullname == ANNOTATIONS_FULLNAME:
