@@ -25,7 +25,18 @@ from mypy.plugins import common
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.typeanal import TypeAnalyser
-from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, TypeVarType, get_proper_type
+from mypy.types import (
+    AnyType,
+    Instance,
+    ProperType,
+    ReadOnlyType,
+    RequiredType,
+    TypedDictType,
+    TypeOfAny,
+    TypeType,
+    TypeVarType,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
 from typing_extensions import override
 
@@ -1133,6 +1144,24 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
                 ctx.api.defer()
 
 
+# The transient wrappers mypy puts around TypedDict items. They are not proper types, so
+# `get_proper_type` raises on them, and mypy's own TypedDict analyser is what consumes them.
+TYPED_DICT_ITEM_TYPES = (ReadOnlyType, RequiredType)
+
+
+def _analyze_and_unwrap(ctx: AnalyzeTypeContext, type_expr: MypyType) -> ProperType | ReadOnlyType | RequiredType:
+    """
+    Analyses a type argument, unwrapping it to a `ProperType` where that is safe.
+
+    TypedDict item modifiers are left to mypy's own TypedDict analyser, so they are returned
+    untouched instead of being passed to `get_proper_type`, which raises on them.
+    """
+    analyzed_type = ctx.api.analyze_type(type_expr)
+    if isinstance(analyzed_type, TYPED_DICT_ITEM_TYPES):
+        return analyzed_type
+    return get_proper_type(analyzed_type)
+
+
 def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
     """
     Replaces the 'WithAnnotations' type with a type that can represent an annotated
@@ -1142,7 +1171,11 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
     args = ctx.type.args
     if not args:
         return AnyType(TypeOfAny.from_omitted_generics) if is_with_annotations else ctx.type
-    type_arg = get_proper_type(ctx.api.analyze_type(args[0]))
+    type_arg = _analyze_and_unwrap(ctx, args[0])
+    if not isinstance(type_arg, ProperType):
+        # TypedDict item modifiers are not model types; they belong to mypy's TypedDict
+        # analyser and are returned as they came in.
+        return type_arg
     if not isinstance(type_arg, Instance) or not helpers.is_model_type(type_arg.type):
         if isinstance(type_arg, TypeVarType):
             # When the first arg is a TypeVar bounded by a Model (e.g. WithAnnotations[_Model, BarDict]),
@@ -1158,7 +1191,12 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
 
     fields_dict = None
     if len(args) > 1:
-        second_arg_type = get_proper_type(ctx.api.analyze_type(args[1]))
+        # `args[1]` is the annotations argument. mypy accepts a TypedDict item modifier
+        # there, where it means nothing, so it is dropped instead of asserted away: a
+        # strict assertion would turn that accepted code into an internal error.
+        second_arg_type = _analyze_and_unwrap(ctx, args[1])
+        if not isinstance(second_arg_type, ProperType):
+            return type_arg
         if isinstance(second_arg_type, TypedDictType) and is_with_annotations:
             fields_dict = second_arg_type
         elif isinstance(second_arg_type, Instance) and second_arg_type.type.fullname == ANNOTATIONS_FULLNAME:

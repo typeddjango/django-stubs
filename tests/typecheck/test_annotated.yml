@@ -30,3 +30,96 @@
                 from django.db import models
                 class Blog(models.Model):
                     text = models.CharField(max_length=100)
+
+# Regression test for #3658. A TypedDict item wrapped in `Annotated` makes mypy's
+# analyser hand the plugin a transient `RequiredType` / `ReadOnlyType`, which is not a
+# `ProperType`; the plugin used to pass it to `get_proper_type` and crash with an
+# INTERNAL ERROR. The plugin now leaves those wrappers alone.
+-   case: annotated_typeddict_items_do_not_crash
+    main: |
+        from typing import Annotated, NotRequired, Required, TypedDict, reveal_type
+
+        from typing_extensions import ReadOnly
+
+        def keep_last(left: list[str], right: list[str]) -> list[str]:
+            return right
+
+        class NotRequiredState(TypedDict):
+            items: Annotated[NotRequired[list[str]], keep_last]
+
+        class RequiredState(TypedDict, total=False):
+            items: Annotated[Required[list[str]], keep_last]
+
+        class ReadOnlyState(TypedDict):
+            items: Annotated[ReadOnly[list[str]], keep_last]
+
+        a: NotRequiredState
+        b: RequiredState
+        c: ReadOnlyState
+
+        reveal_type(a)  # N: Revealed type is "TypedDict(main.NotRequiredState, {'items'?: list[str]})"
+        reveal_type(b)  # N: Revealed type is "TypedDict(main.RequiredState, {'items': list[str]})"
+        reveal_type(c)  # N: Revealed type is "TypedDict(main.ReadOnlyState, {'items'=: list[str]})"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Blog(models.Model):
+                    text = models.CharField(max_length=100)
+
+# The ordinary `Annotated` shapes must stay exactly where they were. This case passes
+# with and without the guard, which is the point: the guard must not intercept them.
+-   case: annotated_ordinary_shapes_are_unchanged
+    main: |
+        from typing import Annotated, TypeVar, reveal_type
+
+        class Meta:
+            pass
+
+        T = TypeVar("T")
+
+        plain: Annotated[int, Meta] = 1
+        listed: Annotated[list[str], Meta] = []
+        nested: Annotated[Annotated[int, Meta], Meta] = 1
+
+        def identity(v: Annotated[T, Meta]) -> T:
+            return v
+
+        reveal_type(plain)  # N: Revealed type is "int"
+        reveal_type(listed)  # N: Revealed type is "list[str]"
+        reveal_type(nested)  # N: Revealed type is "int"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Blog(models.Model):
+                    text = models.CharField(max_length=100)
+
+# mypy accepts a TypedDict item modifier in the metadata position, where it means
+# nothing. The plugin must ignore it rather than assert it cannot happen: a strict
+# assertion here would turn accepted code into an INTERNAL ERROR.
+-   case: annotated_typeddict_modifier_as_metadata_is_ignored
+    main: |
+        from typing import Annotated, NotRequired, TypedDict, reveal_type
+        from myapp.models import Blog
+
+        class State(TypedDict):
+            items: Annotated[Blog, NotRequired[str]]
+
+        def f(state: State) -> None:
+            reveal_type(state["items"])  # N: Revealed type is "myapp.models.Blog"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Blog(models.Model):
+                    text = models.CharField(max_length=100)
