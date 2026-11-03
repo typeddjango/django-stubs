@@ -1195,9 +1195,8 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
         # there, where it means nothing, so it is dropped instead of asserted away: a
         # strict assertion would turn that accepted code into an internal error.
         second_arg_type = _analyze_and_unwrap(ctx, args[1])
-        if isinstance(second_arg_type, TYPED_DICT_ITEM_TYPES):
+        if not isinstance(second_arg_type, ProperType):
             return type_arg
-        assert isinstance(second_arg_type, ProperType)
         if isinstance(second_arg_type, TypedDictType) and is_with_annotations:
             fields_dict = second_arg_type
         elif isinstance(second_arg_type, Instance) and second_arg_type.type.fullname == ANNOTATIONS_FULLNAME:
