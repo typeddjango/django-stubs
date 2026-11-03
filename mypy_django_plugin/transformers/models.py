@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import deque
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
 from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToManyRel, OneToOneRel
@@ -1149,7 +1149,7 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
 TYPED_DICT_ITEM_TYPES = (ReadOnlyType, RequiredType)
 
 
-def _analyze_and_unwrap(ctx: AnalyzeTypeContext, type_expr: MypyType) -> MypyType:
+def _analyze_and_unwrap(ctx: AnalyzeTypeContext, type_expr: MypyType) -> ProperType | ReadOnlyType | RequiredType:
     """
     Analyses a type argument, unwrapping it to a `ProperType` where that is safe.
 
@@ -1191,10 +1191,13 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
 
     fields_dict = None
     if len(args) > 1:
-        # `args[1]` is the annotations argument. A TypedDict item modifier cannot appear
-        # there: mypy reports it as "valid-type" and analyses it as `Any`, so it never
-        # arrives as a wrapper and the cast is sound.
-        second_arg_type = cast("ProperType", _analyze_and_unwrap(ctx, args[1]))
+        # `args[1]` is the annotations argument. mypy accepts a TypedDict item modifier
+        # there, where it means nothing, so it is dropped instead of asserted away: a
+        # strict assertion would turn that accepted code into an internal error.
+        second_arg_type = _analyze_and_unwrap(ctx, args[1])
+        if isinstance(second_arg_type, TYPED_DICT_ITEM_TYPES):
+            return type_arg
+        assert isinstance(second_arg_type, ProperType)
         if isinstance(second_arg_type, TypedDictType) and is_with_annotations:
             fields_dict = second_arg_type
         elif isinstance(second_arg_type, Instance) and second_arg_type.type.fullname == ANNOTATIONS_FULLNAME:

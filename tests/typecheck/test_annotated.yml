@@ -100,3 +100,26 @@
                 from django.db import models
                 class Blog(models.Model):
                     text = models.CharField(max_length=100)
+
+# mypy accepts a TypedDict item modifier in the metadata position, where it means
+# nothing. The plugin must ignore it rather than assert it cannot happen: a strict
+# assertion here would turn accepted code into an INTERNAL ERROR.
+-   case: annotated_typeddict_modifier_as_metadata_is_ignored
+    main: |
+        from typing import Annotated, NotRequired, TypedDict, reveal_type
+        from myapp.models import Blog
+
+        class State(TypedDict):
+            items: Annotated[Blog, NotRequired[str]]
+
+        def f(state: State) -> None:
+            reveal_type(state["items"])  # N: Revealed type is "myapp.models.Blog"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                class Blog(models.Model):
+                    text = models.CharField(max_length=100)
