@@ -1,0 +1,19 @@
+# Regression test for #3780: a `Field` subclass can be called through a type variable,
+# e.g. `type[F]` where `F` is bound to `Field`. The return type of that call is the type
+# variable itself, not an `Instance`; the plugin used to assert it was an `Instance` and
+# crashed mypy with an INTERNAL ERROR.
+-   case: field_class_called_through_typevar_does_not_crash
+    main: |
+        from typing import Any
+
+        from django.db.models import CharField, Field
+        from typing_extensions import TypeVar, reveal_type
+
+        F = TypeVar("F", bound=Field)
+
+        def labeled_field(field_class: type[F], *args: Any, label: str, **kwargs: Any) -> F:
+            field = field_class(*args, **kwargs)
+            reveal_type(field)  # N: Revealed type is "F"
+            return field
+
+        reveal_type(labeled_field(CharField, max_length=10, label="name"))  # N: Revealed type is "django.db.models.fields.CharField[Any, Any]"
