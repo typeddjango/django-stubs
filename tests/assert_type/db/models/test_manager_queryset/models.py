@@ -52,6 +52,8 @@ def manager_methods_return_the_declared_queryset_type_param() -> None:
     assert_type(Blog.objects.only("id"), BlogQuerySet)
     assert_type(Blog.objects.union(Blog.objects.all()), BlogQuerySet)
     assert_type(Blog.objects.all().queryset_method(), int)
+    assert_type(Blog.objects.filter().queryset_method(), int)
+    assert_type(Blog.objects.get_queryset().queryset_method(), int)
     assert_type(Blog.objects.get(), Blog)
     # Methods building a differently-typed queryset stay plain `QuerySet`
     assert_type(Blog.objects.dates("created_at", "day"), QuerySet[Blog, datetime.date])
