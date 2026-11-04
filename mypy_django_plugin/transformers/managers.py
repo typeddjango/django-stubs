@@ -300,7 +300,7 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
 
     # Default the queryset type var to the queryset the manager is built from, so a bare
     # `ManagerFromMyQuerySet[MyModel]` fills in as `ManagerFromMyQuerySet[MyModel, MyQuerySet[MyModel, MyModel]]`.
-    # ponytail: only the `[_T, _QS]` layout inherited from `Manager`, a user-generic manager keeps its own defaults.
+    # Only for the `[_T, _QS]` layout inherited from `Manager`, a user-generic manager keeps its own defaults.
     if len(manager_info.defn.type_vars) == 2:
         model_type_var, queryset_type_var = manager_info.defn.type_vars
         if isinstance(queryset_type_var, TypeVarType):
