@@ -589,7 +589,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
 def _infer_prefetch_queryset_type(queryset_expr: Expression, api: TypeChecker) -> Instance | None:
     """Infer the model Instance from `Prefetch(queryset=...)`"""
-    qs_type = get_proper_type(api.expr_checker.accept(queryset_expr))
+    qs_type = get_proper_type(api.get_expression_type(queryset_expr))
     if isinstance(qs_type, Instance):
         return qs_type
     return None

@@ -340,6 +340,7 @@
 
 -   case: prefetch_related_check_valid_lookup
     main: |
+        from enum import StrEnum
         from django.db.models import Prefetch, F
         from myapp.models import Article, Tag, Author, Category
         from django.contrib.auth.models import User
@@ -357,6 +358,11 @@
 
         Article.objects.prefetch_related("xyz") # E: Cannot find "xyz" on "Article" object, "xyz" is an invalid parameter to "prefetch_related()"  [misc]
         Article.objects.prefetch_related("id") # E: "id" does not resolve to an item that supports prefetching - this is an invalid parameter to "prefetch_related()"  [misc]
+
+        # An enum literal's value is the member name, not the lookup
+        class Lookup(StrEnum):
+            TAGS = "tags"
+        Article.objects.prefetch_related(Lookup.TAGS)
 
         ## M2M -- forward / backward
         Article.objects.prefetch_related("tags__xyz") # E: Cannot find "xyz" on "Tag" object, "tags__xyz" is an invalid parameter to "prefetch_related()"  [misc]

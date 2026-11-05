@@ -100,9 +100,7 @@ def _try_replace_label(typ: ProperType, label_laziness: _LabelLaziness) -> MypyT
         if isinstance(t, Instance)
         and t.type.has_base(fullnames.STR_PROMISE_FULLNAME) == (label_laziness is _LabelLaziness.LAZY)
     ]
-
-    # If we only have one item use that, otherwise make a new union.
-    return UnionType.make_union(items) if len(items) > 1 else items[0]
+    return UnionType.make_union(items)
 
 
 def _try_replace_value(typ: ProperType, base_type: Instance | None, has_empty_label: bool) -> MypyType:

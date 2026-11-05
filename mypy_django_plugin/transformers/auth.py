@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from mypy.nodes import TypeInfo
 from mypy.semanal import SemanticAnalyzer
 from mypy.typeanal import TypeAnalyser
-from mypy.types import PlaceholderType, ProperType
+from mypy.types import PlaceholderType
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars_with_any
 
@@ -17,18 +16,12 @@ if TYPE_CHECKING:
     from mypy_django_plugin.django.context import DjangoContext
 
 
-def _get_abstract_base_user(api: SemanticAnalyzer) -> ProperType:
-    sym = api.lookup_fully_qualified(fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME)
-    assert isinstance(sym.node, TypeInfo)
-    return fill_typevars_with_any(sym.node)
-
-
 def get_user_model(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> MypyType:
     assert isinstance(ctx.api, TypeAnalyser)
     assert isinstance(ctx.api.api, SemanticAnalyzer)
 
     if not django_context.is_contrib_auth_installed:
-        return _get_abstract_base_user(ctx.api.api)
+        return ctx.api.api.named_type(fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME)
 
     auth_user_model = django_context.settings.AUTH_USER_MODEL
     model_info = helpers.resolve_lazy_reference(
@@ -41,6 +34,6 @@ def get_user_model(ctx: AnalyzeTypeContext, django_context: DjangoContext) -> My
             # we notice that its value is recognised we'll return a placeholder for
             # the class as we expect it to exist later on.
             return PlaceholderType(fullname=fullname, args=[], line=ctx.context.line)
-        return _get_abstract_base_user(ctx.api.api)
+        return ctx.api.api.named_type(fullnames.ABSTRACT_BASE_USER_MODEL_FULLNAME)
 
     return fill_typevars_with_any(model_info)

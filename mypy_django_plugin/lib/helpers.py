@@ -39,8 +39,9 @@ from mypy.plugin import (
     MethodContext,
 )
 from mypy.semanal import SemanticAnalyzer
-from mypy.semanal_shared import has_placeholder
+from mypy.semanal_shared import has_placeholder, parse_bool
 from mypy.typeanal import make_optional_type
+from mypy.typeops import try_getting_str_literals_from_type
 from mypy.types import (
     AnyType,
     CallableType,
@@ -124,8 +125,7 @@ def get_or_create_annotated_type(api: SemanticAnalyzer, model_info: TypeInfo, an
     annotated_model_name = model_info.name + "@AnnotatedWith"
     annotated_model = lookup_fully_qualified_typeinfo(api, model_info.fullname + "@AnnotatedWith")
     if annotated_model is None:
-        model_type = fill_typevars_with_any(model_info)
-        assert isinstance(model_type, Instance)
+        model_type = model_instance(model_info)
         annotations_type = fill_typevars(annotations_info)
         assert isinstance(annotations_type, Instance)
         model_module = api.modules[model_info.module_name]
@@ -331,26 +331,10 @@ def is_optional(typ: MypyType) -> bool:
     return isinstance(typ, UnionType) and any(isinstance(get_proper_type(item), NoneTyp) for item in typ.items)
 
 
-# Duplicating mypy.semanal_shared.parse_bool because importing it directly caused ImportError (#1784)
-def parse_bool(expr: Expression) -> bool | None:
-    if isinstance(expr, NameExpr):
-        if expr.fullname == "builtins.True":
-            return True
-        if expr.fullname == "builtins.False":
-            return False
-    return None
-
-
 def get_literal_str_type(typ: Type) -> str | None:
     """Extract the str value of a string like type if possible"""
-    typ = get_proper_type(typ)
-    if (isinstance(typ, LiteralType) and isinstance((literal_value := typ.value), str)) or (
-        isinstance(typ, Instance)
-        and isinstance(typ.last_known_value, LiteralType)
-        and isinstance((literal_value := typ.last_known_value.value), str)
-    ):
-        return literal_value
-    return None
+    values = try_getting_str_literals_from_type(typ)
+    return values[0] if values is not None and len(values) == 1 else None
 
 
 def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
@@ -485,24 +469,13 @@ def build_reparametrized_subclass(
     return info
 
 
-def get_current_module(api: TypeChecker) -> MypyFile:
-    """
-    Scope is guaranteed to be initialized with the module as the first element of the stack.
-    Inspired from https://github.com/python/mypy/blob/15b8ca967cc6187effcab23e6613da2db4546584/mypy/checker.py#L5788
-    """
-    current_module = api.scope.stack[0]
-    assert isinstance(current_module, MypyFile)
-    return current_module
-
-
 def make_oneoff_named_tuple(
     api: TypeChecker, name: str, fields: dict[str, MypyType], extra_bases: list[Instance] | None = None
 ) -> TupleType:
-    current_module = get_current_module(api)
     if extra_bases is None:
         extra_bases = []
     namedtuple_info = add_new_class_for_module(
-        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", []), *extra_bases], fields=fields
+        api.tree, name, bases=[api.named_generic_type("typing.NamedTuple", []), *extra_bases], fields=fields
     )
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 
