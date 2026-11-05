@@ -115,9 +115,8 @@ class DjangoPluginConfig:
             exit_with_error(COULD_NOT_LOAD_FILE)
 
         section = "mypy.plugins.django-stubs"
-        if not parser.has_section(section):
-            if not os.getenv(DJANGO_SETTINGS_ENV_VAR):
-                exit_with_error(MISSING_SECTION.format(section=section))
+        if not parser.has_section(section) and not os.getenv(DJANGO_SETTINGS_ENV_VAR):
+            exit_with_error(MISSING_SECTION.format(section=section))
 
         if parser.has_section(section) and parser.has_option(section, "django_settings_module"):
             django_settings_module = parser.get(section, "django_settings_module").strip("'\"")

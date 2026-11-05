@@ -13,8 +13,6 @@ _Annotations_co = TypeVar("_Annotations_co", covariant=True, bound=Mapping[str, 
 class Annotations(Generic[_Annotations_co]):
     """Use as `Annotations[MyTypedDict]`"""
 
-    pass
-
 
 _T = TypeVar("_T", bound=Model)
 

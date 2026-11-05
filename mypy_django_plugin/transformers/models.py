@@ -273,14 +273,13 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
     def run(self) -> None:
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
-            return None
+            return
         meta_node.fallback_to_any = True
 
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
         if typed_model_meta_info and not meta_node.has_base(fullnames.TYPED_MODEL_META_FULLNAME):
             # Insert TypedModelMeta just before `object` to leverage mypy's class-body semantic analysis.
             meta_node.mro.insert(-1, typed_model_meta_info)
-        return None
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
@@ -353,9 +352,9 @@ class AddRelatedModelsId(ModelClassInitializer):
 
             try:
                 field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_target_field.__class__)
-            except helpers.IncompleteDefnException as exc:
+            except helpers.IncompleteDefnException:
                 if not self.api.final_iteration:
-                    raise exc
+                    raise
                 continue
 
             set_type, get_type = get_field_descriptor_types(
@@ -490,14 +489,14 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
     @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         if "_default_manager" in self.model_classdef.info.names:
-            return None
+            return
 
         default_manager_cls = model_cls._meta.default_manager.__class__
         default_manager_fullname = helpers.get_class_fullname(default_manager_cls)
 
         try:
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
-        except helpers.IncompleteDefnException as exc:
+        except helpers.IncompleteDefnException:
             # Check if default manager could be a generated manager
             base_manager_fullname = helpers.get_class_fullname(default_manager_cls.__bases__[0])
             generated_manager_info = self.get_generated_manager_info(default_manager_fullname, base_manager_fullname)
@@ -505,8 +504,8 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
                 # Manager doesn't appear to be generated. Unless we're on the final round,
                 # see if another round could help figuring out the default manager type
                 if not self.api.final_iteration:
-                    raise exc
-                return None
+                    raise
+                return
             default_manager_info = generated_manager_info
 
         default_manager = helpers.fill_instance(

@@ -153,9 +153,8 @@ class DjangoContext:
 
     def get_primary_key_field(self, model_cls: type[Model]) -> Field:
         for field in model_cls._meta.get_fields():
-            if isinstance(field, Field):
-                if field.primary_key:
-                    return field
+            if isinstance(field, Field) and field.primary_key:
+                return field
         raise ValueError("No primary key defined")
 
     def get_expected_types(

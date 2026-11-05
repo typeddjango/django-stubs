@@ -138,18 +138,16 @@ respect-type-ignore-comments = false
 ignore-words-list = "aadd,acount,asend,indentity,nam"
 
 [tool.ruff]
-# Adds to default excludes: https://ruff.rs/docs/settings/#exclude
 line-length = 120
-target-version = "py311"
 
 [tool.ruff.lint]
-# See Rules in Ruff documentation: https://beta.ruff.rs/docs/rules/
-select = [
+# On top of Ruff's default rule set: https://docs.astral.sh/ruff/rules/
+extend-select = [
   "B",        # bugbear
   "E",        # pycodestyle
   "F",        # pyflakes
   "FURB",     # refurb
-  "INP",      # flake8-tidy-imports
+  "INP",      # flake8-no-pep420
   "W",        # pycodestyle
   "I",        # isort
   "ISC001",   # Implicitly concatenated string literals on one line
@@ -184,6 +182,7 @@ ignore = [
   "F405",
   "F822",
   "F821",
+  "PLW0211", # Parameter names must match the runtime (stubtest)
 ]
 "tests/*.py" = ["INP001", "PGH003", "RUF012"]
 "ext/tests/*.py" = ["INP001"]

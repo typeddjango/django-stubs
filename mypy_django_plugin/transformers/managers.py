@@ -195,7 +195,7 @@ def register_dynamically_created_manager(fullname: str, manager_name: str, manag
     # The `__module__` value of the manager type created by Django's
     # `.from_queryset` is `django.db.models.manager`. But we put new type(s) in the
     # module currently being processed, so we'll map those together through metadata.
-    runtime_fullname = ".".join(["django.db.models.manager", manager_name])
+    runtime_fullname = f"django.db.models.manager.{manager_name}"
     manager_base.metadata["from_queryset_managers"][runtime_fullname] = fullname
 
 
@@ -212,7 +212,7 @@ def create_manager_info_from_from_queryset_call(
         or not isinstance(call_expr.callee.expr, RefExpr)
         or not isinstance(call_expr.callee.expr.node, TypeInfo)
         or not call_expr.callee.expr.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
-        or not call_expr.callee.name == "from_queryset"
+        or call_expr.callee.name != "from_queryset"
         # Check that the call has one or two arguments and that the first is a
         # QuerySet subclass
         or not 1 <= len(call_expr.args) <= 2
