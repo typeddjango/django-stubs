@@ -88,9 +88,8 @@ def write_to_file(file_contents: str, suffix: str | None = None) -> Generator[st
 def test_misconfiguration_handling(capsys: Any, config_file_contents: list[str], message_part: str) -> None:
     """Invalid configuration raises `SystemExit` with a precise error message."""
     contents = "\n".join(config_file_contents).expandtabs(4)
-    with write_to_file(contents) as filename:
-        with pytest.raises(SystemExit, match="2"):
-            DjangoPluginConfig(filename)
+    with write_to_file(contents) as filename, pytest.raises(SystemExit, match="2"):
+        DjangoPluginConfig(filename)
 
     error_message = "usage: " + TEMPLATE.format(message_part)
     assert error_message == capsys.readouterr().err
@@ -168,9 +167,8 @@ def test_handles_filename(capsys: Any, filename: str) -> None:
     ],
 )
 def test_toml_misconfiguration_handling(capsys: Any, config_file_contents: str, message_part: str) -> None:
-    with write_to_file(config_file_contents, suffix=".toml") as filename:
-        with pytest.raises(SystemExit, match="2"):
-            DjangoPluginConfig(filename)
+    with write_to_file(config_file_contents, suffix=".toml") as filename, pytest.raises(SystemExit, match="2"):
+        DjangoPluginConfig(filename)
 
     error_message = "usage: " + TEMPLATE_TOML.format(message_part)
     assert error_message == capsys.readouterr().err
@@ -219,9 +217,11 @@ def test_correct_toml_configuration_with_django_setting_from_env(boolean_value: 
     """
     django_settings_env_value = "my.module"
 
-    with write_to_file(config_file_contents, suffix=".toml") as filename:
-        with mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": django_settings_env_value}):
-            config = DjangoPluginConfig(filename)
+    with (
+        write_to_file(config_file_contents, suffix=".toml") as filename,
+        mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": django_settings_env_value}),
+    ):
+        config = DjangoPluginConfig(filename)
 
     assert config.django_settings_module == django_settings_env_value
     assert config.strict_settings is (boolean_value == "true")
@@ -239,9 +239,11 @@ def test_correct_configuration_with_django_setting_from_env(boolean_value: str) 
     )
     django_settings_env_value = "my.module"
 
-    with write_to_file(config_file_contents) as filename:
-        with mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": django_settings_env_value}):
-            config = DjangoPluginConfig(filename)
+    with (
+        write_to_file(config_file_contents) as filename,
+        mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": django_settings_env_value}),
+    ):
+        config = DjangoPluginConfig(filename)
 
     assert config.django_settings_module == django_settings_env_value
     assert config.strict_settings is (boolean_value.lower() == "true")
@@ -253,9 +255,11 @@ def test_toml_missing_section_with_env_var() -> None:
     [tool.mypy]
     plugins = ["mypy_django_plugin.main"]
     """
-    with write_to_file(config_file_contents, suffix=".toml") as filename:
-        with mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": "my.module"}):
-            config = DjangoPluginConfig(filename)
+    with (
+        write_to_file(config_file_contents, suffix=".toml") as filename,
+        mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": "my.module"}),
+    ):
+        config = DjangoPluginConfig(filename)
 
     assert config.django_settings_module == "my.module"
     assert config.strict_settings is True
@@ -263,15 +267,12 @@ def test_toml_missing_section_with_env_var() -> None:
 
 def test_ini_missing_section_with_env_var() -> None:
     """Missing [mypy.plugins.django-stubs] section works when DJANGO_SETTINGS_MODULE is set."""
-    config_file_contents = "\n".join(
-        [
-            "[mypy]",
-            "plugins = mypy_django_plugin.main",
-        ]
-    )
-    with write_to_file(config_file_contents) as filename:
-        with mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": "my.module"}):
-            config = DjangoPluginConfig(filename)
+    config_file_contents = "[mypy]\nplugins = mypy_django_plugin.main"
+    with (
+        write_to_file(config_file_contents) as filename,
+        mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": "my.module"}),
+    ):
+        config = DjangoPluginConfig(filename)
 
     assert config.django_settings_module == "my.module"
     assert config.strict_settings is True

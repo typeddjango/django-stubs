@@ -589,10 +589,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
 def _infer_prefetch_queryset_type(queryset_expr: Expression, api: TypeChecker) -> Instance | None:
     """Infer the model Instance from `Prefetch(queryset=...)`"""
-    try:
-        qs_type = get_proper_type(api.expr_checker.accept(queryset_expr))
-    except Exception:
-        return None
+    qs_type = get_proper_type(api.expr_checker.accept(queryset_expr))
     if isinstance(qs_type, Instance):
         return qs_type
     return None
@@ -649,10 +646,11 @@ def _specialize_string_arg_to_literal(
     and validation in later analysis phases.
     """
 
-    if arg_expr := helpers.get_call_argument_by_name(ctx, arg_name):
-        if arg_value := helpers.resolve_string_attribute_value(arg_expr, django_context):
-            api = helpers.get_typechecker_api(ctx)
-            return LiteralType(value=arg_value, fallback=api.named_generic_type("builtins.str", []))
+    if (arg_expr := helpers.get_call_argument_by_name(ctx, arg_name)) and (
+        arg_value := helpers.resolve_string_attribute_value(arg_expr, django_context)
+    ):
+        api = helpers.get_typechecker_api(ctx)
+        return LiteralType(value=arg_value, fallback=api.named_generic_type("builtins.str", []))
 
     return fallback_type
 
@@ -1169,12 +1167,11 @@ def _validate_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str
         ctx.api.fail(exc.args[0], ctx.context)
         return
 
-    if remainder:
-        # Check if the trailing part is a valid transform (e.g. __year, __month) on the field.
-        # Transforms are allowed, but lookups (e.g. __exact) are not.
-        if final_field.get_transform(remainder[0]) is None:
-            msg = f"Cannot resolve keyword '{remainder[0]}' into field or transform on '{final_field.name}'."
-            ctx.api.fail(msg, ctx.context)
+    # Check if the trailing part is a valid transform (e.g. __year, __month) on the field.
+    # Transforms are allowed, but lookups (e.g. __exact) are not.
+    if remainder and final_field.get_transform(remainder[0]) is None:
+        msg = f"Cannot resolve keyword '{remainder[0]}' into field or transform on '{final_field.name}'."
+        ctx.api.fail(msg, ctx.context)
 
 
 def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str]) -> None:

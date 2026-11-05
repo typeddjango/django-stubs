@@ -8,8 +8,8 @@ from django.db import models
 from django.db.models import IntegerField, OuterRef, Subquery
 from typing_extensions import TypeVar
 
-_ST = TypeVar("_ST", contravariant=True)
-_GT = TypeVar("_GT", covariant=True)
+_ST_contra = TypeVar("_ST_contra", contravariant=True)
+_GT_co = TypeVar("_GT_co", covariant=True)
 
 
 class MyModel(models.Model):
@@ -32,10 +32,10 @@ def blank_and_not_null_charfield_does_not_allow_none() -> None:
     BlankNotNull(notnulltext=None)  # type: ignore[misc]
 
 
-class HtmlField(models.TextField[_ST, _GT]): ...
+class HtmlField(models.TextField[_ST_contra, _GT_co]): ...
 
 
-class IntWrap(models.IntegerField[_ST, _GT]): ...
+class IntWrap(models.IntegerField[_ST_contra, _GT_co]): ...
 
 
 class Article(models.Model):

@@ -134,8 +134,8 @@ def get_related_manager_and_model(ctx: MethodContext) -> tuple[Instance, Instanc
     """
     Returns a 3-tuple consisting of:
       1. A `ManyRelatedManager` instance
-      2. The first type parameter (_To) instance of 1. when it's a model
-      3. The second type parameter (_Through) instance of 1. when it's a model
+      2. The first type parameter (to_instance) instance of 1. when it's a model
+      3. The second type parameter (through_instance) instance of 1. when it's a model
     When encountering a `ManyRelatedManager` that has populated its 2 first type
     parameters with models. Otherwise `None` is returned.
 
@@ -154,12 +154,12 @@ def get_related_manager_and_model(ctx: MethodContext) -> tuple[Instance, Instanc
         # Require first and second type argument of 'ManyRelatedManager' to be models
         if (
             len(many_related_manager.args) >= 2
-            and isinstance((_To := get_proper_type(many_related_manager.args[0])), Instance)
-            and helpers.is_model_type(_To.type)
-            and isinstance((_Through := get_proper_type(many_related_manager.args[1])), Instance)
-            and helpers.is_model_type(_Through.type)
+            and isinstance((to_instance := get_proper_type(many_related_manager.args[0])), Instance)
+            and helpers.is_model_type(to_instance.type)
+            and isinstance((through_instance := get_proper_type(many_related_manager.args[1])), Instance)
+            and helpers.is_model_type(through_instance.type)
         ):
-            return many_related_manager, _To, _Through
+            return many_related_manager, to_instance, through_instance
 
     return None
 

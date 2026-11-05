@@ -22,9 +22,9 @@ from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeVar, Unpack, override
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True, default=Any)
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=Any)
+_GT_co = TypeVar("_GT_co", covariant=True, default=Any)
 
 class SRIDCacheEntry(NamedTuple):
     units: Any
@@ -34,7 +34,7 @@ class SRIDCacheEntry(NamedTuple):
 
 def get_srid_info(srid: int, connection: Any) -> SRIDCacheEntry: ...
 
-class BaseSpatialField(Field[_ST, _GT]):
+class BaseSpatialField(Field[_ST_contra, _GT_co]):
     form_class: type[forms.GeometryField]
     geom_type: str
     geom_class: type[GEOSGeometry] | None
@@ -68,7 +68,7 @@ class BaseSpatialField(Field[_ST, _GT]):
     @override
     def get_prep_value(self, value: Any) -> Any: ...
 
-class GeometryField(BaseSpatialField[_ST, _GT]):
+class GeometryField(BaseSpatialField[_ST_contra, _GT_co]):
     dim: int
     def __init__(
         self,
@@ -113,7 +113,7 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         **kwargs: Any,
     ) -> forms.GeometryField | None: ...
 
-class PointField(GeometryField[_ST, _GT]):
+class PointField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: Point
     _pyi_private_get_type: Point
     _pyi_lookup_exact_type: Point
@@ -121,7 +121,7 @@ class PointField(GeometryField[_ST, _GT]):
     geom_class: type[Point]
     form_class: type[forms.PointField]
 
-class LineStringField(GeometryField[_ST, _GT]):
+class LineStringField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: LineString
     _pyi_private_get_type: LineString
     _pyi_lookup_exact_type: LineString
@@ -129,7 +129,7 @@ class LineStringField(GeometryField[_ST, _GT]):
     geom_class: type[LineString]
     form_class: type[forms.LineStringField]
 
-class PolygonField(GeometryField[_ST, _GT]):
+class PolygonField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: Polygon
     _pyi_private_get_type: Polygon
     _pyi_lookup_exact_type: Polygon
@@ -137,7 +137,7 @@ class PolygonField(GeometryField[_ST, _GT]):
     geom_class: type[Polygon]
     form_class: type[forms.PolygonField]
 
-class MultiPointField(GeometryField[_ST, _GT]):
+class MultiPointField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: MultiPoint
     _pyi_private_get_type: MultiPoint
     _pyi_lookup_exact_type: MultiPoint
@@ -145,7 +145,7 @@ class MultiPointField(GeometryField[_ST, _GT]):
     geom_class: type[MultiPoint]
     form_class: type[forms.MultiPointField]
 
-class MultiLineStringField(GeometryField[_ST, _GT]):
+class MultiLineStringField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: MultiLineString
     _pyi_private_get_type: MultiLineString
     _pyi_lookup_exact_type: MultiLineString
@@ -153,7 +153,7 @@ class MultiLineStringField(GeometryField[_ST, _GT]):
     geom_class: type[MultiLineString]
     form_class: type[forms.MultiLineStringField]
 
-class MultiPolygonField(GeometryField[_ST, _GT]):
+class MultiPolygonField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: MultiPolygon
     _pyi_private_get_type: MultiPolygon
     _pyi_lookup_exact_type: MultiPolygon
@@ -161,7 +161,7 @@ class MultiPolygonField(GeometryField[_ST, _GT]):
     geom_class: type[MultiPolygon]
     form_class: type[forms.MultiPolygonField]
 
-class GeometryCollectionField(GeometryField[_ST, _GT]):
+class GeometryCollectionField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: GeometryCollection
     _pyi_private_get_type: GeometryCollection
     _pyi_lookup_exact_type: GeometryCollection
@@ -173,7 +173,7 @@ class ExtentField(Field[Any, Any]):
     @override
     def get_internal_type(self) -> str: ...
 
-class RasterField(BaseSpatialField[_ST, _GT]):
+class RasterField(BaseSpatialField[_ST_contra, _GT_co]):
     @override
     def db_type(self, connection: Any) -> Any: ...
     def from_db_value(self, value: Any, expression: Any, connection: Any) -> Any: ...

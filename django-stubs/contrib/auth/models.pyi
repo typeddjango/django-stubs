@@ -23,7 +23,7 @@ _UserModel: TypeAlias = type[_User]
 _AnyUser: TypeAlias = _User | AnonymousUser
 
 # These are only needed for generic classes in order to bind to a specific implementation
-_AnyUserType = TypeVar("_AnyUserType", bound=_AnyUser)  # noqa: PYI018
+_AnyUserType = TypeVar("_AnyUserType", bound=_AnyUser)  # ruff: ignore[unused-private-type-var]
 
 # do not use the alias `_User` so the bound remains at `AbstractBaseUser`
 _UserType = TypeVar("_UserType", bound=AbstractBaseUser)

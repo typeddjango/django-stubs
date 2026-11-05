@@ -33,26 +33,26 @@ _ChoicesList: TypeAlias = Sequence[_Choice] | Sequence[_ChoiceNamedGroup]
 _LimitChoicesTo: TypeAlias = Q | dict[str, Any]
 _LimitChoicesToCallable: TypeAlias = Callable[[], _LimitChoicesTo]
 
-_F = TypeVar("_F", bound=Field, covariant=True)
+_F_co = TypeVar("_F_co", bound=Field, covariant=True)
 
 @type_check_only
-class _FieldDescriptor(Protocol[_F]):
+class _FieldDescriptor(Protocol[_F_co]):
     """
     Accessing fields of a model class (not instance) returns an object conforming to this protocol.
     Depending on field type this could be DeferredAttribute, ForwardManyToOneDescriptor, FileDescriptor, etc.
     """
 
     @property
-    def field(self) -> _F: ...
+    def field(self) -> _F_co: ...
 
-_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _LimitChoicesToCallable | _ChoicesCallable  # noqa: PYI047
+_AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _LimitChoicesToCallable | _ChoicesCallable  # ruff: ignore[unused-private-type-alias]
 _ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
 _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True, default=Any)
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=Any)
+_GT_co = TypeVar("_GT_co", covariant=True, default=Any)
 
 # Keyword arguments shared by every Field constructor, factored out so subclass constructors stay short.
 # `primary_key`, `max_length` and `db_default` vary per field, so each constructor spells them out.
@@ -78,7 +78,7 @@ class FieldInitKwargs(TypedDict, total=False, closed=True):
     error_messages: _ErrorMessagesMapping | None
     db_comment: str | None
 
-class Field(RegisterLookupMixin, Generic[_ST, _GT]):
+class Field(RegisterLookupMixin, Generic[_ST_contra, _GT_co]):
     """
     Typing model fields.
 
@@ -190,13 +190,13 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
-    def __set__(self, instance: Any, value: _ST | Combinable) -> None: ...
+    def __set__(self, instance: Any, value: _ST_contra | Combinable) -> None: ...
     # class access
     @overload
     def __get__(self, instance: None, owner: Any) -> _FieldDescriptor[Self]: ...
     # Model instance access
     @overload
-    def __get__(self, instance: Model, owner: Any) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT_co: ...
     # non-Model instances
     @overload
     def __get__(self, instance: Any, owner: Any) -> Self: ...
@@ -280,10 +280,10 @@ class Field(RegisterLookupMixin, Generic[_ST, _GT]):
         **kwargs: Any,
         # Subclasses are allowed to return None
     ) -> forms.Field | None: ...
-    def value_from_object(self, obj: Model) -> _GT: ...
+    def value_from_object(self, obj: Model) -> _GT_co: ...
     def slice_expression(self, expression: Expression, start: int, length: int | None) -> Func: ...
 
-class IntegerField(Field[_ST, _GT]):
+class IntegerField(Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: float | int | str
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
@@ -291,26 +291,26 @@ class IntegerField(Field[_ST, _GT]):
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
-class SmallIntegerField(IntegerField[_ST, _GT]): ...
+class SmallIntegerField(IntegerField[_ST_contra, _GT_co]): ...
 
-class BigIntegerField(IntegerField[_ST, _GT]):
+class BigIntegerField(IntegerField[_ST_contra, _GT_co]):
     MAX_BIGINT: ClassVar[int]
 
-class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST, _GT]):
+class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_contra, _GT_co]):
     integer_field_class: type[IntegerField]
 
-class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST, _GT]):
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST_contra, _GT_co]):
     integer_field_class: type[SmallIntegerField]
 
-class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST, _GT]):
+class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST_contra, _GT_co]):
     integer_field_class: type[BigIntegerField]
 
-class FloatField(Field[_ST, _GT]):
+class FloatField(Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: float | int | str
     _pyi_private_get_type: float
     _pyi_lookup_exact_type: float
 
-class DecimalField(Field[_ST, _GT]):
+class DecimalField(Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: str | float | decimal.Decimal
     _pyi_private_get_type: decimal.Decimal
     _pyi_lookup_exact_type: str | int | decimal.Decimal
@@ -332,7 +332,7 @@ class DecimalField(Field[_ST, _GT]):
     @cached_property
     def context(self) -> decimal.Context: ...
 
-class CharField(Field[_ST, _GT]):
+class CharField(Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: str | int
     _pyi_private_get_type: str
     # objects are converted to string before comparison
@@ -351,9 +351,9 @@ class CharField(Field[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class CommaSeparatedIntegerField(CharField[_ST, _GT]): ...
+class CommaSeparatedIntegerField(CharField[_ST_contra, _GT_co]): ...
 
-class SlugField(CharField[_ST, _GT]):
+class SlugField(CharField[_ST_contra, _GT_co]):
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -368,10 +368,10 @@ class SlugField(CharField[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class EmailField(CharField[_ST, _GT]):
+class EmailField(CharField[_ST_contra, _GT_co]):
     _pyi_private_set_type: str
 
-class URLField(CharField[_ST, _GT]):
+class URLField(CharField[_ST_contra, _GT_co]):
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -385,7 +385,7 @@ class URLField(CharField[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class TextField(Field[_ST, _GT]):
+class TextField(Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: str
     _pyi_private_get_type: str
     # objects are converted to string before comparison
@@ -404,21 +404,21 @@ class TextField(Field[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class BooleanField(Field[_ST, _GT]):
+class BooleanField(Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: bool
     _pyi_private_get_type: bool
     _pyi_lookup_exact_type: bool
 
-class NullBooleanField(BooleanField[_ST, _GT]):
+class NullBooleanField(BooleanField[_ST_contra, _GT_co]):
     _pyi_private_set_type: bool | None  # type: ignore[assignment]
     _pyi_private_get_type: bool | None  # type: ignore[assignment]
     _pyi_lookup_exact_type: bool | None  # type: ignore[assignment]
 
-class IPAddressField(Field[_ST, _GT]):
+class IPAddressField(Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: str
     _pyi_private_get_type: str
 
-class GenericIPAddressField(Field[_ST, _GT]):
+class GenericIPAddressField(Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: str | int | Callable[..., Any]
     _pyi_private_get_type: str
 
@@ -441,7 +441,7 @@ class GenericIPAddressField(Field[_ST, _GT]):
 class DateTimeCheckMixin:
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
 
-class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
+class DateField(DateTimeCheckMixin, Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: str | date
     _pyi_private_get_type: date
     _pyi_lookup_exact_type: str | date
@@ -463,7 +463,7 @@ class DateField(DateTimeCheckMixin, Field[_ST, _GT]):
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
 
-class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
+class TimeField(DateTimeCheckMixin, Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: str | time | real_datetime
     _pyi_private_get_type: time
     auto_now: bool
@@ -481,12 +481,12 @@ class TimeField(DateTimeCheckMixin, Field[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class DateTimeField(DateField[_ST, _GT]):
+class DateTimeField(DateField[_ST_contra, _GT_co]):
     _pyi_private_set_type: str | real_datetime | date
     _pyi_private_get_type: real_datetime
     _pyi_lookup_exact_type: str | real_datetime
 
-class UUIDField(Field[_ST, _GT]):
+class UUIDField(Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: str | uuid.UUID
     _pyi_private_get_type: uuid.UUID
     _pyi_lookup_exact_type: uuid.UUID | str
@@ -502,7 +502,7 @@ class UUIDField(Field[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class FilePathField(Field[_ST, _GT]):
+class FilePathField(Field[_ST_contra, _GT_co]):
     path: str | Callable[..., str]
     match: str | None
     recursive: bool
@@ -525,11 +525,11 @@ class FilePathField(Field[_ST, _GT]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class BinaryField(Field[_ST, _GT]):
+class BinaryField(Field[_ST_contra, _GT_co]):
     _pyi_private_get_type: bytes | memoryview
     def get_placeholder_sql(self, value: Any, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
-class DurationField(Field[_ST, _GT]):
+class DurationField(Field[_ST_contra, _GT_co]):
     _pyi_private_get_type: timedelta
 
 class AutoFieldMixin:
@@ -545,13 +545,13 @@ class AutoFieldMixin:
 
 class AutoFieldMeta(type): ...
 
-class AutoField(AutoFieldMixin, IntegerField[_ST, _GT], metaclass=AutoFieldMeta):  # type: ignore[misc]
+class AutoField(AutoFieldMixin, IntegerField[_ST_contra, _GT_co], metaclass=AutoFieldMeta):  # type: ignore[misc]
     _pyi_private_set_type: int | str
     _pyi_private_get_type: int
     _pyi_lookup_exact_type: str | int
 
-class BigAutoField(AutoFieldMixin, BigIntegerField[_ST, _GT]): ...  # type: ignore[misc]
-class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST, _GT]): ...  # type: ignore[misc]
+class BigAutoField(AutoFieldMixin, BigIntegerField[_ST_contra, _GT_co]): ...  # type: ignore[misc]
+class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST_contra, _GT_co]): ...  # type: ignore[misc]
 
 __all__ = [
     "BLANK_CHOICE_DASH",

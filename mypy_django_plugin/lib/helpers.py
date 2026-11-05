@@ -357,10 +357,7 @@ def get_literal_str_type(typ: Type) -> str | None:
 
 
 def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
-    for base_fullname in bases:
-        if info.has_base(base_fullname):
-            return True
-    return False
+    return any(info.has_base(base_fullname) for base_fullname in bases)
 
 
 def iter_bases(info: TypeInfo) -> Iterator[Instance]:
@@ -599,21 +596,24 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: Django
     # support extracting from settings, in general case it's unresolvable yet
     if isinstance(attr_expr, MemberExpr):
         member_name = attr_expr.name
-        if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == "django.conf.settings":
-            if hasattr(django_context.settings, member_name):
-                return getattr(django_context.settings, member_name)  # type: ignore[no-any-return]
+        if (
+            isinstance(attr_expr.expr, NameExpr)
+            and attr_expr.expr.fullname == "django.conf.settings"
+            and hasattr(django_context.settings, member_name)
+        ):
+            return getattr(django_context.settings, member_name)  # type: ignore[no-any-return]
     return None
 
 
 def get_semanal_api(ctx: ClassDefContext | DynamicClassDefContext) -> SemanticAnalyzer:
     if not isinstance(ctx.api, SemanticAnalyzer):
-        raise ValueError("Not a SemanticAnalyzer")
+        raise TypeError("Not a SemanticAnalyzer")
     return ctx.api
 
 
 def get_typechecker_api(ctx: AttributeContext | MethodContext | FunctionContext) -> TypeChecker:
     if not isinstance(ctx.api, TypeChecker):
-        raise ValueError("Not a TypeChecker")
+        raise TypeError("Not a TypeChecker")
     return ctx.api
 
 
@@ -721,9 +721,8 @@ def get_model_from_expression(
     Attempts to resolve an expression to a 'TypeInfo' instance. Any lazy reference
     argument(e.g. "<app_label>.<object_name>") to a Django model is also attempted.
     """
-    if isinstance(expr, RefExpr) and isinstance(expr.node, TypeInfo):
-        if is_model_type(expr.node):
-            return model_instance(expr.node)
+    if isinstance(expr, RefExpr) and isinstance(expr.node, TypeInfo) and is_model_type(expr.node):
+        return model_instance(expr.node)
 
     if isinstance(expr, StrExpr) and expr.value == "self":
         return model_instance(self_model)

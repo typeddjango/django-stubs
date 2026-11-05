@@ -5,7 +5,7 @@ from enum import property as enum_property
 from typing import Any, Literal, overload, type_check_only
 
 from _typeshed import ConvertibleToInt
-from _typeshed import Self as MetaclassSelf  # noqa: TID251
+from _typeshed import Self as MetaclassSelf  # ruff: ignore[banned-api]
 from django.utils.functional import _StrOrPromise
 from typing_extensions import override
 

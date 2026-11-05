@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 def get_model_of_related_manager(ctx: MethodContext) -> Instance | None:
     """
-    Returns the type parameter (_To) instance of a `RelatedManager` instance when it's a
+    Returns the type parameter (to_instance) instance of a `RelatedManager` instance when it's a
     model. Otherwise `None` is returned.
 
     For example: if given a `RelatedManager[A]` where `A` is a model then `A` is
@@ -31,10 +31,10 @@ def get_model_of_related_manager(ctx: MethodContext) -> Instance | None:
         # Require first type argument of 'RelatedManager' to be a model
         if (
             len(related_manager.args) >= 1
-            and isinstance((_To := get_proper_type(related_manager.args[0])), Instance)
-            and helpers.is_model_type(_To.type)
+            and isinstance((to_instance := get_proper_type(related_manager.args[0])), Instance)
+            and helpers.is_model_type(to_instance.type)
         ):
-            return _To
+            return to_instance
 
     return None
 

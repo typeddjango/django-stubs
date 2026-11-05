@@ -4,12 +4,11 @@ from typing import TYPE_CHECKING
 
 # Re-export stubs-only classes RelatedManger and ManyRelatedManager.
 # These are fake, Django defines these inside function body.
+__all__ = ["ManyRelatedManager", "RelatedManager"]
+
 if TYPE_CHECKING:
     # noinspection PyUnresolvedReferences
-    from django.db.models.fields.related_descriptors import ManyRelatedManager as ManyRelatedManager
-
-    # noinspection PyUnresolvedReferences
-    from django.db.models.fields.related_descriptors import RelatedManager as RelatedManager
+    from django.db.models.fields.related_descriptors import ManyRelatedManager, RelatedManager
 
 else:
     from typing import Any, Protocol

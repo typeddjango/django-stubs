@@ -288,7 +288,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import NewManager
-        reveal_type(NewManager)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T, _T]] () -> myapp.models.ManagerFromModelQuerySet[_T, _QS]"
+        reveal_type(NewManager)  # N: Revealed type is "def [_T_co <: django.db.models.base.Model, _QS_co <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T_co, _T_co]] () -> myapp.models.ManagerFromModelQuerySet[_T_co, _QS_co]"
     installed_apps:
         - myapp
     files:
@@ -718,7 +718,7 @@
         reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: str) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.order_by)  # N: Revealed type is "def (*field_names: str | django.db.models.expressions.Combinable) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel], def [_LookupT <: str, _PrefetchedQuerySetT <: django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model] = django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model], _ToAttrT <: str = str] (*lookups: str | django.db.models.query.Prefetch[_LookupT, _PrefetchedQuerySetT, _ToAttrT]) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel])"
+        reveal_type(MyModel.objects.prefetch_related)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel], def [_LookupT_co <: str, _PrefetchedQuerySetT_co <: django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model] = django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model], _ToAttrT_co <: str = str] (*lookups: str | django.db.models.query.Prefetch[_LookupT_co, _PrefetchedQuerySetT_co, _ToAttrT_co]) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel])"
         reveal_type(MyModel.objects.reverse)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.select_for_update)  # N: Revealed type is "def (nowait: bool =, skip_locked: bool =, of: typing.Sequence[str] =, no_key: bool =) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.select_related)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel], def (*fields: str) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel])"
@@ -784,8 +784,8 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel, FirstManager, SecondManager
-        reveal_type(FirstManager)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T, _T]] () -> myapp.models.ManagerFromModelQuerySet[_T, _QS]"
-        reveal_type(SecondManager)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T, _T]] () -> myapp.models.ManagerFromModelQuerySet[_T, _QS]"
+        reveal_type(FirstManager)  # N: Revealed type is "def [_T_co <: django.db.models.base.Model, _QS_co <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T_co, _T_co]] () -> myapp.models.ManagerFromModelQuerySet[_T_co, _QS_co]"
+        reveal_type(SecondManager)  # N: Revealed type is "def [_T_co <: django.db.models.base.Model, _QS_co <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T_co, _T_co]] () -> myapp.models.ManagerFromModelQuerySet[_T_co, _QS_co]"
         reveal_type(MyModel.first)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
         reveal_type(MyModel.second)  # N: Revealed type is "myapp.models.ManagerFromModelQuerySet[myapp.models.MyModel, myapp.models.ModelQuerySet[myapp.models.MyModel, myapp.models.MyModel]]"
     installed_apps:
@@ -856,8 +856,8 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import PositionalNone, NoneAsKwarg
-        reveal_type(PositionalNone)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T, _T]] () -> myapp.models.ManagerFromModelQuerySet[_T, _QS]"
-        reveal_type(NoneAsKwarg)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T, _T]] () -> myapp.models.ManagerFromModelQuerySet[_T, _QS]"
+        reveal_type(PositionalNone)  # N: Revealed type is "def [_T_co <: django.db.models.base.Model, _QS_co <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T_co, _T_co]] () -> myapp.models.ManagerFromModelQuerySet[_T_co, _QS_co]"
+        reveal_type(NoneAsKwarg)  # N: Revealed type is "def [_T_co <: django.db.models.base.Model, _QS_co <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T_co, _T_co]] () -> myapp.models.ManagerFromModelQuerySet[_T_co, _QS_co]"
     installed_apps:
         - myapp
     files:
@@ -877,7 +877,7 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import StrCallable
-        reveal_type(StrCallable)  # N: Revealed type is "def [_T <: django.db.models.base.Model, _QS <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T, _T]] () -> myapp.models.ManagerFromModelQuerySet[_T, _QS]"
+        reveal_type(StrCallable)  # N: Revealed type is "def [_T_co <: django.db.models.base.Model, _QS_co <: django.db.models.query.QuerySet[Any, Any] = myapp.models.ModelQuerySet[_T_co, _T_co]] () -> myapp.models.ManagerFromModelQuerySet[_T_co, _QS_co]"
     installed_apps:
         - myapp
     files:
@@ -910,16 +910,16 @@
             from django.db.models.query import QuerySet
 
             if TYPE_CHECKING:
-                from django.db.models.manager import _T
-                from django.db.models.query import _Model, _Row
+                from django.db.models.manager import _T_co
+                from django.db.models.query import _Model_co, _Row_co
 
-            class MyQuerySet(QuerySet["_Model", "_Row"]):
+            class MyQuerySet(QuerySet["_Model_co", "_Row_co"]):
                 def __init__(self, *a: Any, **k: Any) -> None:
                     super().__init__(*a, **k)
 
             _base = Manager.from_queryset(MyQuerySet)
 
-            class BaseManager(_base["_T"]):
+            class BaseManager(_base["_T_co"]):
                 def __init__(self, *a: Any, ttl: int = 0, **k: Any) -> None:
                     self.ttl = ttl
                     super().__init__(*a, **k)
