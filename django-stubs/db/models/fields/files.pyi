@@ -48,11 +48,11 @@ class FileDescriptor(DeferredAttribute):
     def __get__(self, instance: Model | None, cls: type[Model] | None = None) -> FieldFile | FileDescriptor: ...
     def __set__(self, instance: Model, value: Any | None) -> None: ...
 
-_M = TypeVar("_M", bound=Model, contravariant=True)
+_M_contra = TypeVar("_M_contra", bound=Model, contravariant=True)
 
 @type_check_only
-class _UploadToCallable(Protocol[_M]):
-    def __call__(self, instance: _M, filename: str, /) -> StrPath: ...
+class _UploadToCallable(Protocol[_M_contra]):
+    def __call__(self, instance: _M_contra, filename: str, /) -> StrPath: ...
 
 class FileField(Field[Any, Any]):
     attr_class: type[FieldFile]

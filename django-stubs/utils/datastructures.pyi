@@ -7,7 +7,7 @@ from typing_extensions import TypeVar, override
 _K = TypeVar("_K")
 _V = TypeVar("_V")
 _Z = TypeVar("_Z")
-_I = TypeVar("_I", covariant=True)
+_I_co = TypeVar("_I_co", covariant=True)
 
 # Unfortunately, there's often check `if isinstance(var, (list, tuple))` in django
 # codebase. So we need sometimes to declare exactly list or tuple.
@@ -37,9 +37,9 @@ class _PropertyDescriptor(Generic[_K, _V]):
     def __set__(self, instance: Any, value: _K) -> None: ...
 
 @type_check_only
-class _IndexableCollection(Protocol[_I], Collection[_I]):  # noqa: PYI046
+class _IndexableCollection(Protocol[_I_co], Collection[_I_co]):  # noqa: PYI046
     @overload
-    def __getitem__(self, index: int) -> _I: ...
+    def __getitem__(self, index: int) -> _I_co: ...
     @overload
     def __getitem__(self, index: slice) -> Self: ...
 

@@ -13,12 +13,12 @@ from django.utils.functional import cached_property
 from typing_extensions import TypeVar, override
 
 _M = TypeVar("_M", bound=Model)
-_M_QS = TypeVar("_M_QS", bound=QuerySet[Any], covariant=True, default=QuerySet[_M])
+_M_QS_co = TypeVar("_M_QS_co", bound=QuerySet[Any], covariant=True, default=QuerySet[_M])
 _F = TypeVar("_F", bound=Field)
 _From = TypeVar("_From", bound=Model)
 _Through = TypeVar("_Through", bound=Model, default=Model)
 _To = TypeVar("_To", bound=Model)
-_To_QS = TypeVar("_To_QS", bound=QuerySet[Any], covariant=True, default=QuerySet[_To])
+_To_QS_co = TypeVar("_To_QS_co", bound=QuerySet[Any], covariant=True, default=QuerySet[_To])
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):
     field: RelatedField
@@ -81,7 +81,7 @@ class ReverseOneToOneDescriptor(Generic[_From, _To]):
     @override
     def __reduce__(self) -> tuple[Callable[..., Any], tuple[type[_To], str]]: ...
 
-class ReverseManyToOneDescriptor(Generic[_To, _To_QS]):
+class ReverseManyToOneDescriptor(Generic[_To, _To_QS_co]):
     """
     In the example::
 
@@ -95,16 +95,16 @@ class ReverseManyToOneDescriptor(Generic[_To, _To_QS]):
     field: ForeignKey[_To, _To]
     def __init__(self, rel: ManyToOneRel) -> None: ...
     @cached_property
-    def related_manager_cls(self) -> type[RelatedManager[_To, _To_QS]]: ...
+    def related_manager_cls(self) -> type[RelatedManager[_To, _To_QS_co]]: ...
     @overload
     def __get__(self, instance: None, cls: Any | None = None) -> Self: ...
     @overload
-    def __get__(self, instance: Model, cls: Any | None = None) -> RelatedManager[_To, _To_QS]: ...
+    def __get__(self, instance: Model, cls: Any | None = None) -> RelatedManager[_To, _To_QS_co]: ...
     def __set__(self, instance: Any, value: Any) -> Never: ...
 
 # Fake class, Django defines 'RelatedManager' inside a function body
 @type_check_only
-class RelatedManager(Manager[_To, _To_QS], Generic[_To, _To_QS]):
+class RelatedManager(Manager[_To, _To_QS_co], Generic[_To, _To_QS_co]):
     related_val: tuple[int, ...]
     # Reverse accessors live on instances, so lift the ban from `BaseManager.__get__` (hence the override ignore).
     @override
@@ -133,8 +133,8 @@ class RelatedManager(Manager[_To, _To_QS], Generic[_To, _To_QS]):
     ) -> None: ...
 
 def create_reverse_many_to_one_manager(
-    superclass: type[BaseManager[_M, _M_QS]], rel: ManyToOneRel
-) -> type[RelatedManager[_M, _M_QS]]: ...
+    superclass: type[BaseManager[_M, _M_QS_co]], rel: ManyToOneRel
+) -> type[RelatedManager[_M, _M_QS_co]]: ...
 
 class ManyToManyDescriptor(ReverseManyToOneDescriptor[Any], Generic[_To, _Through]):
     """

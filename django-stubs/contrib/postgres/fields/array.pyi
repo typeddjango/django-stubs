@@ -16,11 +16,11 @@ from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeVar, Unpack, override
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True, default=Any)
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=Any)
+_GT_co = TypeVar("_GT_co", covariant=True, default=Any)
 
-class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST, _GT]):
+class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_contra, _GT_co]):
     _pyi_private_set_type: Sequence[Any]
     _pyi_private_get_type: list[Any]
 

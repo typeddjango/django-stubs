@@ -300,7 +300,7 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
 
     # Default the queryset type var to the queryset the manager is built from, so a bare
     # `ManagerFromMyQuerySet[MyModel]` fills in as `ManagerFromMyQuerySet[MyModel, MyQuerySet[MyModel, MyModel]]`.
-    # Only for the `[_T, _QS]` layout inherited from `Manager`, a user-generic manager keeps its own defaults.
+    # Only for the `[_T_co, _QS_co]` layout inherited from `Manager`, a user-generic manager keeps its own defaults.
     if len(manager_info.defn.type_vars) == 2:
         model_type_var, queryset_type_var = manager_info.defn.type_vars
         if isinstance(queryset_type_var, TypeVarType):
@@ -541,7 +541,7 @@ def reparametrize_generic_class(
     parent_info = parent_class.type
     if _omits_type_args(ctx.cls, parent_info):
         # Args were omitted -- reuse the parent's TypeVars so their existing
-        # PEP 696 defaults (e.g. `_Row = TypeVar(default=_Model)`) are preserved.
+        # PEP 696 defaults (e.g. `_Row_co = TypeVar(default=_Model_co)`) are preserved.
         type_vars = list(parent_info.defn.type_vars)
     elif bind_explicit_args and parent_info.fullname == base_class_fullname:
         # Args were supplied explicitly on the canonical base class -- synthesize TypeVars bounded by
@@ -580,9 +580,9 @@ def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
 
     is interpreted as:
 
-        _Model = TypeVar('_Model', bound=Model, covariant=True)
-        _Row = TypeVar('_Row', covariant=True, default=_Model)
-        class MyQuerySet(models.QuerySet[_Model, _Row]): ...
+        _Model_co = TypeVar('_Model_co', bound=Model, covariant=True)
+        _Row_co = TypeVar('_Row_co', covariant=True, default=_Model_co)
+        class MyQuerySet(models.QuerySet[_Model_co, _Row_co]): ...
 
     And
 
@@ -590,9 +590,9 @@ def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
 
     is interpreted as:
 
-        _Model = TypeVar('_Model', bound=Book, covariant=True, default=Book)
-        _Row = TypeVar('_Row', bound=Book, covariant=True, default=Book)
-        class BookQuerySet(models.QuerySet[_Model, _Row]): ...
+        _Model_co = TypeVar('_Model_co', bound=Book, covariant=True, default=Book)
+        _Row_co = TypeVar('_Row_co', bound=Book, covariant=True, default=Book)
+        class BookQuerySet(models.QuerySet[_Model_co, _Row_co]): ...
 
     Note that this does not happen if mypy is run with disallow_any_generics = True,
     as not specifying the generic type is then considered an error.

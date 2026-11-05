@@ -223,7 +223,7 @@ class AddAnnotateUtilities(ModelClassInitializer):
         class MyModel(models.Model):
             ...
 
-        class MyModel@AnnotatedWith(MyModel, django_stubs_ext.Annotations[_Annotations]):
+        class MyModel@AnnotatedWith(MyModel, django_stubs_ext.Annotations[_Annotations_co]):
             ...
     """
 
@@ -612,7 +612,7 @@ class AddReverseLookups(ModelClassInitializer):
             return
 
         # Create a reverse manager subclassed from the default manager of the related
-        # model and 'RelatedManager', sharing the default manager's queryset so both bases agree on `_QS`
+        # model and 'RelatedManager', sharing the default manager's queryset so both bases agree on `_QS_co`
         base_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.BASE_MANAGER_CLASS_FULLNAME)
         default_manager_queryset = map_instance_to_supertype(default_manager_type, base_manager_info).args[1]
         if has_placeholder(default_manager_queryset):
