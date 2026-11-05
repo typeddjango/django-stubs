@@ -25,6 +25,11 @@ class Category(models.Model):
 class Post(models.Model):
     """No declared manager, `objects` only resolves through `ModelBase.__getattr__`."""
 
+    @classmethod
+    def bulk_create_from_cls(cls) -> None:
+        # mypy types an unannotated `cls` as `type[Post]`, not `type[Self]`: https://github.com/python/mypy/issues/14075
+        cls.objects.bulk_create([cls()])  # type: ignore[list-item]
+
 
 class Article(models.Model):
     category_set: RelatedManager[Category]  # pyright: ignore[reportUninitializedInstanceVariable]
