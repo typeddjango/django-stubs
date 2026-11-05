@@ -229,7 +229,7 @@ def create_manager_info_from_from_queryset_call(
         # so this isn't a problem.
         return None  # type: ignore[unreachable]
 
-    if not api.final_iteration and any(has_placeholder(tv) for tv in queryset_info.defn.type_vars):
+    if not api.final_iteration and helpers.has_placeholder_type_vars(queryset_info):
         # Let the queryset's `as_manager` hook, which defers on the same condition, create the manager first,
         # it subclasses the parent queryset's manager so `as_manager` overrides stay compatible.
         return None
@@ -284,7 +284,7 @@ def create_manager_class(
     api: SemanticAnalyzer, base_manager_info: TypeInfo, name: str, line: int, with_unique_name: bool
 ) -> TypeInfo:
     # If any of the type vars are undefined we need to defer. This is handled by the caller
-    if any(has_placeholder(type_var) for type_var in base_manager_info.defn.type_vars):
+    if helpers.has_placeholder_type_vars(base_manager_info):
         raise helpers.IncompleteDefnException
 
     return helpers.build_reparametrized_subclass(
@@ -413,7 +413,7 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
 
     # If any of the queryset's type vars have unresolved bounds (placeholders),
     # defer to avoid generating methods with unresolved types that crash mypy.
-    if any(has_placeholder(tv) for tv in queryset_info.defn.type_vars):
+    if helpers.has_placeholder_type_vars(queryset_info):
         return _defer()
 
     existing_as_manager = queryset_info.names.get("as_manager")
