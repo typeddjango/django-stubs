@@ -141,56 +141,66 @@ ignore-words-list = "aadd,acount,asend,indentity,nam"
 line-length = 120
 
 [tool.ruff.lint]
+preview = true
 # On top of Ruff's default rule set: https://docs.astral.sh/ruff/rules/
 extend-select = [
-  "B",        # bugbear
+  "B",        # flake8-bugbear
   "E",        # pycodestyle
   "F",        # pyflakes
   "FURB",     # refurb
-  "INP",      # flake8-no-pep420
-  "W",        # pycodestyle
   "I",        # isort
-  "ISC001",   # Implicitly concatenated string literals on one line
-  "ISC002",   # Implicitly concatenated string literals over multiple lines
-  "UP",       # pyupgrade
-  "TID251",   # Disallowed imports (flake8-tidy-imports.banned-api)
+  "INP",      # flake8-no-pep420
   "PYI",      # flake8-pyi
-  "RUF100",   # Equivalent to flake8-noqa NQA103
-  "PGH004",   # Equivalent to flake8-noqa NQA104
-  "PGH003",   # Disallowed blanket `type: ignore` annotations.
-  "RET504",   # Unnecessary assignment to {name} before return statement
-  "RET505",   # Unnecessary {branch} after return statement
-  "RET506",   # Unnecessary {branch} after raise statement
-  "RET507",   # Unnecessary {branch} after continue statement
-  "RET508",   # Unnecessary {branch} after break statement
   "RUF",      # Ruff specific rules
   "TC",       # flake8-type-checking
+  "UP",       # pyupgrade
+  "W",        # pycodestyle
+  "banned-api",
+  "blanket-noqa",
+  "blanket-type-ignore",
+  "multi-line-implicit-string-concatenation",
+  "single-line-implicit-string-concatenation",
+  "superfluous-else-break",
+  "superfluous-else-continue",
+  "superfluous-else-raise",
+  "superfluous-else-return",
+  "unnecessary-assign",
 ]
 ignore = [
-  "PYI021", # We have a few meaningful docstrings for stubs only constructs/utilities.
-  "PYI041", # This might not be obvious that `float | int` is mostly equivalent to `float` typing wise | int | str
-  "PYI043",
+  "docstring-in-stub", # We have a few meaningful docstrings for stubs only constructs/utilities.
+  "redundant-numeric-union", # This might not be obvious that `float | int` is mostly equivalent to `float` typing wise | int | str
+  "t-suffixed-type-alias",
+  # Preview rules with false positives
+  "del-attr-with-constant", # Autofix breaks type checking when the attribute isn't declared
+  "meta-class-abc-meta", # Stubs must keep the runtime metaclass
+  "unused-async", # Flags async generators, by design: https://github.com/astral-sh/ruff/issues/24481
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "*.pyi" = [
   "B",
-  "E501",
-  "E741",
-  "E743",
-  "F403", # Use wildcard import
-  "F405",
-  "F822",
-  "F821",
-  "PLW0211", # Parameter names must match the runtime (stubtest)
+  "line-too-long",
+  "ambiguous-variable-name",
+  "ambiguous-function-name",
+  "undefined-local-with-import-star",
+  "undefined-local-with-import-star-usage",
+  "undefined-export",
+  "undefined-name",
+  "bad-staticmethod-argument", # Parameter names must match the runtime (stubtest)
 ]
-"tests/*.py" = ["INP001", "PGH003", "RUF012"]
-"ext/tests/*.py" = ["INP001"]
-"setup.py" = ["INP001"]
-"tests/assert_type/*.py" = ["B", "UP013"]
+"tests/*.py" = ["implicit-namespace-package", "blanket-type-ignore", "mutable-class-default"]
+"ext/tests/*.py" = ["implicit-namespace-package"]
+"setup.py" = ["implicit-namespace-package"]
+# Type fixtures: models don't need `__str__`, builtin subclasses are under test
+"tests/assert_type/*.py" = [
+  "B",
+  "convert-typed-dict-functional-to-class",
+  "django-model-without-dunder-str",
+  "subclass-builtin",
+]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead. If you type a metaclass, add a noqa"
+"_typeshed.Self".msg = "Use typing_extensions.Self (PEP 673) instead. If you type a metaclass, add a `ruff: ignore[banned-api]`"
 "typing.NoReturn".msg = "Use `typing.Never` instead."
 "typing_extensions.NoReturn".msg = "Use `typing.Never` instead."
 "typing.TypeVar".msg ="Only support the `default` parameter in Python 3.13 and above. Use `typing_extensions.TypeVar` instead."

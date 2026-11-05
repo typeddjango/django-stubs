@@ -305,7 +305,7 @@ class RawQuerySet(_SupportsContains[object], Iterable[_Model_co], Sized):
     def model_fields(self) -> dict[str, str]: ...
 
 # Deprecated alias of QuerySet, for compatibility only.
-_QuerySet: TypeAlias = QuerySet  # noqa: PYI047
+_QuerySet: TypeAlias = QuerySet  # ruff: ignore[unused-private-type-alias]
 
 class Prefetch(Generic[_LookupT_co, _PrefetchedQuerySetT_co, _ToAttrT_co]):
     prefetch_through: str

@@ -23,6 +23,9 @@ class OtherModel(models.Model):
 
 # Override with QuerySet[Model] — valid
 class OverrideWithModel(models.Model):
+    class Meta:
+        app_label = "myapp"
+
     @override
     def refresh_from_db(
         self,
@@ -30,9 +33,6 @@ class OverrideWithModel(models.Model):
         fields: Iterable[str] | None = None,
         from_queryset: QuerySet[models.Model] | None = None,
     ) -> None: ...
-
-    class Meta:
-        app_label = "myapp"
 
 
 def test_correct_queryset(m: MyModel, qs: QuerySet[MyModel]) -> None:

@@ -32,23 +32,23 @@ def make_generic_classes(
     request: pytest.FixtureRequest,
     monkeypatch: pytest.MonkeyPatch,
 ) -> _MakeGenericClasses:
-    _extra_classes: list[type] = []
+    registered_classes: list[type] = []
 
     def fin() -> None:
         for el in _need_generic:
             with suppress(AttributeError):
                 delattr(el.cls, "__class_getitem__")
-        for cls in _extra_classes:
+        for cls in registered_classes:
             with suppress(AttributeError):
                 delattr(cls, "__class_getitem__")
-        _extra_classes.clear()
+        registered_classes.clear()
 
     def factory(
         django_version: _VersionSpec | None = None,
         extra_classes: Iterable[type] | None = None,
     ) -> None:
         if extra_classes:
-            _extra_classes.extend(extra_classes)
+            registered_classes.extend(extra_classes)
         if django_version is not None:
             monkeypatch.setattr(patch, "VERSION", django_version)
         django_stubs_ext.monkeypatch(extra_classes=extra_classes)
@@ -91,9 +91,9 @@ def test_patched_class_real_generic_subclass(make_generic_classes: _MakeGenericC
 
     assert View[int] is View  # type: ignore[type-var, comparison-overlap]
 
-    _T = TypeVar("_T")
+    T = TypeVar("T")
 
-    class _Controller(View, Generic[_T]):
+    class _Controller(View, Generic[T]):
         pass
 
     alias = _Controller[int]

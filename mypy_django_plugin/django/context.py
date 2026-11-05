@@ -24,7 +24,7 @@ from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Mapping, Sequence
+    from collections.abc import Generator, Iterable, Iterator, Mapping, Sequence
 
     from django.apps.registry import Apps
     from django.conf import LazySettings
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def temp_environ() -> Iterator[None]:
+def temp_environ() -> Generator[None]:
     """Allow the ability to set os.environ temporarily"""
     environ = dict(os.environ)
     try:

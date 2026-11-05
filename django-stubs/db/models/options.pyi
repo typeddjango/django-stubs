@@ -21,7 +21,7 @@ EMPTY_RELATION_TREE: Any
 IMMUTABLE_WARNING: str
 DEFAULT_NAMES: tuple[str, ...]
 
-_OptionTogetherT: TypeAlias = _ListOrTuple[_ListOrTuple[str] | str] | set[tuple[str, ...]]  # noqa: PYI047
+_OptionTogetherT: TypeAlias = _ListOrTuple[_ListOrTuple[str] | str] | set[tuple[str, ...]]  # ruff: ignore[unused-private-type-alias]
 _AnyField: TypeAlias = Field | ForeignObjectRel
 
 @overload

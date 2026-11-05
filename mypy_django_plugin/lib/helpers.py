@@ -357,10 +357,7 @@ def get_literal_str_type(typ: Type) -> str | None:
 
 
 def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
-    for base_fullname in bases:
-        if info.has_base(base_fullname):
-            return True
-    return False
+    return any(info.has_base(base_fullname) for base_fullname in bases)
 
 
 def iter_bases(info: TypeInfo) -> Iterator[Instance]:

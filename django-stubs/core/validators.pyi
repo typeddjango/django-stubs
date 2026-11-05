@@ -12,7 +12,7 @@ EMPTY_VALUES: Any
 
 _Regex: TypeAlias = str | Pattern[str]
 
-_ValidatorCallable: TypeAlias = Callable[[Any], None]  # noqa: PYI047
+_ValidatorCallable: TypeAlias = Callable[[Any], None]  # ruff: ignore[unused-private-type-alias]
 
 class RegexValidator(_Deconstructible):
     regex: _Regex  # Pattern[str] on instance, but may be str on class definition

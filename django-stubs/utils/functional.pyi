@@ -126,7 +126,7 @@ class _StrPromise(Promise, _StrMethods):
     def __mul__(self, n: SupportsIndex, /) -> str: ...
     def __rmul__(self, n: SupportsIndex, /) -> str: ...
 
-_StrOrPromise: TypeAlias = str | _StrPromise  # noqa: PYI047
+_StrOrPromise: TypeAlias = str | _StrPromise  # ruff: ignore[unused-private-type-alias]
 _C = TypeVar("_C", bound=Callable[..., Any])
 
 def lazy(func: _C, *resultclasses: Any) -> _C: ...
@@ -190,7 +190,7 @@ def partition(
 ) -> tuple[list[_PartitionMember], list[_PartitionMember]]: ...
 
 @type_check_only
-class _Getter(Protocol[_Get_co]):  # noqa: PYI046
+class _Getter(Protocol[_Get_co]):  # ruff: ignore[unused-private-protocol]
     """
     Type fake to declare some read-only properties (until `property` builtin is generic).
 

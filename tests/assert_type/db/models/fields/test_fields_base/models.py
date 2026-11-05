@@ -73,10 +73,10 @@ def if_field_called_on_class_return_field_itself() -> None:
 
 
 class AuthMixin(models.Model):
+    username = models.CharField(max_length=100)
+
     class Meta:
         abstract = True
-
-    username = models.CharField(max_length=100)
 
 
 class MixinModel(AuthMixin, models.Model):
