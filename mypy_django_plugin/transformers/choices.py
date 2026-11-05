@@ -3,8 +3,7 @@ from __future__ import annotations
 from enum import Enum, auto
 from typing import TYPE_CHECKING
 
-from django.db.models.constants import LOOKUP_SEP
-from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo, Var
+from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo
 from mypy.typeanal import make_optional_type
 from mypy.types import (
     AnyType,
@@ -25,25 +24,6 @@ from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:
     from mypy.plugin import AttributeContext
-
-
-# TODO: [mypy 1.14+] Remove this backport of `TypeInfo.enum_members`.
-def _get_enum_members(info: TypeInfo) -> list[str]:
-    try:
-        return info.enum_members
-    except AttributeError:  # mypy < 1.14
-        pass
-
-    return [
-        name
-        for name, sym in info.names.items()
-        if (
-            isinstance(sym.node, Var)
-            and name not in ("_ignore_", "_order_", "__order__")
-            and not name.startswith(LOOKUP_SEP)
-            and sym.node.has_explicit_value
-        )
-    ]
 
 
 class _LabelLaziness(Enum):
@@ -91,8 +71,7 @@ def _label_laziness(node: TypeInfo) -> _LabelLaziness:
     else:
         lazy = None
 
-    # TODO: [mypy 1.14+] Use `node.enum_members` and remove `_get_enum_members()` backport.
-    for member_name in _get_enum_members(node):
+    for member_name in node.enum_members:
         member_lazy = _is_lazy_member(node, member_name)
         if lazy is None:
             lazy = member_lazy
