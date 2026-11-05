@@ -218,3 +218,20 @@
             def create_animal_generic(klass: type[T], name: str) -> T:
                 reveal_type(klass)  # N: Revealed type is "type[T]"
                 return klass._default_manager.create(name=name)
+
+
+- case: test_default_objects_on_models_outside_the_app_registry
+  main: |
+    from typing_extensions import reveal_type
+    from django.db import models
+
+    class Unregistered(models.Model):
+        class Meta:
+            app_label = "not_installed"
+
+    class AbstractUnregistered(models.Model):
+        class Meta:
+            abstract = True
+
+    reveal_type(Unregistered.objects)  # N: Revealed type is "django.db.models.manager.Manager[main.Unregistered, django.db.models.query.QuerySet[main.Unregistered, main.Unregistered]]"
+    AbstractUnregistered.objects  # E: "type[AbstractUnregistered]" has no attribute "objects"  [attr-defined]
