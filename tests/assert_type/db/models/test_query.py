@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, assert_type
 
+from django.db.models import Model
 from django.db.models.query import QuerySet, RawQuerySet, aprefetch_related_objects, prefetch_related_objects
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from django.contrib.auth.models import AnonymousUser
-    from django.db.models import Model
 
 models_list: list[Model] = []
 prefetch_related_objects(models_list, "pk")
@@ -51,3 +51,7 @@ def test_in_operator(
     assert_type(None in qs, bool)
     assert_type("test" in qs, bool)
     assert_type(42 in qs, bool)
+
+
+def test_class_getitem_returns_the_class(qs_class: type[QuerySet[Model]]) -> None:
+    assert_type(qs_class.__class_getitem__(Model), type[QuerySet[Model]])
