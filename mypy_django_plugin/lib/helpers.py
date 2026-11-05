@@ -357,6 +357,10 @@ def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
     return any(info.has_base(base_fullname) for base_fullname in bases)
 
 
+def has_placeholder_type_vars(info: TypeInfo) -> bool:
+    return any(has_placeholder(type_var) for type_var in info.defn.type_vars)
+
+
 def iter_bases(info: TypeInfo) -> Iterator[Instance]:
     for base in info.bases:
         yield base

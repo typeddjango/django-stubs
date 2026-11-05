@@ -1130,7 +1130,7 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
     # A generic model whose type variable is bounded by a not yet analysed class (e.g. a forward
     # reference) still has a `PlaceholderType` bound. Types built from it, such as the manager's
     # `Self`, would keep that placeholder and fail to serialize, so wait for a later iteration.
-    if not ctx.api.final_iteration and any(has_placeholder(type_var) for type_var in ctx.cls.info.defn.type_vars):
+    if not ctx.api.final_iteration and helpers.has_placeholder_type_vars(ctx.cls.info):
         ctx.api.defer()
         return
 
