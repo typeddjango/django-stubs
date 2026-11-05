@@ -22,7 +22,7 @@ from mypy.nodes import (
     TypeInfo,
     Var,
 )
-from mypy.plugins import common
+from mypy.plugins.common import add_method_to_class
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.typeanal import TypeAnalyser
@@ -655,16 +655,21 @@ class AddExtraFieldMethods(ModelClassInitializer):
         # get_FOO_display for choices
         for field in self.django_context.get_model_fields(model_cls):
             if field.choices:
-                info = self.lookup_typeinfo_or_incomplete_defn_error("builtins.str")
-                return_type = Instance(info, [])
-                common.add_method(self.ctx, name=f"get_{field.attname}_display", args=[], return_type=return_type)
+                add_method_to_class(
+                    self.api,
+                    self.model_classdef,
+                    name=f"get_{field.attname}_display",
+                    args=[],
+                    return_type=self.api.named_type("builtins.str"),
+                )
 
         # get_next_by, get_previous_by for Date, DateTime
         for field in self.django_context.get_model_fields(model_cls):
             if isinstance(field, DateField | DateTimeField) and not field.null:
                 return_type = helpers.model_instance(self.model_classdef.info)
-                common.add_method(
-                    self.ctx,
+                add_method_to_class(
+                    self.api,
+                    self.model_classdef,
                     name=f"get_next_by_{field.attname}",
                     args=[
                         Argument(
@@ -676,8 +681,9 @@ class AddExtraFieldMethods(ModelClassInitializer):
                     ],
                     return_type=return_type,
                 )
-                common.add_method(
-                    self.ctx,
+                add_method_to_class(
+                    self.api,
+                    self.model_classdef,
                     name=f"get_previous_by_{field.attname}",
                     args=[
                         Argument(
@@ -848,13 +854,11 @@ class ProcessManyToManyFields(ModelClassInitializer):
         Get a primary key instance of provided model's type info. If primary key can't be resolved,
         return a default declaration.
         """
-        contains_from_pk_info = model.get_containing_type_info("pk")
-        if contains_from_pk_info is not None:
-            pk = contains_from_pk_info.names["pk"].node
-            if isinstance(pk, Var):
-                pk_type = get_proper_type(pk.type)
-                if isinstance(pk_type, Instance):
-                    return pk_type
+        pk_sym = model.get("pk")
+        if pk_sym is not None and isinstance(pk_sym.node, Var):
+            pk_type = get_proper_type(pk_sym.node.type)
+            if isinstance(pk_type, Instance):
+                return pk_type
         return self.default_pk_instance
 
     def create_through_table_class(

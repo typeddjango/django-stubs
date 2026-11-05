@@ -106,7 +106,7 @@ def get_method_type_from_dynamic_manager(
     ):
         method_type = method_proper_type.copy_modified(ret_type=queryset_instance)
 
-    return get_proper_type(method_type) if method_type is not None else None
+    return get_proper_type(method_type)
 
 
 def _get_funcdef_type(definition: Node | None) -> ProperType | None:
