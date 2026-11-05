@@ -10,7 +10,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
-from typing_extensions import override
+from typing_extensions import TypeVar, override
 
 if TYPE_CHECKING:
     from django_stubs_ext.db.models.manager import RelatedManager
@@ -140,6 +140,25 @@ class RawModel(models.Model):
 def base_manager_direct_subclass() -> None:
     assert_type(RawModel.objects, RawManager)
     assert_type(RawModel.objects.get_queryset(), QuerySet[RawModel])
+
+
+# ---------------------------------------------------------------------------
+# A generic manager can set and read `_queryset_class`
+# ---------------------------------------------------------------------------
+
+_M = TypeVar("_M", bound=models.Model)
+
+
+class GenericQuerySet(models.QuerySet[_M]): ...
+
+
+class GenericManager(models.Manager[_M]):
+    def build_queryset(self) -> QuerySet[_M]:
+        return self._queryset_class(self.model, using=self._db)
+
+
+class GenericQuerySetManager(GenericManager[_M]):
+    _queryset_class = GenericQuerySet
 
 
 # ---------------------------------------------------------------------------
