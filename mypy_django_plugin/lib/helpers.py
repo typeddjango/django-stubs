@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, NamedTuple, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NamedTuple, Self, TypedDict, cast
 
 from mypy import checker
 from mypy.checker import TypeChecker
-from mypy.checkmember import analyze_member_access as _mypy_analyze_member_access
+from mypy.checkmember import analyze_member_access
 from mypy.expandtype import expand_type
 from mypy.lookup import lookup_fully_qualified
 from mypy.maptype import map_instance_to_supertype
@@ -58,11 +58,8 @@ from mypy.types import (
 )
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars, fill_typevars_with_any
-from mypy.version import __version__ as mypy_version
 
 from mypy_django_plugin.lib import fullnames
-
-mypy_version_info = tuple(map(int, mypy_version.partition("+")[0].split(".")))
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Mapping, Sequence
@@ -794,36 +791,6 @@ def merge_extra_attrs(
         attrs=new_attrs or {},
         immutable=new_immutable,
         mod_name=None,
-    )
-
-
-def analyze_member_access(
-    name: str,
-    typ: MypyType,
-    context: Context,
-    *,
-    is_lvalue: bool,
-    is_super: bool,
-    is_operator: bool,
-    original_type: MypyType,
-    chk: TypeChecker,
-    suppress_errors: bool = False,
-) -> MypyType:
-    # TODO: [mypy 1.16+] Remove this workaround for passing `msg` to `analyze_member_access()`.
-    extra: dict[str, Any] = {}
-    if mypy_version_info < (1, 16):
-        extra["msg"] = chk.msg
-    return _mypy_analyze_member_access(
-        name,
-        typ,
-        context,
-        is_lvalue=is_lvalue,
-        is_super=is_super,
-        is_operator=is_operator,
-        original_type=original_type,
-        chk=chk,
-        suppress_errors=suppress_errors,
-        **extra,
     )
 
 

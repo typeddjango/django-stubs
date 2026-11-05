@@ -118,8 +118,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --no-dev --group tests
 
-      - name: Downgrade Django
-        run: uv pip install django==5.2.0
+      # Must match the lowest supported versions in the README table
+      - name: Downgrade Django and mypy
+        run: uv pip install django==5.2.0 mypy==1.16.0
 
       # Exit 1 only if ont of the pytest error is a mypy crash
       - name: Run pytest tests
