@@ -27,12 +27,11 @@ def _get_current_field_from_assignment(ctx: FunctionContext, django_context: Dja
 
     field_name = None
     for stmt in outer_model_info.defn.defs.body:
-        if isinstance(stmt, AssignmentStmt):
-            if stmt.rvalue == ctx.context:
-                if not isinstance(stmt.lvalues[0], NameExpr):
-                    return None
-                field_name = stmt.lvalues[0].name
-                break
+        if isinstance(stmt, AssignmentStmt) and stmt.rvalue == ctx.context:
+            if not isinstance(stmt.lvalues[0], NameExpr):
+                return None
+            field_name = stmt.lvalues[0].name
+            break
     if field_name is None:
         return None
 
@@ -119,9 +118,8 @@ def get_field_descriptor_types(
 
 def set_descriptor_types_for_field_callback(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     current_field = _get_current_field_from_assignment(ctx, django_context)
-    if current_field is not None:
-        if isinstance(current_field, AutoField):
-            return set_descriptor_types_for_field(ctx, is_set_nullable=True)
+    if isinstance(current_field, AutoField):
+        return set_descriptor_types_for_field(ctx, is_set_nullable=True)
 
     return set_descriptor_types_for_field(ctx)
 

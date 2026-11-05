@@ -14,9 +14,9 @@ from .utils import CheckPostgresInstalledMixin
 _Expression: TypeAlias = str | Combinable | SearchQueryCombinable
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True, default=Any)
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=Any)
+_GT_co = TypeVar("_GT_co", covariant=True, default=Any)
 
 class UTF8Dumper(Dumper):
     @override
@@ -36,8 +36,8 @@ class SearchVectorExact(Lookup):
     @override
     def as_sql(self, qn: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
-class SearchVectorField(CheckPostgresInstalledMixin, Field[_ST, _GT]): ...
-class SearchQueryField(CheckPostgresInstalledMixin, Field[_ST, _GT]): ...
+class SearchVectorField(CheckPostgresInstalledMixin, Field[_ST_contra, _GT_co]): ...
+class SearchQueryField(CheckPostgresInstalledMixin, Field[_ST_contra, _GT_co]): ...
 
 class SearchConfig(Expression):
     config: _Expression | None

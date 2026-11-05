@@ -87,7 +87,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
     ):
         return default_return_type
 
-    return default_return_type.copy_modified(args=[outer_model_info.self_type])
+    return helpers.fill_instance(default_return_type.type, [outer_model_info.self_type])
 
 
 def get_field_type_from_lookup(
@@ -589,10 +589,7 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
 
 def _infer_prefetch_queryset_type(queryset_expr: Expression, api: TypeChecker) -> Instance | None:
     """Infer the model Instance from `Prefetch(queryset=...)`"""
-    try:
-        qs_type = get_proper_type(api.expr_checker.accept(queryset_expr))
-    except Exception:
-        return None
+    qs_type = get_proper_type(api.expr_checker.accept(queryset_expr))
     if isinstance(qs_type, Instance):
         return qs_type
     return None
@@ -649,10 +646,11 @@ def _specialize_string_arg_to_literal(
     and validation in later analysis phases.
     """
 
-    if arg_expr := helpers.get_call_argument_by_name(ctx, arg_name):
-        if arg_value := helpers.resolve_string_attribute_value(arg_expr, django_context):
-            api = helpers.get_typechecker_api(ctx)
-            return LiteralType(value=arg_value, fallback=api.named_generic_type("builtins.str", []))
+    if (arg_expr := helpers.get_call_argument_by_name(ctx, arg_name)) and (
+        arg_value := helpers.resolve_string_attribute_value(arg_expr, django_context)
+    ):
+        api = helpers.get_typechecker_api(ctx)
+        return LiteralType(value=arg_value, fallback=api.named_generic_type("builtins.str", []))
 
     return fallback_type
 
@@ -700,6 +698,9 @@ def _get_selected_fields_from_queryset_type(qs_type: Instance) -> set[str] | Non
       - values_list(named=True): row is a NamedTuple; extract field names from fallback TypeInfo
       - values_list(named=False): stored in qs_type.extra_attrs.immutable
     """
+    if qs_type.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+        # A manager yields full model rows, its second type arg is the queryset, not a row type.
+        return None
     if len(qs_type.args) > 1:
         row_type = get_proper_type(qs_type.args[1])
         if isinstance(row_type, Instance) and helpers.is_model_type(row_type.type):
@@ -1166,12 +1167,11 @@ def _validate_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str
         ctx.api.fail(exc.args[0], ctx.context)
         return
 
-    if remainder:
-        # Check if the trailing part is a valid transform (e.g. __year, __month) on the field.
-        # Transforms are allowed, but lookups (e.g. __exact) are not.
-        if final_field.get_transform(remainder[0]) is None:
-            msg = f"Cannot resolve keyword '{remainder[0]}' into field or transform on '{final_field.name}'."
-            ctx.api.fail(msg, ctx.context)
+    # Check if the trailing part is a valid transform (e.g. __year, __month) on the field.
+    # Transforms are allowed, but lookups (e.g. __exact) are not.
+    if remainder and final_field.get_transform(remainder[0]) is None:
+        msg = f"Cannot resolve keyword '{remainder[0]}' into field or transform on '{final_field.name}'."
+        ctx.api.fail(msg, ctx.context)
 
 
 def _validate_order_by_lookup(ctx: MethodContext, model_cls: type[Model], parts: list[str]) -> None:

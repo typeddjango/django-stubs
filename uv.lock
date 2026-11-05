@@ -400,7 +400,7 @@ ty = [
 requires-dist = [
     { name = "django" },
     { name = "django-stubs-ext", editable = "ext" },
-    { name = "mypy", marker = "extra == 'compatible-mypy'", specifier = ">=1.13,<2.5" },
+    { name = "mypy", marker = "extra == 'compatible-mypy'", specifier = ">=1.16,<2.5" },
     { name = "oracledb", marker = "extra == 'oracle'" },
     { name = "redis", marker = "extra == 'redis'" },
     { name = "types-pyyaml" },
@@ -470,7 +470,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "django" },
-    { name = "typing-extensions" },
+    { name = "typing-extensions", specifier = ">=4.4.0" },
 ]
 
 [[package]]

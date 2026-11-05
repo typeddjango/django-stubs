@@ -41,11 +41,11 @@ def lazy_related_operation(
 ) -> None: ...
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True, default=Any)
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=_ST)
+_GT_co = TypeVar("_GT_co", covariant=True, default=_ST_contra)
 
-class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
+class RelatedField(FieldCacheMixin, Field[_ST_contra, _GT_co]):
     one_to_many: bool
     one_to_one: bool
     many_to_many: bool
@@ -84,7 +84,7 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     @property
     def target_field(self) -> Field: ...
 
-class ForeignObject(RelatedField[_ST, _GT]):
+class ForeignObject(RelatedField[_ST_contra, _GT_co]):
     remote_field: ForeignObjectRel
     rel_class: type[ForeignObjectRel]
     column: None
@@ -117,7 +117,7 @@ class ForeignObject(RelatedField[_ST, _GT]):
     # Model instance access
     @overload
     @override
-    def __get__(self, instance: Model, owner: Any) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT_co: ...
     # non-Model instances
     @overload
     @override
@@ -155,7 +155,7 @@ class ForeignObject(RelatedField[_ST, _GT]):
     related_accessor_class: type[ReverseManyToOneDescriptor[Any]]
     requires_unique_target: bool
 
-class ForeignKey(ForeignObject[_ST, _GT]):
+class ForeignKey(ForeignObject[_ST_contra, _GT_co]):
     _pyi_private_set_type: Any
     _pyi_private_get_type: Any
 
@@ -214,7 +214,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
     @override
     def get_attname_column(self) -> tuple[str, str]: ...  # type: ignore[override]
 
-class OneToOneField(ForeignKey[_ST, _GT]):
+class OneToOneField(ForeignKey[_ST_contra, _GT_co]):
     _pyi_private_set_type: Any
     _pyi_private_get_type: Any
 
@@ -247,7 +247,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     # Model instance access
     @overload
     @override
-    def __get__(self, instance: Model, owner: Any) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT_co: ...
     # non-Model instances
     @overload
     @override

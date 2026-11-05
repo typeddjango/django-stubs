@@ -22,8 +22,19 @@ from mypy.nodes import (
 from mypy.plugins.common import add_method_to_class
 from mypy.semanal_shared import has_placeholder
 from mypy.subtypes import find_member
-from mypy.types import AnyType, CallableType, Instance, ProperType, TypeOfAny, TypeType, UnionType, get_proper_type
+from mypy.types import (
+    AnyType,
+    CallableType,
+    Instance,
+    ProperType,
+    TypeOfAny,
+    TypeType,
+    TypeVarType,
+    UnionType,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
+from mypy.typevars import fill_typevars_with_any
 
 from mypy_django_plugin.lib import fullnames, helpers
 
@@ -184,7 +195,7 @@ def register_dynamically_created_manager(fullname: str, manager_name: str, manag
     # The `__module__` value of the manager type created by Django's
     # `.from_queryset` is `django.db.models.manager`. But we put new type(s) in the
     # module currently being processed, so we'll map those together through metadata.
-    runtime_fullname = ".".join(["django.db.models.manager", manager_name])
+    runtime_fullname = f"django.db.models.manager.{manager_name}"
     manager_base.metadata["from_queryset_managers"][runtime_fullname] = fullname
 
 
@@ -201,7 +212,7 @@ def create_manager_info_from_from_queryset_call(
         or not isinstance(call_expr.callee.expr, RefExpr)
         or not isinstance(call_expr.callee.expr.node, TypeInfo)
         or not call_expr.callee.expr.node.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME)
-        or not call_expr.callee.name == "from_queryset"
+        or call_expr.callee.name != "from_queryset"
         # Check that the call has one or two arguments and that the first is a
         # QuerySet subclass
         or not 1 <= len(call_expr.args) <= 2
@@ -286,6 +297,15 @@ def populate_manager_from_queryset(manager_info: TypeInfo, queryset_info: TypeIn
     # that QuerySet class
     django_metadata = helpers.get_django_metadata(manager_info)
     django_metadata["from_queryset_manager"] = queryset_info.fullname
+
+    # Default the queryset type var to the queryset the manager is built from, so a bare
+    # `ManagerFromMyQuerySet[MyModel]` fills in as `ManagerFromMyQuerySet[MyModel, MyQuerySet[MyModel, MyModel]]`.
+    # Only for the `[_T_co, _QS_co]` layout inherited from `Manager`, a user-generic manager keeps its own defaults.
+    if len(manager_info.defn.type_vars) == 2:
+        model_type_var, queryset_type_var = manager_info.defn.type_vars
+        if isinstance(queryset_type_var, TypeVarType):
+            queryset_default = Instance(queryset_info, [model_type_var] * len(queryset_info.type_vars))
+            manager_info.defn.type_vars = [model_type_var, queryset_type_var.copy_modified(default=queryset_default)]
 
     # We collect and mark up all methods before django.db.models.query.QuerySet as class members
     for class_mro_info in queryset_info.mro:
@@ -461,7 +481,7 @@ def add_as_manager_to_queryset_class(ctx: ClassDefContext) -> None:
         ctx.cls,
         "as_manager",
         args=[],
-        return_type=Instance(new_manager_info, [AnyType(TypeOfAny.from_omitted_generics)]),
+        return_type=fill_typevars_with_any(new_manager_info),
         is_classmethod=True,
     )
 
@@ -521,7 +541,7 @@ def reparametrize_generic_class(
     parent_info = parent_class.type
     if _omits_type_args(ctx.cls, parent_info):
         # Args were omitted -- reuse the parent's TypeVars so their existing
-        # PEP 696 defaults (e.g. `_Row = TypeVar(default=_Model)`) are preserved.
+        # PEP 696 defaults (e.g. `_Row_co = TypeVar(default=_Model_co)`) are preserved.
         type_vars = list(parent_info.defn.type_vars)
     elif bind_explicit_args and parent_info.fullname == base_class_fullname:
         # Args were supplied explicitly on the canonical base class -- synthesize TypeVars bounded by
@@ -560,9 +580,9 @@ def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
 
     is interpreted as:
 
-        _Model = TypeVar('_Model', bound=Model, covariant=True)
-        _Row = TypeVar('_Row', covariant=True, default=_Model)
-        class MyQuerySet(models.QuerySet[_Model, _Row]): ...
+        _Model_co = TypeVar('_Model_co', bound=Model, covariant=True)
+        _Row_co = TypeVar('_Row_co', covariant=True, default=_Model_co)
+        class MyQuerySet(models.QuerySet[_Model_co, _Row_co]): ...
 
     And
 
@@ -570,9 +590,9 @@ def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
 
     is interpreted as:
 
-        _Model = TypeVar('_Model', bound=Book, covariant=True, default=Book)
-        _Row = TypeVar('_Row', bound=Book, covariant=True, default=Book)
-        class BookQuerySet(models.QuerySet[_Model, _Row]): ...
+        _Model_co = TypeVar('_Model_co', bound=Book, covariant=True, default=Book)
+        _Row_co = TypeVar('_Row_co', bound=Book, covariant=True, default=Book)
+        class BookQuerySet(models.QuerySet[_Model_co, _Row_co]): ...
 
     Note that this does not happen if mypy is run with disallow_any_generics = True,
     as not specifying the generic type is then considered an error.

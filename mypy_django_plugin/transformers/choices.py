@@ -3,8 +3,7 @@ from __future__ import annotations
 from enum import Enum, auto
 from typing import TYPE_CHECKING
 
-from django.db.models.constants import LOOKUP_SEP
-from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo, Var
+from mypy.nodes import MemberExpr, NameExpr, SuperExpr, TypeAlias, TypeInfo
 from mypy.typeanal import make_optional_type
 from mypy.types import (
     AnyType,
@@ -27,25 +26,6 @@ if TYPE_CHECKING:
     from mypy.plugin import AttributeContext
 
 
-# TODO: [mypy 1.14+] Remove this backport of `TypeInfo.enum_members`.
-def _get_enum_members(info: TypeInfo) -> list[str]:
-    try:
-        return info.enum_members
-    except AttributeError:  # mypy < 1.14
-        pass
-
-    return [
-        name
-        for name, sym in info.names.items()
-        if (
-            isinstance(sym.node, Var)
-            and name not in ("_ignore_", "_order_", "__order__")
-            and not name.startswith(LOOKUP_SEP)
-            and sym.node.has_explicit_value
-        )
-    ]
-
-
 class _LabelLaziness(Enum):
     LAZY = auto()
     NON_LAZY = auto()
@@ -65,16 +45,16 @@ def _is_lazy_member(node: TypeInfo, member_name: str) -> bool:
     if (sym := node.get(member_name)) is None:
         return False
 
-    _member_type = get_proper_type(sym.type)
-    if not isinstance(_member_type, TupleType):
+    member_type = get_proper_type(sym.type)
+    if not isinstance(member_type, TupleType):
         # Member has auto-generated plain string label - enum.auto() or no explicit label.
         return False
 
-    if _member_type.length() < 2:
+    if member_type.length() < 2:
         # There need to be at least two items in the tuple.
         return False
 
-    return _is_lazy_string(_member_type.items[-1])
+    return _is_lazy_string(member_type.items[-1])
 
 
 def _label_laziness(node: TypeInfo) -> _LabelLaziness:
@@ -91,8 +71,7 @@ def _label_laziness(node: TypeInfo) -> _LabelLaziness:
     else:
         lazy = None
 
-    # TODO: [mypy 1.14+] Use `node.enum_members` and remove `_get_enum_members()` backport.
-    for member_name in _get_enum_members(node):
+    for member_name in node.enum_members:
         member_lazy = _is_lazy_member(node, member_name)
         if lazy is None:
             lazy = member_lazy
@@ -196,28 +175,28 @@ def transform_into_proper_attr_type(ctx: AttributeContext) -> MypyType:
     elif isinstance(expr, SuperExpr):
         node = expr.info
 
-    _node_type: ProperType | None = None
+    node_type: ProperType | None = None
 
     if node is None:
-        _node_type = get_proper_type(ctx.api.get_expression_type(expr))
-        if isinstance(_node_type, UnionType):
+        node_type = get_proper_type(ctx.api.get_expression_type(expr))
+        if isinstance(node_type, UnionType):
             # If this is a union of enum literals, check if they're all of the same enum type and
             # use that type instead. This situation often occurs where there is comparison to an
             # enum member in a branch.
-            _node_type = get_proper_type(_get_enum_type_from_union_of_literals(_node_type))
-        if isinstance(_node_type, LiteralType) and _node_type.is_enum_literal():
-            _node_type = _node_type.fallback
-        if isinstance(_node_type, TypeType):
-            _node_type = _node_type.item
-        if isinstance(_node_type, TypeVarType):
-            _node_type = get_proper_type(_node_type.upper_bound)
-        if isinstance(_node_type, Instance):
-            node = _node_type.type
-        if isinstance(_node_type, Overloaded) and _node_type.is_type_obj():
-            node = _node_type.type_object()
+            node_type = get_proper_type(_get_enum_type_from_union_of_literals(node_type))
+        if isinstance(node_type, LiteralType) and node_type.is_enum_literal():
+            node_type = node_type.fallback
+        if isinstance(node_type, TypeType):
+            node_type = node_type.item
+        if isinstance(node_type, TypeVarType):
+            node_type = get_proper_type(node_type.upper_bound)
+        if isinstance(node_type, Instance):
+            node = node_type.type
+        if isinstance(node_type, Overloaded) and node_type.is_type_obj():
+            node = node_type.type_object()
 
     if node is None:
-        if isinstance(_node_type, UnionType):
+        if isinstance(node_type, UnionType):
             # Suppress the error for a known case where there are multiple base choices types in a
             # union. In theory this is something that could be handled by extracting all of the
             # base types and making the following code consider all of these types, but that's

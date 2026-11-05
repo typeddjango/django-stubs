@@ -7,8 +7,8 @@ from django.db.models import fields
 from django.db.models.expressions import F
 from typing_extensions import TypeVar
 
-_ST = TypeVar("_ST", contravariant=True)
-_GT = TypeVar("_GT", covariant=True)
+_ST_contra = TypeVar("_ST_contra", contravariant=True)
+_GT_co = TypeVar("_GT_co", covariant=True)
 
 T = TypeVar("T")
 
@@ -16,7 +16,7 @@ T = TypeVar("T")
 class CustomFieldValue: ...
 
 
-class GenericField(fields.Field[_ST, _GT]): ...
+class GenericField(fields.Field[_ST_contra, _GT_co]): ...
 
 
 class SingleTypeField(fields.Field[T, T]): ...
@@ -25,13 +25,13 @@ class SingleTypeField(fields.Field[T, T]): ...
 class CustomValueField(fields.Field[CustomFieldValue | int, CustomFieldValue]): ...
 
 
-class AdditionalTypeVarField(fields.Field[_ST, _GT], Generic[_ST, _GT, T]): ...
+class AdditionalTypeVarField(fields.Field[_ST_contra, _GT_co], Generic[_ST_contra, _GT_co, T]): ...
 
 
 # Generic type arguments
 
 
-class CustomSmallIntegerField(fields.SmallIntegerField[_ST, _GT]): ...
+class CustomSmallIntegerField(fields.SmallIntegerField[_ST_contra, _GT_co]): ...
 
 
 class User(models.Model):
@@ -181,21 +181,23 @@ def test_custom_field_subclassing_an_alias() -> None:
 
 
 # Generic subclasses default their type vars like the parent field, so bare calls resolve without the plugin
-_ST_Int = TypeVar("_ST_Int", contravariant=True, default=float | int | str)
-_GT_Int = TypeVar("_GT_Int", covariant=True, default=int)
-_ST_Custom = TypeVar("_ST_Custom", contravariant=True, default=CustomFieldValue | int)
-_GT_Custom = TypeVar("_GT_Custom", covariant=True, default=CustomFieldValue)
-_ST_Text = TypeVar("_ST_Text", contravariant=True, default=str)
-_GT_Text = TypeVar("_GT_Text", covariant=True, default=str)
+_ST_Int_contra = TypeVar("_ST_Int_contra", contravariant=True, default=float | int | str)
+_GT_Int_co = TypeVar("_GT_Int_co", covariant=True, default=int)
+_ST_Custom_contra = TypeVar("_ST_Custom_contra", contravariant=True, default=CustomFieldValue | int)
+_GT_Custom_co = TypeVar("_GT_Custom_co", covariant=True, default=CustomFieldValue)
+_ST_Text_contra = TypeVar("_ST_Text_contra", contravariant=True, default=str)
+_GT_Text_co = TypeVar("_GT_Text_co", covariant=True, default=str)
 
 
-class DefaultedSmallIntegerField(fields.SmallIntegerField[_ST_Int, _GT_Int]): ...
+class DefaultedSmallIntegerField(fields.SmallIntegerField[_ST_Int_contra, _GT_Int_co]): ...
 
 
-class DefaultedAdditionalTypeVarField(fields.Field[_ST_Custom, _GT_Custom], Generic[T, _ST_Custom, _GT_Custom]): ...
+class DefaultedAdditionalTypeVarField(
+    fields.Field[_ST_Custom_contra, _GT_Custom_co], Generic[T, _ST_Custom_contra, _GT_Custom_co]
+): ...
 
 
-class DefaultedHtmlField(models.TextField[_ST_Text, _GT_Text]): ...
+class DefaultedHtmlField(models.TextField[_ST_Text_contra, _GT_Text_co]): ...
 
 
 class DefaultedTypeVars(models.Model):
