@@ -59,6 +59,7 @@ class BaseManager(Generic[_T_co, _QS_co]):
     def __get__(self, instance: object, cls: type[Any] | None = None) -> Self: ...
 
 class Manager(BaseManager[_T_co, _QS_co]):
+    _queryset_class: type[QuerySet[Any, Any]]
     # NOTE: The following methods are in common with QuerySet. Methods that proxy to `get_queryset()` and
     # preserve its type return `_QS_co`; methods building a differently-typed queryset (e.g. `values`,
     # `datetimes`, `extra`) return a plain `QuerySet` instead.
