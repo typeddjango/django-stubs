@@ -4,13 +4,16 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import assert_type
+from typing import TYPE_CHECKING, assert_type
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 from typing_extensions import override
+
+if TYPE_CHECKING:
+    from django_stubs_ext.db.models.manager import RelatedManager
 
 # ---------------------------------------------------------------------------
 # Declared queryset param: `Manager[Model, QuerySet]` flows through every chainable method
@@ -42,6 +45,24 @@ class Blog(models.Model):
     created_at = models.DateTimeField()
     objects = BlogManager()
     conflicting = ConflictingBlogManager()
+    from_queryset = BlogQuerySet.as_manager()
+
+
+def takes_a_plain_manager(manager: models.Manager[Blog]) -> None: ...
+
+
+def declared_manager_is_a_plain_manager_of_its_model() -> None:
+    takes_a_plain_manager(Blog.objects)
+
+
+def as_manager_keeps_the_queryset_type() -> None:
+    assert_type(Blog.from_queryset.all(), BlogQuerySet)
+    assert_type(Blog.from_queryset.get(), Blog)
+
+
+def related_manager_call_switches_to_the_named_manager(related: RelatedManager[Blog, BlogQuerySet]) -> None:
+    assert_type(related.all(), BlogQuerySet)
+    assert_type(related(manager="other").all(), QuerySet[Blog])
 
 
 def manager_methods_return_the_declared_queryset_type_param() -> None:
