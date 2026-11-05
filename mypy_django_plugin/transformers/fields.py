@@ -6,17 +6,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import RelatedField
 from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
-from mypy.types import (
-    AnyType,
-    Instance,
-    NoneType,
-    ProperType,
-    TypeOfAny,
-    TypeVarType,
-    UninhabitedType,
-    UnionType,
-    get_proper_type,
-)
+from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, UnionType, get_proper_type
 from mypy.types import Type as MypyType
 
 from mypy_django_plugin.exceptions import UnregisteredModelError
@@ -229,12 +219,11 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
 
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = get_proper_type(ctx.default_return_type)
-    if isinstance(default_return_type, TypeVarType):
+    if not isinstance(default_return_type, Instance):
         # A `Field` subclass can be called through a type variable, e.g. `type[F]` where `F` is
-        # bound to `Field`. There is no concrete field type to specialize here, and replacing the
-        # type variable with its upper bound would widen the result of the call, which is `F`.
+        # bound to `Field`. There is no concrete field type to specialize there, and replacing
+        # the type variable with its upper bound would widen the result of the call, which is `F`.
         return default_return_type
-    assert isinstance(default_return_type, Instance)
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_type(outer_model_info):
