@@ -87,7 +87,7 @@ def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
     ):
         return default_return_type
 
-    return default_return_type.copy_modified(args=[outer_model_info.self_type])
+    return helpers.fill_instance(default_return_type.type, [outer_model_info.self_type])
 
 
 def get_field_type_from_lookup(
@@ -700,6 +700,9 @@ def _get_selected_fields_from_queryset_type(qs_type: Instance) -> set[str] | Non
       - values_list(named=True): row is a NamedTuple; extract field names from fallback TypeInfo
       - values_list(named=False): stored in qs_type.extra_attrs.immutable
     """
+    if qs_type.type.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
+        # A manager yields full model rows, its second type arg is the queryset, not a row type.
+        return None
     if len(qs_type.args) > 1:
         row_type = get_proper_type(qs_type.args[1])
         if isinstance(row_type, Instance) and helpers.is_model_type(row_type.type):
