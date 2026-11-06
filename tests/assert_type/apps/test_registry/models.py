@@ -43,3 +43,21 @@ def get_model_of_historical_state_is_not_narrowed() -> None:
     # `StateApps` returns historical models rebuilt from migration state, so skip narrowing.
     state_apps = ProjectState().apps
     assert_type(state_apps.get_model("test_registry.First"), type[Any])
+
+
+class Tag(models.Model):
+    pass
+
+
+class Taggable(models.Model):
+    tags = models.ManyToManyField(Tag)
+
+
+def get_model_resolves_auto_created_through_models() -> None:
+    # Django creates the through model of a many-to-many field automatically and registers it in
+    # the app registry, so `Apps.get_model()` resolves it (#3769).
+    through = apps.get_model("test_registry.Taggable_tags")
+    through.objects.none()
+
+    through_with_args = apps.get_model("test_registry", "taggable_TAGS")
+    through_with_args.objects.none()
