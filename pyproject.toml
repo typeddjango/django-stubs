@@ -50,7 +50,7 @@ tests = [
   "pytest-xdist==3.8.0",
   # Django deps:
   "django==5.2.19; python_version < '3.12'",
-  "django==6.1.2; python_version >= '3.12'",
+  "django==6.1.3; python_version >= '3.12'",
   "mysqlclient==2.3.0",
   "psycopg[binary]==3.3.7",
   "psycopg2-binary==2.9.13",
