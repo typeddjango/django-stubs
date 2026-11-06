@@ -80,10 +80,10 @@ assert_type(flatten(person_list_admin.get_fields(request)), list[str])
 assert_type(flatten(person_tuple_admin.fields), list[str])
 assert_type(flatten(person_tuple_admin.get_fields(request)), list[str])
 
-assert_type(flatten(person_list_admin.list_display), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
-assert_type(flatten(person_list_admin.get_list_display(request)), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
-assert_type(flatten(person_tuple_admin.list_display), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
-assert_type(flatten(person_tuple_admin.get_list_display(request)), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
+assert_type(flatten(person_list_admin.list_display), list[_DisplayT[Person]])
+assert_type(flatten(person_list_admin.get_list_display(request)), list[_DisplayT[Person]])
+assert_type(flatten(person_tuple_admin.list_display), list[_DisplayT[Person]])
+assert_type(flatten(person_tuple_admin.get_list_display(request)), list[_DisplayT[Person]])
 
 assert_type(flatten_fieldsets(person_fieldset_list_admin.fieldsets), list[str])
 assert_type(flatten_fieldsets(person_fieldset_list_admin.get_fieldsets(request)), list[str])
