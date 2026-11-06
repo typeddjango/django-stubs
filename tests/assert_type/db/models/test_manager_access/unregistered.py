@@ -7,11 +7,11 @@ from typing import assert_type
 from django.db import models
 
 
-class CustomManager(models.Manager["WithDeclaredManager"]):
+class WithDefaultManager(models.Model):
     pass
 
 
-class WithDefaultManager(models.Model):
+class CustomManager(models.Manager["WithDeclaredManager"]):
     pass
 
 
