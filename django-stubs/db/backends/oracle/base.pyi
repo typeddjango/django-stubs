@@ -65,6 +65,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def oracledb_version(self) -> tuple[int, ...]: ...
 
 class OracleParam:
+    lob_types: frozenset[Any]
     force_bytes: Any
     input_size: Any
     def __init__(self, param: Any, cursor: Any, strings_only: bool = False) -> None: ...

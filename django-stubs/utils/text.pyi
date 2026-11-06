@@ -9,6 +9,8 @@ from django.db.models.base import Model
 from django.utils.functional import SimpleLazyObject, _StrOrPromise, _StrPromise, cached_property
 from typing_extensions import TypeVar, override
 
+_T = TypeVar("_T")
+
 _StrOrPromiseT = TypeVar("_StrOrPromiseT", bound=_StrOrPromise)
 _StrOrPromiseOrNoneT = TypeVar("_StrOrPromiseOrNoneT", bound=_StrOrPromise | None)
 
@@ -44,6 +46,7 @@ class Truncator(SimpleLazyObject[str]):
     def chars(self, num: int, truncate: str | None = None, html: bool = False) -> str: ...
     def words(self, num: int, truncate: str | None = None, html: bool = False) -> str: ...
 
+def trim_value(value: _T, limit: int = 4096) -> tuple[_T, str]: ...
 def get_valid_filename(name: _StrOrPromiseT) -> _StrOrPromiseT: ...
 @overload
 def get_text_list(list_: list[str], last_word: str = ...) -> str: ...

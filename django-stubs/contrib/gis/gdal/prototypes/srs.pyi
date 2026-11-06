@@ -16,7 +16,8 @@ from_wkt: Any
 from_proj: Any
 from_epsg: Any
 from_xml: Any
-from_user_input: Any
+# from_user_input: Any  # GDAL < 3.9
+from_user_input_ex: Any  # GDAL 3.9+
 morph_to_esri: Any
 morph_from_esri: Any
 identify_epsg: Any
