@@ -1,0 +1,47 @@
+name: Remove unused type checker ignores
+
+on:
+  pull_request:
+    paths: [uv.lock, pyproject.toml]
+
+env:
+  UV_FROZEN: true
+  UV_NO_SYNC: true
+  UV_PYTHON: "3.12"  # Same as run-ty and run-pyrefly in test.yml
+
+permissions:
+  contents: read
+
+jobs:
+  fix:
+    if: startsWith(github.head_ref, 'renovate/ty-') || startsWith(github.head_ref, 'renovate/pyrefly-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write  # to dispatch test.yml
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
+
+      # Remaining real errors are reported by test.yml
+      - if: startsWith(github.head_ref, 'renovate/ty-')
+        run: |
+          uv sync --no-dev --group ty
+          uv run ty check --fix tests/assert_type || true
+      - if: startsWith(github.head_ref, 'renovate/pyrefly-')
+        run: |
+          uv sync --no-dev --group pyrefly
+          uv run pyrefly check --remove-unused-ignores tests/assert_type || true
+
+      - run: |
+          git diff --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Remove unused type checker ignores"
+          git push
+          # Pushes with GITHUB_TOKEN don't trigger CI, dispatch is the exception
+          gh workflow run test.yml --ref "$GITHUB_HEAD_REF"
+        env:
+          GH_TOKEN: ${{ github.token }}
