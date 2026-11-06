@@ -385,6 +385,20 @@ class AddManagers(ModelClassInitializer):
         self.add_new_var_to_model_class(manager_name, manager_type, is_classvar=True)
 
     @override
+    def run(self) -> None:
+        model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
+        if model_cls is not None:
+            self.run_with_model_cls(model_cls)
+        elif not self.is_model_abstract and self.model_classdef.info.get("objects") is None:
+            # The app registry can't see this model, so its managers are unknown. Declare the default
+            # `objects` the stubs' `ModelBase.__getattr__` would, as `MetaclassAdjustments` removes it for mypy.
+            # See https://github.com/typeddjango/django-stubs/issues/1744
+            manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.MANAGER_CLASS_FULLNAME)
+            assert self.model_classdef.info.self_type is not None
+            manager_type = helpers.fill_instance(manager_info, [self.model_classdef.info.self_type])
+            self.add_new_var_to_model_class("objects", manager_type, is_classvar=True)
+
+    @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         manager_info: TypeInfo | None
 
