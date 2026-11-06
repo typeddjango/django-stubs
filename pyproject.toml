@@ -64,7 +64,7 @@ pyright = [
   "pyright==1.1.414",
 ]
 pyrefly = [
-  "pyrefly==1.4.0",
+  "pyrefly==1.4.1",
   "psycopg2-binary",
   "types-psycopg2",
 ]
