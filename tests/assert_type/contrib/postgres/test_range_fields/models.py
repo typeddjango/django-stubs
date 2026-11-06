@@ -17,6 +17,6 @@ class Booking(models.Model):
 def range_fields_read_null_true_as_optional() -> None:
     booking = Booking()
     assert_type(booking.null_time_range, DateTimeTZRange | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
-    assert_type(booking.int_range, NumericRange)  # pyrefly: ignore[assert-type]
+    assert_type(booking.int_range, NumericRange)
     assert_type(booking.null_decimal_range, NumericRange | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
     assert_type(booking.null_date_range, DateRange | None)  # type: ignore[assert-type]  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
