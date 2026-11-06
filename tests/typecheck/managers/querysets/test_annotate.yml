@@ -544,6 +544,96 @@
         User.objects.values_list("username", named=True).annotate(username=F("first_name"))  # E: Attribute "username" already defined on "django.contrib.auth.models.User"  [no-redef]
         User.objects.values_list("id", "username", named=True).annotate(username=F("first_name"))  # E: Attribute "username" already defined on "django.contrib.auth.models.User"  [no-redef]
 
+- case: annotate_expands_typeddict
+  main: |
+    from typing import cast, NotRequired, Required, TypedDict
+    from typing_extensions import reveal_type
+    from myapp.models import User
+    from django.db.models import BigIntegerField, CharField, F, Func
+    from django.db.models.functions import Lower
+
+    class ImplicitTotalAnnotation(TypedDict):
+        value: Func[CharField[str, str]]
+        other: NotRequired[Func[CharField[str, str]]]
+
+    class TotalAnnotation(TypedDict, total=True):
+        value: Func[CharField[str, str]]
+        other: NotRequired[Func[CharField[str, str]]]
+
+    class NonTotalAnnotation(TypedDict, total=False):
+        value: Required[Func[CharField[str, str]]]
+        other: Func[CharField[str, str]]
+
+    lower = cast(Func[CharField[str, str]], Lower("username"))
+    reveal_type(User.objects.annotate(**ImplicitTotalAnnotation(value=lower))) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': str | None})], myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': str | None})]]"
+    reveal_type(User.objects.annotate(**TotalAnnotation(value=lower))) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': str | None})], myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': str | None})]]"
+    reveal_type(User.objects.annotate(**NonTotalAnnotation(value=lower))) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': str | None})], myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': str | None})]]"
+
+    class PkPlusPlusAnnotation(TypedDict):
+        pkpp: Func[BigIntegerField[int, int]]
+
+    pkpp = cast(Func[BigIntegerField[int, int]], F("pk") + 1)
+    reveal_type(User.objects.annotate(  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'pkpp': int, 'other': str | None})], myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'pkpp': int, 'other': str | None})]]"
+        **ImplicitTotalAnnotation(value=lower),
+        **PkPlusPlusAnnotation(pkpp=pkpp),
+    ))
+
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class User(models.Model):
+            username = models.CharField(max_length=100)
+
+- case: annotate_expands_typeddict_merge_reusing_keys
+  skip: yes  # mypy crashes on key reuse
+  main: |
+    from typing import cast, NotRequired, TypedDict
+    from typing_extensions import reveal_type
+    from myapp.models import User
+    from django.db.models import BigIntegerField, CharField, F, Func
+    from django.db.models.functions import Lower
+
+    class ImplicitTotalAnnotation(TypedDict):
+        value: Func[CharField[str, str]]
+        other: NotRequired[Func[CharField[str, str]]]
+
+    class OtherRequiredAnnotation(TypedDict):
+        other: Func[BigIntegerField[int, int]]
+
+    lower = cast(Func[CharField[str, str]], Lower("username"))
+    pkpp = cast(Func[BigIntegerField[int, int]], F("pk") + 1)
+    reveal_type(User.objects.annotate( # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': int})], myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': int})]]"
+        **ImplicitTotalAnnotation(value=lower),
+        **OtherRequiredAnnotation(other=pkpp),
+    ))
+
+    reveal_type(User.objects.annotate( # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User@AnnotatedWith[TypedDict({'other': int, 'value': str})], myapp.models.User@AnnotatedWith[TypedDict({'other': int, 'value': str})]]"
+        **OtherRequiredAnnotation(other=pkpp),
+        **ImplicitTotalAnnotation(value=lower),
+    ))
+
+    class OtherOptionalAnnotation(TypedDict):
+        other: NotRequired[Func[BigIntegerField[int, int]]]
+
+    reveal_type(User.objects.annotate( # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': str | int | None})], myapp.models.User@AnnotatedWith[TypedDict({'value': str, 'other': str | int | None})]]"
+        **ImplicitTotalAnnotation(value=lower),
+        **OtherOptionalAnnotation(other=pkpp),
+    ))
+
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from django.db import models
+        class User(models.Model):
+            username = models.CharField(max_length=100)
+
 # Regression test for https://github.com/typeddjango/django-stubs/issues/3098
 # __isnull lookup on annotated fields should expect bool, not the annotation type
 - case: test_annotated_field_lookup_type_checking_ok
@@ -635,6 +725,7 @@
 
 -   case: annotate_resolves_output_field_type_from_classvar
     main: |
+        from typing import TypedDict
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models import Count, Exists, OuterRef
@@ -668,6 +759,16 @@
         created_time = User.objects.annotate(created_time=TruncTime('created_at')).get().created_time
         reveal_type(created_time) # N: Revealed type is "datetime.time"
 
+        # Count has output_field: ClassVar[IntegerField] → int
+        class CountAnnotation(TypedDict):
+            user_count: Count
+
+        def annotated() -> CountAnnotation:
+            return CountAnnotation(user_count=Count('id'))
+
+        user_count = User.objects.annotate(**annotated()).get().user_count
+        reveal_type(user_count) # N: Revealed type is "int"
+
     installed_apps:
         - myapp
     files:
@@ -681,6 +782,7 @@
 
 -   case: annotate_resolves_output_field_from_property
     main: |
+        from typing import TypedDict
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.contrib.postgres.aggregates import ArrayAgg
@@ -694,6 +796,16 @@
         sub_ids = User.objects.annotate(sub_ids=ArraySubquery(User.objects.values('id'))).get().sub_ids
         reveal_type(sub_ids) # N: Revealed type is "list[Any]"
 
+        class ArrayAggAnnotation(TypedDict):
+            usernames: ArrayAgg
+
+        def annotated() -> ArrayAggAnnotation:
+            return ArrayAggAnnotation(usernames=ArrayAgg('username'))
+
+        # ArrayAgg has output_field as @property → ArrayField → list[Any]
+        usernames = User.objects.annotate(**annotated()).get().usernames
+        reveal_type(usernames) # N: Revealed type is "list[Any]"
+
     installed_apps:
         - myapp
     files:
@@ -706,6 +818,7 @@
 
 -   case: annotate_resolves_output_field_from_subquery_generic
     main: |
+        from typing import TypedDict
         from typing_extensions import reveal_type
         from myapp.models import User
         from django.db.models import Subquery, OuterRef, IntegerField, CharField, Exists
@@ -729,6 +842,19 @@
         plain_subquery = Subquery(User.objects.filter(pk=OuterRef('pk')).values('id')[:1])
         val_any = User.objects.annotate(val=plain_subquery).get().val
         reveal_type(val_any)  # N: Revealed type is "Any"
+
+        # Subquery with explicit output_field=IntegerField() → int
+        class SubqueryAnnotation(TypedDict):
+            val: Subquery[IntegerField[int, int]]
+
+        def annotated() -> SubqueryAnnotation:
+            return SubqueryAnnotation(
+                val=Subquery(User.objects.filter(pk=OuterRef('pk')).values('id')[:1], output_field=IntegerField())
+            )
+
+        val_int = User.objects.annotate(**annotated()).get().val
+        reveal_type(val_int)  # N: Revealed type is "int"
+
     installed_apps:
         - myapp
     files:
@@ -741,9 +867,10 @@
 
 -   case: annotate_resolves_output_field_from_func_generic
     main: |
+        from typing import TypedDict
         from typing_extensions import reveal_type
         from myapp.models import User
-        from django.db.models import BinaryField
+        from django.db.models import BinaryField, Func
         from django.db.models.functions import Substr, Left, Right
 
         # Substr with explicit output_field=BinaryField() via variable
@@ -764,6 +891,17 @@
         right_expr = Right("username", 5, output_field=BinaryField())
         right_val = User.objects.annotate(suffix=right_expr).get().suffix
         reveal_type(right_val)  # N: Revealed type is "bytes | memoryview[int]"
+
+        class FuncAnnotation(TypedDict):
+            preview: Func[BinaryField[bytes | memoryview[int], bytes | memoryview[int]]]
+
+        def annotated() -> FuncAnnotation:
+            return FuncAnnotation(
+                preview=Substr("username", 1, 100, output_field=BinaryField())
+            )
+
+        val = User.objects.annotate(**annotated()).get().preview
+        reveal_type(val)  # N: Revealed type is "bytes | memoryview[int]"
 
     installed_apps:
         - myapp
