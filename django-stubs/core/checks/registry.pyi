@@ -13,6 +13,7 @@ class Tags:
     compatibility: str
     database: str
     files: str
+    gis: str
     mail: str
     models: str
     security: str
