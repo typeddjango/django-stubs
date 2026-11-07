@@ -373,7 +373,6 @@ def _resolve_output_field_type(expr_type: MypyType) -> MypyType | None:
             field_type = get_proper_type(func_type.ret_type)
 
     if isinstance(field_type, Instance):
-        # Annotated fields carry their PEP 696 defaults already, so the get type is the second arg
         type_args = helpers.get_field_type_args(field_type)
         if type_args is not None and not isinstance(type_args.get, AnyType):
             return type_args.get
