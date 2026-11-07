@@ -347,11 +347,10 @@ class DjangoContext:
                     field_info = helpers.lookup_class_typeinfo(api, field.__class__)
                     if field_info is None:
                         return None
-                    defaults = helpers.fill_field_defaults(field_info, api, is_get_nullable=field.null)
-                    field_type_args = helpers.get_field_type_args(defaults)
+                    field_type_args = helpers.get_field_type_args(helpers.fill_field_defaults(field_info, api))
                     if field_type_args is None:
                         return AnyType(TypeOfAny.explicit)
-                    return field_type_args.get
+                    return make_optional_type(field_type_args.get) if field.null else field_type_args.get
                 return lookup_type
 
         return None
