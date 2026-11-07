@@ -1,6 +1,6 @@
 name: Comment with mypy_primer diff
 
-on:
+on: # zizmor: ignore[dangerous-triggers] # We mitigate potential issues in `Unzip diffs` step
   workflow_run:
     workflows:
       - Run mypy_primer
@@ -38,7 +38,14 @@ jobs:
             });
             fs.writeFileSync("diff.zip", Buffer.from(download.data));
 
-      - run: unzip diff.zip
+      - name: Unzip diffs
+        run: |
+          unzip diff.zip
+          # The artifact comes from the PR's own run, a symlink could leak a runner file into the comment
+          if [ -n "$(find . -type l)" ]; then
+            echo "Error: the artifact cannot contain symlinks"
+            exit 1
+          fi
 
       - name: Get PR number
         id: get-pr-number
