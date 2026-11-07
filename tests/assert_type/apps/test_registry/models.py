@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Any, assert_type
 
@@ -56,8 +56,5 @@ class Taggable(models.Model):
 def get_model_resolves_auto_created_through_models() -> None:
     # Django creates the through model of a many-to-many field automatically and registers it in
     # the app registry, so `Apps.get_model()` resolves it (#3769).
-    through = apps.get_model("test_registry.Taggable_tags")
-    through.objects.none()
-
-    through_with_args = apps.get_model("test_registry", "taggable_TAGS")
-    through_with_args.objects.none()
+    assert_type(apps.get_model("test_registry.Taggable_tags"), type[Taggable_tags])  # ruff: ignore[undefined-name]  # pyright: ignore[reportUndefinedVariable]  # pyrefly: ignore[unknown-name]
+    assert_type(apps.get_model("test_registry", "taggable_TAGS"), type[Taggable_tags])  # ruff: ignore[undefined-name]  # pyright: ignore[reportUndefinedVariable]  # pyrefly: ignore[unknown-name]
