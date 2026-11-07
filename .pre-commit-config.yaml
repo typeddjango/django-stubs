@@ -31,6 +31,17 @@ repos:
     rev: 46787482b9fb2003c56e0f7592e312ef381829d9  # frozen: 0.13.6
     hooks:
       - id: uv-lock
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: 06a39750ec31860bb44f2acf67182c40016cd1e7  # frozen: v1.32.0
+    hooks:
+      - id: zizmor
+        args: ["--fix"]
+  - repo: https://github.com/rhysd/actionlint
+    rev: 914e7df21a07ef503a81201c76d2b11c789d3fca  # frozen: v1.7.12
+    hooks:
+      - id: actionlint
+        additional_dependencies:
+          - "github.com/wasilibs/go-shellcheck/cmd/shellcheck@v0.11.1"
 
 ci:
   autofix_commit_msg: "[pre-commit.ci] auto fixes from pre-commit.com hooks"

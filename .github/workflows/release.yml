@@ -7,6 +7,8 @@ on:
 concurrency:
   group: release-${{ github.event.release.tag_name }}
 
+permissions: {}
+
 jobs:
   build-and-publish-ext:
     runs-on: ubuntu-latest
@@ -23,6 +25,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Build ext package
         run: uv build --package=django-stubs-ext
       - name: Publish ext to PyPI
@@ -44,6 +47,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Build package
         run: uv build --package=django-stubs
       - name: Publish to PyPI
