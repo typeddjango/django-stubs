@@ -50,5 +50,4 @@ ci:
   autoupdate_schedule: weekly
   submodules: false
   skip:
-    - actionlint
     - uv-lock
