@@ -40,9 +40,7 @@ def lazy_related_operation(
     function: Callable[..., Any], model: type[Model], *related_models: type[Model] | str, **kwargs: Any
 ) -> None: ...
 
-# __set__ value type
 _ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
-# __get__ return type
 _GT_co = TypeVar("_GT_co", covariant=True, default=_ST_contra)
 
 class RelatedField(FieldCacheMixin, Field[_ST_contra, _GT_co]):

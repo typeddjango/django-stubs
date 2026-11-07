@@ -15,11 +15,8 @@ from django.db.models.sql.compiler import _AsSqlType
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeVar, Unpack, deprecated, override
 
-# The column's set and get types, like every other field. The `__init__` overloads fill them
-# from `base_field`'s own type parameters, so the element type never needs spelling out.
 _ST_Array_contra = TypeVar("_ST_Array_contra", contravariant=True, default=Sequence[Any])
 _GT_Array_co = TypeVar("_GT_Array_co", covariant=True, default=list[Any])
-# Element set and get types, solved from the `base_field` argument.
 _ElemST = TypeVar("_ElemST")
 _ElemGT = TypeVar("_ElemGT")
 

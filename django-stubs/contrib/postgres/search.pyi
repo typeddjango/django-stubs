@@ -13,9 +13,7 @@ from .utils import CheckPostgresInstalledMixin
 
 _Expression: TypeAlias = str | Combinable | SearchQueryCombinable
 
-# __set__ value type
 _ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
-# __get__ return type
 _GT_co = TypeVar("_GT_co", covariant=True, default=Any)
 
 class UTF8Dumper(Dumper):
