@@ -1,6 +1,6 @@
 name: Comment with mypy_primer diff
 
-on: # zizmor: ignore[dangerous-triggers] # We mitigate potential issues in `Unzip diffs` step
+on: # zizmor: ignore[dangerous-triggers] # Needed to comment on fork PRs, the artifact is checked in `Extract diffs` and `Get PR number`
   workflow_run:
     workflows:
       - Run mypy_primer
@@ -38,14 +38,12 @@ jobs:
             });
             fs.writeFileSync("diff.zip", Buffer.from(download.data));
 
-      - name: Unzip diffs
+      # The artifact comes from the PR's own run, streaming it writes none of its entries,
+      # so a symlink entry can't leak a runner file into the comment.
+      - name: Extract diffs
         run: |
-          unzip diff.zip
-          # The artifact comes from the PR's own run, a symlink could leak a runner file into the comment
-          if [ -n "$(find . -type l)" ]; then
-            echo "Error: the artifact cannot contain symlinks"
-            exit 1
-          fi
+          unzip -p diff.zip 'diff_*.txt' | tee fulldiff.txt
+          unzip -p diff.zip pr_number.txt > pr_number
 
       - name: Get PR number
         id: get-pr-number
@@ -53,7 +51,13 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            return parseInt(fs.readFileSync("pr_number.txt", { encoding: "utf8" }))
+            const prNumber = parseInt(fs.readFileSync("pr_number", { encoding: "utf8" }))
+            // The PR's own run wrote this number, so check it points at the PR this run tested
+            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: prNumber })
+            if (pr.head.sha !== context.payload.workflow_run.head_sha) {
+              throw new Error(`PR #${prNumber} is not the PR tested by this run`)
+            }
+            return prNumber
 
       - name: Hide old comments
         uses: int128/hide-comment-action@06152282c98d81595109f39d4d1542d0c676ffba  # v1.77.0
@@ -61,11 +65,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ steps.get-pr-number.outputs.result }}
 
-      - run: cat diff_*.txt | tee fulldiff.txt
-
       - name: Post comment
         id: post-comment
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
+        env:
+          PR_NUMBER: ${{ steps.get-pr-number.outputs.result }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -100,9 +104,8 @@ jobs:
               body = 'Diff from [mypy_primer](https://github.com/hauntsaninja/mypy_primer), '
               body += 'showing the effect of this PR on type check results on a corpus of open source code:\n```diff\n'
               body += data + '```'
-              const prNumber = parseInt(fs.readFileSync("pr_number.txt", { encoding: "utf8" }))
               await github.rest.issues.createComment({
-                issue_number: prNumber,
+                issue_number: Number(process.env.PR_NUMBER),
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 body
