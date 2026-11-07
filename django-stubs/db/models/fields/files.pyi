@@ -73,13 +73,12 @@ class FileField(Field[_ST_contra, _GT_File_co]):
         db_default: type[NOT_PROVIDED] | Expression | str = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
-    # FileDescriptor.__get__ wraps a NULL column in `FieldFile(name=None)`, so reads are never optional.
     # class access
     @overload
     @type_check_only
     @override
     def __get__(self, instance: None, owner: Any) -> FileDescriptor: ...
-    # Model instance access — null=True does NOT add `| None`
+    # Model instance access: a NULL column reads as `FieldFile(name=None)`, so `null=True` adds no `| None`.
     @overload
     @type_check_only
     @override
