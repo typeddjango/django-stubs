@@ -182,12 +182,11 @@ def set_descriptor_types_for_field(
             _warn_if_nullable_get_not_optional(ctx, default_return_type)
         return default_return_type
 
-    # FileDescriptor.__get__ always returns a FieldFile and its __set__ accepts None; the stub is authoritative.
-    if default_return_type.type.has_base(fullnames.FILE_FIELD_FULLNAME):
-        return default_return_type
-
-    # The ArrayField overloads derive the column types from `base_field`, nullability included.
-    if default_return_type.type.has_base(fullnames.ARRAY_FIELD_FULLNAME):
+    # The `null=True` widening below is wrong for these two: a NULL FileField column still reads as
+    # `FieldFile`, and ArrayField's args are nested element types derived from `base_field`.
+    if helpers.has_any_of_bases(
+        default_return_type.type, (fullnames.FILE_FIELD_FULLNAME, fullnames.ARRAY_FIELD_FULLNAME)
+    ):
         return default_return_type
 
     is_primary_key = helpers.get_bool_call_argument_by_name(ctx, "primary_key", default=False)
@@ -197,10 +196,7 @@ def set_descriptor_types_for_field(
         is_set_nullable = is_primary_key
 
     set_type, get_type = get_field_descriptor_types(
-        default_return_type.type,
-        helpers.get_typechecker_api(ctx),
-        is_set_nullable=is_set_nullable or is_nullable,
-        is_get_nullable=is_get_nullable or is_nullable,
+        default_return_type.type, helpers.get_typechecker_api(ctx), is_set_nullable=False, is_get_nullable=False
     )
 
     # reconcile set and get types with the base field class
@@ -212,12 +208,12 @@ def set_descriptor_types_for_field(
         # always replace set_type and get_type with (non-Any) mapped types
         set_type = helpers.convert_any_to_type(mapped_types.set, set_type)
         get_type = helpers.convert_any_to_type(mapped_types.get, get_type)
-        # The type parameters default to the non-null types, so fold `None` in for nullable fields.
-        if is_set_nullable or is_nullable:
-            set_type = make_optional_type(set_type)
-        if is_get_nullable or is_nullable:
-            get_type = make_optional_type(get_type)
 
+    # The type parameters default to the non-null types, so fold `None` in for nullable fields.
+    if is_set_nullable or is_nullable:
+        set_type = make_optional_type(set_type)
+    if is_get_nullable or is_nullable:
+        get_type = make_optional_type(get_type)
     return default_return_type.copy_modified(args=[set_type, get_type])
 
 
