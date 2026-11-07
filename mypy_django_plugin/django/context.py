@@ -200,7 +200,9 @@ class DjangoContext:
 
     @cached_property
     def all_registered_model_classes(self) -> set[type[models.Model]]:
-        model_classes = self.apps_registry.get_models()
+        # Mirror `Apps.get_model()`, which also resolves models that Django creates automatically
+        # (e.g. the implicit through model of a many-to-many field) and swapped-in models.
+        model_classes = self.apps_registry.get_models(include_auto_created=True, include_swapped=True)
 
         all_model_bases = set()
         for model_cls in model_classes:
