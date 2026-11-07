@@ -18,7 +18,6 @@ from typing_extensions import TypeVar, override
 _To = TypeVar("_To", bound=Model, default=Any)
 
 class GenericForeignKey(FieldCacheMixin, Field[Any, Any]):
-    # attributes
     hidden: bool
     is_relation: bool
     many_to_many: bool

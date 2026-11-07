@@ -49,9 +49,7 @@ _AllLimitChoicesTo: TypeAlias = _LimitChoicesTo | _LimitChoicesToCallable | _Cho
 _ErrorMessagesMapping: TypeAlias = Mapping[str, _StrOrPromise]
 _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
-# __set__ value type
 _ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
-# __get__ return type
 _GT_co = TypeVar("_GT_co", covariant=True, default=Any)
 
 # Keyword arguments shared by every Field constructor, factored out so subclass constructors stay short.
@@ -661,7 +659,6 @@ _GT_Decimal_co = TypeVar("_GT_Decimal_co", covariant=True, default=decimal.Decim
 
 class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
     _pyi_lookup_exact_type: str | int | decimal.Decimal
-    # attributes
     max_digits: int
     decimal_places: int
     @overload

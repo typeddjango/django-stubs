@@ -54,7 +54,6 @@ _M_contra = TypeVar("_M_contra", bound=Model, contravariant=True)
 class _UploadToCallable(Protocol[_M_contra]):
     def __call__(self, instance: _M_contra, filename: str, /) -> StrPath: ...
 
-# __get__ return type
 _GT_File_co = TypeVar("_GT_File_co", covariant=True, default=FieldFile)
 
 class FileField(Field[_ST_contra, _GT_File_co]):
