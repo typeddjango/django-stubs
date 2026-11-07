@@ -391,23 +391,10 @@ class FieldTypeArgs(NamedTuple):
     get: ProperType
 
 
-def fill_field_defaults(
-    field_info: TypeInfo,
-    api: TypeChecker | SemanticAnalyzer,
-    *,
-    is_set_nullable: bool = False,
-    is_get_nullable: bool = False,
-) -> Instance:
-    """Build an Instance of `field_info` with PEP 696 defaults; fold `| None` into set/get args if asked."""
+def fill_field_defaults(field_info: TypeInfo, api: TypeChecker | SemanticAnalyzer) -> Instance:
+    """Build an Instance of `field_info` with its PEP 696 defaults applied."""
     inst = Instance(field_info, ())
     fix_instance(inst, api.fail, api.note, disallow_any=False, options=api.options, use_generic_error=True)
-    if inst.args:
-        args = list(inst.args)
-        if is_set_nullable:
-            args[0] = make_optional_type(args[0])
-        if is_get_nullable and len(args) > 1:
-            args[1] = make_optional_type(args[1])
-        inst = inst.copy_modified(args=args)
     return inst
 
 
