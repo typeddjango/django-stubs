@@ -111,6 +111,20 @@ def nullable_field_subclass_without_explicit_type_vars() -> None:
     assert_type(BareArticle().slug_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
 
 
+class MixedIntegerField(FieldMixin, models.IntegerField[_ST_contra, _GT_co]): ...
+
+
+# The type vars have no defaults, so only the plugin resolves them, walking past the mixin.
+class MixinFirstArticle(models.Model):
+    count = MixedIntegerField()  # pyright: ignore[reportUnknownVariableType]
+    count_nullable = MixedIntegerField(null=True)  # pyright: ignore[reportUnknownVariableType]
+
+
+def generic_subclass_with_mixin_before_the_field_resolves_the_defaults() -> None:
+    assert_type(MixinFirstArticle().count, int)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
+    assert_type(MixinFirstArticle().count_nullable, int | None)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]
+
+
 class PositionalArgs(models.Model):
     amount = models.DecimalField(None, None, 10, 2, null=True)  # max_digits/decimal_places positional
     day = models.DateField(None, None, False, False, null=True)  # auto_now/auto_now_add positional

@@ -84,10 +84,12 @@ def field_two_typevar_form_in_user_annotation() -> None:
 
 class NullableUser(models.Model):
     # test null=True on fields with non-optional generic types throw error
-    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)
     my_custom_field6 = CustomValueField(null=True)  # type: ignore[misc]
     my_custom_field7 = SingleTypeField[bool](null=True)  # type: ignore[misc]
     my_custom_field8 = AdditionalTypeVarField[CustomFieldValue | int, CustomFieldValue, bool](null=True)  # type: ignore[misc]
+
+    # test null=True on fields with a non-optional `[set, get]` pair: the plugin makes both optional
+    my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)
     my_custom_field9 = fields.Field[CustomFieldValue | int, CustomFieldValue](null=True)
 
     # test null=True on fields with optional generic types throw no errors
