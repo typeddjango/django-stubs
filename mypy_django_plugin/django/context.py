@@ -332,7 +332,8 @@ class DjangoContext:
         Returns:
             The resolved type, or None if it couldn't be determined
         """
-        lookup_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), lookup_cls)
+        api = helpers.get_typechecker_api(ctx)
+        lookup_info = helpers.lookup_class_typeinfo(api, lookup_cls)
         if lookup_info is None:
             return None
 
@@ -343,12 +344,10 @@ class DjangoContext:
                     if field is None:
                         # No field available (e.g., annotation), can't resolve further
                         return None
-                    field_info = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), field.__class__)
+                    field_info = helpers.lookup_class_typeinfo(api, field.__class__)
                     if field_info is None:
                         return None
-                    defaults = helpers.fill_field_defaults(
-                        field_info, helpers.get_typechecker_api(ctx), is_get_nullable=field.null
-                    )
+                    defaults = helpers.fill_field_defaults(field_info, api, is_get_nullable=field.null)
                     field_type_args = helpers.get_field_type_args(defaults)
                     if field_type_args is None:
                         return AnyType(TypeOfAny.explicit)
