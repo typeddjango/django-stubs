@@ -571,7 +571,9 @@ The `null=...` flag is resolved at the call site by the fields' constructor over
 - `IntegerField()` and `IntegerField(null=False)` are an `IntegerField[float | int | str, int]`.
 - `IntegerField(null=True)` is an `IntegerField[float | int | str | None, int | None]`.
 
-A custom field subclass has to declare both the type parameters' defaults and the constructor overloads.
+A custom field subclass has to declare the type parameters' defaults. The constructor overloads are only
+needed for mypy and pyright, which don't solve a subclass's type parameters from the inherited overloads;
+pyrefly and ty resolve `MyIntegerField(null=True)` without them.
 ```python
 from __future__ import annotations
 
@@ -589,6 +591,7 @@ _GT_co = TypeVar("_GT_co", covariant=True, default=int)
 
 
 class MyIntegerField(models.IntegerField[_ST_contra, _GT_co]):
+    # The overloads below are only needed for mypy and pyright, see above
     @overload
     def __init__(
         # Self-annotation: what `MyIntegerField(null=True)` resolves to
