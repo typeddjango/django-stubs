@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from typing import Annotated, Any, Generic
 
 from django.db.models.base import Model
-from typing_extensions import TypeVar
+from typing_extensions import TypeAliasType, TypeVar
 
 # Really, we would like to use TypedDict as a bound, but it's not possible
 _Annotations_co = TypeVar("_Annotations_co", covariant=True, bound=Mapping[str, Any])
@@ -16,7 +16,12 @@ class Annotations(Generic[_Annotations_co]):
 
 _T = TypeVar("_T", bound=Model)
 
-WithAnnotations = Annotated[_T, Annotations[_Annotations_co]]
+# Explicit type params: `Annotated` only collects TypeVars from its first argument,
+# so a plain alias would be single-parameter at runtime (#719).
+# Swap to `type WithAnnotations[_T: Model, _Annotations_co: Mapping[str, Any]] = ...` once 3.11 is dropped.
+WithAnnotations = TypeAliasType(
+    "WithAnnotations", Annotated[_T, Annotations[_Annotations_co]], type_params=(_T, _Annotations_co)
+)
 """Alias to make it easy to annotate the model `_T` as having annotations
 `_Annotations_co` (a `TypedDict`).
 
