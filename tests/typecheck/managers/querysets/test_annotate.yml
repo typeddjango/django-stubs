@@ -1073,3 +1073,33 @@
         annotated = qs.values("id").annotate(foo=models.Max("id"))
         reveal_type(annotated)  # N: Revealed type is "django.db.models.query.QuerySet[django.db.models.base.Model, dict[str, Any]]"
         return annotated.first()
+
+# Regression test from https://github.com/typeddjango/django-stubs/pull/3068
+- case: annotate_in_generic_queryset_with_distinct_row_type_var
+  main: |
+    from typing_extensions import reveal_type
+    from myapp.models import Tag
+
+    reveal_type(Tag.objects.annotate_with_foo())  # N: Revealed type is "myapp.models.TagQuerySet[myapp.models.Tag@AnnotatedWith[TypedDict(myapp.models.AnnWithFoo, {'foo': str})], myapp.models.Tag@AnnotatedWith[TypedDict(myapp.models.AnnWithFoo, {'foo': str})]]"
+    reveal_type(Tag.objects.annotate_with_foo().get().foo)  # N: Revealed type is "str"
+  installed_apps:
+    - myapp
+  files:
+    - path: myapp/__init__.py
+    - path: myapp/models.py
+      content: |
+        from typing import TypedDict
+        from django.db import models
+        from django.db.models import F
+        from django_stubs_ext import WithAnnotations
+
+        class AnnWithFoo(TypedDict):
+            foo: str
+
+        class TagQuerySet[M: models.Model, R: models.Model](models.QuerySet[M, R]):
+            def annotate_with_foo(self) -> "TagQuerySet[WithAnnotations[M, AnnWithFoo], WithAnnotations[R, AnnWithFoo]]":
+                return self.annotate(foo=F("id"))
+
+        class Tag(models.Model):
+            name = models.CharField(max_length=10)
+            objects = TagQuerySet.as_manager()
