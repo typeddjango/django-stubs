@@ -1088,7 +1088,7 @@
     - path: myapp/__init__.py
     - path: myapp/models.py
       content: |
-        from typing import TypedDict
+        from typing import TypedDict, TypeVar
         from django.db import models
         from django.db.models import F
         from django_stubs_ext import WithAnnotations
@@ -1096,7 +1096,10 @@
         class AnnWithFoo(TypedDict):
             foo: str
 
-        class TagQuerySet[M: models.Model, R: models.Model](models.QuerySet[M, R]):
+        M = TypeVar("M", bound=models.Model)
+        R = TypeVar("R", bound=models.Model)
+
+        class TagQuerySet(models.QuerySet[M, R]):
             def annotate_with_foo(self) -> "TagQuerySet[WithAnnotations[M, AnnWithFoo], WithAnnotations[R, AnnWithFoo]]":
                 return self.annotate(foo=F("id"))
 
