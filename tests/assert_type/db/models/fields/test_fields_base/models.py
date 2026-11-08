@@ -30,7 +30,7 @@ class NoPrimaryKey(models.Model):
 
 
 def test_add_id_field_if_no_primary_key_defined() -> None:
-    assert_type(NoPrimaryKey().id, int)  # pyright: ignore[reportAssertTypeFailure, reportAttributeAccessIssue, reportUnknownMemberType]  # ty: ignore[type-assertion-failure, missing-attribute]  # pyrefly: ignore[assert-type, missing-attribute]
+    assert_type(NoPrimaryKey().id, int)  # pyright: ignore[reportAssertTypeFailure, reportAttributeAccessIssue, reportUnknownMemberType]  # ty: ignore[type-assertion-failure, missing-attribute]
 
 
 class CustomPrimaryKey(models.Model):
