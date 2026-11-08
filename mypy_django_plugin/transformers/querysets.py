@@ -14,6 +14,7 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
 from mypy.errorcodes import NO_REDEF
+from mypy.maptype import map_instance_to_supertype
 from mypy.nodes import (
     ARG_NAMED,
     ARG_NAMED_OPT,
@@ -26,8 +27,10 @@ from mypy.nodes import (
     SetExpr,
     StrExpr,
     TupleExpr,
+    TypeInfo,
     Var,
 )
+from mypy.subtypes import is_subtype
 from mypy.types import (
     AnyType,
     CallableType,
@@ -41,6 +44,7 @@ from mypy.types import (
     get_proper_type,
 )
 from mypy.types import Type as MypyType
+from mypy.typevars import fill_typevars
 
 from mypy_django_plugin.django.context import DjangoContext, LookupsAreUnsupported
 from mypy_django_plugin.lib import fullnames, helpers
@@ -191,6 +195,33 @@ def get_values_list_row_type(
     return row_type
 
 
+def _mro_base(instance: Instance, fullname: str) -> TypeInfo | None:
+    return next((base for base in instance.type.mro if base.fullname == fullname), None)
+
+
+def _with_row(ctx: MethodContext, default: Instance, model: MypyType, row: MypyType) -> Instance:
+    """
+    Keep the receiver's QuerySet subclass when it forwards the row type var, e.g. `QuerySet[_M, _Row]`.
+    Stubs can't spell "Self with another row type": https://github.com/python/typing/issues/548
+    """
+    qs: ProperType = ctx.type
+    if isinstance(qs, Instance) and (manager_info := _mro_base(qs, fullnames.BASE_MANAGER_CLASS_FULLNAME)):
+        qs = get_proper_type(map_instance_to_supertype(qs, manager_info).args[1])
+    if isinstance(qs, Instance) and (queryset_info := _mro_base(qs, fullnames.QUERYSET_CLASS_FULLNAME)):
+        own = fill_typevars(qs.type)
+        assert isinstance(own, Instance)
+        model_var, row_var = (get_proper_type(arg) for arg in map_instance_to_supertype(own, queryset_info).args)
+        # `QuerySet[_M]` has no row slot of its own, the row defaults to the model type var,
+        # and `reparametrize_any_queryset_hook` bounds the row of `QuerySet["Book"]` to `Book`
+        if isinstance(row_var, TypeVarType) and row_var != model_var and is_subtype(row, row_var.upper_bound):
+            substitutions = {row_var.id: row}
+            if isinstance(model_var, TypeVarType):
+                substitutions[model_var.id] = model
+            args = [substitutions.get(tv.id, arg) for tv, arg in zip(qs.type.defn.type_vars, qs.args, strict=True)]
+            return Instance(qs.type, args)
+    return default.copy_modified(args=[model, row])
+
+
 def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
@@ -205,7 +236,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
 
     if flat and named:
         ctx.api.fail("'flat' and 'named' can't be used together", ctx.context)
-        return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
+        return _with_row(ctx, default_return_type, django_model.typ, AnyType(TypeOfAny.from_error))
 
     annotation_types = _get_annotation_field_types(django_model.typ) if django_model.is_annotated else {}
     row_type = get_values_list_row_type(
@@ -216,7 +247,7 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
         flat=flat,
         named=named,
     )
-    ret = default_return_type.copy_modified(args=[django_model.typ, row_type])
+    ret = _with_row(ctx, default_return_type, django_model.typ, row_type)
     if not named and (field_lookups := resolve_field_lookups(ctx.args[0], django_context)):
         # For non-named values_list, the row type does not encode column names.
         # Attach selected field names to the returned QuerySet instance so that
@@ -577,14 +608,14 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
             if django_model.is_annotated:
                 column_types[field_lookup] = AnyType(TypeOfAny.from_omitted_generics)
             else:
-                return default_return_type.copy_modified(args=[django_model.typ, AnyType(TypeOfAny.from_error)])
+                return _with_row(ctx, default_return_type, django_model.typ, AnyType(TypeOfAny.from_error))
         else:
             column_types[field_lookup] = field_lookup_type
 
     # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
     column_types.update(gather_expression_types(ctx))
     row_type = helpers.make_typeddict(ctx.api, column_types)
-    return default_return_type.copy_modified(args=[django_model.typ, row_type])
+    return _with_row(ctx, default_return_type, django_model.typ, row_type)
 
 
 def _infer_prefetch_queryset_type(queryset_expr: Expression, api: TypeChecker) -> Instance | None:
