@@ -462,6 +462,10 @@ def _resolve_annotate_row_type(
         return api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.from_omitted_generics)])
     if isinstance(original_row_type, Instance) and helpers.is_model_type(original_row_type.type):
         return annotated_model
+    if isinstance(original_row_type, TypeVarType):
+        upper_bound = get_proper_type(original_row_type.upper_bound)
+        if isinstance(upper_bound, Instance) and helpers.is_model_type(upper_bound.type):
+            return annotated_model
     return original_row_type
 
 
