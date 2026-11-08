@@ -14,6 +14,7 @@ from django.db.models.fields.related_descriptors import (
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.sql.query import Query
 from mypy.errorcodes import NO_REDEF
+from mypy.maptype import map_instance_to_supertype
 from mypy.nodes import (
     ARG_NAMED,
     ARG_NAMED_OPT,
@@ -26,8 +27,10 @@ from mypy.nodes import (
     SetExpr,
     StrExpr,
     TupleExpr,
+    TypeInfo,
     Var,
 )
+from mypy.subtypes import is_subtype
 from mypy.types import (
     AnyType,
     CallableType,
@@ -191,6 +194,37 @@ def get_values_list_row_type(
     return row_type
 
 
+def _mro_base(instance: Instance, fullname: str) -> TypeInfo | None:
+    return next((base for base in instance.type.mro if base.fullname == fullname), None)
+
+
+def _queryset_subclass_with_row(ctx: MethodContext, row: MypyType) -> Instance | None:
+    """
+    Rebuild the receiver's custom queryset with another row type, e.g. `MyQS[_M, _Row]` -> `MyQS[Book, Row]`.
+    The stubs can't express it: https://github.com/python/typing/issues/548
+    """
+    qs: ProperType = ctx.type
+    if isinstance(qs, Instance) and (manager_info := _mro_base(qs, fullnames.BASE_MANAGER_CLASS_FULLNAME)):
+        qs = get_proper_type(map_instance_to_supertype(qs, manager_info).args[1])
+    if not isinstance(qs, Instance) or not (queryset_info := _mro_base(qs, fullnames.QUERYSET_CLASS_FULLNAME)):
+        return None
+
+    # Which of the subclass's own type vars fills the `QuerySet` row slot?
+    own_type_vars = qs.type.defn.type_vars
+    model_var, row_var = map(
+        get_proper_type, map_instance_to_supertype(Instance(qs.type, own_type_vars), queryset_info).args
+    )
+    if (
+        not isinstance(row_var, TypeVarType)
+        or row_var == model_var  # `QuerySet[_M]`: the row slot defaults to the model type var
+        or not is_subtype(row, row_var.upper_bound)  # `QuerySet["Book"]`: the plugin bounds the row slot to `Book`
+    ):
+        return None
+    return qs.copy_modified(
+        args=[row if tv.id == row_var.id else arg for tv, arg in zip(own_type_vars, qs.args, strict=True)]
+    )
+
+
 def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is None:
@@ -216,7 +250,9 @@ def extract_proper_type_queryset_values_list(ctx: MethodContext, django_context:
         flat=flat,
         named=named,
     )
-    ret = default_return_type.copy_modified(args=[django_model.typ, row_type])
+    ret = _queryset_subclass_with_row(ctx, row_type) or default_return_type.copy_modified(
+        args=[django_model.typ, row_type]
+    )
     if not named and (field_lookups := resolve_field_lookups(ctx.args[0], django_context)):
         # For non-named values_list, the row type does not encode column names.
         # Attach selected field names to the returned QuerySet instance so that
@@ -584,7 +620,9 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
     # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
     column_types.update(gather_expression_types(ctx))
     row_type = helpers.make_typeddict(ctx.api, column_types)
-    return default_return_type.copy_modified(args=[django_model.typ, row_type])
+    return _queryset_subclass_with_row(ctx, row_type) or default_return_type.copy_modified(
+        args=[django_model.typ, row_type]
+    )
 
 
 def _infer_prefetch_queryset_type(queryset_expr: Expression, api: TypeChecker) -> Instance | None:

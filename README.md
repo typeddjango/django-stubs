@@ -310,6 +310,36 @@ class Book(models.Model):
 > so code that used to go through `Any` (for instance attributes added by `annotate` inside a queryset
 > method) may now report errors that were previously hidden.
 
+### Why are my custom queryset methods lost after `values()` or `values_list()`?
+
+These methods change the row type of the queryset, so they return a plain `QuerySet` by default.
+To keep your custom queryset class, give it a row type variable defaulting to the model:
+
+```python
+from typing_extensions import Self, TypeVar
+
+_M = TypeVar("_M", bound=models.Model)
+_Row = TypeVar("_Row", default=_M)
+
+
+class BookQuerySet(models.QuerySet[_M, _Row]):
+    def published(self) -> Self:
+        return self.filter(is_published=True)
+
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    is_published = models.BooleanField()
+    objects = BookQuerySet.as_manager()
+
+
+Book.objects.values("title").published()  # BookQuerySet[Book, TypedDict({'title': str})]
+```
+
+> [!NOTE]
+> This relies on the mypy plugin. Other type checkers still return a plain `QuerySet`,
+> as typing cannot express "`Self` with another row type" ([python/typing#548](https://github.com/python/typing/issues/548)).
+
 ### How do I annotate cases where I called QuerySet.annotate?
 
 Django-stubs provides a special type, `django_stubs_ext.WithAnnotations[Model, <Annotations>]`, which indicates that
