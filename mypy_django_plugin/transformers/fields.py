@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, NamedTuple, cast
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import RelatedField
-from mypy.nodes import AssignmentStmt, NameExpr, TypeInfo
+from mypy.nodes import AssignmentStmt, CallExpr, IndexExpr, NameExpr, TypeInfo
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.typeanal import make_optional_type
@@ -175,9 +175,11 @@ def set_descriptor_types_for_field(
     default_return_type = cast("Instance", ctx.default_return_type)
     is_nullable = helpers.get_bool_call_argument_by_name(ctx, "null", default=False)
 
-    if len(default_return_type.args) != 2:
-        # A fully bound field (`class F(Field[str, str])`) or a field with extra type parameters
-        # has no set/get slot to widen: the stub's answer stands.
+    # Explicit type arguments (`F[str, str](null=True)`) are fixed by the typing spec: a self-annotated
+    # overload can't widen them and neither should the plugin. Same as a fully bound field (`class F(Field[str, str])`)
+    # or a field with extra type parameters: there is no set/get slot to widen, the stub's answer stands.
+    is_explicitly_subscripted = isinstance(ctx.context, CallExpr) and isinstance(ctx.context.callee, IndexExpr)
+    if len(default_return_type.args) != 2 or is_explicitly_subscripted:
         if is_nullable:
             _warn_if_nullable_get_not_optional(ctx, default_return_type)
         return default_return_type
