@@ -150,6 +150,26 @@
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100, blank=True)
 
+-   case: queryset_values_field_with_default_is_not_nullable
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Blog
+        values = Blog.objects.values('data', 'text', 'num_posts').get()
+        reveal_type(values)  # N: Revealed type is "TypedDict({'data': Any, 'text': str, 'num_posts': int})"
+        values['data'].get('key')
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Blog(models.Model):
+                    data = models.JSONField(default=dict)
+                    text = models.CharField(max_length=100, default="")
+                    num_posts = models.IntegerField(default=0)
+
 -   case: queryset_values_with_expressions
     main: |
         from typing_extensions import reveal_type
