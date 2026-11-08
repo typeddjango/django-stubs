@@ -16,9 +16,7 @@ class Annotations(Generic[_Annotations_co]):
 
 _T = TypeVar("_T", bound=Model)
 
-# Explicit type params: `Annotated` only collects TypeVars from its first argument,
-# so a plain alias would be single-parameter at runtime (#719).
-# Swap to `type WithAnnotations[_T: Model, _Annotations_co: Mapping[str, Any]] = ...` once 3.11 is dropped.
+# TODO: 3.12+: `type WithAnnotations[_T: Model, _Annotations_co: Mapping[str, Any]] = Annotated[...]`
 WithAnnotations = TypeAliasType(
     "WithAnnotations", Annotated[_T, Annotations[_Annotations_co]], type_params=(_T, _Annotations_co)
 )
