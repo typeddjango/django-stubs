@@ -1636,6 +1636,9 @@ _GT_Auto_co = TypeVar("_GT_Auto_co", covariant=True, default=int)
 
 class AutoField(AutoFieldMixin, IntegerField[_ST_Auto_contra, _GT_Auto_co], metaclass=AutoFieldMeta):  # type: ignore[misc]
     _pyi_lookup_exact_type: str | int
+    # pyrefly types the implicit `id` from these, not from the type parameters. TODO: drop once it does.
+    _pyi_private_set_type: int | str
+    _pyi_private_get_type: int
 
 class BigAutoField(AutoFieldMixin, BigIntegerField[_ST_Auto_contra, _GT_Auto_co]): ...  # type: ignore[misc]
 class SmallAutoField(AutoFieldMixin, SmallIntegerField[_ST_Auto_contra, _GT_Auto_co]): ...  # type: ignore[misc]
