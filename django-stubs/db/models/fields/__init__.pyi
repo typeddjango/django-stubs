@@ -340,6 +340,10 @@ class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
+# Every subclass repeats its parent's `__init__` overloads: mypy and pyright don't solve a subclass's
+# type parameters from an inherited self-annotated overload, so `SmallIntegerField(null=True)` would
+# fall back to the non-null defaults. pyrefly and ty get it right from the inherited overloads alone.
+# TODO: drop the repeated overloads once mypy and pyright support it, see https://github.com/python/mypy/issues/22395 and https://github.com/microsoft/pyright/issues/11989.
 class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
     @overload
     def __init__(
