@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from typing import Any, Self, overload
+from typing import Any, Generic, Self, overload
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
@@ -7,13 +7,15 @@ from django.db.models.base import Model
 from django.db.models.fields import Field, _AllLimitChoicesTo
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import ForeignObject
-from django.db.models.fields.related_descriptors import ReverseManyToOneDescriptor
+from django.db.models.fields.related_descriptors import RelatedManager, ReverseManyToOneDescriptor
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import FilteredRelation, PathInfo
 from django.db.models.sql.where import WhereNode
 from django.utils.functional import cached_property
-from typing_extensions import override
+from typing_extensions import TypeVar, override
+
+_To = TypeVar("_To", bound=Model, default=Any)
 
 class GenericForeignKey(FieldCacheMixin, Field[Any, Any]):
     # django-stubs implementation only fields
@@ -90,7 +92,7 @@ class GenericRel(ForeignObjectRel):
         limit_choices_to: _AllLimitChoicesTo | None = None,
     ) -> None: ...
 
-class GenericRelation(ForeignObject):
+class GenericRelation(ForeignObject[Any, Any], Generic[_To]):
     rel_class: type[GenericRel]
     mti_inherited: bool
     object_id_field_name: str
@@ -98,7 +100,7 @@ class GenericRelation(ForeignObject):
     for_concrete_model: bool
     def __init__(
         self,
-        to: type[Model] | str,
+        to: type[_To] | str,
         object_id_field: str = "object_id",
         content_type_field: str = "content_type",
         for_concrete_model: bool = True,
@@ -106,6 +108,18 @@ class GenericRelation(ForeignObject):
         limit_choices_to: _AllLimitChoicesTo | None = None,
         **kwargs: Any,
     ) -> None: ...
+    # class access
+    @overload  # type: ignore[override]
+    @override
+    def __get__(self, instance: None, owner: Any) -> ReverseGenericManyToOneDescriptor[_To]: ...
+    # Model instance access
+    @overload
+    @override
+    def __get__(self, instance: Model, owner: Any) -> RelatedManager[_To]: ...
+    # non-Model instances
+    @overload
+    @override
+    def __get__(self, instance: Any, owner: Any) -> Self: ...
     @override
     def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
     @override
@@ -123,6 +137,6 @@ class GenericRelation(ForeignObject):
     def get_extra_restriction(self, alias: str | None, remote_alias: str) -> WhereNode: ...
     def bulk_related_objects(self, objs: list[Model], using: str = "default") -> QuerySet[Any]: ...
 
-class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor[Any]): ...
+class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor[_To]): ...
 
 def create_generic_related_manager(superclass: Any, rel: Any) -> type[Any]: ...  # GenericRelatedObjectManager

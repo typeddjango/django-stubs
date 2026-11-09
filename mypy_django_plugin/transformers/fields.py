@@ -200,6 +200,25 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
     return default_return_type.copy_modified(args=args)
 
 
+def fill_model_arg_for_generic_relation(
+    ctx: FunctionContext, *, model_info: TypeInfo, django_context: DjangoContext
+) -> MypyType:
+    """Resolve `GenericRelation("app.Model")` to `GenericRelation[Model]`, as a class reference would."""
+    default_return_type = cast("Instance", ctx.default_return_type)
+    if not (ctx.args and ctx.args[0] and default_return_type.args):
+        return default_return_type
+    to_arg = get_proper_type(default_return_type.args[0])
+    if not isinstance(to_arg, (UninhabitedType, AnyType)):
+        # `GenericRelation(Model)` was already solved from the class reference.
+        return default_return_type
+    to_model = helpers.get_model_from_expression(
+        ctx.args[0][0], self_model=model_info, api=helpers.get_typechecker_api(ctx), django_context=django_context
+    )
+    if to_model is None:
+        return default_return_type
+    return default_return_type.copy_modified(args=[to_model])
+
+
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     default_return_type = get_proper_type(ctx.default_return_type)
     if not isinstance(default_return_type, Instance):
@@ -220,7 +239,7 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
         )
     if default_return_type.type.has_base(fullnames.GENERIC_RELATION_FULLNAME):
         # A to-many relation read through a manager, unlike the foreign keys it shares a base with.
-        return default_return_type
+        return fill_model_arg_for_generic_relation(ctx, model_info=outer_model_info, django_context=django_context)
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)
 
