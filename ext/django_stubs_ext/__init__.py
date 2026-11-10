@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from .aliases import AsyncClientResponse as AsyncClientResponse
+from .aliases import ClientResponse as ClientResponse
 from .aliases import FieldOpts as FieldOpts
 from .aliases import FieldsetSpec as FieldsetSpec
 from .aliases import QuerySetAny as QuerySetAny
@@ -14,6 +16,8 @@ from .types import MutableHttpRequest as MutableHttpRequest
 __all__ = [
     "Annotations",
     "AnyAttrAllowed",
+    "AsyncClientResponse",
+    "ClientResponse",
     "FieldOpts",
     "FieldsetSpec",
     "MutableHttpRequest",
