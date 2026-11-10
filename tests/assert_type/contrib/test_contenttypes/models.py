@@ -33,3 +33,9 @@ if sys.version_info >= (3, 12):
         # pyrefly resolves fields from the class and ignores `__get__`: https://github.com/meta/pyrefly/issues/5532
         assert_type(Bookmark().tags, RelatedManager[TaggedItem])  # pyrefly: ignore[assert-type]
         assert_type(Bookmark.tags, ReverseGenericManyToOneDescriptor[TaggedItem])  # pyrefly: ignore[assert-type]
+
+    def test_generic_relation_value_from_object(field: GenericRelation[TaggedItem]) -> None:
+        assert_type(field.value_from_object(Bookmark()), RelatedManager[TaggedItem])
+
+    def test_generic_relation_rejects_direct_assignment() -> None:
+        Bookmark().tags = [TaggedItem()]  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]

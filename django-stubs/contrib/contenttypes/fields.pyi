@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from typing import Any, Generic, Self, overload
+from typing import Any, Generic, Never, Self, overload
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.checks.messages import CheckMessage
@@ -92,7 +92,7 @@ class GenericRel(ForeignObjectRel):
         limit_choices_to: _AllLimitChoicesTo | None = None,
     ) -> None: ...
 
-class GenericRelation(ForeignObject[Any, Any], Generic[_To]):
+class GenericRelation(ForeignObject[Never, RelatedManager[_To]], Generic[_To]):
     rel_class: type[GenericRel]
     mti_inherited: bool
     object_id_field_name: str
