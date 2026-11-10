@@ -426,6 +426,19 @@ If you encounter this error in your own code, you can either cast the `Promise` 
 
 If this is reported on Django code, please report an issue or open a pull request to fix the type hints.
 
+### How do I annotate a test client response?
+
+The test client adds attributes such as `context`, `templates` and `json()` to its responses, so `HttpResponse` is not enough.
+Use `ClientResponse`, or `AsyncClientResponse` for `AsyncClient`, from `django-stubs-ext`:
+
+```python
+from django_stubs_ext import ClientResponse
+
+
+def assert_has_form(response: ClientResponse) -> None:
+    assert "form" in response.context
+```
+
 ### How to use a custom library to handle Django settings?
 
 Using something like [`django-split-settings`](https://github.com/wemake-services/django-split-settings) or [`django-configurations`](https://github.com/jazzband/django-configurations) will make it hard for mypy to infer your settings.
