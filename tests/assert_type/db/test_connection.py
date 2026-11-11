@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import assert_type
 
+from django.contrib.auth.models import Permission
+from django.core.management.color import no_style
 from django.db import connection, connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorWrapper
@@ -18,6 +20,7 @@ with connection.cursor() as cursor:
     cursor.execute(SQL("INSERT INTO {} VALUES (%s)").format(Identifier("my_table")), [123])
 
 assert_type(connections["test"], BaseDatabaseWrapper)
+assert_type(connection.ops.sequence_reset_sql(no_style(), [Permission]), list[str])
 for conn in connections.all():
     with conn.cursor() as cursor:
         assert_type(cursor, CursorWrapper)

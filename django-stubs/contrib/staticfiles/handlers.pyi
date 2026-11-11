@@ -1,18 +1,18 @@
 from collections.abc import Awaitable, Callable, Mapping
-from typing import Any
+from typing import Any, TypeAlias
 from urllib.parse import ParseResult
 from wsgiref.types import StartResponse, WSGIEnvironment
 
-from django.core.handlers.asgi import ASGIHandler
-from django.core.handlers.base import BaseHandler
+from django.core.handlers.asgi import ASGIHandler, _ReceiveCallback, _SendCallback
 from django.core.handlers.wsgi import WSGIHandler
 from django.http import HttpRequest
 from django.http.response import FileResponse, HttpResponse, HttpResponseBase
 from typing_extensions import override
 
+_ASGIApplication: TypeAlias = Callable[[dict[str, Any], _ReceiveCallback, _SendCallback], Awaitable[None]]
+
 class StaticFilesHandlerMixin:
     handles_files: bool
-    application: BaseHandler
     base_url: ParseResult
     def load_middleware(self) -> None: ...
     def get_base_url(self) -> str: ...
@@ -34,9 +34,9 @@ class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):  # type: ignore[
     ) -> HttpResponseBase: ...
 
 class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):  # type: ignore[misc]
-    application: ASGIHandler
+    application: _ASGIApplication
     base_url: ParseResult
-    def __init__(self, application: ASGIHandler) -> None: ...
+    def __init__(self, application: _ASGIApplication) -> None: ...
     @override
     async def __call__(
         self,
