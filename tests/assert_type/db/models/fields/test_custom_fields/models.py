@@ -83,8 +83,8 @@ def field_two_typevar_form_in_user_annotation() -> None:
 
 
 class NullableUser(models.Model):
-    # test null=True on fields with non-optional generic types throw error. Explicit type arguments
-    # are fixed, the plugin doesn't widen them: write `| None` in the arguments instead.
+    # test null=True on fields with non-optional generic types throw error.
+    # Explicit type arguments are fixed, the plugin doesn't widen them: write `| None` in the arguments instead.
     my_custom_field5 = GenericField[CustomFieldValue | int, CustomFieldValue](null=True)  # type: ignore[misc]
     my_custom_field6 = CustomValueField(null=True)  # type: ignore[misc]
     my_custom_field7 = SingleTypeField[bool](null=True)  # type: ignore[misc]
@@ -154,6 +154,7 @@ def custom_fields_with_any_type_args() -> None:
     user = AnyUser()
     assert_type(user.my_custom_field_any1, Any)
     assert_type(user.my_custom_field_any2, Any)
+    # A bare subclass is pinned to its parent's type arguments, only the plugin folds `None` in
     assert_type(user.my_custom_field_any3, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(user.my_custom_field_any4, Any)
 
@@ -180,6 +181,7 @@ class AliasUser(models.Model):
 def test_custom_field_subclassing_an_alias() -> None:
     user = AliasUser()
     assert_type(user.text, str)
+    # A bare subclass is pinned to its parent's non-null defaults, only the plugin can widen it
     assert_type(user.nullable_text, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(user.flag, bool)
 
@@ -217,6 +219,7 @@ class DefaultedTypeVars(models.Model):
 def custom_fields_with_defaulted_type_vars() -> None:
     instance = DefaultedTypeVars()
     assert_type(instance.small_int, int)
+    # pyright doesn't solve the inherited self-annotated overload: https://github.com/microsoft/pyright/issues/11989
     assert_type(instance.null_small_int, int | None)  # pyright: ignore[reportAssertTypeFailure]
     assert_type(instance.additional, CustomFieldValue)
     assert_type(instance.null_additional, CustomFieldValue | None)
