@@ -144,3 +144,17 @@ def positional_overload_args_with_null_true_select_nullable_overload() -> None:
     assert_type(instance.moment, datetime.time | None)
     assert_type(instance.stamp, datetime.datetime | None)
     assert_type(instance.addr, str | None)
+
+
+class AnnotatedFields(models.Model):
+    # An annotation fixes the type arguments, and a bare one means the non-null defaults.
+    # pyrefly and ty accept the mismatch, ty on purpose: https://github.com/astral-sh/ty/issues/4977
+    bare: models.IntegerField = models.IntegerField(null=True)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
+    non_null_base: models.Field[int, int] = models.IntegerField(null=True)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
+    nullable: models.IntegerField[int | None, int | None] = models.IntegerField(null=True)
+
+
+def annotation_fixes_the_field_nullability() -> None:
+    assert_type(AnnotatedFields().bare, int)
+    assert_type(AnnotatedFields().non_null_base, int)
+    assert_type(AnnotatedFields().nullable, int | None)

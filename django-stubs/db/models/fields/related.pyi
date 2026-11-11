@@ -6,7 +6,7 @@ from django import forms
 from django.core.validators import _ValidatorCallable
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
-from django.db.models.expressions import Combinable, Expression
+from django.db.models.expressions import Expression
 from django.db.models.fields import (
     NOT_PROVIDED,
     Field,
@@ -108,9 +108,6 @@ class ForeignObject(RelatedField[_ST_contra, _GT_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
-    @type_check_only
-    @override
-    def __set__(self, instance: Any, value: _ST_contra | Combinable) -> None: ...
     # class access
     @overload
     @type_check_only
@@ -238,9 +235,6 @@ class OneToOneField(ForeignKey[_ST_contra, _GT_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
-    @type_check_only
-    @override
-    def __set__(self, instance: Any, value: _ST_contra | Combinable) -> None: ...
     # class access
     @overload
     @type_check_only
