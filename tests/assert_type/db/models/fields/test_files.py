@@ -43,3 +43,18 @@ def file_and_image_class_access_returns_specific_descriptor() -> None:
 
     assert_type(WithFiles.doc, FileDescriptor)  # pyrefly: ignore[assert-type]
     assert_type(WithFiles.pic, ImageFileDescriptor)  # pyrefly: ignore[assert-type]
+
+
+def upload_path(instance: MyModel, filename: str) -> str:
+    return f"uploads/{instance.pk}/{filename}"
+
+
+def no_args() -> str:
+    return "uploads/"
+
+
+class WithUploadTo(models.Model):
+    file = models.FileField(upload_to=upload_path)
+    image = models.ImageField(upload_to=upload_path)
+    # Django calls `upload_to(instance, filename)`
+    wrong = models.FileField(upload_to=no_args)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]

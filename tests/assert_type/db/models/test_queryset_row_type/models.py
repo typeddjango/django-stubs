@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Iterator
+from collections.abc import AsyncIterator, Iterator
 from typing import Any, assert_type
 
 from django.db import models
@@ -52,3 +52,13 @@ def queryset_methods_keep_the_row_type(qs: QuerySet[Blog], manager: models.Manag
     assert_type(qs.bulk_update(list(qs), fields=["created_at"]), int)
     assert_type(qs.bulk_create([]), list[Blog])
     assert_type(qs.delete(), tuple[int, dict[str, int]])
+
+
+async def async_queryset_methods_keep_the_row_type(qs: QuerySet[Blog], manager: models.Manager[Blog]) -> None:
+    assert_type(await qs.aget(id=1), Blog)
+    assert_type(await qs.afirst(), Blog | None)
+    assert_type(await qs.acreate(), Blog)
+    assert_type(qs.aiterator(), AsyncIterator[Blog])
+    assert_type(manager.aiterator(), AsyncIterator[Blog])
+    async for blog in qs:
+        assert_type(blog, Blog)
