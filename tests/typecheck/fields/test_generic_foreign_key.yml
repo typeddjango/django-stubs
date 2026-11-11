@@ -46,12 +46,14 @@
                     content_object = fields.GenericForeignKey()
                 # Simulate a GenericForeignKey subclass without type infos.
                 Tag.content_object.__class__ = type('MyGenericForeignKey', (fields.GenericForeignKey,), {})
--   case: generic_relation_is_not_typed_as_its_related_model
+-   case: generic_relation_is_typed_as_a_manager_of_its_related_model
     main: |
         from typing_extensions import reveal_type
         from myapp.models import Contract
-        reveal_type(Contract().orders)  # N: Revealed type is "Any"
-        reveal_type(Contract().orders_by_name)  # N: Revealed type is "Any"
+        reveal_type(Contract().orders)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Order, django.db.models.query.QuerySet[myapp.models.Order, myapp.models.Order]]"
+        reveal_type(Contract().orders_by_name)  # N: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Order, django.db.models.query.QuerySet[myapp.models.Order, myapp.models.Order]]"
+        reveal_type(Contract.orders)  # N: Revealed type is "django.contrib.contenttypes.fields.ReverseGenericManyToOneDescriptor[myapp.models.Order]"
+        reveal_type(Contract().orders.get(pk=1).content_object)  # N: Revealed type is "Any | None"
     installed_apps:
         - myapp
         - django.contrib.contenttypes
