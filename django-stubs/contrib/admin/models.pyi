@@ -1,19 +1,22 @@
 import datetime as dt
 from collections.abc import Iterable
-from typing import Any, ClassVar, Literal, overload
+from typing import Any, ClassVar, Literal, Self, overload
 from uuid import UUID
 
 from django.contrib.auth.models import _User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.base import Model
+from typing_extensions import TypeVar
 
 ADDITION: int
 CHANGE: int
 DELETION: int
 ACTION_FLAG_CHOICES: Any
 
-class LogEntryManager(models.Manager[LogEntry]):
+_LogEntryT = TypeVar("_LogEntryT", bound=LogEntry)
+
+class LogEntryManager(models.Manager[_LogEntryT]):
     @overload
     def log_actions(
         self,
@@ -23,7 +26,7 @@ class LogEntryManager(models.Manager[LogEntry]):
         change_message: str | list[Any] = "",
         *,
         single_object: Literal[True],
-    ) -> LogEntry: ...
+    ) -> _LogEntryT: ...
     @overload
     def log_actions(
         self,
@@ -33,7 +36,7 @@ class LogEntryManager(models.Manager[LogEntry]):
         change_message: str | list[Any] = "",
         *,
         single_object: Literal[False] = ...,
-    ) -> list[LogEntry]: ...
+    ) -> list[_LogEntryT]: ...
 
 class LogEntry(models.Model):
     action_time: models.DateTimeField[str | dt.datetime | dt.date, dt.datetime]
@@ -43,7 +46,7 @@ class LogEntry(models.Model):
     object_repr: models.CharField[str | int, str]
     action_flag: models.PositiveSmallIntegerField[float | int | str, int]
     change_message: models.TextField[str, str]
-    objects: ClassVar[LogEntryManager]
+    objects: ClassVar[LogEntryManager[Self]]
     def is_addition(self) -> bool: ...
     def is_change(self) -> bool: ...
     def is_deletion(self) -> bool: ...
