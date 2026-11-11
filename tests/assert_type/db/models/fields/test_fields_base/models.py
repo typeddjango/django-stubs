@@ -278,5 +278,13 @@ def every_builtin_field_reads_null_true_as_optional() -> None:
     assert_type(instance.null_path, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
 
 
+def binary_and_duration_fields_restrict_their_set_type() -> None:
+    instance = AllFields()
+    instance.blob = bytearray(b"\x01")
+    instance.blob = "text"  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
+    instance.duration = datetime.timedelta(days=1)
+    instance.duration = 1  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
+
+
 def if_field_called_on_class_keeps_null_in_its_type() -> None:
     assert_type(AllFields.null_name.field, CharField[str | int | None, str | None])
