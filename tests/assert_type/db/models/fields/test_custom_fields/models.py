@@ -212,8 +212,8 @@ class DefaultedTypeVars(models.Model):
     additional = DefaultedAdditionalTypeVarField[bool]()
     null_additional = DefaultedAdditionalTypeVarField[bool, CustomFieldValue | int | None, CustomFieldValue | None]()
     html = DefaultedHtmlField()
-    # The cross-checker recipe for a nullable custom field: widen the generic parameters with `| None`
-    null_html = DefaultedHtmlField[str | None, str | None]()
+    # Explicit nullable type arguments resolve on every checker, without the subclass repeating the overloads
+    null_html = DefaultedHtmlField[str | None, str | None](null=True)
 
 
 def custom_fields_with_defaulted_type_vars() -> None:

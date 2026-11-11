@@ -157,7 +157,7 @@ def set_descriptor_types_for_field_callback(ctx: FunctionContext, django_context
     return set_descriptor_types_for_field(ctx)
 
 
-def _warn_if_nullable_get_not_optional(ctx: FunctionContext, field_type: Instance) -> None:
+def _validate_nullable_get_is_optional(ctx: FunctionContext, field_type: Instance) -> None:
     field_args = helpers.get_field_type_args(field_type)
     if field_args is None:
         return
@@ -181,7 +181,7 @@ def set_descriptor_types_for_field(
     is_explicitly_subscripted = isinstance(ctx.context, CallExpr) and isinstance(ctx.context.callee, IndexExpr)
     if len(default_return_type.args) != 2 or is_explicitly_subscripted:
         if is_nullable:
-            _warn_if_nullable_get_not_optional(ctx, default_return_type)
+            _validate_nullable_get_is_optional(ctx, default_return_type)
         return default_return_type
 
     # The `null=True` widening below is wrong for these two: a NULL FileField column still reads as `FieldFile`,
