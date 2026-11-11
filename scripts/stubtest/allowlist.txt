@@ -279,7 +279,8 @@ django.forms.models.modelformset_factory
 # a manager is accessed on a model instance rather than on the model class
 django.db.models.manager.BaseManager.__get__
 
-# Field.__get__/__set__ are stub-only for the mypy plugin, they don't exist at runtime
+# Field.__get__ is stub-only, it doesn't exist at runtime.
+# stubtest only skips `@type_check_only` functions when they are not overloaded.
 django.contrib.contenttypes.fields.GenericForeignKey.__get__
 django.contrib.contenttypes.fields.GenericRelation.__get__
 django.db.models.fields.Field.__get__

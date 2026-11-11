@@ -135,9 +135,10 @@ def get_field_descriptor_types(
             set_type, get_type = field_args.set, field_args.get
             break
     if isinstance(api, SemanticAnalyzer) and (has_placeholder(set_type) or has_placeholder(get_type)):
-        # A default can name a class not analysed yet when the stubs and the models share an import
-        # cycle (`ImageFieldFile` for an `ImageField` subclass). Stored on the model, that placeholder
-        # fails to serialize into the cache, so defer and pick it up on a later iteration.
+        # A default can name a class not analysed yet (`ImageFieldFile` for an `ImageField` subclass),
+        # when the stubs and the models share an import cycle.
+        # Stored on the model, that placeholder fails to serialize into the cache,
+        # so defer and pick it up on a later iteration.
         if not api.final_iteration:
             raise helpers.IncompleteDefnException()
         set_type = get_type = AnyType(TypeOfAny.from_error)
@@ -175,17 +176,16 @@ def set_descriptor_types_for_field(
     default_return_type = cast("Instance", ctx.default_return_type)
     is_nullable = helpers.get_bool_call_argument_by_name(ctx, "null", default=False)
 
-    # Explicit type arguments (`F[str, str](null=True)`) are fixed by the typing spec: a self-annotated
-    # overload can't widen them and neither should the plugin. Same as a fully bound field (`class F(Field[str, str])`)
-    # or a field with extra type parameters: there is no set/get slot to widen, the stub's answer stands.
+    # Nothing to widen, the stub's answer stands: explicit type arguments (`F[str, str](null=True)`) are fixed,
+    # as are a fully bound field (`class F(Field[str, str])`) and one with extra type parameters.
     is_explicitly_subscripted = isinstance(ctx.context, CallExpr) and isinstance(ctx.context.callee, IndexExpr)
     if len(default_return_type.args) != 2 or is_explicitly_subscripted:
         if is_nullable:
             _warn_if_nullable_get_not_optional(ctx, default_return_type)
         return default_return_type
 
-    # The `null=True` widening below is wrong for these two: a NULL FileField column still reads as
-    # `FieldFile`, and ArrayField's args are nested element types derived from `base_field`.
+    # The `null=True` widening below is wrong for these two: a NULL FileField column still reads as `FieldFile`,
+    # and ArrayField's args are nested element types derived from `base_field`.
     if helpers.has_any_of_bases(
         default_return_type.type, (fullnames.FILE_FIELD_FULLNAME, fullnames.ARRAY_FIELD_FULLNAME)
     ):
@@ -211,7 +211,8 @@ def set_descriptor_types_for_field(
         set_type = helpers.convert_any_to_type(mapped_types.set, set_type)
         get_type = helpers.convert_any_to_type(mapped_types.get, get_type)
 
-    # The type parameters default to the non-null types, so fold `None` in for nullable fields.
+    # Fold `None` in for the nullable fields the stub overloads don't widen: bare subclasses, fields without overloads,
+    # and inherited overloads until https://github.com/python/mypy/issues/22395.
     if is_set_nullable or is_nullable:
         set_type = make_optional_type(set_type)
     if is_get_nullable or is_nullable:

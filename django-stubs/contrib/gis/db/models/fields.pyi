@@ -113,6 +113,7 @@ _GT_Point_co = TypeVar("_GT_Point_co", covariant=True, default=Point)
 
 class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
     _pyi_lookup_exact_type: Point
+    # Same four `__init__` overloads as the core fields, see `django.db.models.fields.IntegerField`.
     @overload
     def __init__(
         self,

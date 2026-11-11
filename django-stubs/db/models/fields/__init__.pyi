@@ -287,6 +287,12 @@ _GT_Int_co = TypeVar("_GT_Int_co", covariant=True, default=int)
 
 class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
     _pyi_lookup_exact_type: str | int
+    # The concrete fields all declare the same four `__init__` overloads, keyed on `null`:
+    # 1. `Literal[False]`, the default, keeps the class defaults.
+    # 2. `Literal[True]` annotates `self` with the nullable specialisation.
+    # 3. `Literal[True]` without a self-annotation, for a subclass that binds the type arguments so 2. can't match,
+    #    as in `class HTMLField(TextField): ...`. It keeps `HTMLField(null=True)` off the deprecated overload.
+    # 4. A deprecated plain `bool`, as the field type can't be inferred from a non-literal `null`.
     @overload
     def __init__(
         self,
@@ -340,10 +346,11 @@ class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
 class PositiveIntegerRelDbTypeMixin:
     def rel_db_type(self, connection: BaseDatabaseWrapper) -> str: ...
 
-# Every subclass repeats its parent's `__init__` overloads: mypy and pyright don't solve a subclass's
-# type parameters from an inherited self-annotated overload, so `SmallIntegerField(null=True)` would
-# fall back to the non-null defaults. pyrefly and ty get it right from the inherited overloads alone.
-# TODO: drop the repeated overloads once mypy and pyright support it, see https://github.com/python/mypy/issues/22395 and https://github.com/microsoft/pyright/issues/11989.
+# mypy and pyright don't solve a subclass's type parameters from an inherited self-annotated overload,
+# so subclasses repeat their parent's `__init__` overloads to keep `SmallIntegerField(null=True)` nullable.
+# pyrefly and ty get it right from the inherited overloads alone.
+# TODO: drop the repeated overloads once mypy and pyright support it,
+# see https://github.com/python/mypy/issues/22395 and https://github.com/microsoft/pyright/issues/11989.
 class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
     @overload
     def __init__(

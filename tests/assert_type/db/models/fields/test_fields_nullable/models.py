@@ -54,6 +54,9 @@ class Article(models.Model):
 
 
 def nullable_subclass_inherits_null_overload() -> None:
+    # The type vars have no defaults, so only the plugin resolves a bare call, from the nearest base's defaults.
+    # pyrefly and ty still solve `null=True` from the inherited self-annotated overload,
+    # pyright doesn't: https://github.com/microsoft/pyright/issues/11989
     assert_type(Article().body, str)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(Article().body_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]
     assert_type(Article().count, int)  # pyright: ignore[reportAssertTypeFailure, reportUnknownMemberType]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
@@ -106,6 +109,7 @@ class BareArticle(models.Model):
 
 def nullable_field_subclass_without_explicit_type_vars() -> None:
     assert_type(BareArticle().body, str)
+    # A bare subclass is pinned to its parent's non-null defaults, only the plugin can widen it
     assert_type(BareArticle().body_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(BareArticle().count_nullable, int | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
     assert_type(BareArticle().slug_nullable, str | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
