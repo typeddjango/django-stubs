@@ -40,7 +40,7 @@ from mypy.plugin import (
 )
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder, parse_bool
-from mypy.typeanal import make_optional_type
+from mypy.typeanal import fix_instance, make_optional_type
 from mypy.typeops import try_getting_str_literals_from_type
 from mypy.types import (
     AnyType,
@@ -391,8 +391,15 @@ class FieldTypeArgs(NamedTuple):
     get: ProperType
 
 
+def fill_field_defaults(field_info: TypeInfo, api: TypeChecker | SemanticAnalyzer) -> Instance:
+    """Build an Instance of `field_info` with its PEP 696 defaults applied."""
+    inst = Instance(field_info, ())
+    fix_instance(inst, api.fail, api.note, disallow_any=False, options=api.options, use_generic_error=True)
+    return inst
+
+
 def get_field_type_args(field_type: Instance) -> FieldTypeArgs | None:
-    """Extract (_ST, _GT) from a Field instance by mapping to the base Field class."""
+    """Extract (_ST_contra, _GT_co) from a Field instance by mapping to the base Field class."""
     base_field_info = next((base for base in field_type.type.mro if base.fullname == fullnames.FIELD_FULLNAME), None)
     if base_field_info is None:
         return None

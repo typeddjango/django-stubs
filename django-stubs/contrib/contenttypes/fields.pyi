@@ -18,10 +18,6 @@ from typing_extensions import TypeVar, override
 _To = TypeVar("_To", bound=Model, default=Any)
 
 class GenericForeignKey(FieldCacheMixin, Field[Any, Any]):
-    # django-stubs implementation only fields
-    _pyi_private_set_type: Any
-    _pyi_private_get_type: Any
-    # attributes
     hidden: bool
     is_relation: bool
     many_to_many: bool

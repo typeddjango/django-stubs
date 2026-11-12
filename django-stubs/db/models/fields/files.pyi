@@ -7,7 +7,7 @@ from django.core.files.images import ImageFile
 from django.core.files.storage import Storage
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
-from django.db.models.fields import NOT_PROVIDED, Field, FieldInitKwargs
+from django.db.models.fields import NOT_PROVIDED, Field, FieldInitKwargs, _ST_contra
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData
 from django.utils.functional import _StrOrPromise
@@ -54,7 +54,9 @@ _M_contra = TypeVar("_M_contra", bound=Model, contravariant=True)
 class _UploadToCallable(Protocol[_M_contra]):
     def __call__(self, instance: _M_contra, filename: str, /) -> StrPath: ...
 
-class FileField(Field[Any, Any]):
+_GT_File_co = TypeVar("_GT_File_co", covariant=True, default=FieldFile)
+
+class FileField(Field[_ST_contra, _GT_File_co]):
     attr_class: type[FieldFile]
     descriptor_class: type[FileDescriptor]
     storage: Storage
@@ -73,14 +75,17 @@ class FileField(Field[Any, Any]):
     ) -> None: ...
     # class access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: None, owner: Any) -> FileDescriptor: ...
-    # Model instance access
+    # Model instance access: a NULL column reads as `FieldFile(name=None)`, so `null=True` adds no `| None`.
     @overload
+    @type_check_only
     @override
-    def __get__(self, instance: Model, owner: Any) -> FieldFile: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT_File_co: ...
     # non-Model instances
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     @override
@@ -99,7 +104,9 @@ class ImageFieldFile(ImageFile, FieldFile):
     @override
     def delete(self, save: bool = True) -> None: ...
 
-class ImageField(FileField):
+_GT_ImageFile_co = TypeVar("_GT_ImageFile_co", covariant=True, default=ImageFieldFile)
+
+class ImageField(FileField[_ST_contra, _GT_ImageFile_co]):
     attr_class: type[ImageFieldFile]
     descriptor_class: type[ImageFileDescriptor]
     def __init__(
@@ -118,14 +125,17 @@ class ImageField(FileField):
     ) -> None: ...
     # class access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: None, owner: Any) -> ImageFileDescriptor: ...
-    # Model instance access
+    # Model instance access — null=True does NOT add `| None` (see FileField)
     @overload
+    @type_check_only
     @override
-    def __get__(self, instance: Model, owner: Any) -> ImageFieldFile: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT_ImageFile_co: ...
     # non-Model instances
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     def update_dimension_fields(self, instance: Model, force: bool = False, *args: Any, **kwargs: Any) -> None: ...

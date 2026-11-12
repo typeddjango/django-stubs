@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any, Generic, Literal, Self, overload
+from typing import Any, Generic, Literal, Self, overload, type_check_only
 from uuid import UUID
 
 from django import forms
@@ -40,9 +40,7 @@ def lazy_related_operation(
     function: Callable[..., Any], model: type[Model], *related_models: type[Model] | str, **kwargs: Any
 ) -> None: ...
 
-# __set__ value type
 _ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
-# __get__ return type
 _GT_co = TypeVar("_GT_co", covariant=True, default=_ST_contra)
 
 class RelatedField(FieldCacheMixin, Field[_ST_contra, _GT_co]):
@@ -112,14 +110,17 @@ class ForeignObject(RelatedField[_ST_contra, _GT_co]):
     ) -> None: ...
     # class access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: None, owner: Any) -> ForwardManyToOneDescriptor[Self]: ...
     # Model instance access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Model, owner: Any) -> _GT_co: ...
     # non-Model instances
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
@@ -156,9 +157,6 @@ class ForeignObject(RelatedField[_ST_contra, _GT_co]):
     requires_unique_target: bool
 
 class ForeignKey(ForeignObject[_ST_contra, _GT_co]):
-    _pyi_private_set_type: Any
-    _pyi_private_get_type: Any
-
     descriptor_class: type[ForeignKeyDeferredAttribute]
     remote_field: ManyToOneRel
     rel_class: type[ManyToOneRel]
@@ -215,9 +213,6 @@ class ForeignKey(ForeignObject[_ST_contra, _GT_co]):
     def get_attname_column(self) -> tuple[str, str]: ...  # type: ignore[override]
 
 class OneToOneField(ForeignKey[_ST_contra, _GT_co]):
-    _pyi_private_set_type: Any
-    _pyi_private_get_type: Any
-
     remote_field: OneToOneRel
     rel_class: type[OneToOneRel]
     def __init__(
@@ -242,14 +237,17 @@ class OneToOneField(ForeignKey[_ST_contra, _GT_co]):
     ) -> None: ...
     # class access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: None, owner: Any) -> ForwardOneToOneDescriptor[Self]: ...
     # Model instance access
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Model, owner: Any) -> _GT_co: ...
     # non-Model instances
     @overload
+    @type_check_only
     @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
     forward_related_accessor_class: type[ForwardOneToOneDescriptor[Any]]
