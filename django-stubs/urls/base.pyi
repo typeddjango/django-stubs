@@ -1,4 +1,5 @@
 from collections.abc import Callable, Mapping, Sequence
+from types import ModuleType
 from typing import Any, Literal, TypeAlias
 
 from django.http.request import QueryDict
@@ -11,12 +12,12 @@ _QueryType: TypeAlias = (
     Mapping[Any, Any] | Mapping[Any, Sequence[Any]] | Sequence[tuple[Any, Any]] | Sequence[tuple[Any, Sequence[Any]]]
 )
 
-def resolve(path: str | _StrPromise, urlconf: str | None = None) -> ResolverMatch: ...
+def resolve(path: str | _StrPromise, urlconf: str | ModuleType | None = None) -> ResolverMatch: ...
 
 # NOTE: make sure `reverse` and `reverse_lazy` objects are in sync:
 def reverse(
     viewname: Callable[..., HttpResponseBase] | str | None,
-    urlconf: str | None = None,
+    urlconf: str | ModuleType | None = None,
     args: Sequence[Any] | None = None,
     kwargs: dict[str, Any] | None = None,
     current_app: str | None = None,
@@ -26,7 +27,7 @@ def reverse(
 ) -> str: ...
 def reverse_lazy(
     viewname: Callable[..., HttpResponseBase] | str | None,
-    urlconf: str | None = None,
+    urlconf: str | ModuleType | None = None,
     args: Sequence[Any] | None = None,
     kwargs: dict[str, Any] | None = None,
     current_app: str | None = None,
@@ -40,5 +41,5 @@ def get_script_prefix() -> str: ...
 def clear_script_prefix() -> None: ...
 def set_urlconf(urlconf_name: str | None) -> None: ...
 def get_urlconf(default: str | None = None) -> str | None: ...
-def is_valid_path(path: str, urlconf: str | None = None) -> Literal[False] | ResolverMatch: ...
+def is_valid_path(path: str, urlconf: str | ModuleType | None = None) -> Literal[False] | ResolverMatch: ...
 def translate_url(url: str, lang_code: str) -> str: ...
