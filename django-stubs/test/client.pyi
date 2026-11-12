@@ -5,6 +5,7 @@ from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
 from typing import Any, Generic, Literal, TypeAlias, TypedDict, type_check_only
+from wsgiref.types import WSGIEnvironment
 
 from _typeshed import ExcInfo
 from asgiref.typing import ASGIVersions
@@ -60,7 +61,7 @@ class _ASGIResponse(HttpResponseBase):
 class ClientHandler(BaseHandler):
     enforce_csrf_checks: bool
     def __init__(self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any) -> None: ...
-    def __call__(self, environ: dict[str, Any]) -> _WSGIResponse: ...
+    def __call__(self, environ: WSGIEnvironment) -> _WSGIResponse: ...
 
 class AsyncClientHandler(BaseHandler):
     enforce_csrf_checks: bool
