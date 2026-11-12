@@ -1,15 +1,12 @@
-from collections.abc import Awaitable, Callable, Mapping
-from typing import Any, TypeAlias
 from urllib.parse import ParseResult
 from wsgiref.types import StartResponse, WSGIEnvironment
 
-from django.core.handlers.asgi import ASGIHandler, _ReceiveCallback, _SendCallback
+from asgiref.typing import ASGI3Application, ASGIReceiveCallable, ASGISendCallable, Scope
+from django.core.handlers.asgi import ASGIHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.http import HttpRequest
 from django.http.response import FileResponse, HttpResponse, HttpResponseBase
 from typing_extensions import override
-
-_ASGIApplication: TypeAlias = Callable[[dict[str, Any], _ReceiveCallback, _SendCallback], Awaitable[None]]
 
 class StaticFilesHandlerMixin:
     handles_files: bool
@@ -34,13 +31,13 @@ class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):  # type: ignore[
     ) -> HttpResponseBase: ...
 
 class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):  # type: ignore[misc]
-    application: _ASGIApplication
+    application: ASGI3Application
     base_url: ParseResult
-    def __init__(self, application: _ASGIApplication) -> None: ...
+    def __init__(self, application: ASGI3Application) -> None: ...
     @override
     async def __call__(
         self,
-        scope: dict[str, Any],
-        receive: Callable[[], Awaitable[Mapping[str, Any]]],
-        send: Callable[[Mapping[str, Any]], Awaitable[None]],
+        scope: Scope,
+        receive: ASGIReceiveCallable,
+        send: ASGISendCallable,
     ) -> None: ...
