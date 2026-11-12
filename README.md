@@ -524,6 +524,24 @@ you are using our mypy plugin.
 
 Use this setting on your own risk, because it can hide valid errors.
 
+### How do I annotate `apps` in a `RunPython` migration?
+
+Use `StateApps`, not `Apps`:
+
+```python
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.migrations.state import StateApps
+
+
+def forwards(apps: StateApps, schema_editor: BaseDatabaseSchemaEditor) -> None:
+    Book = apps.get_model("myapp", "Book")  # type[Any]
+```
+
+In a migration, `get_model()` returns the model as it was at that point in your migration history,
+not the one in your current `models.py`.
+With `Apps`, our mypy plugin types it as your current model, so fields added or removed since then are typed wrong.
+With `StateApps`, it returns `type[Any]`: the historical model only exists once Django replays your migrations, which a type checker can't do.
+
 ### Do I need to annotate reverse relations?
 
 Not if you use our mypy plugin. It reads your app registry and declares every reverse accessor for you, as
