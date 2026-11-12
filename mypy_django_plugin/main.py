@@ -31,8 +31,6 @@ from mypy_django_plugin.transformers import (
     fields,
     forms,
     init_create,
-    manytomany,
-    manytoone,
     meta,
     orm_lookups,
     querysets,
@@ -43,6 +41,7 @@ from mypy_django_plugin.transformers.auth import get_user_model
 from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
+    refine_related_manager,
     reparametrize_generic_class,
     resolve_manager_method,
 )
@@ -57,6 +56,13 @@ if TYPE_CHECKING:
 
 
 _APPS_MODULES: Final = frozenset({"django.apps", "django.apps.registry"})
+_RELATED_MANAGER_DESCRIPTORS: Final = frozenset(
+    {
+        fullnames.MANYTOMANY_FIELD_FULLNAME,
+        fullnames.MANY_TO_MANY_DESCRIPTOR,
+        fullnames.REVERSE_MANY_TO_ONE_DESCRIPTOR,
+    }
+)
 
 
 class NewSemanalDjangoPlugin(Plugin):
@@ -230,12 +236,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return None
 
         if method_name == "__get__":
-            hooks = {
-                fullnames.MANYTOMANY_FIELD_FULLNAME: manytomany.refine_many_to_many_related_manager,
-                fullnames.MANY_TO_MANY_DESCRIPTOR: manytomany.refine_many_to_many_related_manager,
-                fullnames.REVERSE_MANY_TO_ONE_DESCRIPTOR: manytoone.refine_many_to_one_related_manager,
-            }
-            return hooks.get(class_fullname)
+            return refine_related_manager if class_fullname in _RELATED_MANAGER_DESCRIPTORS else None
 
         info = self._get_typeinfo_or_none(class_fullname)
         if not info:
