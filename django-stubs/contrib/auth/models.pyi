@@ -30,12 +30,14 @@ _UserType = TypeVar("_UserType", bound=AbstractBaseUser)
 
 def update_last_login(sender: _UserModel, user: _User, **kwargs: Any) -> None: ...
 
-class PermissionManager(models.Manager[Permission]):
-    def get_by_natural_key(self, codename: str, app_label: str, model: str) -> Permission: ...
+_PermissionT = TypeVar("_PermissionT", bound=Permission)
+
+class PermissionManager(models.Manager[_PermissionT]):
+    def get_by_natural_key(self, codename: str, app_label: str, model: str) -> _PermissionT: ...
 
 class Permission(models.Model):
     content_type_id: int
-    objects: ClassVar[PermissionManager]
+    objects: ClassVar[PermissionManager[Self]]
 
     name: models.CharField[str | int, str]
     content_type: models.ForeignKey[ContentType, ContentType]
@@ -44,12 +46,14 @@ class Permission(models.Model):
     def user_perm_str(self) -> str: ...
     def natural_key(self) -> tuple[str, str, str]: ...
 
-class GroupManager(models.Manager[Group]):
-    def get_by_natural_key(self, name: str) -> Group: ...
-    async def aget_by_natural_key(self, name: str) -> Group: ...
+_GroupT = TypeVar("_GroupT", bound=Group)
+
+class GroupManager(models.Manager[_GroupT]):
+    def get_by_natural_key(self, name: str) -> _GroupT: ...
+    async def aget_by_natural_key(self, name: str) -> _GroupT: ...
 
 class Group(models.Model):
-    objects: ClassVar[GroupManager]
+    objects: ClassVar[GroupManager[Self]]
 
     name: models.CharField[str | int, str]
     permissions = models.ManyToManyField(Permission)
