@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import assert_type
 
+from django.contrib.auth.models import User
 from django.core.handlers.wsgi import WSGIRequest
 from django.test.client import Client
 from django.test.testcases import TestCase, _AssertTemplateNotUsedContext, _AssertTemplateUsedContext
@@ -30,3 +31,10 @@ class ExampleTestCase(TestCase):
             assert_type(ctx, _AssertTemplateNotUsedContext)
         with self.assertTemplateNotUsed(template_name="template.html") as ctx:
             assert_type(ctx, _AssertTemplateNotUsedContext)
+
+    def test_assert_queryset_equal(self) -> None:
+        users = User.objects.all()
+        # `transform` receives the items `qs` yields
+        self.assertQuerySetEqual(users, ["admin"], transform=lambda u: u.username)
+        self.assertQuerySetEqual(users.values_list("username"), [("admin",)], transform=tuple)
+        self.assertQuerySetEqual(users.iterator(), ["admin"], transform=str)
