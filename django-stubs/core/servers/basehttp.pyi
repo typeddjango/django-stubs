@@ -3,6 +3,7 @@ from collections.abc import Callable
 from io import BytesIO
 from typing import Any
 from wsgiref import simple_server
+from wsgiref.types import WSGIEnvironment
 
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
 from typing_extensions import override
@@ -23,7 +24,7 @@ class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
     def __init__(self, *args: Any, connections_override: Any = ..., **kwargs: Any) -> None: ...
 
 class ServerHandler(simple_server.ServerHandler):
-    def __init__(self, stdin: Any, stdout: Any, stderr: Any, environ: dict[str, Any], **kwargs: Any) -> None: ...
+    def __init__(self, stdin: Any, stdout: Any, stderr: Any, environ: WSGIEnvironment, **kwargs: Any) -> None: ...
     @override
     def handle_error(self) -> None: ...
 
