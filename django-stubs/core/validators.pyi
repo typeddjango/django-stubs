@@ -1,4 +1,4 @@
-from collections.abc import Callable, Collection, Sequence, Sized
+from collections.abc import Callable, Collection, Container, Sequence, Sized
 from decimal import Decimal
 from re import Pattern, RegexFlag
 from typing import Any, TypeAlias
@@ -57,7 +57,7 @@ class URLValidator(RegexValidator):
     schemes: Sequence[str]
     unsafe_chars: frozenset[str]
     max_length: int
-    def __init__(self, schemes: Collection[str] | None = None, **kwargs: Any) -> None: ...
+    def __init__(self, schemes: Container[str] | None = None, **kwargs: Any) -> None: ...
     @override
     def __call__(self, value: Any) -> None: ...
 
