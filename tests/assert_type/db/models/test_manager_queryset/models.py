@@ -37,7 +37,7 @@ class BlogManager(models.Manager["Blog", BlogQuerySet]):
 class ConflictingBlogManager(models.Manager["Blog", BlogQuerySet]):
     # `get_queryset` has to return the declared queryset param
     @override
-    def get_queryset(self) -> OtherBlogQuerySet:  # type: ignore[override]  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]
+    def get_queryset(self) -> OtherBlogQuerySet:  # type: ignore[override]  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[incompatible-method-override]
         return OtherBlogQuerySet(self.model, using=self._db)
 
 

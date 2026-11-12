@@ -71,7 +71,7 @@ def declared_manager_access_on_instance_is_banned() -> None:
 def default_manager_access_on_instance_is_banned() -> None:
     # `ModelBase.__getattr__` lives on the metaclass, so instances can't reach it. mypy sees the
     # per-model attribute the plugin declares instead, and rejects it through `BaseManager.__get__`
-    Post().objects  # type: ignore[deprecated]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+    Post().objects  # type: ignore[deprecated]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 def manager_access_on_class_is_allowed() -> None:
@@ -83,7 +83,7 @@ def manager_access_on_class_is_allowed() -> None:
 def unknown_attribute_is_still_an_error() -> None:
     # `Literal["objects"]` must not turn `__getattr__` into a catch-all
     Category.not_defined  # type: ignore[attr-defined]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-attribute-access]
-    Category().not_defined  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+    Category().not_defined  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 def meta_manager_access_on_instance_is_allowed() -> None:
