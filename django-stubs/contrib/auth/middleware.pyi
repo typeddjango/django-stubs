@@ -1,9 +1,10 @@
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable
 from typing import Any, ClassVar, Literal
 
 from django.contrib.auth.models import _AnyUser
 from django.http import HttpRequest, HttpResponseBase, HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin, _AnyGetResponseCallable
+from django.views import _ViewCallable
 
 def get_user(request: HttpRequest) -> _AnyUser: ...
 async def auser(request: HttpRequest) -> _AnyUser: ...
@@ -17,15 +18,13 @@ class LoginRequiredMiddleware(MiddlewareMixin):
     def process_view(
         self,
         request: HttpRequest,
-        view_func: Callable[..., HttpResponseBase],
+        view_func: _ViewCallable,
         view_args: tuple[Any, ...],
         view_kwargs: dict[Any, Any],
     ) -> HttpResponseBase | None: ...
-    def get_login_url(self, view_func: Callable[..., HttpResponseBase]) -> str: ...
-    def get_redirect_field_name(self, view_func: Callable[..., HttpResponseBase]) -> str: ...
-    def handle_no_permission(
-        self, request: HttpRequest, view_func: Callable[..., HttpResponseBase]
-    ) -> HttpResponseRedirect: ...
+    def get_login_url(self, view_func: _ViewCallable) -> str: ...
+    def get_redirect_field_name(self, view_func: _ViewCallable) -> str: ...
+    def handle_no_permission(self, request: HttpRequest, view_func: _ViewCallable) -> HttpResponseRedirect: ...
 
 class RemoteUserMiddleware:
     header: ClassVar[str]

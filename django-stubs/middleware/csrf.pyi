@@ -1,5 +1,4 @@
 from collections import defaultdict
-from collections.abc import Callable
 from logging import Logger
 from re import Pattern
 from typing import Any
@@ -8,6 +7,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase, HttpResponseForbidden
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import cached_property
+from django.views import _ViewCallable
 
 logger: Logger
 
@@ -51,7 +51,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
     def process_view(
         self,
         request: HttpRequest,
-        callback: Callable[..., HttpResponseBase],
+        callback: _ViewCallable,
         callback_args: tuple[Any, ...],
         callback_kwargs: dict[str, Any],
     ) -> HttpResponseForbidden | None: ...

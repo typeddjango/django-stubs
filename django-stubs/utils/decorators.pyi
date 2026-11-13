@@ -1,8 +1,8 @@
 from collections.abc import Callable, Iterable
 from typing import Any, Protocol, TypeAlias, type_check_only
 
-from django.http.response import HttpResponseBase
 from django.utils.deprecation import MiddlewareMixin
+from django.views import _ViewCallable
 from django.views.generic.base import View
 from typing_extensions import TypeVar
 
@@ -12,10 +12,7 @@ class _MiddlewareClass(Protocol):
 
 _ViewType = TypeVar("_ViewType", bound=View | Callable[..., Any])  # Any callable
 _CallableType = TypeVar("_CallableType", bound=Callable[..., Any])
-_ViewDecorator: TypeAlias = Callable[
-    [Callable[..., HttpResponseBase]],
-    Callable[..., HttpResponseBase],
-]
+_ViewDecorator: TypeAlias = Callable[[_ViewCallable], _ViewCallable]
 _DecoratorFactory: TypeAlias = Callable[..., _ViewDecorator]
 
 classonlymethod = classmethod

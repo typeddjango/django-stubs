@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Iterable, Sequence
 from typing import Any
 from weakref import WeakSet
 
@@ -10,15 +10,15 @@ from django.core.checks import CheckMessage
 from django.db.models.base import Model
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse, HttpResponseBase
+from django.http.response import HttpResponse
 from django.template.response import TemplateResponse
 from django.urls import URLPattern, URLResolver
 from django.utils.functional import LazyObject, _StrOrPromise
+from django.views import _ViewCallableT
 from typing_extensions import TypeVar
 
 all_sites: WeakSet[AdminSite]
 
-_ViewType = TypeVar("_ViewType", bound=Callable[..., HttpResponseBase])
 _ModelT = TypeVar("_ModelT", bound=Model)
 
 class AdminSite:
@@ -59,7 +59,7 @@ class AdminSite:
     @property
     def actions(self) -> Iterable[tuple[str, _ActionCallable[ModelAdmin[_ModelT], _ModelT]]]: ...
     def has_permission(self, request: HttpRequest) -> bool: ...
-    def admin_view(self, view: _ViewType, cacheable: bool = ...) -> _ViewType: ...
+    def admin_view(self, view: _ViewCallableT, cacheable: bool = ...) -> _ViewCallableT: ...
     def get_urls(self) -> list[URLResolver | URLPattern]: ...
     @property
     def urls(self) -> tuple[list[URLResolver | URLPattern], str, str]: ...
