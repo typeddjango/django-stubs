@@ -514,7 +514,15 @@ def reparametrize_generic_class(
     bind_explicit_args: bool = False,
 ) -> None:
     """
-    Add implicit generics to classes that are defined without generic.
+    Add implicit pass-through generics to subclasses of generic stub classes that omit their type arguments.
+
+    Eg.
+
+        class MyManager(models.Manager): ...
+
+    is interpreted as:
+
+        class MyManager(models.Manager[_T_co, _QS_co]): ...
 
     When ``bind_explicit_args`` is True, also reparametrize partially or
     fully-explicit parametrizations by binding each explicit arg as both
@@ -572,71 +580,3 @@ def reparametrize_generic_class(
     parent_class.args = tuple(type_vars)
     class_info.node.defn.type_vars = type_vars
     class_info.node.add_type_vars()
-
-
-def reparametrize_any_queryset_hook(ctx: ClassDefContext) -> None:
-    """
-    Add implicit generics to QuerySet subclasses that are defined without generic.
-    This is required for `.annotate` / `.values` call to update the typevars accordingly.
-
-    Eg.
-
-        class MyQuerySet(models.QuerySet): ...
-
-    is interpreted as:
-
-        _Model_co = TypeVar('_Model_co', bound=Model, covariant=True)
-        _Row_co = TypeVar('_Row_co', covariant=True, default=_Model_co)
-        class MyQuerySet(models.QuerySet[_Model_co, _Row_co]): ...
-
-    And
-
-        class BookQuerySet(models.QuerySet["Book"]): ...
-
-    is interpreted as:
-
-        _Model_co = TypeVar('_Model_co', bound=Book, covariant=True, default=Book)
-        _Row_co = TypeVar('_Row_co', bound=Book, covariant=True, default=Book)
-        class BookQuerySet(models.QuerySet[_Model_co, _Row_co]): ...
-
-    Note that this does not happen if mypy is run with disallow_any_generics = True,
-    as not specifying the generic type is then considered an error.
-    """
-    reparametrize_generic_class(ctx, fullnames.QUERYSET_CLASS_FULLNAME, bind_explicit_args=True)
-
-
-def reparametrize_any_manager_hook(ctx: ClassDefContext) -> None:
-    """
-    Add implicit generics to manager classes that are defined without generic.
-
-    Eg.
-
-        class MyManager(models.Manager): ...
-
-    is interpreted as:
-
-        _T = TypeVar('_T', covariant=True)
-        class MyManager(models.Manager[_T]): ...
-
-    Note that this does not happen if mypy is run with disallow_any_generics = True,
-    as not specifying the generic type is then considered an error.
-    """
-    reparametrize_generic_class(ctx, fullnames.BASE_MANAGER_CLASS_FULLNAME)
-
-
-def reparametrize_any_field_hook(ctx: ClassDefContext) -> None:
-    """
-    Add implicit generics to Field subclasses that omit the parent's TypeVars.
-
-    Eg.
-
-        class HTMLField(models.TextField): ...
-
-    is interpreted as:
-
-        class HTMLField(models.TextField[_ST_Text, _GT_Text]): ...
-
-    Without this, mypy treats `HTMLField` as non-Generic and the set/get args
-    assigned by the field function hook don't propagate through `__get__`.
-    """
-    reparametrize_generic_class(ctx, fullnames.FIELD_FULLNAME)
