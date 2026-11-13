@@ -43,9 +43,7 @@ from mypy_django_plugin.transformers.auth import get_user_model
 from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
-    reparametrize_any_field_hook,
-    reparametrize_any_manager_hook,
-    reparametrize_any_queryset_hook,
+    reparametrize_generic_class,
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import MetaclassAdjustments, handle_annotated_type, process_model_class
@@ -278,13 +276,17 @@ class NewSemanalDjangoPlugin(Plugin):
             return None
 
         if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-            return reparametrize_any_manager_hook
+            return partial(reparametrize_generic_class, base_class_fullname=fullnames.BASE_MANAGER_CLASS_FULLNAME)
 
         if info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-            return reparametrize_any_queryset_hook
+            return partial(
+                reparametrize_generic_class,
+                base_class_fullname=fullnames.QUERYSET_CLASS_FULLNAME,
+                bind_explicit_args=True,
+            )
 
         if info.has_base(fullnames.FIELD_FULLNAME):
-            return reparametrize_any_field_hook
+            return partial(reparametrize_generic_class, base_class_fullname=fullnames.FIELD_FULLNAME)
 
         return None
 
