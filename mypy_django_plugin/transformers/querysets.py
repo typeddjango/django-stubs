@@ -65,34 +65,6 @@ if TYPE_CHECKING:
     from mypy_django_plugin.lib.helpers import DjangoModel
 
 
-def determine_proper_manager_type(ctx: FunctionContext) -> MypyType:
-    """
-    Fill the manager TypeVar on instantiation using the enclosing class.
-    For example:
-
-        class MyModel(Model):
-            objects = MyManager()
-
-    Is interpreted as:
-
-        class MyModel(Model):
-            objects: MyManager[MyModel] = MyManager()
-    """
-    default_return_type = get_proper_type(ctx.default_return_type)
-    assert isinstance(default_return_type, Instance)
-
-    outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
-    if (
-        outer_model_info is None
-        or not helpers.is_model_type(outer_model_info)
-        or outer_model_info.self_type is None
-        or not default_return_type.type.is_generic()
-    ):
-        return default_return_type
-
-    return helpers.fill_instance(default_return_type.type, [outer_model_info.self_type])
-
-
 def get_field_type_from_lookup(
     ctx: MethodContext,
     django_context: DjangoContext,

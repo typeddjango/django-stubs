@@ -38,11 +38,12 @@ from mypy_django_plugin.transformers import (
     settings,
 )
 from mypy_django_plugin.transformers.auth import get_user_model
+from mypy_django_plugin.transformers.generics import reparametrize_generic_class
 from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
+    determine_proper_manager_type,
     refine_related_manager,
-    reparametrize_generic_class,
     resolve_manager_method,
 )
 from mypy_django_plugin.transformers.models import MetaclassAdjustments, handle_annotated_type, process_model_class
@@ -166,7 +167,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(init_create.typecheck_model_method, django_context=self.django_context, method="__init__")
 
         if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-            return querysets.determine_proper_manager_type
+            return determine_proper_manager_type
 
         if info.has_base(fullnames.PREFETCH_CLASS_FULLNAME):
             return partial(querysets.specialize_prefetch_type, django_context=self.django_context)
