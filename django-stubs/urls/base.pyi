@@ -18,8 +18,8 @@ def resolve(path: str | _StrPromise, urlconf: str | ModuleType | None = None) ->
 def reverse(
     viewname: Callable[..., HttpResponseBase] | str | None,
     urlconf: str | ModuleType | None = None,
-    args: Sequence[Any] | None = None,
-    kwargs: dict[str, Any] | None = None,
+    args: Sequence[object] | None = None,
+    kwargs: Mapping[str, object] | None = None,
     current_app: str | None = None,
     *,
     query: QueryDict | _QueryType | None = None,
@@ -28,8 +28,8 @@ def reverse(
 def reverse_lazy(
     viewname: Callable[..., HttpResponseBase] | str | None,
     urlconf: str | ModuleType | None = None,
-    args: Sequence[Any] | None = None,
-    kwargs: dict[str, Any] | None = None,
+    args: Sequence[object] | None = None,
+    kwargs: Mapping[str, object] | None = None,
     current_app: str | None = None,
     *,
     query: QueryDict | _QueryType | None = None,

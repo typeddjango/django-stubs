@@ -26,29 +26,29 @@ _Resolvable: TypeAlias = Callable[..., HttpResponseBase] | _StrOrPromise | Suppo
 @overload
 def redirect(
     to: _Resolvable,
-    *args: Any,
+    *args: object,
     permanent: Literal[True],
     preserve_request: bool = False,
     max_length: int = ...,
-    **kwargs: Any,
+    **kwargs: object,
 ) -> HttpResponsePermanentRedirect: ...
 @overload
 def redirect(
     to: _Resolvable,
-    *args: Any,
+    *args: object,
     permanent: Literal[False] = False,
     preserve_request: bool = False,
     max_length: int = ...,
-    **kwargs: Any,
+    **kwargs: object,
 ) -> HttpResponseRedirect: ...
 @overload
 def redirect(
     to: _Resolvable,
-    *args: Any,
+    *args: object,
     permanent: bool = False,
     preserve_request: bool = False,
     max_length: int = ...,
-    **kwargs: Any,
+    **kwargs: object,
 ) -> HttpResponseRedirect | HttpResponsePermanentRedirect: ...
 
 _T = TypeVar("_T", bound=Model)
@@ -57,4 +57,4 @@ def get_object_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, 
 async def aget_object_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> _T: ...
 def get_list_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> list[_T]: ...
 async def aget_list_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> list[_T]: ...
-def resolve_url(to: _Resolvable, *args: Any, **kwargs: Any) -> str: ...
+def resolve_url(to: _Resolvable, *args: object, **kwargs: object) -> str: ...

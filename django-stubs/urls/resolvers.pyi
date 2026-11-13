@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from re import Pattern
 from types import ModuleType
 from typing import Any, TypeAlias, overload
@@ -11,8 +11,8 @@ from django.utils.functional import cached_property
 
 class ResolverMatch:
     func: Callable[..., Any]
-    args: tuple[Any, ...]
-    kwargs: dict[str, Any]
+    args: Sequence[object]
+    kwargs: Mapping[str, object]
     url_name: str | None
     app_names: list[str]
     app_name: str
@@ -25,8 +25,8 @@ class ResolverMatch:
     def __init__(
         self,
         func: Callable[..., Any],
-        args: tuple[Any, ...],
-        kwargs: dict[str, Any],
+        args: Sequence[object],
+        kwargs: Mapping[str, object],
         url_name: str | None = None,
         app_names: list[str | None] | None = None,
         namespaces: list[str | None] | None = None,
@@ -135,4 +135,4 @@ class URLResolver:
     def _is_callback(self, name: str) -> bool: ...
     def resolve(self, path: str) -> ResolverMatch: ...
     def resolve_error_handler(self, view_type: int) -> Callable[[HttpRequest], HttpResponse]: ...
-    def reverse(self, lookup_view: str, *args: Any, **kwargs: Any) -> str: ...
+    def reverse(self, lookup_view: str, *args: object, **kwargs: object) -> str: ...
