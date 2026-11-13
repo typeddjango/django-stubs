@@ -40,7 +40,7 @@ from mypy_django_plugin.lib import fullnames, helpers
 
 if TYPE_CHECKING:
     from mypy.checker import TypeChecker
-    from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext
+    from mypy.plugin import AttributeContext, ClassDefContext, DynamicClassDefContext, MethodContext
     from mypy.semanal import SemanticAnalyzer
 
 MANAGER_METHODS_RETURNING_QUERYSET: Final = frozenset(
@@ -156,6 +156,40 @@ def resolve_manager_method(ctx: AttributeContext) -> MypyType:
         return UnionType(resolved)
     ctx.api.fail(f'Unable to resolve return type of queryset/manager method "{method_name}"', ctx.context)
     return AnyType(TypeOfAny.from_error)
+
+
+def refine_related_manager(ctx: MethodContext) -> MypyType:
+    """
+    Like Django, build the `RelatedManager` (reverse foreign key) or `ManyRelatedManager` (many-to-many)
+    returned by a related descriptor's `__get__` from the related model's default manager.
+
+    Only the `__get__` overload for access on a model instance returns a manager,
+    access on the class returns the descriptor itself and is left as is.
+    """
+    manager = get_proper_type(ctx.default_return_type)
+    if not (
+        isinstance(manager, Instance)
+        and manager.args
+        and isinstance(to := get_proper_type(manager.args[0]), Instance)
+        and helpers.is_model_type(to.type)
+    ):
+        return ctx.default_return_type
+
+    api = helpers.get_typechecker_api(ctx)
+    if manager.type.fullname == fullnames.RELATED_MANAGER_CLASS:
+        info = helpers.get_reverse_manager_info(api, to.type, derived_from="_default_manager")
+        args: list[MypyType] = []
+    elif (
+        manager.type.fullname == fullnames.MANY_RELATED_MANAGER
+        and len(manager.args) >= 2
+        and isinstance(through := get_proper_type(manager.args[1]), Instance)
+        and helpers.is_model_type(through.type)
+    ):
+        info = helpers.get_many_to_many_manager_info(api, to=to.type, derived_from="_default_manager")
+        args = [through]
+    else:
+        return ctx.default_return_type
+    return ctx.default_return_type if info is None else Instance(info, args)
 
 
 def create_new_manager_class_from_from_queryset_method(ctx: DynamicClassDefContext) -> None:

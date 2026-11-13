@@ -6,10 +6,10 @@ from mypy.nodes import AssignmentStmt, NameExpr, Node, TypeInfo
 from mypy.types import AnyType, Instance, ProperType, UninhabitedType, get_proper_type
 from mypy.types import Type as MypyType
 
-from mypy_django_plugin.lib import fullnames, helpers
+from mypy_django_plugin.lib import helpers
 
 if TYPE_CHECKING:
-    from mypy.plugin import FunctionContext, MethodContext
+    from mypy.plugin import FunctionContext
 
     from mypy_django_plugin.django.context import DjangoContext
 
@@ -128,56 +128,3 @@ def get_m2m_arguments(
                         through = M2MThrough(arg=through_arg, model=helpers.model_instance(through_model_info))
 
     return M2MArguments(to=to, through=through)
-
-
-def get_related_manager_and_model(ctx: MethodContext) -> tuple[Instance, Instance, Instance] | None:
-    """
-    Returns a 3-tuple consisting of:
-      1. A `ManyRelatedManager` instance
-      2. The first type parameter (to_instance) instance of 1. when it's a model
-      3. The second type parameter (through_instance) instance of 1. when it's a model
-    When encountering a `ManyRelatedManager` that has populated its 2 first type
-    parameters with models. Otherwise `None` is returned.
-
-    For example: if given a `ManyRelatedManager[A, B]` where `A` and `B` are models the
-    following 3-tuple is returned: `(ManyRelatedManager[A, B], A, B)`.
-    """
-    default_return_type = get_proper_type(ctx.default_return_type)
-    if (
-        isinstance(default_return_type, Instance)
-        and default_return_type.type.fullname == fullnames.MANY_RELATED_MANAGER
-    ):
-        # This is a call to '__get__' overload with a model instance of 'ManyToManyDescriptor'.
-        # Returning a 'ManyRelatedManager'. Which we want to, just like Django, build from the
-        # default manager of the related model.
-        many_related_manager = default_return_type
-        # Require first and second type argument of 'ManyRelatedManager' to be models
-        if (
-            len(many_related_manager.args) >= 2
-            and isinstance((to_instance := get_proper_type(many_related_manager.args[0])), Instance)
-            and helpers.is_model_type(to_instance.type)
-            and isinstance((through_instance := get_proper_type(many_related_manager.args[1])), Instance)
-            and helpers.is_model_type(through_instance.type)
-        ):
-            return many_related_manager, to_instance, through_instance
-
-    return None
-
-
-def refine_many_to_many_related_manager(ctx: MethodContext) -> MypyType:
-    """
-    Updates the 'ManyRelatedManager' returned by e.g. 'ManyToManyDescriptor' to be a subclass
-    of 'ManyRelatedManager' and the related model's default manager.
-    """
-    related_objects = get_related_manager_and_model(ctx)
-    if related_objects is None:
-        return ctx.default_return_type
-
-    _, related_model_instance, through_model_instance = related_objects
-    checker = helpers.get_typechecker_api(ctx)
-    related_manager_info = helpers.get_many_to_many_manager_info(
-        checker, to=related_model_instance.type, derived_from="_default_manager"
-    )
-    if related_manager_info is None:
-        return ctx.default_return_type
-    return Instance(related_manager_info, [through_model_instance])
