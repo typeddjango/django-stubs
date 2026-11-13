@@ -4,7 +4,7 @@ from typing import Any, Literal, TypeAlias
 
 from django.http.request import QueryDict
 from django.urls.resolvers import ResolverMatch
-from django.utils.functional import _StrPromise
+from django.utils.functional import _StrOrPromise, _StrPromise
 from django.views import _ViewCallable
 
 # https://github.com/python/typeshed/blob/87f599dc8312ac67b941b5f2b47274534a1a2d3a/stdlib/urllib/parse.pyi#L136-L138
@@ -12,7 +12,7 @@ _QueryType: TypeAlias = (
     Mapping[Any, Any] | Mapping[Any, Sequence[Any]] | Sequence[tuple[Any, Any]] | Sequence[tuple[Any, Sequence[Any]]]
 )
 
-def resolve(path: str | _StrPromise, urlconf: str | ModuleType | None = None) -> ResolverMatch: ...
+def resolve(path: _StrOrPromise, urlconf: str | ModuleType | None = None) -> ResolverMatch: ...
 
 # NOTE: make sure `reverse` and `reverse_lazy` objects are in sync:
 def reverse(
