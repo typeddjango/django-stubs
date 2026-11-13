@@ -45,4 +45,4 @@ assert_type(CustomManager.from_queryset(OtherQuerySet)().manager_method(), str)
 def managers_are_not_querysets(manager: models.Manager[OtherModel]) -> None:
     len(manager)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
     manager[0]  # type: ignore[index]  # pyright: ignore[reportIndexIssue]  # pyrefly: ignore[bad-index]  # ty: ignore[not-subscriptable]
-    manager.delete()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+    manager.delete()  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]

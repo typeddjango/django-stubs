@@ -30,7 +30,7 @@ class NoPrimaryKey(models.Model):
 
 
 def test_add_id_field_if_no_primary_key_defined() -> None:
-    assert_type(NoPrimaryKey().id, int)  # pyright: ignore[reportAssertTypeFailure, reportAttributeAccessIssue, reportUnknownMemberType]  # ty: ignore[type-assertion-failure, unresolved-attribute]
+    assert_type(NoPrimaryKey().id, int)  # pyright: ignore[reportAssertTypeFailure, reportAttributeAccessIssue, reportUnknownMemberType]  # ty: ignore[type-assertion-failure, missing-attribute]
 
 
 class CustomPrimaryKey(models.Model):
@@ -39,7 +39,7 @@ class CustomPrimaryKey(models.Model):
 
 def test_do_not_add_id_if_field_with_primary_key_True_defined() -> None:
     assert_type(CustomPrimaryKey().my_pk, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    CustomPrimaryKey().id  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+    CustomPrimaryKey().id  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 class MyModel(models.Model):
@@ -134,9 +134,9 @@ def test_ignores_renamed_field() -> None:
     # along. But the 'name=' argument to a field isn't a documented feature.
     instance = RenamedField()
     assert_type(instance.modelname, int)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
-    instance.fieldname  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+    instance.fieldname  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
     instance.modelname = 1
-    instance.fieldname = 1  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+    instance.fieldname = 1  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 class AllFields(models.Model):

@@ -58,7 +58,7 @@ def override_manager_create_with_type_param() -> None:
 class ReviewManager(models.Manager["Author"]):
     # The type parameter, not the model the manager ends up on, drives what the inherited `create()` returns.
     @override
-    def create(self, **kwargs: Any) -> Review:  # type: ignore[override]  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]
+    def create(self, **kwargs: Any) -> Review:  # type: ignore[override]  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[incompatible-method-override]
         return super().create(**kwargs)  # type: ignore[return-value]  # pyright: ignore[reportReturnType]  # pyrefly: ignore[bad-return]  # ty: ignore[invalid-return-type]
 
 

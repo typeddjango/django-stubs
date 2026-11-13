@@ -26,14 +26,14 @@ class Foo:
 
 f = Foo()
 assert_type(f.attr, list[str])
-f.attr.func  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+f.attr.func  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 # May be overridden by @property
 class Bar(Foo):
     @property
     @override
-    def attr(self) -> list[str]:  # pyright: ignore[reportIncompatibleVariableOverride]  # ty: ignore[invalid-property-type-override]
+    def attr(self) -> list[str]:  # pyright: ignore[reportIncompatibleVariableOverride]  # ty: ignore[incompatible-property-override]
         raise NotImplementedError
 
 
@@ -46,7 +46,7 @@ class Quux(Foo):
 class Baz(Quux):
     @cached_property
     @override
-    def attr(self) -> list[str]:  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
+    def attr(self) -> list[str]:  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[incompatible-attribute-override]
         raise NotImplementedError
 
 
@@ -64,7 +64,7 @@ assert_type("foo" + s, str)
 assert_type(s % "asd", str)
 assert_type(list(s), list[str])
 
-s.nonsense  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+s.nonsense  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 def test_str_or_promise(f2: StrOrPromise) -> None:

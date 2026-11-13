@@ -6,12 +6,12 @@ from django.db import migrations
 
 
 class ExplicitMigration(migrations.Migration):
-    initial: ClassVar[bool] = True  # pyright: ignore[reportIncompatibleVariableOverride]  # ty: ignore[invalid-mutable-override]
+    initial: ClassVar[bool] = True  # pyright: ignore[reportIncompatibleVariableOverride]  # ty: ignore[incompatible-mutable-override]
 
 
 # initial remains a class-only default.
 class IncorrectInitialMigration(migrations.Migration):
-    initial: bool = True  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
+    initial: bool = True  # type: ignore[misc]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[incompatible-attribute-override]
 
 
 class ImplicitMigration(migrations.Migration):

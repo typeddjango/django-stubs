@@ -20,7 +20,7 @@ class NullableActiveUser(AbstractUser):
 class PropertyStaffUser(AbstractUser):
     @property
     @override
-    def is_staff(self) -> Literal[True]:  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-property-type-override]
+    def is_staff(self) -> Literal[True]:  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[incompatible-property-override]
         return True
 
 
@@ -39,7 +39,7 @@ def flags_accept_expressions(user: User) -> None:
 class MyBaseUser(AbstractBaseUser, PermissionsMixin):
     # pyright rejects the bases' distinct `Meta` classes unless the model inherits both,
     # ty wrongly rejects that override: https://github.com/astral-sh/ty/issues/4711
-    class Meta(AbstractBaseUser.Meta, PermissionsMixin.Meta):  # ty: ignore[invalid-attribute-override]
+    class Meta(AbstractBaseUser.Meta, PermissionsMixin.Meta):  # ty: ignore[incompatible-attribute-override]
         pass
 
 
