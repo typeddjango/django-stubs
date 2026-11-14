@@ -1,3 +1,15 @@
+"""Model instantiation
+
+Type-checks the arguments of `Model(...)`, `QuerySet.create()` and `QuerySet.acreate()`.
+
+```python
+Book(pages=[])  # error: Incompatible type for "pages" of "Book" (got "list[Any]", ...)  [misc]
+Book(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
+Book.objects.create(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
+await Book.objects.acreate(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
+```
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal

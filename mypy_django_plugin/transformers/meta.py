@@ -1,3 +1,13 @@
+"""Model options (`_meta`)
+
+Infers the field returned by `Model._meta.get_field()`.
+
+```python
+reveal_type(Book._meta.get_field("publisher"))  # ForeignKey[Publisher, Publisher]
+Book._meta.get_field("nope")  # error: Book has no field named 'nope'  [misc]
+```
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

@@ -1,3 +1,13 @@
+"""Forms
+
+Allows combining forms whose nested `Meta` classes differ.
+A form's `Meta` is typed as `Any`, so inheriting from several forms isn't reported as an incompatible definition.
+
+```python
+class CompositeForm(ArticleForm, CategoryForm): ...  # no error
+```
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

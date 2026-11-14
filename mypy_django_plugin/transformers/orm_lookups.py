@@ -1,3 +1,14 @@
+"""Field lookups
+
+Type-checks lookups passed to `filter()`, `get()`, `exclude()` and friends.
+Also covers `get_or_create()`, `update_or_create()` and the async variants.
+
+```python
+Book.objects.filter(nope=1)  # error: Cannot resolve keyword 'nope' into field. Choices are: id, title  [misc]
+Book.objects.get(id=Book())  # error: Incompatible type for lookup 'id': (got "Book", expected "str | int")  [misc]
+```
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

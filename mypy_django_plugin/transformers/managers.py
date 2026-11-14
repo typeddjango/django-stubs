@@ -1,3 +1,63 @@
+"""Managers
+
+### Infer the model of a manager instantiated in a model body
+
+So `objects = BookManager()` needs no annotation.
+
+```python
+class Book(models.Model):
+    objects = BookManager()
+
+reveal_type(Book.objects)  # BookManager[Book, QuerySet[Book, Book]]
+```
+
+### Resolve `QuerySet` methods on managers built by `from_queryset()` and `as_manager()`
+
+Custom methods are bound to the model, and built-in ones return your queryset class.
+
+```python
+class Book(models.Model):
+    objects = models.Manager.from_queryset(BookQuerySet)()
+
+reveal_type(Book.objects.filter(id=1))  # BookQuerySet[Book, Book]
+```
+
+### Create a manager class for a module-level `Manager.from_queryset()`
+
+```python
+BookManager = models.Manager.from_queryset(BookQuerySet)
+
+class Book(models.Model):
+    objects = BookManager()
+
+reveal_type(Book.objects)  # ManagerFromBookQuerySet[Book, BookQuerySet[Book, Book]]
+```
+
+### Type `QuerySet.as_manager()` as a manager with the queryset's methods
+
+```python
+class Book(models.Model):
+    objects = BookQuerySet.as_manager()
+
+reveal_type(Book.objects)  # ManagerFromBookQuerySet[Book, BookQuerySet[Book, Book]]
+reveal_type(Book.objects.published())  # BookQuerySet[Book, Book]
+```
+
+### Add the related model's manager methods to reverse `ForeignKey` and `ManyToManyField` managers
+
+Many-to-many managers get them on both sides of the relation.
+
+```python
+class Book(models.Model):
+    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, related_name="books")
+    authors = models.ManyToManyField(Author)
+    objects = BookQuerySet.as_manager()
+
+reveal_type(Publisher().books.published())  # BookQuerySet[Book, Book]
+reveal_type(Book().authors.active())  # AuthorQuerySet[Author, Author], from Author's default manager
+```
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final

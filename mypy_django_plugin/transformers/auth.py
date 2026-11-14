@@ -1,3 +1,14 @@
+"""Auth user model
+
+Resolves `get_user_model()`, `request.user` and other auth APIs to `AUTH_USER_MODEL`.
+
+```python
+# settings.py: AUTH_USER_MODEL = "myapp.MyUser"
+reveal_type(get_user_model())  # type[MyUser]
+reveal_type(request.user)  # MyUser | AnonymousUser
+```
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

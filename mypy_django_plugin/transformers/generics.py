@@ -1,3 +1,29 @@
+"""Generic subclasses
+
+Keeps custom subclasses declared without type arguments generic:
+
+- `QuerySet` subclasses over their model and row types
+- `Manager` subclasses over their model and queryset
+- `Field` subclasses over their value types
+
+```python
+class BookQuerySet(models.QuerySet): ...
+class BookManager(models.Manager): ...
+class HTMLField(models.TextField): ...
+
+class Book(models.Model):
+    summary = HTMLField(null=True)
+    objects = BookManager()
+    published = BookQuerySet.as_manager()
+
+reveal_type(Book.published.all())  # BookQuerySet[Book, Book]
+reveal_type(Book.objects.get())  # Book
+reveal_type(Book().summary)  # str | None
+```
+
+Skipped under `disallow_any_generics = true`, which requires the type arguments.
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

@@ -1,3 +1,14 @@
+"""HTTP requests
+
+Reports mutations of immutable `QueryDict`s such as `request.GET`.
+
+```python
+request.GET["page"] = "2"  # error: This QueryDict is immutable.  [misc]
+params = request.GET.copy()
+params["page"] = "2"  # OK
+```
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

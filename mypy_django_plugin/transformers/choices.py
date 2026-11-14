@@ -1,3 +1,19 @@
+"""Choices
+
+Narrows the value and label types of `Choices` enums.
+`choices`, `values`, `labels`, `value` and `label` follow the enum definition,
+and `__empty__` adds `None` to the values.
+
+```python
+class Gender(models.TextChoices):
+    MALE = "M", "Male"
+    __empty__ = "(Undeclared)"
+
+reveal_type(Gender.choices)  # list[tuple[str | None, str]]
+reveal_type(Gender.MALE.label)  # str
+```
+"""
+
 from __future__ import annotations
 
 from enum import Enum, auto

@@ -1,3 +1,16 @@
+"""App registry
+
+Narrows `apps.get_model()` to the referenced model.
+With literal arguments, the model class is returned instead of `type[Any]`.
+
+```python
+reveal_type(apps.get_model("myapp.Book"))  # type[Book]
+apps.get_model("myapp.Missing")  # error: Could not match lazy reference with any model  [misc]
+```
+
+Migration `apps` (`StateApps`) keep `type[Any]`, since their models are historical.
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

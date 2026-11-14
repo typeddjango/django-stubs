@@ -1,3 +1,15 @@
+"""Settings
+
+Infers `django.conf.settings` attribute types from your settings module, falling back to Django's defaults.
+
+```python
+reveal_type(settings.BASE_DIR)  # Path
+settings.NOT_EXISTING  # error: 'Settings' object has no attribute 'NOT_EXISTING'  [misc]
+```
+
+Set `strict_settings = false` to type settings only created at runtime as `Any` instead of reporting them.
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

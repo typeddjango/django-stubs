@@ -1,3 +1,38 @@
+"""Model classes
+
+### Report `objects` and `DoesNotExist` accessed where Django doesn't add them
+
+Django adds `objects` to concrete models only, and `DoesNotExist` and friends to `Model` subclasses only.
+
+```python
+def count(model: type[models.Model]) -> None:
+    model.objects.count()  # error: "type[Model]" has no attribute "objects"  [attr-defined]
+```
+
+Set `strict_model_abstract_attrs = false` to allow it, at your own risk: `count(models.Model)` fails at runtime.
+
+### Add the attributes Django generates on model classes
+
+Such as `id` and `pk`, `<fk>_id`, managers, reverse relations, `get_<field>_display()` and `DoesNotExist`.
+
+```python
+class Book(models.Model):
+    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
+
+reveal_type(Book().publisher_id)  # int
+reveal_type(Publisher().book_set)  # RelatedManager[Book, QuerySet[Book, Book]]
+```
+
+### Resolve `WithAnnotations[Model, TypedDict]` to the annotated model type
+
+Use it to type instances returned by `annotate()`.
+
+```python
+def f(book: WithAnnotations[Book, Pages]) -> None:
+    reveal_type(book.n_pages)  # int, from the `Pages` TypedDict
+```
+"""
+
 from __future__ import annotations
 
 from collections import deque
