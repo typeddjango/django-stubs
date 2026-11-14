@@ -412,28 +412,32 @@ def _extract_model_type_var_upper_bound(ctx: MethodContext) -> Instance | None:
     return None
 
 
-def _with_annotated_model(
-    api: TypeChecker,
-    qs_type: Instance,
-    annotated_model: ProperType,
-    row_fields: Collection[str] | None = None,
+def _annotate_queryset_model(
+    api: TypeChecker, qs_type: Instance, model: Instance, annotations: TypedDictType
 ) -> Instance:
-    """Swap the model of `qs_type` for `annotated_model`, model rows included."""
+    """Add `annotations` to the model of `qs_type`; rows that are that model follow, other rows are kept."""
+    annotated_model = get_annotated_type(api, model, fields_dict=annotations)
     row = get_proper_type(qs_type.args[1]) if len(qs_type.args) > 1 else annotated_model
     bound = get_proper_type(row.upper_bound) if isinstance(row, TypeVarType) else row
-    any_fields: dict[str, MypyType] = {name: AnyType(TypeOfAny.from_omitted_generics) for name in row_fields or ()}
+    is_model_row = isinstance(bound, Instance) and helpers.is_model_type(bound.type)
+    return qs_type.copy_modified(args=[annotated_model, annotated_model if is_model_row else row])
 
-    row_type: MypyType = row
-    if isinstance(bound, Instance) and helpers.is_model_type(bound.type):
-        row_type = annotated_model
-    elif row_fields is not None and isinstance(row, TypedDictType):
-        row_type = helpers.merge_typeddict(api, row, helpers.make_typeddict(api, any_fields))
-    elif row_fields is not None and isinstance(row, TupleType):
+
+def _extend_values_row(api: TypeChecker, qs_type: Instance, names: Collection[str]) -> Instance:
+    """Mirror `.values(...).annotate(...)`: values() rows gain the annotated `names`, typed as Any."""
+    if len(qs_type.args) < 2:
+        return qs_type
+    row = get_proper_type(qs_type.args[1])
+    any_fields: dict[str, MypyType] = {name: AnyType(TypeOfAny.from_omitted_generics) for name in names}
+    if isinstance(row, TypedDictType):
+        row = helpers.merge_typeddict(api, row, helpers.make_typeddict(api, any_fields))
+    elif isinstance(row, TupleType):
         if row.partial_fallback.type.has_base("typing.NamedTuple"):
-            row_type = helpers.extend_oneoff_named_tuple(api, "Row", row, any_fields)
+            row = helpers.extend_oneoff_named_tuple(api, "Row", row, any_fields)
         else:
-            row_type = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.from_omitted_generics)])
-    return qs_type.copy_modified(args=[annotated_model, row_type])
+            # Unresolved aliases (e.g. `**kwargs`) still add columns, the positional shape is unknown
+            row = api.named_generic_type("builtins.tuple", [AnyType(TypeOfAny.from_omitted_generics)])
+    return qs_type.copy_modified(args=[qs_type.args[0], row])
 
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
@@ -451,8 +455,8 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
                 expression_types = gather_expression_types(ctx)
                 if expression_types:
                     fields_dict = helpers.make_typeddict(api, expression_types)
-                    upper_annotated = get_annotated_type(api, upper_bound, fields_dict=fields_dict)
-                    return _with_annotated_model(api, default_return_type, upper_annotated, expression_types)
+                    qs_type = _annotate_queryset_model(api, default_return_type, upper_bound, fields_dict)
+                    return _extend_values_row(api, qs_type, expression_types)
         return AnyType(TypeOfAny.from_omitted_generics)
 
     default_return_type = get_proper_type(ctx.default_return_type)
@@ -475,12 +479,11 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
 
     all_fields = {**existing_row_extra_attrs, **expression_types}
 
-    annotated_type: ProperType = django_model.typ
+    qs_type = default_return_type
     if all_fields:
         fields_dict = helpers.make_typeddict(api, all_fields)
-        annotated_type = get_annotated_type(api, django_model.typ, fields_dict=fields_dict)
-
-    return _with_annotated_model(api, default_return_type, annotated_type, expression_types)
+        qs_type = _annotate_queryset_model(api, qs_type, django_model.typ, fields_dict)
+    return _extend_values_row(api, qs_type, expression_types)
 
 
 def merge_annotations_from_custom_method(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
@@ -505,9 +508,7 @@ def merge_annotations_from_custom_method(ctx: MethodContext, django_context: Dja
         return ctx.default_return_type
 
     api = helpers.get_typechecker_api(ctx)
-    return _with_annotated_model(
-        api, default_return_type, get_annotated_type(api, django_model.typ, fields_dict=new_td)
-    )
+    return _annotate_queryset_model(api, default_return_type, django_model.typ, new_td)
 
 
 def resolve_field_lookups(lookup_exprs: Sequence[Expression], django_context: DjangoContext) -> list[str] | None:
@@ -985,10 +986,7 @@ def extract_prefetch_related_annotations(ctx: MethodContext, django_context: Dja
     if not new_attrs:
         return ctx.default_return_type
 
-    fields_dict = helpers.make_typeddict(api, new_attrs)
-    return _with_annotated_model(
-        api, default_return_type, get_annotated_type(api, qs_model.typ, fields_dict=fields_dict)
-    )
+    return _annotate_queryset_model(api, default_return_type, qs_model.typ, helpers.make_typeddict(api, new_attrs))
 
 
 def _extract_field_names_from_collection(
