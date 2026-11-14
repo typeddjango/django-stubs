@@ -140,20 +140,39 @@ The supported settings are:
 
 ## FAQ
 
+<details>
+<summary>
+
 ### Is this an official Django project?
+
+</summary>
 
 No, it is not. We are independent from Django at the moment.
 There's a [proposal](https://github.com/django/deps/pull/65) to merge our project into the Django itself.
 You can show your support by liking the PR.
 
+</details>
+
+<details>
+<summary>
+
 ### Is it safe to use this in production?
+
+</summary>
 
 Yes, it is! This project does not affect your runtime at all.
 It only affects `mypy` type checking process.
 
 But, it does not make any sense to use this project without `mypy`.
 
+</details>
+
+<details>
+<summary>
+
 ### mypy crashes when I run it with this plugin installed
+
+</summary>
 
 The current implementation uses Django's runtime to extract information about models, so it might crash if your installed apps or `models.py` are broken.
 
@@ -161,7 +180,14 @@ In other words, if your `manage.py runserver` crashes, mypy will crash too.
 You can also run `mypy` with [`--tb`](https://mypy.readthedocs.io/en/stable/command_line.html#cmdoption-mypy-show-traceback)
 option to get extra information about the error.
 
+</details>
+
+<details>
+<summary>
+
 ### I cannot use QuerySet or Manager with type annotations
+
+</summary>
 
 You can get a `TypeError: 'type' object is not subscriptable`
 when you will try to use `QuerySet[MyModel]`, `Manager[MyModel, MyQuerySet]` or some other Django-based Generic types.
@@ -208,7 +234,14 @@ This happens because these Django classes do not support [`__class_getitem__`](h
 
 2. You can use strings instead: `'QuerySet[MyModel]'` and `'Manager[MyModel, MyQuerySet]'`, this way it will work as a type for `mypy` and as a regular `str` in runtime.
 
+</details>
+
+<details>
+<summary>
+
 ### How can I create a HttpRequest that's guaranteed to have an authenticated user?
+
+</summary>
 
 Django's built in [`HttpRequest`](https://docs.djangoproject.com/en/stable/ref/request-response/#django.http.HttpRequest) has the attribute `user` that resolves to the type `User | AnonymousUser` where `User` is the user model specified by the `AUTH_USER_MODEL` setting.
 
@@ -225,7 +258,14 @@ class AuthenticatedHttpRequest(HttpRequest):
 
 And then use `AuthenticatedHttpRequest` instead of the standard `HttpRequest` for when you know that the user is authenticated. For example in views using the `@login_required` decorator.
 
+</details>
+
+<details>
+<summary>
+
 ### Why am I getting incompatible return type errors on my custom managers?
+
+</summary>
 
 If you declare your custom managers without generics and override built-in
 methods you might see an error message about incompatible error messages,
@@ -310,7 +350,14 @@ class Book(models.Model):
 > so code that used to go through `Any` (for instance attributes added by `annotate` inside a queryset
 > method) may now report errors that were previously hidden.
 
+</details>
+
+<details>
+<summary>
+
 ### Why are my custom queryset methods lost after `values()` or `values_list()`?
+
+</summary>
 
 These methods change the row type of the queryset, so they return a plain `QuerySet` by default.
 To keep your custom queryset class, give it a row type variable defaulting to the model:
@@ -340,7 +387,14 @@ Book.objects.values("title").published()  # BookQuerySet[Book, TypedDict({'title
 > This relies on the mypy plugin. Other type checkers still return a plain `QuerySet`,
 > as typing cannot express "`Self` with another row type" ([python/typing#548](https://github.com/python/typing/issues/548)).
 
+</details>
+
+<details>
+<summary>
+
 ### How do I annotate cases where I called QuerySet.annotate?
+
+</summary>
 
 Django-stubs provides a special type, `django_stubs_ext.WithAnnotations[Model, <Annotations>]`, which indicates that
 the `Model` has been annotated, meaning it requires extra attributes on the model instance.
@@ -418,7 +472,14 @@ product.total_sales  # OK, int
 product.name  # OK, str
 ```
 
+</details>
+
+<details>
+<summary>
+
 ### Why am I getting incompatible argument type mentioning `_StrPromise`?
+
+</summary>
 
 The lazy translation functions of Django (such as `gettext_lazy`) return a `Promise` instead of `str`. These two types [cannot be used interchangeably](https://github.com/typeddjango/django-stubs/pull/1139#issuecomment-1232167698). The return type of these functions was therefore [changed](https://github.com/typeddjango/django-stubs/pull/689) to reflect that.
 
@@ -426,7 +487,14 @@ If you encounter this error in your own code, you can either cast the `Promise` 
 
 If this is reported on Django code, please report an issue or open a pull request to fix the type hints.
 
+</details>
+
+<details>
+<summary>
+
 ### How do I annotate a test client response?
+
+</summary>
 
 The test client adds attributes such as `context`, `templates` and `json()` to its responses, so `HttpResponse` is not enough.
 Use `ClientResponse`, or `AsyncClientResponse` for `AsyncClient`, from `django-stubs-ext`:
@@ -439,7 +507,14 @@ def assert_has_form(response: ClientResponse) -> None:
     assert "form" in response.context
 ```
 
+</details>
+
+<details>
+<summary>
+
 ### How to use a custom library to handle Django settings?
+
+</summary>
 
 Using something like [`django-split-settings`](https://github.com/wemake-services/django-split-settings) or [`django-configurations`](https://github.com/jazzband/django-configurations) will make it hard for mypy to infer your settings.
 
@@ -488,7 +563,14 @@ reveal_type(settings.EXISTS_AT_RUNTIME)  # N: Any
 reveal_type(settings.MISSING)  # E: 'Settings' object has no attribute 'MISSING'
 ```
 
+</details>
+
+<details>
+<summary>
+
 ### How to use `type[Model]` annotation with `.objects` attribute?
+
+</summary>
 
 Let's say you have a function similar to this one,
 which accepts a model type and accesses its `.object` attribute:
@@ -524,7 +606,14 @@ you are using our mypy plugin.
 
 Use this setting on your own risk, because it can hide valid errors.
 
+</details>
+
+<details>
+<summary>
+
 ### How do I annotate `apps` in a `RunPython` migration?
+
+</summary>
 
 Use `StateApps`, not `Apps`:
 
@@ -542,7 +631,14 @@ not the one in your current `models.py`.
 With `Apps`, our mypy plugin types it as your current model, so fields added or removed since then are typed wrong.
 With `StateApps`, it returns `type[Any]`: the historical model only exists once Django replays your migrations, which a type checker can't do.
 
+</details>
+
+<details>
+<summary>
+
 ### Do I need to annotate reverse relations?
+
+</summary>
 
 Not if you use our mypy plugin. It reads your app registry and declares every reverse accessor for you, as
 `RelatedManager[Model]`, or `ManyRelatedManager[Model, Through]` for a `ManyToManyField`.
@@ -575,7 +671,14 @@ class Article(models.Model):
 
 `ManyRelatedManager` does not take a queryset argument: a `ManyToManyField` accessor always returns a plain `QuerySet`.
 
+</details>
+
+<details>
+<summary>
+
 ### How to type a custom `models.Field`?
+
+</summary>
 
 > [!NOTE]
 > This require type generic support, see <a href="#i-cannot-use-queryset-or-manager-with-type-annotations">this section</a> to enable it.
@@ -630,6 +733,8 @@ User().my_field = "12"  # E: Incompatible types in assignment (expression has ty
 ```
 
 See mypy section on [generic classes subclasses](https://mypy.readthedocs.io/en/stable/generics.html#defining-subclasses-of-generic-classes).
+
+</details>
 
 ## Related projects
 
