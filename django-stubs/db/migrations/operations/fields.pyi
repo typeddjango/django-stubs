@@ -1,5 +1,3 @@
-from typing import Any
-
 from django.db.models.fields import Field
 from django.utils.functional import cached_property
 
@@ -8,7 +6,7 @@ from .base import Operation
 class FieldOperation(Operation):
     model_name: str
     name: str
-    def __init__(self, model_name: str, name: str, field: Field[Any, Any] | None = None) -> None: ...
+    def __init__(self, model_name: str, name: str, field: Field | None = None) -> None: ...
     @cached_property
     def name_lower(self) -> str: ...
     @cached_property
@@ -17,16 +15,16 @@ class FieldOperation(Operation):
     def is_same_field_operation(self, operation: FieldOperation) -> bool: ...
 
 class AddField(FieldOperation):
-    field: Field[Any, Any]
+    field: Field
     preserve_default: bool
-    def __init__(self, model_name: str, name: str, field: Field[Any, Any], preserve_default: bool = True) -> None: ...
+    def __init__(self, model_name: str, name: str, field: Field, preserve_default: bool = True) -> None: ...
 
 class RemoveField(FieldOperation): ...
 
 class AlterField(FieldOperation):
-    field: Field[Any, Any]
+    field: Field
     preserve_default: bool
-    def __init__(self, model_name: str, name: str, field: Field[Any, Any], preserve_default: bool = True) -> None: ...
+    def __init__(self, model_name: str, name: str, field: Field, preserve_default: bool = True) -> None: ...
 
 class RenameField(FieldOperation):
     old_name: str

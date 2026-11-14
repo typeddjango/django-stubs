@@ -26,35 +26,29 @@ from mypy_django_plugin.django.context import DjangoContext
 from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 from mypy_django_plugin.transformers import (
+    annotate,
     apps,
     choices,
+    field_name_validation,
     fields,
     forms,
     init_create,
-    manytomany,
-    manytoone,
     meta,
     orm_lookups,
-    querysets,
-    save,
+    prefetch,
     settings,
+    values,
 )
 from mypy_django_plugin.transformers.auth import get_user_model
-from mypy_django_plugin.transformers.functional import resolve_str_promise_attribute
+from mypy_django_plugin.transformers.generics import reparametrize_generic_class
 from mypy_django_plugin.transformers.managers import (
     add_as_manager_to_queryset_class,
     create_new_manager_class_from_from_queryset_method,
-    reparametrize_any_field_hook,
-    reparametrize_any_manager_hook,
-    reparametrize_any_queryset_hook,
+    determine_proper_manager_type,
+    refine_related_manager,
     resolve_manager_method,
 )
-from mypy_django_plugin.transformers.models import (
-    MetaclassAdjustments,
-    handle_annotated_type,
-    process_model_class,
-    set_auth_user_model_boolean_fields,
-)
+from mypy_django_plugin.transformers.models import MetaclassAdjustments, handle_annotated_type, process_model_class
 from mypy_django_plugin.transformers.request import check_querydict_is_mutable
 
 if TYPE_CHECKING:
@@ -65,6 +59,13 @@ if TYPE_CHECKING:
 
 
 _APPS_MODULES: Final = frozenset({"django.apps", "django.apps.registry"})
+_RELATED_MANAGER_DESCRIPTORS: Final = frozenset(
+    {
+        fullnames.MANYTOMANY_FIELD_FULLNAME,
+        fullnames.MANY_TO_MANY_DESCRIPTOR,
+        fullnames.REVERSE_MANY_TO_ONE_DESCRIPTOR,
+    }
+)
 
 
 class NewSemanalDjangoPlugin(Plugin):
@@ -165,16 +166,16 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(fields.transform_into_proper_return_type, django_context=self.django_context)
 
         if helpers.is_model_type(info):
-            return partial(init_create.typecheck_model_init, django_context=self.django_context)
+            return partial(init_create.typecheck_model_method, django_context=self.django_context, method="__init__")
 
         if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-            return querysets.determine_proper_manager_type
+            return determine_proper_manager_type
 
         if info.has_base(fullnames.PREFETCH_CLASS_FULLNAME):
-            return partial(querysets.specialize_prefetch_type, django_context=self.django_context)
+            return partial(prefetch.specialize_prefetch_type, django_context=self.django_context)
 
         if info.has_base(fullnames.FUNC_EXPRESSION_FULLNAME):
-            return querysets.reparameterize_func_output_field
+            return annotate.reparameterize_func_output_field
 
         return None
 
@@ -182,14 +183,14 @@ class NewSemanalDjangoPlugin(Plugin):
     def manager_and_queryset_method_hooks(self) -> dict[str, Callable[[MethodContext], MypyType]]:
         typecheck_filtering_method = partial(orm_lookups.typecheck_queryset_filter, django_context=self.django_context)
         return {
-            "values": partial(querysets.extract_proper_type_queryset_values, django_context=self.django_context),
-            "values_list": partial(
-                querysets.extract_proper_type_queryset_values_list, django_context=self.django_context
+            "values": partial(values.extract_proper_type_queryset_values, django_context=self.django_context),
+            "values_list": partial(values.extract_proper_type_queryset_values_list, django_context=self.django_context),
+            "alias": partial(annotate.extract_proper_type_queryset_annotate, django_context=self.django_context),
+            "annotate": partial(annotate.extract_proper_type_queryset_annotate, django_context=self.django_context),
+            "create": partial(init_create.typecheck_model_method, django_context=self.django_context, method="create"),
+            "acreate": partial(
+                init_create.typecheck_model_method, django_context=self.django_context, method="acreate"
             ),
-            "alias": partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context),
-            "annotate": partial(querysets.extract_proper_type_queryset_annotate, django_context=self.django_context),
-            "create": partial(init_create.typecheck_model_create, django_context=self.django_context),
-            "acreate": partial(init_create.typecheck_model_acreate, django_context=self.django_context),
             "filter": typecheck_filtering_method,
             "get": typecheck_filtering_method,
             "aget": typecheck_filtering_method,
@@ -199,33 +200,39 @@ class NewSemanalDjangoPlugin(Plugin):
             "aupdate_or_create": typecheck_filtering_method,
             "exclude": typecheck_filtering_method,
             "prefetch_related": partial(
-                querysets.extract_prefetch_related_annotations, django_context=self.django_context
+                prefetch.extract_prefetch_related_annotations, django_context=self.django_context
             ),
-            "select_related": partial(querysets.validate_select_related, django_context=self.django_context),
+            "select_related": partial(
+                field_name_validation.validate_select_related, django_context=self.django_context
+            ),
             "bulk_update": partial(
-                querysets.validate_bulk_update, django_context=self.django_context, method="bulk_update"
+                field_name_validation.validate_bulk_update, django_context=self.django_context, method="bulk_update"
             ),
             "abulk_update": partial(
-                querysets.validate_bulk_update, django_context=self.django_context, method="abulk_update"
+                field_name_validation.validate_bulk_update, django_context=self.django_context, method="abulk_update"
             ),
             "bulk_create": partial(
-                querysets.validate_bulk_create, django_context=self.django_context, method="bulk_create"
+                field_name_validation.validate_bulk_create, django_context=self.django_context, method="bulk_create"
             ),
             "abulk_create": partial(
-                querysets.validate_bulk_create, django_context=self.django_context, method="abulk_create"
+                field_name_validation.validate_bulk_create, django_context=self.django_context, method="abulk_create"
             ),
-            "order_by": partial(querysets.validate_order_by, django_context=self.django_context),
-            "earliest": partial(querysets.validate_order_by, django_context=self.django_context),
-            "aearliest": partial(querysets.validate_order_by, django_context=self.django_context),
-            "latest": partial(querysets.validate_order_by, django_context=self.django_context),
-            "alatest": partial(querysets.validate_order_by, django_context=self.django_context),
-            "defer": partial(querysets.validate_defer_only, django_context=self.django_context, is_defer=True),
-            "only": partial(querysets.validate_defer_only, django_context=self.django_context, is_defer=False),
-            "distinct": partial(querysets.validate_distinct, django_context=self.django_context),
-            "update": partial(querysets.validate_update, django_context=self.django_context),
-            "aupdate": partial(querysets.validate_update, django_context=self.django_context),
-            "in_bulk": partial(querysets.validate_in_bulk, django_context=self.django_context),
-            "ain_bulk": partial(querysets.validate_in_bulk, django_context=self.django_context),
+            "order_by": partial(field_name_validation.validate_order_by, django_context=self.django_context),
+            "earliest": partial(field_name_validation.validate_order_by, django_context=self.django_context),
+            "aearliest": partial(field_name_validation.validate_order_by, django_context=self.django_context),
+            "latest": partial(field_name_validation.validate_order_by, django_context=self.django_context),
+            "alatest": partial(field_name_validation.validate_order_by, django_context=self.django_context),
+            "defer": partial(
+                field_name_validation.validate_defer_only, django_context=self.django_context, is_defer=True
+            ),
+            "only": partial(
+                field_name_validation.validate_defer_only, django_context=self.django_context, is_defer=False
+            ),
+            "distinct": partial(field_name_validation.validate_distinct, django_context=self.django_context),
+            "update": partial(field_name_validation.validate_update, django_context=self.django_context),
+            "aupdate": partial(field_name_validation.validate_update, django_context=self.django_context),
+            "in_bulk": partial(field_name_validation.validate_in_bulk, django_context=self.django_context),
+            "ain_bulk": partial(field_name_validation.validate_in_bulk, django_context=self.django_context),
         }
 
     @override
@@ -236,12 +243,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return None
 
         if method_name == "__get__":
-            hooks = {
-                fullnames.MANYTOMANY_FIELD_FULLNAME: manytomany.refine_many_to_many_related_manager,
-                fullnames.MANY_TO_MANY_DESCRIPTOR: manytomany.refine_many_to_many_related_manager,
-                fullnames.REVERSE_MANY_TO_ONE_DESCRIPTOR: manytoone.refine_many_to_one_related_manager,
-            }
-            return hooks.get(class_fullname)
+            return refine_related_manager if class_fullname in _RELATED_MANAGER_DESCRIPTORS else None
 
         info = self._get_typeinfo_or_none(class_fullname)
         if not info:
@@ -256,7 +258,11 @@ class NewSemanalDjangoPlugin(Plugin):
             return self.manager_and_queryset_method_hooks[method_name]
 
         if method_name in ("save", "asave") and helpers.is_model_type(info):
-            return partial(save.validate_save_update_fields, django_context=self.django_context, method=method_name)
+            return partial(
+                field_name_validation.validate_save_update_fields,
+                django_context=self.django_context,
+                method=method_name,
+            )
 
         if method_name == "get_field" and info.has_base(fullnames.OPTIONS_CLASS_FULLNAME):
             return partial(meta.return_proper_field_type_from_get_field, django_context=self.django_context)
@@ -271,7 +277,7 @@ class NewSemanalDjangoPlugin(Plugin):
             return partial(apps.resolve_model_for_get_model, django_context=self.django_context)
 
         if helpers.has_any_of_bases(info, [fullnames.QUERYSET_CLASS_FULLNAME, fullnames.MANAGER_CLASS_FULLNAME]):
-            return partial(querysets.merge_annotations_from_custom_method, django_context=self.django_context)
+            return partial(annotate.merge_annotations_from_custom_method, django_context=self.django_context)
 
         return None
 
@@ -282,13 +288,17 @@ class NewSemanalDjangoPlugin(Plugin):
             return None
 
         if info.has_base(fullnames.BASE_MANAGER_CLASS_FULLNAME):
-            return reparametrize_any_manager_hook
+            return partial(reparametrize_generic_class, base_class_fullname=fullnames.BASE_MANAGER_CLASS_FULLNAME)
 
         if info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
-            return reparametrize_any_queryset_hook
+            return partial(
+                reparametrize_generic_class,
+                base_class_fullname=fullnames.QUERYSET_CLASS_FULLNAME,
+                bind_explicit_args=True,
+            )
 
         if info.has_base(fullnames.FIELD_FULLNAME):
-            return reparametrize_any_field_hook
+            return partial(reparametrize_generic_class, base_class_fullname=fullnames.FIELD_FULLNAME)
 
         return None
 
@@ -333,23 +343,12 @@ class NewSemanalDjangoPlugin(Plugin):
         if not info:
             return None
 
-        # Lookup of the '.is_superuser' attribute
-        if info.has_base(fullnames.PERMISSION_MIXIN_CLASS_FULLNAME) and attr_name == "is_superuser":
-            return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
-
-        # Lookup of the 'user.is_staff' or 'user.is_active' attribute
-        if info.has_base(fullnames.ABSTRACT_USER_MODEL_FULLNAME) and attr_name in ("is_staff", "is_active"):
-            return partial(set_auth_user_model_boolean_fields, django_context=self.django_context)
-
         # Lookup of a method on a dynamically generated manager class
         # i.e. a manager class only existing while mypy is running, not collected from the AST
         if info.has_base(
             fullnames.BASE_MANAGER_CLASS_FULLNAME
         ) and "from_queryset_manager" in helpers.get_django_metadata(info):
             return resolve_manager_method
-
-        if info.has_base(fullnames.STR_PROMISE_FULLNAME):
-            return resolve_str_promise_attribute
 
         if (
             info.has_base(fullnames.CHOICES_TYPE_METACLASS_FULLNAME)

@@ -23,16 +23,14 @@ class FieldReference(NamedTuple):
 
 def field_references(
     model_tuple: tuple[str, str],
-    field: Field[Any, Any],
+    field: Field,
     reference_model_tuple: tuple[str, str],
     reference_field_name: str | None = None,
-    reference_field: Field[Any, Any] | None = None,
+    reference_field: Field | None = None,
 ) -> Literal[False] | FieldReference: ...
 def get_references(
     state: ProjectState,
     model_tuple: tuple[str, str],
-    field_tuple: tuple[()] | tuple[str, Field[Any, Any]] = (),
-) -> Iterator[tuple[ModelState, str, Field[Any, Any], FieldReference]]: ...
-def field_is_referenced(
-    state: ProjectState, model_tuple: tuple[str, str], field_tuple: tuple[str, Field[Any, Any]]
-) -> bool: ...
+    field_tuple: tuple[()] | tuple[str, Field] = (),
+) -> Iterator[tuple[ModelState, str, Field, FieldReference]]: ...
+def field_is_referenced(state: ProjectState, model_tuple: tuple[str, str], field_tuple: tuple[str, Field]) -> bool: ...

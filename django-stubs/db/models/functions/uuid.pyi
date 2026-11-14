@@ -8,7 +8,7 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from typing_extensions import override
 
 class UUID4(Func):
-    output_field: ClassVar[models.UUIDField[Any, Any]]
+    output_field: ClassVar[models.UUIDField]
     @override
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...  # type: ignore[override]
     def as_postgresql(
@@ -18,7 +18,7 @@ class UUID4(Func):
     def as_oracle(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class UUID7(Func):
-    output_field: ClassVar[models.UUIDField[Any, Any]]
+    output_field: ClassVar[models.UUIDField]
     def __init__(self, shift: dt.timedelta | None = None, **extra: Any) -> None: ...
     @override
     def as_sql(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...  # type: ignore[override]

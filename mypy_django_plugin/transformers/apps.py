@@ -1,4 +1,15 @@
-"""App registry"""
+"""App registry
+
+Narrows `apps.get_model()` to the referenced model.
+With literal arguments, the model class is returned instead of `type[Any]`.
+
+```python
+reveal_type(apps.get_model("myapp.Book"))  # type[Book]
+apps.get_model("myapp.Missing")  # error: Could not match lazy reference with any model  [misc]
+```
+
+Migration `apps` (`StateApps`) keep `type[Any]`, since their models are historical.
+"""
 
 from __future__ import annotations
 
@@ -35,16 +46,16 @@ def _get_model_lazy_reference(ctx: MethodContext) -> str | None:
 
 
 def resolve_model_for_get_model(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    """Narrow `apps.get_model()` to the referenced model
+    """Narrow the return type of an `apps.get_model()` call to the referenced model.
 
-    With literal arguments, the model class is returned instead of `type[Any]`.
+        apps.get_model("myapp.MyModel")        # -> type[myapp.models.MyModel]
+        apps.get_model("myapp", "MyModel")      # -> type[myapp.models.MyModel]
 
-    ```python
-    reveal_type(apps.get_model("myapp.Book"))  # type[Book]
-    apps.get_model("myapp.Missing")  # error: Could not match lazy reference with any model  [misc]
-    ```
+    The model name is case-insensitive, so `"myapp.mymodel"` resolves too.
 
-    Migration `apps` (`StateApps`) keep `type[Any]`, since their models are historical.
+    Non-literal arguments keep the permissive `type[Any]` fallback:
+
+        apps.get_model(app_label, model_name)   # -> type[Any]
     """
     if (lazy_reference := _get_model_lazy_reference(ctx)) and (
         model_info := helpers.resolve_lazy_reference(

@@ -70,12 +70,12 @@ class Deserializer:
 class DeserializedObject:
     object: Model
     m2m_data: dict[str, Sequence[Any]] | None
-    deferred_fields: dict[Field[Any, Any], Any]
+    deferred_fields: dict[Field, Any]
     def __init__(
         self,
         obj: Model,
         m2m_data: dict[str, Sequence[Any]] | None = None,
-        deferred_fields: dict[Field[Any, Any], Any] | None = None,
+        deferred_fields: dict[Field, Any] | None = None,
     ) -> None: ...
     def save(self, save_m2m: bool = True, using: str | None = None, **kwargs: Any) -> None: ...
     def save_deferred_fields(self, using: str | None = None) -> None: ...
@@ -85,5 +85,5 @@ def deserialize_m2m_values(
     field: ManyToManyField[Any, Any], field_value: Iterable[Any], using: str | None, handle_forward_references: bool
 ) -> Sequence[Any] | object: ...
 def deserialize_fk_value(
-    field: ForeignKey[Any, Any], field_value: Any, using: str | None, handle_forward_references: bool
+    field: ForeignKey, field_value: Any, using: str | None, handle_forward_references: bool
 ) -> Any | object: ...

@@ -3,7 +3,7 @@ from collections.abc import Iterable, Iterator, Mapping, Sequence
 from re import Pattern
 from typing import Any, Literal, Protocol, Self, TypeAlias, type_check_only
 
-from _typeshed import Self as MetaclassSelf  # noqa: TID251
+from _typeshed import Self as MetaclassSelf  # ruff: ignore[banned-api]
 from django.core.files.base import File
 from django.db.models.fields.files import FieldFile
 from django.forms.renderers import BaseRenderer

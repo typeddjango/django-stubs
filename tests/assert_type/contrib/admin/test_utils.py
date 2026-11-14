@@ -19,13 +19,13 @@ from django.db.models.functions import Upper
 
 @admin.display(description="Name")
 def upper_case_name(obj: Person) -> str:
-    return f"{obj.first_name} {obj.last_name}".upper()  # pyright: ignore[reportUnknownMemberType]
+    return f"{obj.first_name} {obj.last_name}".upper()
 
 
 class Person(models.Model):
-    first_name = models.CharField(max_length=None)  # pyright: ignore[reportUnknownVariableType]
-    last_name = models.CharField(max_length=None)  # pyright: ignore[reportUnknownVariableType]
-    birthday = models.DateField()  # pyright: ignore[reportUnknownVariableType]
+    first_name = models.CharField(max_length=None)
+    last_name = models.CharField(max_length=None)
+    birthday = models.DateField()
 
 
 class PersonListAdmin(admin.ModelAdmin[Person]):
@@ -80,10 +80,10 @@ assert_type(flatten(person_list_admin.get_fields(request)), list[str])
 assert_type(flatten(person_tuple_admin.fields), list[str])
 assert_type(flatten(person_tuple_admin.get_fields(request)), list[str])
 
-assert_type(flatten(person_list_admin.list_display), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
-assert_type(flatten(person_list_admin.get_list_display(request)), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
-assert_type(flatten(person_tuple_admin.list_display), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
-assert_type(flatten(person_tuple_admin.get_list_display(request)), list[_DisplayT[Person]])  # ty: ignore[type-assertion-failure]
+assert_type(flatten(person_list_admin.list_display), list[_DisplayT[Person]])
+assert_type(flatten(person_list_admin.get_list_display(request)), list[_DisplayT[Person]])
+assert_type(flatten(person_tuple_admin.list_display), list[_DisplayT[Person]])
+assert_type(flatten(person_tuple_admin.get_list_display(request)), list[_DisplayT[Person]])
 
 assert_type(flatten_fieldsets(person_fieldset_list_admin.fieldsets), list[str])
 assert_type(flatten_fieldsets(person_fieldset_list_admin.get_fieldsets(request)), list[str])

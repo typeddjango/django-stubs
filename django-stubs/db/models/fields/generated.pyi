@@ -16,13 +16,15 @@ class GeneratedField(models.Field[Any, Any]):
     generated: ClassVar[Literal[True]]
     db_returning: Literal[True]
     _query: Query | None
-    output_field: models.Field[Any, Any] | None
+    expression: Expression
+    output_field: models.Field | None
+    db_persist: bool
 
     def __init__(
         self,
         *,
         expression: Expression,
-        output_field: models.Field[Any, Any],
+        output_field: models.Field,
         db_persist: bool,
         verbose_name: _StrOrPromise | None = ...,
         name: str | None = ...,
@@ -48,7 +50,7 @@ class GeneratedField(models.Field[Any, Any]):
     ) -> None: ...
     def generated_sql(self, connection: BaseDatabaseWrapper) -> tuple[str, Any]: ...
     @cached_property
-    def referenced_fields(self) -> frozenset[models.Field[Any, Any]]: ...
+    def referenced_fields(self) -> frozenset[models.Field]: ...
     @override
     def db_type_parameters(self, connection: BaseDatabaseWrapper) -> DictWrapper[Any]: ...
 

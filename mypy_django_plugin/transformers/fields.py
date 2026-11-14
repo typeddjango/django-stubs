@@ -1,4 +1,17 @@
-"""Model fields"""
+"""Model fields
+
+Infers the value type of model fields from their arguments.
+`null=True` adds `None`, and related fields resolve their target model, even given as a string.
+
+```python
+class Book(models.Model):
+    subtitle = models.CharField(max_length=100, null=True)
+    publisher = models.ForeignKey("Publisher", on_delete=models.CASCADE)
+
+reveal_type(Book().subtitle)  # str | None
+reveal_type(Book().publisher)  # Publisher
+```
+"""
 
 from __future__ import annotations
 
@@ -29,12 +42,11 @@ def _get_current_field_from_assignment(ctx: FunctionContext, django_context: Dja
 
     field_name = None
     for stmt in outer_model_info.defn.defs.body:
-        if isinstance(stmt, AssignmentStmt):
-            if stmt.rvalue == ctx.context:
-                if not isinstance(stmt.lvalues[0], NameExpr):
-                    return None
-                field_name = stmt.lvalues[0].name
-                break
+        if isinstance(stmt, AssignmentStmt) and stmt.rvalue == ctx.context:
+            if not isinstance(stmt.lvalues[0], NameExpr):
+                return None
+            field_name = stmt.lvalues[0].name
+            break
     if field_name is None:
         return None
 
@@ -121,9 +133,8 @@ def get_field_descriptor_types(
 
 def set_descriptor_types_for_field_callback(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
     current_field = _get_current_field_from_assignment(ctx, django_context)
-    if current_field is not None:
-        if isinstance(current_field, AutoField):
-            return set_descriptor_types_for_field(ctx, is_set_nullable=True)
+    if isinstance(current_field, AutoField):
+        return set_descriptor_types_for_field(ctx, is_set_nullable=True)
 
     return set_descriptor_types_for_field(ctx)
 
@@ -180,23 +191,8 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
         if isinstance(_type, Instance) and _type.type.has_base(fullnames.COMBINABLE_EXPRESSION_FULLNAME):
             return None
         if isinstance(_type, UnionType):
-            items_without_combinable = []
-            for item in _type.items:
-                reduced = drop_combinable(item)
-                if reduced is not None:
-                    items_without_combinable.append(reduced)
-
-            if len(items_without_combinable) > 1:
-                return UnionType(
-                    items_without_combinable,
-                    line=_type.line,
-                    column=_type.column,
-                    is_evaluated=_type.is_evaluated,
-                    uses_pep604_syntax=_type.uses_pep604_syntax,
-                )
-            if len(items_without_combinable) == 1:
-                return items_without_combinable[0]
-            return None
+            items = [reduced for item in _type.items if (reduced := drop_combinable(item)) is not None]
+            return UnionType.make_union(items, _type.line, _type.column) if items else None
 
         return _type
 
@@ -219,25 +215,40 @@ def determine_type_of_array_field(ctx: FunctionContext, django_context: DjangoCo
     return default_return_type.copy_modified(args=args)
 
 
+def fill_model_arg_for_generic_relation(
+    ctx: FunctionContext, *, model_info: TypeInfo, django_context: DjangoContext
+) -> MypyType:
+    """Resolve `GenericRelation("app.Model")` to `GenericRelation[Model]`, as a class reference would."""
+    default_return_type = cast("Instance", ctx.default_return_type)
+    if not (ctx.args and ctx.args[0] and default_return_type.args):
+        return default_return_type
+    to_arg = get_proper_type(default_return_type.args[0])
+    if not isinstance(to_arg, (UninhabitedType, AnyType)):
+        # `GenericRelation(Model)` was already solved from the class reference.
+        return default_return_type
+    to_model = helpers.get_model_from_expression(
+        ctx.args[0][0], self_model=model_info, api=helpers.get_typechecker_api(ctx), django_context=django_context
+    )
+    if to_model is None:
+        return default_return_type
+    return default_return_type.copy_modified(args=[to_model])
+
+
 def transform_into_proper_return_type(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    """Infer the value type of model fields from their arguments
-
-    `null=True` adds `None`, and related fields resolve their target model, even given as a string.
-
-    ```python
-    class Book(models.Model):
-        subtitle = models.CharField(max_length=100, null=True)
-        publisher = models.ForeignKey("Publisher", on_delete=models.CASCADE)
-
-    reveal_type(Book().subtitle)  # str | None
-    reveal_type(Book().publisher)  # Publisher
-    ```
-    """
     default_return_type = get_proper_type(ctx.default_return_type)
-    assert isinstance(default_return_type, Instance)
+    if not isinstance(default_return_type, Instance):
+        # A `Field` subclass can be called through a type variable, e.g. `type[F]` where `F` is
+        # bound to `Field`. There is no concrete field type to specialize there, and replacing
+        # the type variable with its upper bound would widen the result of the call, which is `F`.
+        return default_return_type
 
     outer_model_info = helpers.get_typechecker_api(ctx).scope.active_class()
     if outer_model_info is None or not helpers.is_model_type(outer_model_info):
+        if helpers.has_any_of_bases(
+            default_return_type.type, (fullnames.MANYTOMANY_FIELD_FULLNAME, fullnames.GENERIC_RELATION_FULLNAME)
+        ):
+            # Their type args are the related models, not the descriptor set/get types.
+            return default_return_type
         return set_descriptor_types_for_field(ctx)
 
     assert isinstance(outer_model_info, TypeInfo)
@@ -246,6 +257,9 @@ def transform_into_proper_return_type(ctx: FunctionContext, django_context: Djan
         return manytomany.fill_model_args_for_many_to_many_field(
             ctx=ctx, model_info=outer_model_info, django_context=django_context
         )
+    if default_return_type.type.has_base(fullnames.GENERIC_RELATION_FULLNAME):
+        # A to-many relation read through a manager, unlike the foreign keys it shares a base with.
+        return fill_model_arg_for_generic_relation(ctx, model_info=outer_model_info, django_context=django_context)
     if helpers.has_any_of_bases(default_return_type.type, fullnames.RELATED_FIELDS_CLASSES):
         return fill_descriptor_types_for_related_field(ctx, django_context)
 

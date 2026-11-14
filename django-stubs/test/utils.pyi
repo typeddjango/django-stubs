@@ -1,5 +1,5 @@
 import decimal
-from collections.abc import Callable, Iterable, Iterator, Mapping
+from collections.abc import Callable, Collection, Iterable, Iterator, Mapping
 from contextlib import AbstractContextManager
 from decimal import Decimal
 from io import StringIO
@@ -20,6 +20,7 @@ from typing_extensions import TypeVar, override
 _TestClass: TypeAlias = type[SimpleTestCase]
 _DecoratedTest: TypeAlias = Callable[..., Any] | _TestClass
 _DT = TypeVar("_DT", bound=_DecoratedTest)
+_TC = TypeVar("_TC", bound=_TestClass)
 
 # Django's TestContextDecorator.__call__ only checks isinstance(decorated, type)
 # or callable(decorated) with no fixed signature — decorate_callable wraps using
@@ -61,7 +62,7 @@ class TestContextDecorator:
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None: ...
-    def decorate_class(self, cls: _TestClass) -> _TestClass: ...
+    def decorate_class(self, cls: _TC) -> _TC: ...
     def decorate_callable(self, func: _C) -> _C: ...
     def __call__(self, decorated: _DT) -> _DT: ...
 
@@ -72,7 +73,7 @@ class override_settings(TestContextDecorator):
     wrapped: Settings
     def save_options(self, test_func: _DecoratedTest) -> None: ...
     @override
-    def decorate_class(self, cls: type) -> type: ...
+    def decorate_class(self, cls: _TC) -> _TC: ...
 
 class modify_settings(override_settings):
     wrapped: Settings
@@ -159,7 +160,7 @@ def dependency_ordered(
     test_databases: Iterable[tuple[_Signature, _TestDatabase]], dependencies: Mapping[str, list[str]]
 ) -> list[tuple[_Signature, _TestDatabase]]: ...
 def get_unique_databases_and_mirrors(
-    aliases: set[str] | None = ...,
+    aliases: Collection[str] | None = ...,
 ) -> tuple[dict[_Signature, _TestDatabase], dict[str, Any]]: ...
 def setup_databases(
     verbosity: int,
@@ -169,7 +170,7 @@ def setup_databases(
     keepdb: bool = ...,
     debug_sql: bool = ...,
     parallel: int = ...,
-    aliases: Mapping[str, Any] | None = ...,
+    aliases: Collection[str] | None = ...,
     serialized_aliases: Iterable[str] | None = ...,
     **kwargs: Any,
 ) -> list[tuple[BaseDatabaseWrapper, str, bool]]: ...

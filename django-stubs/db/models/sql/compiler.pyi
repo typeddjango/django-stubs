@@ -147,7 +147,7 @@ class SQLInsertCompiler(SQLCompiler):
     returning_params: Sequence[Any]
     def field_as_sql(
         self,
-        field: Field[Any, Any] | None,
+        field: Field | None,
         get_placeholder_sql: Callable[[Any, SQLInsertCompiler, BaseDatabaseWrapper], _AsSqlType],
         val: Any,
     ) -> _AsSqlType: ...

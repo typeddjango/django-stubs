@@ -281,6 +281,7 @@ django.db.models.manager.BaseManager.__get__
 
 # Field.__get__/__set__ are stub-only for the mypy plugin, they don't exist at runtime
 django.contrib.contenttypes.fields.GenericForeignKey.__get__
+django.contrib.contenttypes.fields.GenericRelation.__get__
 django.db.models.fields.Field.__get__
 django.db.models.fields.Field.__set__
 django.db.models.fields.files.FileField.__get__
@@ -297,3 +298,12 @@ django.utils.functional.LazyObject.__hash__
 django.utils.functional.LazyObject.__iter__
 django.utils.functional.LazyObject.__len__
 django.utils.functional.LazyObject.__str__
+
+# Added at runtime by `django_stubs_ext.monkeypatch()` in `scripts/django_tests_settings.py`
+.*\.__class_getitem__
+
+# The shared Field kwargs live in `**kwargs: Unpack[FieldInitKwargs]`, which makes them keyword-only
+# in the stub while Django still accepts them positionally. Only `Field` spells them out at runtime.
+django.db.models.fields.Field.__init__
+# runtime has a *args passthrough the stub deliberately narrows away
+django.db.models.fields.GenericIPAddressField.__init__

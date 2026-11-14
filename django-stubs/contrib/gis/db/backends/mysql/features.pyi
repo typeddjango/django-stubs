@@ -14,4 +14,7 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     supports_num_points_poly: bool
     @cached_property
     @override
+    def unsupported_geojson_options(self) -> set[str]: ...  # type: ignore[override]
+    @cached_property
+    @override
     def supports_geometry_field_unique_index(self) -> bool: ...  # type: ignore[override]

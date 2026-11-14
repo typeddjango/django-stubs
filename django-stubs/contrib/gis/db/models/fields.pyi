@@ -15,17 +15,16 @@ from django.contrib.gis.geos import (
 from django.core.validators import _ValidatorCallable
 from django.db.models import Model
 from django.db.models.expressions import Expression
-from django.db.models.fields import NOT_PROVIDED, Field, _ErrorMessagesMapping
+from django.db.models.fields import NOT_PROVIDED, Field, FieldInitKwargs, _ErrorMessagesMapping
 from django.db.models.sql.compiler import _AsSqlType
 from django.forms.widgets import Widget
-from django.utils.choices import _Choices
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar, Unpack, override
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True)
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True)
+_GT_co = TypeVar("_GT_co", covariant=True, default=Any)
 
 class SRIDCacheEntry(NamedTuple):
     units: Any
@@ -35,7 +34,7 @@ class SRIDCacheEntry(NamedTuple):
 
 def get_srid_info(srid: int, connection: Any) -> SRIDCacheEntry: ...
 
-class BaseSpatialField(Field[_ST, _GT]):
+class BaseSpatialField(Field[_ST_contra, _GT_co]):
     form_class: type[forms.GeometryField]
     geom_type: str
     geom_class: type[GEOSGeometry] | None
@@ -48,28 +47,12 @@ class BaseSpatialField(Field[_ST, _GT]):
         srid: int = 4326,
         spatial_index: bool = True,
         *,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @override
     def db_type(self, connection: Any) -> Any: ...
@@ -85,7 +68,7 @@ class BaseSpatialField(Field[_ST, _GT]):
     @override
     def get_prep_value(self, value: Any) -> Any: ...
 
-class GeometryField(BaseSpatialField[_ST, _GT]):
+class GeometryField(BaseSpatialField[_ST_contra, _GT_co]):
     dim: int
     def __init__(
         self,
@@ -98,28 +81,12 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         max_geom_collections: int | None = ...,
         srid: int = 4326,
         spatial_index: bool = True,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_comment: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
@@ -146,7 +113,7 @@ class GeometryField(BaseSpatialField[_ST, _GT]):
         **kwargs: Any,
     ) -> forms.GeometryField | None: ...
 
-class PointField(GeometryField[_ST, _GT]):
+class PointField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: Point
     _pyi_private_get_type: Point
     _pyi_lookup_exact_type: Point
@@ -154,7 +121,7 @@ class PointField(GeometryField[_ST, _GT]):
     geom_class: type[Point]
     form_class: type[forms.PointField]
 
-class LineStringField(GeometryField[_ST, _GT]):
+class LineStringField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: LineString
     _pyi_private_get_type: LineString
     _pyi_lookup_exact_type: LineString
@@ -162,7 +129,7 @@ class LineStringField(GeometryField[_ST, _GT]):
     geom_class: type[LineString]
     form_class: type[forms.LineStringField]
 
-class PolygonField(GeometryField[_ST, _GT]):
+class PolygonField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: Polygon
     _pyi_private_get_type: Polygon
     _pyi_lookup_exact_type: Polygon
@@ -170,7 +137,7 @@ class PolygonField(GeometryField[_ST, _GT]):
     geom_class: type[Polygon]
     form_class: type[forms.PolygonField]
 
-class MultiPointField(GeometryField[_ST, _GT]):
+class MultiPointField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: MultiPoint
     _pyi_private_get_type: MultiPoint
     _pyi_lookup_exact_type: MultiPoint
@@ -178,7 +145,7 @@ class MultiPointField(GeometryField[_ST, _GT]):
     geom_class: type[MultiPoint]
     form_class: type[forms.MultiPointField]
 
-class MultiLineStringField(GeometryField[_ST, _GT]):
+class MultiLineStringField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: MultiLineString
     _pyi_private_get_type: MultiLineString
     _pyi_lookup_exact_type: MultiLineString
@@ -186,7 +153,7 @@ class MultiLineStringField(GeometryField[_ST, _GT]):
     geom_class: type[MultiLineString]
     form_class: type[forms.MultiLineStringField]
 
-class MultiPolygonField(GeometryField[_ST, _GT]):
+class MultiPolygonField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: MultiPolygon
     _pyi_private_get_type: MultiPolygon
     _pyi_lookup_exact_type: MultiPolygon
@@ -194,7 +161,7 @@ class MultiPolygonField(GeometryField[_ST, _GT]):
     geom_class: type[MultiPolygon]
     form_class: type[forms.MultiPolygonField]
 
-class GeometryCollectionField(GeometryField[_ST, _GT]):
+class GeometryCollectionField(GeometryField[_ST_contra, _GT_co]):
     _pyi_private_set_type: GeometryCollection
     _pyi_private_get_type: GeometryCollection
     _pyi_lookup_exact_type: GeometryCollection
@@ -206,7 +173,7 @@ class ExtentField(Field[Any, Any]):
     @override
     def get_internal_type(self) -> str: ...
 
-class RasterField(BaseSpatialField[_ST, _GT]):
+class RasterField(BaseSpatialField[_ST_contra, _GT_co]):
     @override
     def db_type(self, connection: Any) -> Any: ...
     def from_db_value(self, value: Any, expression: Any, connection: Any) -> Any: ...

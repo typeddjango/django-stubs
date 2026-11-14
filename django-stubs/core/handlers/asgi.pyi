@@ -1,8 +1,9 @@
-from collections.abc import Awaitable, Callable, Iterator, Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from logging import Logger
-from typing import IO, Any, TypeAlias
+from typing import IO, Any
 
 from _typeshed import ExcInfo
+from asgiref.typing import ASGIReceiveCallable, ASGISendCallable, Scope
 from django.core.files import uploadedfile
 from django.core.handlers import base
 from django.http.request import HttpRequest, _ImmutableQueryDict
@@ -11,10 +12,6 @@ from django.urls.resolvers import ResolverMatch, URLResolver
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from typing_extensions import TypeVar, override
-
-_ReceiveCallback: TypeAlias = Callable[[], Awaitable[Mapping[str, Any]]]
-
-_SendCallback: TypeAlias = Callable[[Mapping[str, Any]], Awaitable[None]]
 
 logger: Logger
 
@@ -49,22 +46,22 @@ class ASGIHandler(base.BaseHandler):
     def __init__(self) -> None: ...
     async def __call__(
         self,
-        scope: dict[str, Any],
-        receive: _ReceiveCallback,
-        send: _SendCallback,
+        scope: Scope,
+        receive: ASGIReceiveCallable,
+        send: ASGISendCallable,
     ) -> None: ...
     async def handle(
-        self, scope: dict[str, Any], receive: _ReceiveCallback, send: _SendCallback
+        self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> HttpResponseBase | None: ...
-    async def listen_for_disconnect(self, receive: _ReceiveCallback) -> None: ...
+    async def listen_for_disconnect(self, receive: ASGIReceiveCallable) -> None: ...
     async def run_get_response(self, request: HttpRequest) -> HttpResponseBase: ...
-    async def read_body(self, receive: _ReceiveCallback) -> IO[bytes]: ...
+    async def read_body(self, receive: ASGIReceiveCallable) -> IO[bytes]: ...
     def create_request(
         self, scope: Mapping[str, Any], body_file: IO[bytes]
     ) -> tuple[ASGIRequest, None] | tuple[None, HttpResponseBase]: ...
     def handle_uncaught_exception(
         self, request: HttpRequest, resolver: URLResolver, exc_info: ExcInfo
     ) -> HttpResponseBase: ...
-    async def send_response(self, response: HttpResponseBase, send: _SendCallback) -> None: ...
+    async def send_response(self, response: HttpResponseBase, send: ASGISendCallable) -> None: ...
     @classmethod
     def chunk_bytes(cls, data: Sequence[_T]) -> Iterator[tuple[Sequence[_T], bool]]: ...

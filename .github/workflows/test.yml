@@ -30,10 +30,12 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -61,19 +63,24 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
       - name: Cache apt packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
-          path: /var/cache/apt/archives
+          path: /tmp/apt-cache
           key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
+        # apt's default cache is root-owned, so actions/cache can't save it.
         run: |
+          mkdir -p /tmp/apt-cache/partial
           sudo apt-get update || true
-          sudo apt-get install -y --no-install-recommends libgdal-dev libproj-dev
+          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives=/tmp/apt-cache gdal-bin
+          sudo chown -R "$(id -u)" /tmp/apt-cache
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -93,27 +100,33 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
       - name: Cache apt packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
-          path: /var/cache/apt/archives
+          path: /tmp/apt-cache
           key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
+        # apt's default cache is root-owned, so actions/cache can't save it.
         run: |
+          mkdir -p /tmp/apt-cache/partial
           sudo apt-get update || true
-          sudo apt-get install -y --no-install-recommends libgdal-dev libproj-dev
+          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives=/tmp/apt-cache gdal-bin
+          sudo chown -R "$(id -u)" /tmp/apt-cache
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: '3.12'
 
       - name: Install dependencies
         run: uv sync --no-dev --group tests
 
-      - name: Downgrade Django
-        run: uv pip install django==5.2.0
+      # Must match the lowest supported versions in the README table
+      - name: Downgrade Django and mypy
+        run: uv pip install django==5.2.0 mypy==1.16.0
 
       # Exit 1 only if ont of the pytest error is a mypy crash
       - name: Run pytest tests
@@ -129,19 +142,24 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
       - name: Cache apt packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6
         with:
-          path: /var/cache/apt/archives
+          path: /tmp/apt-cache
           key: apt-gdal-${{ runner.os }}
       - name: Setup system dependencies
+        # apt's default cache is root-owned, so actions/cache can't save it.
         run: |
+          mkdir -p /tmp/apt-cache/partial
           sudo apt-get update || true
-          sudo apt-get install -y --no-install-recommends libgdal-dev libproj-dev
+          sudo apt-get install -y --no-install-recommends -o Dir::Cache::Archives=/tmp/apt-cache gdal-bin
+          sudo chown -R "$(id -u)" /tmp/apt-cache
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -160,10 +178,12 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -172,7 +192,7 @@ jobs:
 
       # See https://github.com/jakebailey/pyright-action#providing-a-pyright-version-sourced-from-preexisting-dependencies
       - name: Add venv to path
-        run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
+        run: echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
 
       - name: Run pyright on the test cases
         uses: jakebailey/pyright-action@8ec14b5cfe41f26e5f41686a31eb6012758217ef  # v3
@@ -188,10 +208,12 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -199,7 +221,7 @@ jobs:
         run: uv sync --no-dev --group pyrefly
 
       - name: Add venv to path
-        run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
+        run: echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
 
       - name: Run pyrefly on the test cases
         run: pyrefly check tests/assert_type
@@ -213,10 +235,12 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -224,7 +248,7 @@ jobs:
         run: uv sync --no-dev --group ty
 
       - name: Add venv to path
-        run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
+        run: echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
 
       - name: Run ty on the test cases
         run: ty check tests/assert_type
@@ -252,10 +276,12 @@ jobs:
             django-version: '6.1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          persist-credentials: false
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -271,8 +297,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           fetch-tags: true
+          persist-credentials: false
       - name: Install uv & Python
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
         with:
           python-version: "3.13"
       - name: Ensure uv.lock is up to date

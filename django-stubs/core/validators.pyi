@@ -1,4 +1,4 @@
-from collections.abc import Callable, Collection, Sequence, Sized
+from collections.abc import Callable, Collection, Container, Sequence, Sized
 from decimal import Decimal
 from re import Pattern, RegexFlag
 from typing import Any, TypeAlias
@@ -12,7 +12,7 @@ EMPTY_VALUES: Any
 
 _Regex: TypeAlias = str | Pattern[str]
 
-_ValidatorCallable: TypeAlias = Callable[[Any], None]  # noqa: PYI047
+_ValidatorCallable: TypeAlias = Callable[[Any], None]  # ruff: ignore[unused-private-type-alias]
 
 class RegexValidator(_Deconstructible):
     regex: _Regex  # Pattern[str] on instance, but may be str on class definition
@@ -57,7 +57,7 @@ class URLValidator(RegexValidator):
     schemes: Sequence[str]
     unsafe_chars: frozenset[str]
     max_length: int
-    def __init__(self, schemes: Sequence[str] | None = None, **kwargs: Any) -> None: ...
+    def __init__(self, schemes: Container[str] | None = None, **kwargs: Any) -> None: ...
     @override
     def __call__(self, value: Any) -> None: ...
 
@@ -135,7 +135,7 @@ class MaxLengthValidator(BaseValidator):
     def clean(self, x: Sized) -> int: ...
 
 class DecimalValidator(_Deconstructible):
-    messages: dict[str, str]
+    messages: dict[str, _StrOrPromise]
     max_digits: int | None
     decimal_places: int | None
     def __init__(self, max_digits: int | None, decimal_places: int | None) -> None: ...

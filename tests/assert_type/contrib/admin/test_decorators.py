@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_type
 
 from django.contrib import admin
 from django.db import models
+from django.http import FileResponse, HttpResponse
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-    from django.http import FileResponse, HttpRequest, HttpResponse
+    from django.http import HttpRequest
 
 
 class DisplayModel(models.Model):
@@ -154,3 +155,17 @@ class WrongModelAdmin(admin.ModelAdmin[DisplayModel]):
 @admin.register(ActionModel)  # ty: ignore[invalid-argument-type]  # pyright: ignore[reportArgumentType, reportUntypedClassDecorator]
 class UnrelatedClass:  # type: ignore[type-var]
     pass
+
+
+class SubDisplayModelAdmin(DisplayModelAdmin): ...
+
+
+# `register` returns the decorated admin class unchanged
+assert_type(admin.register(DisplayModel)(SubDisplayModelAdmin), type[SubDisplayModelAdmin])
+
+
+def decorators_keep_the_signature(request: HttpRequest, queryset: QuerySet[ActionModel]) -> None:
+    model_admin = ActionModelAdmin(ActionModel, admin.site)
+    assert_type(freestanding_action_http_response(model_admin, request, queryset), HttpResponse)
+    assert_type(model_admin.method_action_file_response(request, queryset), FileResponse)
+    assert_type(DisplayModelAdmin(DisplayModel, admin.site).admin_display_fancy(DisplayModel()), bool)

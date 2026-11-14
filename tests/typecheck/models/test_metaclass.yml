@@ -111,7 +111,7 @@
         reveal_type(models.Model.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         reveal_type(models.Model.NotUpdated)  # N: Revealed type is "type[django.core.exceptions.ObjectNotUpdated]"
         reveal_type(models.Model.MultipleObjectsReturned)  # N: Revealed type is "type[django.core.exceptions.MultipleObjectsReturned]"
-        reveal_type(models.Model.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.db.models.base.Model]"
+        reveal_type(models.Model.objects)  # N: Revealed type is "django.db.models.manager.Manager[django.db.models.base.Model, django.db.models.query.QuerySet[django.db.models.base.Model, django.db.models.base.Model]]"
 
         reveal_type(Abstract1.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"
         reveal_type(Abstract2.DoesNotExist)  # N: Revealed type is "type[django.core.exceptions.ObjectDoesNotExist]"

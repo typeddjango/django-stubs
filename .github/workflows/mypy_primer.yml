@@ -24,11 +24,12 @@ jobs:
         with:
           path: django-stubs_to_test
           fetch-depth: 0
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: "3.14"
       - name: Install uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2  # v10.3.3
       - name: Install dependencies
         run: |
           uv venv
@@ -40,11 +41,11 @@ jobs:
           MYPY_VERSION=$(uv tree --package=mypy --depth=0 -q | sed -n 's/^mypy v\(.\+\)$/\1/p')
 
           echo "new commit"
-          git checkout $GITHUB_SHA
+          git checkout "$GITHUB_SHA"
           git rev-list --format=%s --max-count=1 HEAD
 
-          MERGE_BASE=$(git merge-base $GITHUB_SHA origin/$GITHUB_BASE_REF)
-          git worktree add ../django-stubs_base $MERGE_BASE
+          MERGE_BASE=$(git merge-base "$GITHUB_SHA" "origin/$GITHUB_BASE_REF")
+          git worktree add ../django-stubs_base "$MERGE_BASE"
           cd ../django-stubs_base
 
           echo "base commit"
@@ -55,7 +56,7 @@ jobs:
           # fail action if exit code isn't zero or one
           (
             uv run mypy_primer \
-            --new v${MYPY_VERSION} --old v${MYPY_VERSION} \
+            --new "v${MYPY_VERSION}" --old "v${MYPY_VERSION}" \
             --known-dependency-selector django-stubs \
             --old-prepend-path django-stubs_base --new-prepend-path django-stubs_to_test \
             --num-shards 1 --shard-index ${{ matrix.shard-index }} \

@@ -4,16 +4,15 @@ from typing import Any
 from django.middleware.csrf import CsrfViewMiddleware
 from typing_extensions import TypeVar
 
-csrf_protect: Callable[[_F], _F]
+_F = TypeVar("_F", bound=Callable[..., Any])
+
+def csrf_protect(view_func: _F) -> _F: ...
 
 class _EnsureCsrfToken(CsrfViewMiddleware): ...
 
-requires_csrf_token: Callable[[_F], _F]
+def requires_csrf_token(view_func: _F) -> _F: ...
 
 class _EnsureCsrfCookie(CsrfViewMiddleware): ...
 
-ensure_csrf_cookie: Callable[[_F], _F]
-
-_F = TypeVar("_F", bound=Callable[..., Any])
-
+def ensure_csrf_cookie(view_func: _F) -> _F: ...
 def csrf_exempt(view_func: _F) -> _F: ...

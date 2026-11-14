@@ -1,7 +1,8 @@
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Protocol, type_check_only
+from typing import Any
 
+from _typeshed import SupportsWrite
 from django.contrib.gis.gdal import DataSource, OGRGeomType
 from django.contrib.gis.gdal.field import Field as OGRField
 from django.contrib.gis.gdal.layer import Layer
@@ -14,13 +15,9 @@ class InvalidDecimal(LayerMapError): ...
 class InvalidInteger(LayerMapError): ...
 class MissingForeignKey(LayerMapError): ...
 
-@type_check_only
-class _Writer(Protocol):
-    def write(self, s: str, /) -> Any: ...
-
 class LayerMapping:
     MULTI_TYPES: dict[int, OGRGeomType]
-    FIELD_TYPES: dict[Field[Any, Any], OGRField | tuple[OGRField, ...]]
+    FIELD_TYPES: dict[Field, OGRField | tuple[OGRField, ...]]
     ds: DataSource
     layer: Layer
     using: str
@@ -49,7 +46,7 @@ class LayerMapping:
     ) -> None: ...
     def check_fid_range(self, fid_range: Any) -> Any: ...
     geom_field: str
-    fields: dict[str, Field[Any, Any]]
+    fields: dict[str, Field]
     coord_dim: int
     def check_layer(self) -> Any: ...
     def check_srs(self, source_srs: Any) -> Any: ...
@@ -69,6 +66,6 @@ class LayerMapping:
         step: bool | int = ...,
         progress: bool | int = ...,
         silent: bool = ...,
-        stream: _Writer = ...,
+        stream: SupportsWrite[str] = ...,
         strict: bool = ...,
     ) -> Any: ...

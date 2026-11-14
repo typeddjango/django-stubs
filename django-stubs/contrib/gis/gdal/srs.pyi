@@ -3,6 +3,9 @@ from typing import Any, AnyStr, Self, cast
 
 from django.contrib.gis.gdal.base import GDALBase
 
+papsz_options: list[bytes | None]
+PAPSZ_OPTIONS: Any
+
 class AxisOrder(IntEnum):
     TRADITIONAL = cast(int, ...)
     AUTHORITY = cast(int, ...)

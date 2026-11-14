@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, NamedTuple, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NamedTuple, Self, TypedDict, cast
 
 from mypy import checker
 from mypy.checker import TypeChecker
-from mypy.checkmember import analyze_member_access as _mypy_analyze_member_access
+from mypy.checkmember import analyze_member_access
+from mypy.expandtype import expand_type
 from mypy.lookup import lookup_fully_qualified
 from mypy.maptype import map_instance_to_supertype
 from mypy.mro import calculate_mro
@@ -38,7 +39,9 @@ from mypy.plugin import (
     MethodContext,
 )
 from mypy.semanal import SemanticAnalyzer
+from mypy.semanal_shared import has_placeholder, parse_bool
 from mypy.typeanal import make_optional_type
+from mypy.typeops import try_getting_str_literals_from_type
 from mypy.types import (
     AnyType,
     CallableType,
@@ -56,14 +59,11 @@ from mypy.types import (
 )
 from mypy.types import Type as MypyType
 from mypy.typevars import fill_typevars, fill_typevars_with_any
-from mypy.version import __version__ as mypy_version
 
 from mypy_django_plugin.lib import fullnames
 
-mypy_version_info = tuple(map(int, mypy_version.partition("+")[0].split(".")))
-
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Mapping
+    from collections.abc import Iterable, Iterator, Mapping, Sequence
 
     from django.db.models.base import Model
 
@@ -125,8 +125,7 @@ def get_or_create_annotated_type(api: SemanticAnalyzer, model_info: TypeInfo, an
     annotated_model_name = model_info.name + "@AnnotatedWith"
     annotated_model = lookup_fully_qualified_typeinfo(api, model_info.fullname + "@AnnotatedWith")
     if annotated_model is None:
-        model_type = fill_typevars_with_any(model_info)
-        assert isinstance(model_type, Instance)
+        model_type = model_instance(model_info)
         annotations_type = fill_typevars(annotations_info)
         assert isinstance(annotations_type, Instance)
         model_module = api.modules[model_info.module_name]
@@ -332,33 +331,18 @@ def is_optional(typ: MypyType) -> bool:
     return isinstance(typ, UnionType) and any(isinstance(get_proper_type(item), NoneTyp) for item in typ.items)
 
 
-# Duplicating mypy.semanal_shared.parse_bool because importing it directly caused ImportError (#1784)
-def parse_bool(expr: Expression) -> bool | None:
-    if isinstance(expr, NameExpr):
-        if expr.fullname == "builtins.True":
-            return True
-        if expr.fullname == "builtins.False":
-            return False
-    return None
-
-
 def get_literal_str_type(typ: Type) -> str | None:
     """Extract the str value of a string like type if possible"""
-    typ = get_proper_type(typ)
-    if (isinstance(typ, LiteralType) and isinstance((literal_value := typ.value), str)) or (
-        isinstance(typ, Instance)
-        and isinstance(typ.last_known_value, LiteralType)
-        and isinstance((literal_value := typ.last_known_value.value), str)
-    ):
-        return literal_value
-    return None
+    values = try_getting_str_literals_from_type(typ)
+    return values[0] if values is not None and len(values) == 1 else None
 
 
 def has_any_of_bases(info: TypeInfo, bases: Iterable[str]) -> bool:
-    for base_fullname in bases:
-        if info.has_base(base_fullname):
-            return True
-    return False
+    return any(info.has_base(base_fullname) for base_fullname in bases)
+
+
+def has_placeholder_type_vars(info: TypeInfo) -> bool:
+    return any(has_placeholder(type_var) for type_var in info.defn.type_vars)
 
 
 def iter_bases(info: TypeInfo) -> Iterator[Instance]:
@@ -485,24 +469,13 @@ def build_reparametrized_subclass(
     return info
 
 
-def get_current_module(api: TypeChecker) -> MypyFile:
-    """
-    Scope is guaranteed to be initialized with the module as the first element of the stack.
-    Inspired from https://github.com/python/mypy/blob/15b8ca967cc6187effcab23e6613da2db4546584/mypy/checker.py#L5788
-    """
-    current_module = api.scope.stack[0]
-    assert isinstance(current_module, MypyFile)
-    return current_module
-
-
 def make_oneoff_named_tuple(
     api: TypeChecker, name: str, fields: dict[str, MypyType], extra_bases: list[Instance] | None = None
 ) -> TupleType:
-    current_module = get_current_module(api)
     if extra_bases is None:
         extra_bases = []
     namedtuple_info = add_new_class_for_module(
-        current_module, name, bases=[api.named_generic_type("typing.NamedTuple", []), *extra_bases], fields=fields
+        api.tree, name, bases=[api.named_generic_type("typing.NamedTuple", []), *extra_bases], fields=fields
     )
     return TupleType(list(fields.values()), fallback=Instance(namedtuple_info, []))
 
@@ -597,21 +570,24 @@ def resolve_string_attribute_value(attr_expr: Expression, django_context: Django
     # support extracting from settings, in general case it's unresolvable yet
     if isinstance(attr_expr, MemberExpr):
         member_name = attr_expr.name
-        if isinstance(attr_expr.expr, NameExpr) and attr_expr.expr.fullname == "django.conf.settings":
-            if hasattr(django_context.settings, member_name):
-                return getattr(django_context.settings, member_name)  # type: ignore[no-any-return]
+        if (
+            isinstance(attr_expr.expr, NameExpr)
+            and attr_expr.expr.fullname == "django.conf.settings"
+            and hasattr(django_context.settings, member_name)
+        ):
+            return getattr(django_context.settings, member_name)  # type: ignore[no-any-return]
     return None
 
 
 def get_semanal_api(ctx: ClassDefContext | DynamicClassDefContext) -> SemanticAnalyzer:
     if not isinstance(ctx.api, SemanticAnalyzer):
-        raise ValueError("Not a SemanticAnalyzer")
+        raise TypeError("Not a SemanticAnalyzer")
     return ctx.api
 
 
 def get_typechecker_api(ctx: AttributeContext | MethodContext | FunctionContext) -> TypeChecker:
     if not isinstance(ctx.api, TypeChecker):
-        raise ValueError("Not a TypeChecker")
+        raise TypeError("Not a TypeChecker")
     return ctx.api
 
 
@@ -719,9 +695,8 @@ def get_model_from_expression(
     Attempts to resolve an expression to a 'TypeInfo' instance. Any lazy reference
     argument(e.g. "<app_label>.<object_name>") to a Django model is also attempted.
     """
-    if isinstance(expr, RefExpr) and isinstance(expr.node, TypeInfo):
-        if is_model_type(expr.node):
-            return model_instance(expr.node)
+    if isinstance(expr, RefExpr) and isinstance(expr.node, TypeInfo) and is_model_type(expr.node):
+        return model_instance(expr.node)
 
     if isinstance(expr, StrExpr) and expr.value == "self":
         return model_instance(self_model)
@@ -743,8 +718,24 @@ def get_model_from_expression(
     return None
 
 
-def fill_manager(manager: TypeInfo, typ: MypyType) -> Instance:
-    return Instance(manager, [typ] if manager.is_generic() else [])
+def fill_instance(typ: TypeInfo, args: Sequence[MypyType]) -> Instance:
+    """
+    `Instance(typ, args)` with the trailing type vars filled from their PEP 696 defaults,
+    e.g. `fill_instance(Manager, [MyModel])` is `Manager[MyModel, QuerySet[MyModel, MyModel]]`.
+    A raw `Instance` doesn't apply defaults, and a non-generic class gets no args at all.
+    """
+    type_vars = typ.defn.type_vars
+    filled = list(args[: len(type_vars)])
+    env = {type_var.id: arg for type_var, arg in zip(type_vars, filled, strict=False)}
+    for type_var in type_vars[len(filled) :]:
+        if not type_var.has_default():
+            filled.append(AnyType(TypeOfAny.from_omitted_generics))
+        elif has_placeholder(type_var.default):
+            raise IncompleteDefnException(f"Type var default of {typ.fullname!r} is not analyzed yet")
+        else:
+            filled.append(expand_type(type_var.default, env))
+        env[type_var.id] = filled[-1]
+    return Instance(typ, filled)
 
 
 def merge_extra_attrs(
@@ -777,36 +768,6 @@ def merge_extra_attrs(
         attrs=new_attrs or {},
         immutable=new_immutable,
         mod_name=None,
-    )
-
-
-def analyze_member_access(
-    name: str,
-    typ: MypyType,
-    context: Context,
-    *,
-    is_lvalue: bool,
-    is_super: bool,
-    is_operator: bool,
-    original_type: MypyType,
-    chk: TypeChecker,
-    suppress_errors: bool = False,
-) -> MypyType:
-    # TODO: [mypy 1.16+] Remove this workaround for passing `msg` to `analyze_member_access()`.
-    extra: dict[str, Any] = {}
-    if mypy_version_info < (1, 16):
-        extra["msg"] = chk.msg
-    return _mypy_analyze_member_access(
-        name,
-        typ,
-        context,
-        is_lvalue=is_lvalue,
-        is_super=is_super,
-        is_operator=is_operator,
-        original_type=original_type,
-        chk=chk,
-        suppress_errors=suppress_errors,
-        **extra,
     )
 
 

@@ -4,6 +4,8 @@
   // Python versions in CI are managed manually (test-older-django pins 3.12)
   ignoreDeps: ["python"],
   suppressNotifications: ["prEditedNotification"],
+  // Keep rebasing PRs after remove-unused-ignores.yml pushes to them
+  gitIgnoredAuthors: ["41898282+github-actions[bot]@users.noreply.github.com"],
   mode: "full",
   // Wait 3 days before proposing updates to limit supply chain attack exposure
   minimumReleaseAge: "3 days",

@@ -6,6 +6,7 @@ from typing import Any, ClassVar, Generic, Literal, Self, TypeAlias, cast, type_
 
 from django import forms
 from django.contrib.admin.filters import FieldListFilter, ListFilter
+from django.contrib.admin.helpers import ActionForm
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.views.main import ChangeList
@@ -59,17 +60,17 @@ _Direction: TypeAlias = Literal[1, 2]
 
 @dataclass
 class Action:
-    func: _ActionCallable[ModelAdmin[Any], Any]
+    func: _ActionCallable[Any, Any]
     name: str
     description: str
     plural_description: str
     locations: list[ActionLocation]
     # RemovedInDjango70Warning.
     @deprecated("Unpacking an action tuple is deprecated. Use Action attributes instead.")
-    def __iter__(self) -> Iterator[_ActionCallable[ModelAdmin[Any], Any] | str]: ...
+    def __iter__(self) -> Iterator[_ActionCallable[Any, Any] | str]: ...
     # RemovedInDjango70Warning.
     @deprecated("Using indexes on an action tuple is deprecated. Use Action attributes instead.")
-    def __getitem__(self, index: int) -> _ActionCallable[ModelAdmin[Any], Any] | str: ...
+    def __getitem__(self, index: int) -> _ActionCallable[Any, Any] | str: ...
 
 def get_content_type_for_model(obj: type[Model] | Model) -> ContentType: ...
 def get_ul_class(radio_style: int) -> str: ...
@@ -93,10 +94,10 @@ class _FieldOpts(_OptionalFieldOpts, total=True):
 _FieldsetSpec: TypeAlias = _ListOrTuple[tuple[_StrOrPromise | None, _FieldOpts]]
 _ListFilterT: TypeAlias = (
     type[ListFilter]
-    | Field[Any, Any]
+    | Field
     | str
-    | tuple[Field[Any, Any] | str, type[FieldListFilter]]
-    | list[Field[Any, Any] | str | type[FieldListFilter]]
+    | tuple[Field | str, type[FieldListFilter]]
+    | list[Field | str | type[FieldListFilter]]
 )
 
 # Generic type specifically for models, for use in BaseModelAdmin and subclasses
@@ -118,7 +119,7 @@ class BaseModelAdmin(Generic[_ModelT], metaclass=MediaDefiningClass):
     filter_horizontal: ClassVar[_ListOrTuple[str]]
     radio_fields: ClassVar[Mapping[str, _Direction]]
     prepopulated_fields: ClassVar[dict[str, Sequence[str]]]
-    formfield_overrides: ClassVar[Mapping[type[Field[Any, Any]], Mapping[str, Any]]]
+    formfield_overrides: ClassVar[Mapping[type[Field], Mapping[str, Any]]]
     readonly_fields: ClassVar[_ListOrTuple[str]]
     ordering: ClassVar[_ListOrTuple[_OrderByFieldName] | None]
     sortable_by: ClassVar[_ListOrTuple[str] | None]
@@ -130,17 +131,15 @@ class BaseModelAdmin(Generic[_ModelT], metaclass=MediaDefiningClass):
     admin_site: AdminSite
     def __init__(self) -> None: ...
     def check(self, **kwargs: Any) -> list[CheckMessage]: ...
-    def formfield_for_dbfield(
-        self, db_field: Field[Any, Any], request: HttpRequest, **kwargs: Any
-    ) -> FormField | None: ...
+    def formfield_for_dbfield(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> FormField | None: ...
     def formfield_for_choice_field(
-        self, db_field: Field[Any, Any], request: HttpRequest, **kwargs: Any
+        self, db_field: Field, request: HttpRequest, **kwargs: Any
     ) -> TypedChoiceField | None: ...
     def get_field_queryset(
-        self, db: str | None, db_field: RelatedField[Any, Any], request: HttpRequest
+        self, db: str | None, db_field: RelatedField, request: HttpRequest
     ) -> QuerySet[Any] | None: ...
     def formfield_for_foreignkey(
-        self, db_field: ForeignKey[Any, Any], request: HttpRequest, **kwargs: Any
+        self, db_field: ForeignKey, request: HttpRequest, **kwargs: Any
     ) -> ModelChoiceField[Any] | None: ...
     def formfield_for_manytomany(
         self, db_field: ManyToManyField[Any, Any], request: HttpRequest, **kwargs: Any
@@ -200,7 +199,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     object_history_template: ClassVar[_TemplateForResponseT | None]
     popup_response_template: ClassVar[_TemplateForResponseT | None]
     actions: Sequence[_ActionCallable[Self, _ModelT] | str] | None
-    action_form: ClassVar[Any]
+    action_form: ClassVar[type[ActionForm]]
     actions_on_top: ClassVar[bool]
     actions_on_bottom: ClassVar[bool]
     actions_selection_counter: ClassVar[bool]
@@ -244,9 +243,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     # Django 6.0 requires Python 3.12, so the `else` branch can only ever meet
     # Django 5.x: it keeps the Django 5.x action signatures.
     if sys.version_info >= (3, 12):
-        def get_actions(
-            self, request: HttpRequest, action_location: ActionLocation = ...
-        ) -> dict[str, Action | None]: ...
+        def get_actions(self, request: HttpRequest, action_location: ActionLocation = ...) -> dict[str, Action]: ...
         def get_action_choices(
             self,
             request: HttpRequest,
@@ -259,11 +256,11 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
             action_location: ActionLocation = ...,
         ) -> Action | None: ...
     else:
-        def get_actions(self, request: HttpRequest) -> dict[str, tuple[Callable[..., str], str, str] | None]: ...
+        def get_actions(self, request: HttpRequest) -> dict[str, tuple[_ActionCallable[Any, Any], str, str]]: ...
         def get_action_choices(
             self, request: HttpRequest, default_choices: list[tuple[str, str]] = ...
         ) -> list[tuple[str, str]]: ...
-        def get_action(self, action: Callable[..., Any] | str) -> tuple[Callable[..., str], str, str] | None: ...
+        def get_action(self, action: Callable[..., Any] | str) -> tuple[_ActionCallable[Any, Any], str, str] | None: ...
     def get_list_display(self, request: HttpRequest) -> _ListDisplayT[_ModelT]: ...
     def get_list_display_links(
         self, request: HttpRequest, list_display: _ListDisplayT[_ModelT]
@@ -278,7 +275,11 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
     def _get_edited_object_pks(self, request: HttpRequest, prefix: str) -> list[str]: ...
     def _get_list_editable_queryset(self, request: HttpRequest, prefix: str) -> QuerySet[_ModelT]: ...
     def construct_change_message(
-        self, request: HttpRequest, form: forms.Form, formsets: Iterable[BaseFormSet[Any]], add: bool = ...
+        self,
+        request: HttpRequest,
+        form: forms.BaseForm,
+        formsets: Iterable[BaseFormSet[Any]] | None,
+        add: bool = ...,
     ) -> list[dict[str, dict[str, list[str]]]]: ...
     def message_user(
         self,
@@ -288,7 +289,7 @@ class ModelAdmin(BaseModelAdmin[_ModelT]):
         extra_tags: str = ...,
         fail_silently: bool = ...,
     ) -> None: ...
-    def save_form(self, request: HttpRequest, form: Any, change: Any) -> Any: ...
+    def save_form(self, request: HttpRequest, form: Any, change: bool) -> _ModelT: ...
     def save_model(self, request: HttpRequest, obj: _ModelT, form: Any, change: Any) -> None: ...
     def delete_model(self, request: HttpRequest, obj: _ModelT) -> None: ...
     def delete_queryset(self, request: HttpRequest, queryset: QuerySet[Any]) -> None: ...

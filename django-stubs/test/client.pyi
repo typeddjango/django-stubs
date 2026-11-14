@@ -4,7 +4,8 @@ from http.cookies import SimpleCookie
 from io import BytesIO, IOBase
 from json import JSONEncoder
 from re import Pattern
-from typing import Any, Generic, Literal, NoReturn, TypeAlias, TypedDict, type_check_only
+from typing import Any, Generic, Literal, TypeAlias, TypedDict, type_check_only
+from wsgiref.types import WSGIEnvironment
 
 from _typeshed import ExcInfo
 from asgiref.typing import ASGIVersions
@@ -60,7 +61,7 @@ class _ASGIResponse(HttpResponseBase):
 class ClientHandler(BaseHandler):
     enforce_csrf_checks: bool
     def __init__(self, enforce_csrf_checks: bool = ..., *args: Any, **kwargs: Any) -> None: ...
-    def __call__(self, environ: dict[str, Any]) -> _WSGIResponse: ...
+    def __call__(self, environ: WSGIEnvironment) -> _WSGIResponse: ...
 
 class AsyncClientHandler(BaseHandler):
     enforce_csrf_checks: bool
@@ -259,7 +260,7 @@ class _MonkeyPatchedASGIResponse(_ASGIResponse):
 
 class ClientMixin:
     def store_exc_info(self, **kwargs: object) -> None: ...
-    def check_exception(self, response: HttpResponseBase) -> NoReturn: ...
+    def check_exception(self, response: HttpResponseBase) -> None: ...
     @property
     def session(self) -> SessionBase: ...
     async def asession(self) -> SessionBase: ...

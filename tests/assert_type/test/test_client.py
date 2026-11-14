@@ -8,9 +8,12 @@ from django.template.base import Template
 from django.test.client import AsyncClient, AsyncRequestFactory, Client, RequestFactory
 from django.test.utils import ContextList
 
+from django_stubs_ext import AsyncClientResponse, ClientResponse
+
 # Client response attributes
 client = Client()
 response = client.get("foo")
+assert_type(response, ClientResponse)
 assert_type(response.wsgi_request, WSGIRequest)
 assert_type(response.request, dict[str, Any])
 assert_type(response.templates, list[Template])
@@ -21,12 +24,15 @@ assert_type(response.content, bytes)
 assert_type(response.redirect_chain, list[tuple[str, int]])
 assert_type(response.text, str)
 response.json()
+# Only raises if the request recorded an exception
+assert_type(client.check_exception(response), None)
 
 
 # Async client response attributes
 async def test_async_client() -> None:
     async_client = AsyncClient()
     response = await async_client.get("foo")
+    assert_type(response, AsyncClientResponse)
     assert_type(response.asgi_request, ASGIRequest)
     assert_type(response.request, dict[str, Any])
     assert_type(response.templates, list[Template])

@@ -11,7 +11,7 @@ from django.db.models.fields import DateField, DateTimeField, TimeField
 from typing_extensions import override
 
 UNSUPPORTED_DATETIME_AGGREGATES: tuple[type[Aggregate], ...]
-DATETIME_FIELDS: tuple[type[DateField[Any, Any] | DateTimeField[Any, Any] | TimeField[Any, Any]], ...]
+DATETIME_FIELDS: tuple[type[DateField | DateTimeField | TimeField], ...]
 
 class DatabaseOperations(BaseDatabaseOperations):
     jsonfield_datatype_values: frozenset[str]

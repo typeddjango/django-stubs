@@ -2,7 +2,7 @@ from collections.abc import Awaitable, Callable, Sequence
 from types import FunctionType, MethodType
 from typing import Any, ClassVar, Protocol, TypeAlias, type_check_only
 
-from _typeshed import Self as MetaclassSelf  # noqa: TID251
+from _typeshed import Self as MetaclassSelf  # ruff: ignore[banned-api]
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
 from typing_extensions import TypeVar

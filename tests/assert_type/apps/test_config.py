@@ -17,7 +17,7 @@ class BarConfig(AppConfig):
 
     @property
     @override
-    def default_auto_field(self) -> str:  # type: ignore[override]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-property-type-override]
+    def default_auto_field(self) -> str:  # type: ignore[override]  # pyrefly: ignore[bad-override]  # ty: ignore[incompatible-property-override]
         return "django.db.models.BigAutoField"
 
 

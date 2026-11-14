@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Iterator
+from collections.abc import AsyncIterator, Iterator
 from typing import Any, assert_type
 
 from django.db import models
@@ -10,7 +10,7 @@ from django.utils import timezone
 
 
 class Blog(models.Model):
-    created_at = models.DateTimeField()  # pyright: ignore[reportUnknownVariableType]
+    created_at = models.DateTimeField()
 
 
 def queryset_methods_keep_the_row_type(qs: QuerySet[Blog], manager: models.Manager[Blog]) -> None:
@@ -21,6 +21,10 @@ def queryset_methods_keep_the_row_type(qs: QuerySet[Blog], manager: models.Manag
     assert_type(qs.earliest(), Blog)
     assert_type(qs[0], Blog)
     assert_type(qs[:9], QuerySet[Blog, Blog])
+    assert_type(qs[1:9:None], QuerySet[Blog, Blog])
+    # a step evaluates the queryset and returns a list
+    assert_type(qs[::2], list[Blog])
+    assert_type(qs[1:9:2], list[Blog])
     assert_type(qs.create(), Blog)
     assert_type(qs.get_or_create(), tuple[Blog, bool])
     assert_type(qs.exists(), bool)
@@ -28,6 +32,8 @@ def queryset_methods_keep_the_row_type(qs: QuerySet[Blog], manager: models.Manag
     assert_type(qs.update_or_create(), tuple[Blog, bool])
     assert_type(qs.explain(), str)
     assert_type(qs.raw(qs.explain()), RawQuerySet[Blog])
+    assert_type(qs.raw(qs.explain())[0], Blog)
+    assert_type(qs.raw(qs.explain())[:9], list[Blog])
     assert_type(qs.distinct(), QuerySet[Blog, Blog])
     assert_type(qs.distinct("created_at"), QuerySet[Blog, Blog])
     assert_type(qs & qs, QuerySet[Blog, Blog])
@@ -46,3 +52,13 @@ def queryset_methods_keep_the_row_type(qs: QuerySet[Blog], manager: models.Manag
     assert_type(qs.bulk_update(list(qs), fields=["created_at"]), int)
     assert_type(qs.bulk_create([]), list[Blog])
     assert_type(qs.delete(), tuple[int, dict[str, int]])
+
+
+async def async_queryset_methods_keep_the_row_type(qs: QuerySet[Blog], manager: models.Manager[Blog]) -> None:
+    assert_type(await qs.aget(id=1), Blog)
+    assert_type(await qs.afirst(), Blog | None)
+    assert_type(await qs.acreate(), Blog)
+    assert_type(qs.aiterator(), AsyncIterator[Blog])
+    assert_type(manager.aiterator(), AsyncIterator[Blog])
+    async for blog in qs:
+        assert_type(blog, Blog)

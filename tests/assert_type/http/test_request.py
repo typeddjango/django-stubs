@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Iterator
 from typing import assert_type
 
-from django.http import QueryDict
+from django.http import HttpRequest, QueryDict
 from django.http.request import _ImmutableQueryDict
 
 from django_stubs_ext import MutableHttpRequest
@@ -43,3 +43,17 @@ request = MutableHttpRequest()
 assert_type(request, MutableHttpRequest)
 request.GET["foo"] = "bar"
 request.POST.setdefault("foo", "bar")
+
+# get_signed_cookie raises unless a default is given
+assert_type(request.get_signed_cookie("k"), str)
+assert_type(request.get_signed_cookie("k", salt="s"), str)
+assert_type(request.get_signed_cookie("k", None), str | None)
+
+
+def signed_cookie_default(default: int) -> None:
+    assert_type(request.get_signed_cookie("k", default=default, salt="s"), str | int)
+
+
+def request_headers_are_strings(request: HttpRequest) -> None:
+    assert_type(request.headers.get("X-Foo"), str | None)
+    assert_type(request.headers["X-Foo"], str)

@@ -25,6 +25,11 @@ class Category(models.Model):
 class Post(models.Model):
     """No declared manager, `objects` only resolves through `ModelBase.__getattr__`."""
 
+    @classmethod
+    def bulk_create_from_cls(cls) -> None:
+        # mypy types an unannotated `cls` as `type[Post]`, not `type[Self]`: https://github.com/python/mypy/issues/14075
+        cls.objects.bulk_create([cls()])  # type: ignore[list-item]
+
 
 class Article(models.Model):
     category_set: RelatedManager[Category]  # pyright: ignore[reportUninitializedInstanceVariable]
@@ -59,14 +64,14 @@ class PermissionAware(Protocol):
 
 
 def declared_manager_access_on_instance_is_banned() -> None:
-    assert_type(Category().objects, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]
-    assert_type(Category().secondary, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]
+    assert_type(Category().objects, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # pyrefly: ignore[deprecated]
+    assert_type(Category().secondary, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # pyrefly: ignore[deprecated]
 
 
 def default_manager_access_on_instance_is_banned() -> None:
     # `ModelBase.__getattr__` lives on the metaclass, so instances can't reach it. mypy sees the
     # per-model attribute the plugin declares instead, and rejects it through `BaseManager.__get__`
-    Post().objects  # type: ignore[deprecated]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+    Post().objects  # type: ignore[deprecated]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 def manager_access_on_class_is_allowed() -> None:
@@ -78,7 +83,7 @@ def manager_access_on_class_is_allowed() -> None:
 def unknown_attribute_is_still_an_error() -> None:
     # `Literal["objects"]` must not turn `__getattr__` into a catch-all
     Category.not_defined  # type: ignore[attr-defined]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-attribute-access]
-    Category().not_defined  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+    Category().not_defined  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 def meta_manager_access_on_instance_is_allowed() -> None:
@@ -97,7 +102,7 @@ def manager_of_another_model_on_instance_is_allowed() -> None:
 
 def self_referential_manager_access_on_instance_is_banned() -> None:
     # Indistinguishable from `Node().objects`, annotate it as `RelatedManager[Node]` instead
-    assert_type(Node().children, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # ty: ignore[type-assertion-failure]
+    assert_type(Node().children, manager._ManagerIsNotAccessibleViaInstances)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # pyrefly: ignore[deprecated]  # ty: ignore[type-assertion-failure]
 
 
 def manager_on_plain_class_is_allowed() -> None:

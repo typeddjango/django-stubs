@@ -4,7 +4,9 @@ import copy
 from typing import TYPE_CHECKING, Any, ClassVar, assert_type
 
 from django.contrib.auth.models import User
-from django.utils.functional import Promise, SimpleLazyObject, cached_property, classproperty, lazystr
+from django.utils.functional import Promise, SimpleLazyObject, cached_property, classproperty, keep_lazy_text, lazystr
+from django.utils.html import format_html
+from django.utils.safestring import SafeString
 from typing_extensions import override
 
 if TYPE_CHECKING:
@@ -24,14 +26,14 @@ class Foo:
 
 f = Foo()
 assert_type(f.attr, list[str])
-f.attr.func  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[unresolved-attribute]
+f.attr.func  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 # May be overridden by @property
 class Bar(Foo):
     @property
     @override
-    def attr(self) -> list[str]:  # pyright: ignore[reportIncompatibleVariableOverride]  # ty: ignore[invalid-property-type-override]
+    def attr(self) -> list[str]:  # pyright: ignore[reportIncompatibleVariableOverride]  # ty: ignore[incompatible-property-override]
         raise NotImplementedError
 
 
@@ -44,7 +46,7 @@ class Quux(Foo):
 class Baz(Quux):
     @cached_property
     @override
-    def attr(self) -> list[str]:  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
+    def attr(self) -> list[str]:  # type: ignore[override]  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[incompatible-attribute-override]
         raise NotImplementedError
 
 
@@ -52,17 +54,21 @@ class Baz(Quux):
 
 s = lazystr("asd")
 
-assert_type(s.format("asd"), str)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
-assert_type(s.capitalize(), str)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+assert_type(s.format("asd"), str)
+assert_type(s.capitalize(), str)
+assert_type(s.startswith("a"), bool)
+assert_type(s.split(), list[str])
+assert_type(s.encode(), bytes)
 assert_type(s + "bar", str)
 assert_type("foo" + s, str)
 assert_type(s % "asd", str)
+assert_type(list(s), list[str])
 
-s.nonsense  # type: ignore[attr-defined]
+s.nonsense  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]  # pyrefly: ignore[missing-attribute]  # ty: ignore[missing-attribute]
 
 
 def test_str_or_promise(f2: StrOrPromise) -> None:
-    assert_type(f2.format("asd"), str)  # pyright: ignore[reportAssertTypeFailure]  # pyrefly: ignore[assert-type]  # ty: ignore[type-assertion-failure]
+    assert_type(f2.format("asd"), str)
     assert_type(f2 + "asd", str)
     assert_type("asd" + f2, str)
 
@@ -98,3 +104,8 @@ assert_type(Bam.attr, str)
 class Sub(Bam):
     def method(self) -> None:
         assert_type(self.attr, str)
+
+
+# keep_lazy_text keeps the wrapped function signature
+format_html_lazy = keep_lazy_text(format_html)
+assert_type(format_html_lazy("<b>{}</b>", "x"), SafeString)

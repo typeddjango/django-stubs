@@ -5,7 +5,7 @@ import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
@@ -24,7 +24,7 @@ from mypy_django_plugin.exceptions import UnregisteredModelError
 from mypy_django_plugin.lib import fullnames, helpers
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Mapping, Sequence
+    from collections.abc import Generator, Iterable, Iterator, Mapping, Sequence
 
     from django.apps.registry import Apps
     from django.conf import LazySettings
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def temp_environ() -> Iterator[None]:
+def temp_environ() -> Generator[None]:
     """Allow the ability to set os.environ temporarily"""
     environ = dict(os.environ)
     try:
@@ -98,17 +98,17 @@ class DjangoContext:
         module, _, model_cls_name = fullname.rpartition(".")
         return self.model_modules.get(module, {}).get(model_cls_name)
 
-    def get_model_fields(self, model_cls: type[Model]) -> Iterator[Field[Any, Any]]:
+    def get_model_fields(self, model_cls: type[Model]) -> Iterator[Field]:
         for field in model_cls._meta.get_fields():
             if isinstance(field, Field):
                 yield field
 
-    def get_model_foreign_keys(self, model_cls: type[Model]) -> Iterator[ForeignKey[Any, Any]]:
+    def get_model_foreign_keys(self, model_cls: type[Model]) -> Iterator[ForeignKey]:
         for field in model_cls._meta.get_fields():
             if isinstance(field, ForeignKey):
                 yield field
 
-    def get_model_related_fields(self, model_cls: type[Model]) -> Iterator[RelatedField[Any, Any]]:
+    def get_model_related_fields(self, model_cls: type[Model]) -> Iterator[RelatedField]:
         """Get model forward relations"""
         for field in model_cls._meta.get_fields():
             if isinstance(field, RelatedField):
@@ -140,9 +140,7 @@ class DjangoContext:
             return AnyType(TypeOfAny.explicit)
         return helpers.get_private_descriptor_type(field_info, "_pyi_lookup_exact_type", is_nullable=field.null)
 
-    def get_related_target_field(
-        self, related_model_cls: type[Model], field: ForeignKey[Any, Any]
-    ) -> Field[Any, Any] | None:
+    def get_related_target_field(self, related_model_cls: type[Model], field: ForeignKey) -> Field | None:
         # ForeignKey only supports one `to_fields` item (ForeignObject supports many)
         assert len(field.to_fields) == 1
         to_field_name = field.to_fields[0]
@@ -153,11 +151,10 @@ class DjangoContext:
             return rel_field
         return self.get_primary_key_field(related_model_cls)
 
-    def get_primary_key_field(self, model_cls: type[Model]) -> Field[Any, Any]:
+    def get_primary_key_field(self, model_cls: type[Model]) -> Field:
         for field in model_cls._meta.get_fields():
-            if isinstance(field, Field):
-                if field.primary_key:
-                    return field
+            if isinstance(field, Field) and field.primary_key:
+                return field
         raise ValueError("No primary key defined")
 
     def get_expected_types(
@@ -203,7 +200,9 @@ class DjangoContext:
 
     @cached_property
     def all_registered_model_classes(self) -> set[type[models.Model]]:
-        model_classes = self.apps_registry.get_models()
+        # Mirror `Apps.get_model()`, which also resolves models that Django creates automatically
+        # (e.g. the implicit through model of a many-to-many field) and swapped-in models.
+        model_classes = self.apps_registry.get_models(include_auto_created=True, include_swapped=True)
 
         all_model_bases = set()
         for model_cls in model_classes:
@@ -226,7 +225,7 @@ class DjangoContext:
         app_label, _, model_name = label.partition(".")
         return self._model_class_fullnames_by_label_lower.get(f"{app_label}.{model_name.lower()}")
 
-    def get_field_related_model_cls(self, field: RelatedField[Any, Any] | ForeignObjectRel) -> type[Model]:
+    def get_field_related_model_cls(self, field: RelatedField | ForeignObjectRel) -> type[Model]:
         if isinstance(field, RelatedField):
             related_model_cls = field.remote_field.model
         else:

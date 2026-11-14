@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from re import Pattern
 from types import ModuleType
 from typing import Any, TypeAlias, overload
@@ -7,12 +7,13 @@ from django.core.checks.messages import CheckMessage
 from django.http import HttpRequest, HttpResponse
 from django.urls import _AnyURL
 from django.utils.datastructures import MultiValueDict
-from django.utils.functional import cached_property
+from django.utils.functional import _StrOrPromise, cached_property
+from django.views import _ViewCallable
 
 class ResolverMatch:
     func: Callable[..., Any]
-    args: tuple[Any, ...]
-    kwargs: dict[str, Any]
+    args: Sequence[object]
+    kwargs: Mapping[str, object]
     url_name: str | None
     app_names: list[str]
     app_name: str
@@ -25,8 +26,8 @@ class ResolverMatch:
     def __init__(
         self,
         func: Callable[..., Any],
-        args: tuple[Any, ...],
-        kwargs: dict[str, Any],
+        args: Sequence[object],
+        kwargs: Mapping[str, object],
         url_name: str | None = None,
         app_names: list[str | None] | None = None,
         namespaces: list[str | None] | None = None,
@@ -39,7 +40,7 @@ class ResolverMatch:
     # for tuple unpacking -- python/mypy#2220
     def __iter__(self) -> Iterator[Any]: ...
 
-def get_resolver(urlconf: str | None = None) -> URLResolver: ...
+def get_resolver(urlconf: str | ModuleType | None = None) -> URLResolver: ...
 def get_ns_resolver(ns_pattern: str, resolver: URLResolver, converters: tuple[Any, ...]) -> URLResolver: ...
 
 _Pattern: TypeAlias = RegexPattern | RoutePattern | LocalePrefixPattern
@@ -133,6 +134,6 @@ class URLResolver:
     def check(self) -> list[CheckMessage]: ...
     def _populate(self) -> None: ...
     def _is_callback(self, name: str) -> bool: ...
-    def resolve(self, path: str) -> ResolverMatch: ...
+    def resolve(self, path: _StrOrPromise) -> ResolverMatch: ...
     def resolve_error_handler(self, view_type: int) -> Callable[[HttpRequest], HttpResponse]: ...
-    def reverse(self, lookup_view: str, *args: Any, **kwargs: Any) -> str: ...
+    def reverse(self, lookup_view: _ViewCallable | str, *args: object, **kwargs: object) -> str: ...

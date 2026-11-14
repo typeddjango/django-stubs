@@ -49,7 +49,7 @@ class BitOr(BitAggregate): ...
 class BitXor(BitAggregate): ...
 
 class Count(Aggregate):
-    output_field: ClassVar[IntegerField[Any, Any]]
+    output_field: ClassVar[IntegerField]
     def __init__(
         self,
         expression: Combinable | str,

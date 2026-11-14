@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import math
 from typing import Any, Literal, assert_type
 
 from django.db.models import Choices, IntegerChoices, Model, TextChoices
@@ -79,8 +80,8 @@ class Separator(bytes, Choices):
 
 
 class Constants(float, Choices):
-    PI = 3.141592653589793, "π"
-    TAU = 6.283185307179586, "τ"
+    PI = math.pi, "π"
+    TAU = math.tau, "τ"
 
     __empty__ = "NULL"
 

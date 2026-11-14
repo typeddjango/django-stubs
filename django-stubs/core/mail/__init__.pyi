@@ -37,7 +37,7 @@ def send_mail(
     using: str | None = None,
 ) -> int: ...
 def send_mass_mail(
-    datatuple: Iterable[tuple[str, str, str | None, list[str]]],
+    datatuple: Iterable[tuple[str, str, str | None, Sequence[str]]],
     *,
     fail_silently: bool = False,
     auth_user: str | None = None,

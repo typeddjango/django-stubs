@@ -150,6 +150,26 @@
                     num_posts = models.IntegerField()
                     text = models.CharField(max_length=100, blank=True)
 
+-   case: queryset_values_field_with_default_is_not_nullable
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Blog
+        values = Blog.objects.values('data', 'text', 'num_posts').get()
+        reveal_type(values)  # N: Revealed type is "TypedDict({'data': Any, 'text': str, 'num_posts': int})"
+        values['data'].get('key')
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Blog(models.Model):
+                    data = models.JSONField(default=dict)
+                    text = models.CharField(max_length=100, default="")
+                    num_posts = models.IntegerField(default=0)
+
 -   case: queryset_values_with_expressions
     main: |
         from typing_extensions import reveal_type
@@ -208,3 +228,58 @@
                 class PremiumBookDetails(models.Model):
                     book = models.OneToOneField(Book, on_delete=models.CASCADE)
                     price = models.DecimalField(max_digits=10, decimal_places=2)
+
+-   case: queryset_values_keeps_custom_queryset_with_row_type_var
+    main: |
+        from typing_extensions import reveal_type
+        from myapp.models import Blog, Note, Post, Tag
+
+        reveal_type(Blog.objects.values("text"))  # N: Revealed type is "myapp.models.RowQuerySet[myapp.models.Blog, TypedDict({'text': str})]"
+        reveal_type(Blog.objects.filter(id=1).values("text").published().first())  # N: Revealed type is "TypedDict({'text': str}) | None"
+        reveal_type(Blog.objects.values_list("text", flat=True).published().first())  # N: Revealed type is "str | None"
+        reveal_type(Blog.objects.values("text").values_list("id", "text"))  # N: Revealed type is "myapp.models.RowQuerySet[myapp.models.Blog, tuple[int, str]]"
+        reveal_type(Post.objects.values("text").published())  # N: Revealed type is "myapp.models.PostQuerySet[TypedDict({'text': str})]"
+        # The plugin makes an unparametrized subclass generic over both type vars
+        reveal_type(Note.objects.values("text"))  # N: Revealed type is "myapp.models.BareQuerySet[myapp.models.Note, TypedDict({'text': str})]"
+        # Without its own row type var, the queryset falls back to a plain QuerySet
+        reveal_type(Tag.objects.values("text"))  # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Tag, TypedDict({'text': str})]"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+                from typing_extensions import Self, TypeVar
+
+                _M = TypeVar("_M", bound=models.Model)
+                _Row = TypeVar("_Row", default=_M)
+                _PostRow = TypeVar("_PostRow", default="Post")
+
+                class RowQuerySet(models.QuerySet[_M, _Row]):
+                    def published(self) -> Self:
+                        return self.all()
+
+                class PostQuerySet(models.QuerySet["Post", _PostRow]):
+                    def published(self) -> Self:
+                        return self.all()
+
+                class ModelOnlyQuerySet(models.QuerySet[_M]): ...
+
+                class Blog(models.Model):
+                    text = models.CharField(max_length=100)
+                    objects = models.Manager.from_queryset(RowQuerySet)()
+
+                class Post(models.Model):
+                    text = models.CharField(max_length=100)
+                    objects = PostQuerySet.as_manager()
+
+                class Tag(models.Model):
+                    text = models.CharField(max_length=100)
+                    objects = ModelOnlyQuerySet.as_manager()
+
+                class BareQuerySet(models.QuerySet): ...
+
+                class Note(models.Model):
+                    text = models.CharField(max_length=100)
+                    objects = BareQuerySet.as_manager()

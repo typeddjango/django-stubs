@@ -1,8 +1,18 @@
-"""Model instantiation"""
+"""Model instantiation
+
+Type-checks the arguments of `Model(...)`, `QuerySet.create()` and `QuerySet.acreate()`.
+
+```python
+Book(pages=[])  # error: Incompatible type for "pages" of "Book" (got "list[Any]", ...)  [misc]
+Book(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
+Book.objects.create(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
+await Book.objects.acreate(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
+```
+"""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from mypy.errorcodes import CALL_ARG
 from mypy.types import Instance, get_proper_type
@@ -11,7 +21,6 @@ from mypy.types import Type as MypyType
 from mypy_django_plugin.lib import helpers
 
 if TYPE_CHECKING:
-    from django.db.models.base import Model
     from mypy.plugin import FunctionContext, MethodContext
 
     from mypy_django_plugin.django.context import DjangoContext
@@ -40,13 +49,25 @@ def get_actual_types(ctx: MethodContext | FunctionContext, expected_keys: list[s
 def typecheck_model_method(
     ctx: FunctionContext | MethodContext,
     django_context: DjangoContext,
-    model_cls: type[Model],
-    method: str,
-) -> None:
+    method: Literal["__init__", "create", "acreate"],
+) -> MypyType:
     """Type-checks positional and keyword arguments for Model methods like __init__(), create(), and acreate()."""
+    default_return_type = get_proper_type(ctx.default_return_type)
+    # `acreate()` returns `Coroutine[Any, Any, <Model>]`
+    model = get_proper_type(
+        default_return_type.args[-1]
+        if method == "acreate" and isinstance(default_return_type, Instance)
+        else default_return_type
+    )
+    if not (
+        isinstance(model, Instance)
+        and (model_cls := django_context.get_model_class_by_fullname(model.type.fullname)) is not None
+    ):
+        return ctx.default_return_type
+
     typechecker_api = helpers.get_typechecker_api(ctx)
     expected_types = django_context.get_expected_types(typechecker_api, model_cls, ctx.context, method=method)
-    expected_keys = [key for key in expected_types.keys() if key != "pk"]
+    expected_keys = [key for key in expected_types if key != "pk"]
 
     min_arg_count = helpers.get_min_argument_count(ctx)
 
@@ -64,57 +85,5 @@ def typecheck_model_method(
 
     if min_arg_count > len(expected_keys):
         ctx.api.fail(f'Too many arguments for "{model_cls.__name__}"', ctx.context, code=CALL_ARG)
-
-
-def typecheck_model_init(ctx: FunctionContext, django_context: DjangoContext) -> MypyType:
-    """Type-check the arguments of `Model(...)`
-
-    ```python
-    Book(pages=[])  # error: Incompatible type for "pages" of "Book" (got "list[Any]", ...)  [misc]
-    Book(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
-    ```
-    """
-    default_return_type = get_proper_type(ctx.default_return_type)
-    if (
-        isinstance(default_return_type, Instance)
-        and (model_cls := django_context.get_model_class_by_fullname(default_return_type.type.fullname)) is not None
-    ):
-        typecheck_model_method(ctx, django_context, model_cls, "__init__")
-
-    return ctx.default_return_type
-
-
-def typecheck_model_create(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    """Type-check the arguments of `QuerySet.create()`
-
-    ```python
-    Book.objects.create(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
-    ```
-    """
-    default_return_type = get_proper_type(ctx.default_return_type)
-    if (
-        isinstance(default_return_type, Instance)
-        and (model_cls := django_context.get_model_class_by_fullname(default_return_type.type.fullname)) is not None
-    ):
-        typecheck_model_method(ctx, django_context, model_cls, "create")
-
-    return ctx.default_return_type
-
-
-def typecheck_model_acreate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    """Type-check the arguments of `QuerySet.acreate()`
-
-    ```python
-    await Book.objects.acreate(author="Herbert")  # error: Unexpected attribute "author" for model "Book"  [misc]
-    ```
-    """
-    default_return_type = get_proper_type(ctx.default_return_type)
-    if (
-        isinstance(default_return_type, Instance)
-        # default_return_type at this point should be of type Coroutine[Any, Any, <Model>]
-        and isinstance((model := get_proper_type(default_return_type.args[-1])), Instance)
-        and (model_cls := django_context.get_model_class_by_fullname(model.type.fullname)) is not None
-    ):
-        typecheck_model_method(ctx, django_context, model_cls, "acreate")
 
     return ctx.default_return_type

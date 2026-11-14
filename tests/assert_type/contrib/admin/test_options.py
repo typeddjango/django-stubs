@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+import sys
+from typing import TYPE_CHECKING, Any, assert_type
 
 from django.contrib import admin, messages
 from django.contrib.admin.sites import AdminSite
@@ -128,7 +129,7 @@ class FieldsetWorkaroundAdmin(admin.ModelAdmin[Any]):
 
 class ViewOnSiteCallableAdmin(admin.ModelAdmin[Any]):
     @override
-    def view_on_site(self, obj: ViewOnSiteCallableAdmin) -> str:  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override-mutable-attribute]  # ty: ignore[invalid-mutable-override]
+    def view_on_site(self, obj: ViewOnSiteCallableAdmin) -> str:  # pyright: ignore[reportIncompatibleVariableOverride]  # pyrefly: ignore[bad-override-mutable-attribute]  # ty: ignore[incompatible-mutable-override]
         return "http://example.org"
 
 
@@ -178,7 +179,7 @@ class InlineParentModel(models.Model):
 
 
 class InlineChildModel(models.Model):
-    parent = models.ForeignKey(InlineParentModel, on_delete=models.CASCADE)  # pyright: ignore[reportUnknownVariableType]
+    parent = models.ForeignKey(InlineParentModel, on_delete=models.CASCADE)
 
 
 class ParentObjInline(admin.StackedInline[InlineChildModel, InlineParentModel]):
@@ -224,3 +225,31 @@ class ActionAdmin(admin.ModelAdmin[ValidActionModel]):
     # Normally a method would be passed by name as a string, but defining `actions` after the
     # method makes it possible to ensure that it is typed correctly.
     actions = [valid_action_function, valid_action_method]  # ty: ignore[invalid-assignment]
+
+
+def save_form_returns_the_admin_model(
+    model_admin: FullModelAdmin, request: HttpRequest, form: FullAdminModelForm
+) -> None:
+    assert_type(model_admin.save_form(request, form, True), FullAdminModel)
+
+
+# `Action` and `action_location` are Django 6.0+, which requires Python 3.12
+if sys.version_info >= (3, 12):
+
+    class OverrideActionsAdmin(admin.ModelAdmin[ValidActionModel]):
+        @admin.action(description="Archive")
+        def archive(self, request: HttpRequest, queryset: QuerySet[ValidActionModel]) -> None: ...
+
+        @override
+        def get_actions(
+            self, request: HttpRequest, action_location: admin.ActionLocation = admin.ActionLocation.CHANGE_LIST
+        ) -> dict[str, admin.Action]:
+            actions = super().get_actions(request, action_location)
+            actions["archive"] = admin.Action(
+                func=OverrideActionsAdmin.archive,
+                name="archive",
+                description="Archive",
+                plural_description="Archive",
+                locations=[action_location],
+            )
+            return actions

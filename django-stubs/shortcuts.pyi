@@ -1,11 +1,12 @@
-from collections.abc import Callable, Mapping, Sequence
-from typing import Any, Literal, Protocol, overload, type_check_only
+from collections.abc import Mapping, Sequence
+from typing import Any, Literal, Protocol, TypeAlias, overload, type_check_only
 
 from django.db.models import Manager, QuerySet
 from django.db.models.base import Model
 from django.http import HttpRequest
 from django.http.response import HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.utils.functional import _StrOrPromise
+from django.views import _ViewCallable
 from typing_extensions import TypeVar
 
 def render(
@@ -21,26 +22,34 @@ def render(
 class SupportsGetAbsoluteUrl(Protocol):
     def get_absolute_url(self) -> str: ...
 
+_Resolvable: TypeAlias = _ViewCallable | _StrOrPromise | SupportsGetAbsoluteUrl
+
 @overload
 def redirect(
-    to: Callable[..., Any] | str | SupportsGetAbsoluteUrl,
-    *args: Any,
+    to: _Resolvable,
+    *args: object,
     permanent: Literal[True],
     preserve_request: bool = False,
     max_length: int = ...,
-    **kwargs: Any,
+    **kwargs: object,
 ) -> HttpResponsePermanentRedirect: ...
 @overload
 def redirect(
-    to: Callable[..., Any] | str | SupportsGetAbsoluteUrl,
-    *args: Any,
+    to: _Resolvable,
+    *args: object,
     permanent: Literal[False] = False,
     preserve_request: bool = False,
-    **kwargs: Any,
+    max_length: int = ...,
+    **kwargs: object,
 ) -> HttpResponseRedirect: ...
 @overload
 def redirect(
-    to: Callable[..., Any] | str | SupportsGetAbsoluteUrl, *args: Any, permanent: bool, **kwargs: Any
+    to: _Resolvable,
+    *args: object,
+    permanent: bool = False,
+    preserve_request: bool = False,
+    max_length: int = ...,
+    **kwargs: object,
 ) -> HttpResponseRedirect | HttpResponsePermanentRedirect: ...
 
 _T = TypeVar("_T", bound=Model)
@@ -49,4 +58,4 @@ def get_object_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, 
 async def aget_object_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> _T: ...
 def get_list_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> list[_T]: ...
 async def aget_list_or_404(klass: type[_T] | Manager[_T] | QuerySet[_T], *args: Any, **kwargs: Any) -> list[_T]: ...
-def resolve_url(to: Callable[..., Any] | Model | _StrOrPromise, *args: Any, **kwargs: Any) -> str: ...
+def resolve_url(to: _Resolvable, *args: object, **kwargs: object) -> str: ...

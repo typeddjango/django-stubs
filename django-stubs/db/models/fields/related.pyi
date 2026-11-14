@@ -7,7 +7,14 @@ from django.core.validators import _ValidatorCallable
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.models.base import Model
 from django.db.models.expressions import Expression
-from django.db.models.fields import NOT_PROVIDED, Field, _AllLimitChoicesTo, _ErrorMessagesMapping, _LimitChoicesTo
+from django.db.models.fields import (
+    NOT_PROVIDED,
+    Field,
+    FieldInitKwargs,
+    _AllLimitChoicesTo,
+    _ErrorMessagesMapping,
+    _LimitChoicesTo,
+)
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related_descriptors import ForeignKeyDeferredAttribute, ManyRelatedManager
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor as ForwardManyToOneDescriptor
@@ -22,9 +29,9 @@ from django.db.models.fields.reverse_related import OneToOneRel as OneToOneRel
 from django.db.models.query_utils import FilteredRelation, PathInfo, Q
 from django.db.models.sql.where import WhereNode
 from django.forms.widgets import Widget
-from django.utils.choices import _Choices
+from django.utils.choices import _ChoicesInput
 from django.utils.functional import _StrOrPromise, cached_property
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar, Unpack, override
 
 RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 
@@ -34,11 +41,11 @@ def lazy_related_operation(
 ) -> None: ...
 
 # __set__ value type
-_ST = TypeVar("_ST", contravariant=True)
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
 # __get__ return type
-_GT = TypeVar("_GT", covariant=True, default=_ST)
+_GT_co = TypeVar("_GT_co", covariant=True, default=_ST_contra)
 
-class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
+class RelatedField(FieldCacheMixin, Field[_ST_contra, _GT_co]):
     one_to_many: bool
     one_to_one: bool
     many_to_many: bool
@@ -53,30 +60,13 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
         related_query_name: str | None = None,
         limit_choices_to: _AllLimitChoicesTo | None = None,
         *,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        rel: ForeignObjectRel | None = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_tablespace: str | None = ...,
-        auto_created: bool = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        db_comment: str | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @cached_property
     @override
@@ -92,9 +82,9 @@ class RelatedField(FieldCacheMixin, Field[_ST, _GT]):
     def get_limit_choices_to(self) -> _LimitChoicesTo: ...
     def related_query_name(self) -> str: ...
     @property
-    def target_field(self) -> Field[Any, Any]: ...
+    def target_field(self) -> Field: ...
 
-class ForeignObject(RelatedField[_ST, _GT]):
+class ForeignObject(RelatedField[_ST_contra, _GT_co]):
     remote_field: ForeignObjectRel
     rel_class: type[ForeignObjectRel]
     column: None
@@ -113,25 +103,12 @@ class ForeignObject(RelatedField[_ST, _GT]):
         parent_link: bool = False,
         swappable: bool = True,
         *,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        db_comment: str | None = ...,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     # class access
     @overload
@@ -140,29 +117,29 @@ class ForeignObject(RelatedField[_ST, _GT]):
     # Model instance access
     @overload
     @override
-    def __get__(self, instance: Model, owner: Any) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT_co: ...
     # non-Model instances
     @overload
     @override
     def __get__(self, instance: Any, owner: Any) -> Self: ...
-    def resolve_related_fields(self) -> list[tuple[Field[Any, Any], Field[Any, Any]]]: ...
+    def resolve_related_fields(self) -> list[tuple[Field, Field]]: ...
     @cached_property
-    def related_fields(self) -> list[tuple[Field[Any, Any], Field[Any, Any]]]: ...
+    def related_fields(self) -> list[tuple[Field, Field]]: ...
     @cached_property
-    def reverse_related_fields(self) -> list[tuple[Field[Any, Any], Field[Any, Any]]]: ...
+    def reverse_related_fields(self) -> list[tuple[Field, Field]]: ...
     @cached_property
-    def local_related_fields(self) -> tuple[Field[Any, Any], ...]: ...
+    def local_related_fields(self) -> tuple[Field, ...]: ...
     @cached_property
-    def foreign_related_fields(self) -> tuple[Field[Any, Any], ...]: ...
+    def foreign_related_fields(self) -> tuple[Field, ...]: ...
     @property
     @override
     def non_db_attrs(self) -> tuple[str, ...]: ...  # type: ignore[override]
     def get_local_related_value(self, instance: Model) -> tuple[Any, ...]: ...
     def get_foreign_related_value(self, instance: Model) -> tuple[Any, ...]: ...
     @staticmethod
-    def get_instance_value_for_fields(instance: Model, fields: Sequence[Field[Any, Any]]) -> tuple[Any, ...]: ...
-    def get_joining_fields(self, reverse_join: bool = False) -> tuple[tuple[Field[Any, Any], Field[Any, Any]], ...]: ...
-    def get_reverse_joining_fields(self) -> tuple[tuple[Field[Any, Any], Field[Any, Any]], ...]: ...
+    def get_instance_value_for_fields(instance: Model, fields: Sequence[Field]) -> tuple[Any, ...]: ...
+    def get_joining_fields(self, reverse_join: bool = False) -> tuple[tuple[Field, Field], ...]: ...
+    def get_reverse_joining_fields(self) -> tuple[tuple[Field, Field], ...]: ...
     def get_extra_descriptor_filter(self, instance: Model) -> dict[str, Any] | Q: ...
     def get_extra_restriction(self, alias: str, related_alias: str) -> WhereNode | None: ...
     def get_path_info(self, filtered_relation: FilteredRelation | None = None) -> list[PathInfo]: ...
@@ -171,14 +148,14 @@ class ForeignObject(RelatedField[_ST, _GT]):
     def get_reverse_path_info(self, filtered_relation: FilteredRelation | None = None) -> list[PathInfo]: ...
     @cached_property
     def reverse_path_infos(self) -> list[PathInfo]: ...
-    def contribute_to_related_class(self, cls: type[Model], related: RelatedField[Any, Any]) -> None: ...
+    def contribute_to_related_class(self, cls: type[Model], related: RelatedField) -> None: ...
     @override
     def get_attname_column(self) -> tuple[str, None]: ...
     forward_related_accessor_class: type[ForwardManyToOneDescriptor[Any]]
     related_accessor_class: type[ReverseManyToOneDescriptor[Any]]
     requires_unique_target: bool
 
-class ForeignKey(ForeignObject[_ST, _GT]):
+class ForeignKey(ForeignObject[_ST_contra, _GT_co]):
     _pyi_private_set_type: Any
     _pyi_private_get_type: Any
 
@@ -197,35 +174,19 @@ class ForeignKey(ForeignObject[_ST, _GT]):
         to_field: str | None = None,
         db_constraint: bool = True,
         *,
-        swappable: bool = ...,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        db_comment: str | None = ...,
+        swappable: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     @classmethod
     def __class_getitem__(cls, *args: Any, **kwargs: Any) -> type[Self]: ...
     @override
-    def contribute_to_related_class(self, cls: type[Model], related: RelatedField[Any, Any]) -> None: ...
+    def contribute_to_related_class(self, cls: type[Model], related: RelatedField) -> None: ...
     @override
     def formfield(
         self,
@@ -253,7 +214,7 @@ class ForeignKey(ForeignObject[_ST, _GT]):
     @override
     def get_attname_column(self) -> tuple[str, str]: ...  # type: ignore[override]
 
-class OneToOneField(ForeignKey[_ST, _GT]):
+class OneToOneField(ForeignKey[_ST_contra, _GT_co]):
     _pyi_private_set_type: Any
     _pyi_private_get_type: Any
 
@@ -265,35 +226,19 @@ class OneToOneField(ForeignKey[_ST, _GT]):
         on_delete: Callable[..., None],
         to_field: str | None = None,
         *,
-        swappable: bool = ...,
-        related_name: str | None = ...,
-        related_query_name: str | None = ...,
-        limit_choices_to: _AllLimitChoicesTo | None = ...,
-        parent_link: bool = ...,
-        db_constraint: bool = ...,
-        verbose_name: _StrOrPromise | None = ...,
-        name: str | None = ...,
-        primary_key: bool = ...,
-        max_length: int | None = ...,
-        unique: bool = ...,
-        blank: bool = ...,
-        null: bool = ...,
-        db_index: bool = ...,
-        default: Any = ...,
-        db_default: type[NOT_PROVIDED] | Expression | _ST = ...,
-        editable: bool = ...,
-        auto_created: bool = ...,
-        serialize: bool = ...,
-        unique_for_date: str | None = ...,
-        unique_for_month: str | None = ...,
-        unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
-        help_text: _StrOrPromise = ...,
-        db_column: str | None = ...,
-        db_tablespace: str | None = ...,
-        validators: Iterable[_ValidatorCallable] = ...,
-        error_messages: _ErrorMessagesMapping | None = ...,
-        db_comment: str | None = ...,
+        swappable: bool = True,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        db_constraint: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
     # class access
     @overload
@@ -302,7 +247,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
     # Model instance access
     @overload
     @override
-    def __get__(self, instance: Model, owner: Any) -> _GT: ...
+    def __get__(self, instance: Model, owner: Any) -> _GT_co: ...
     # non-Model instances
     @overload
     @override
@@ -313,7 +258,7 @@ class OneToOneField(ForeignKey[_ST, _GT]):
 _Through = TypeVar("_Through", bound=Model, default=Any)
 _To = TypeVar("_To", bound=Model)
 
-class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
+class ManyToManyField(RelatedField, Generic[_To, _Through]):
     has_null_arg: bool
     swappable: bool
 
@@ -353,7 +298,7 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
         unique_for_date: str | None = ...,
         unique_for_month: str | None = ...,
         unique_for_year: str | None = ...,
-        choices: _Choices | None = ...,
+        choices: _ChoicesInput | None = ...,
         help_text: _StrOrPromise = ...,
         db_column: str | None = ...,
         db_tablespace: str | None = ...,
@@ -376,7 +321,7 @@ class ManyToManyField(RelatedField[Any, Any], Generic[_To, _Through]):
     def get_reverse_path_info(self, filtered_relation: FilteredRelation | None = None) -> list[PathInfo]: ...
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
-    def contribute_to_related_class(self, cls: type[Model], related: RelatedField[Any, Any]) -> None: ...
+    def contribute_to_related_class(self, cls: type[Model], related: RelatedField) -> None: ...
     @override
     def get_attname_column(self) -> tuple[str, None]: ...
     def m2m_db_table(self) -> str: ...

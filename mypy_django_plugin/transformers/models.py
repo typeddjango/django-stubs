@@ -1,4 +1,37 @@
-"""Model classes"""
+"""Model classes
+
+### Report `objects` and `DoesNotExist` accessed where Django doesn't add them
+
+Django adds `objects` to concrete models only, and `DoesNotExist` and friends to `Model` subclasses only.
+
+```python
+def count(model: type[models.Model]) -> None:
+    model.objects.count()  # error: "type[Model]" has no attribute "objects"  [attr-defined]
+```
+
+Set `strict_model_abstract_attrs = false` to allow it, at your own risk: `count(models.Model)` fails at runtime.
+
+### Add the attributes Django generates on model classes
+
+Such as `id` and `pk`, `<fk>_id`, managers, reverse relations, `get_<field>_display()` and `DoesNotExist`.
+
+```python
+class Book(models.Model):
+    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
+
+reveal_type(Book().publisher_id)  # int
+reveal_type(Publisher().book_set)  # RelatedManager[Book, QuerySet[Book, Book]]
+```
+
+### Resolve `WithAnnotations[Model, TypedDict]` to the annotated model type
+
+Use it to type instances returned by `annotate()`.
+
+```python
+def f(book: WithAnnotations[Book, Pages]) -> None:
+    reveal_type(book.n_pages)  # int, from the `Pages` TypedDict
+```
+"""
 
 from __future__ import annotations
 
@@ -8,6 +41,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from django.db.models.fields import DateField, DateTimeField, Field
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToManyRel, OneToOneRel
+from mypy.maptype import map_instance_to_supertype
 from mypy.nodes import (
     ARG_STAR2,
     MDEF,
@@ -23,11 +57,22 @@ from mypy.nodes import (
     TypeInfo,
     Var,
 )
-from mypy.plugins import common
+from mypy.plugins.common import add_method_to_class
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.typeanal import TypeAnalyser
-from mypy.types import AnyType, Instance, ProperType, TypedDictType, TypeOfAny, TypeType, TypeVarType, get_proper_type
+from mypy.types import (
+    AnyType,
+    Instance,
+    ProperType,
+    ReadOnlyType,
+    RequiredType,
+    TypedDictType,
+    TypeOfAny,
+    TypeType,
+    TypeVarType,
+    get_proper_type,
+)
 from mypy.types import Type as MypyType
 from typing_extensions import override
 
@@ -48,7 +93,7 @@ if TYPE_CHECKING:
     from django.db.models import Manager, Model
     from mypy.checker import TypeChecker
     from mypy.nodes import MypyFile
-    from mypy.plugin import AnalyzeTypeContext, AttributeContext, ClassDefContext
+    from mypy.plugin import AnalyzeTypeContext, ClassDefContext
 
     from mypy_django_plugin.config import DjangoPluginConfig
     from mypy_django_plugin.django.context import DjangoContext
@@ -213,7 +258,7 @@ class AddAnnotateUtilities(ModelClassInitializer):
         class MyModel(models.Model):
             ...
 
-        class MyModel@AnnotatedWith(MyModel, django_stubs_ext.Annotations[_Annotations]):
+        class MyModel@AnnotatedWith(MyModel, django_stubs_ext.Annotations[_Annotations_co]):
             ...
     """
 
@@ -263,14 +308,13 @@ class InjectAnyAsBaseForNestedMeta(ModelClassInitializer):
     def run(self) -> None:
         meta_node = helpers.get_nested_meta_node_for_current_class(self.model_classdef.info)
         if meta_node is None:
-            return None
+            return
         meta_node.fallback_to_any = True
 
         typed_model_meta_info = self.lookup_typeinfo(fullnames.TYPED_MODEL_META_FULLNAME)
         if typed_model_meta_info and not meta_node.has_base(fullnames.TYPED_MODEL_META_FULLNAME):
             # Insert TypedModelMeta just before `object` to leverage mypy's class-body semantic analysis.
             meta_node.mro.insert(-1, typed_model_meta_info)
-        return None
 
 
 class AddDefaultPrimaryKey(ModelClassInitializer):
@@ -286,7 +330,7 @@ class AddDefaultPrimaryKey(ModelClassInitializer):
 
     def create_autofield(
         self,
-        auto_field: Field[Any, Any],
+        auto_field: Field,
         dest_name: str,
         existing_field: bool,
     ) -> None:
@@ -343,9 +387,9 @@ class AddRelatedModelsId(ModelClassInitializer):
 
             try:
                 field_info = self.lookup_class_typeinfo_or_incomplete_defn_error(rel_target_field.__class__)
-            except helpers.IncompleteDefnException as exc:
+            except helpers.IncompleteDefnException:
                 if not self.api.final_iteration:
-                    raise exc
+                    raise
                 continue
 
             set_type, get_type = get_field_descriptor_types(
@@ -371,9 +415,23 @@ class AddManagers(ModelClassInitializer):
             return
 
         assert manager_info is not None
-        # Reparameterize dynamically created manager with model type
-        manager_type = helpers.fill_manager(manager_info, helpers.model_instance(self.model_classdef.info))
+        assert self.model_classdef.info.self_type is not None
+        manager_type = helpers.fill_instance(manager_info, [self.model_classdef.info.self_type])
         self.add_new_var_to_model_class(manager_name, manager_type, is_classvar=True)
+
+    @override
+    def run(self) -> None:
+        model_cls = self.django_context.get_model_class_by_fullname(self.model_classdef.fullname)
+        if model_cls is not None:
+            self.run_with_model_cls(model_cls)
+        elif not self.is_model_abstract and self.model_classdef.info.get("objects") is None:
+            # The app registry can't see this model, so its managers are unknown. Declare the default
+            # `objects` the stubs' `ModelBase.__getattr__` would, as `MetaclassAdjustments` removes it for mypy.
+            # See https://github.com/typeddjango/django-stubs/issues/1744
+            manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.MANAGER_CLASS_FULLNAME)
+            assert self.model_classdef.info.self_type is not None
+            manager_type = helpers.fill_instance(manager_info, [self.model_classdef.info.self_type])
+            self.add_new_var_to_model_class("objects", manager_type, is_classvar=True)
 
     @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
@@ -399,7 +457,7 @@ class AddManagers(ModelClassInitializer):
                 continue
 
             assert self.model_classdef.info.self_type is not None
-            manager_type = helpers.fill_manager(manager_info, self.model_classdef.info.self_type)
+            manager_type = helpers.fill_instance(manager_info, [self.model_classdef.info.self_type])
             self.add_new_var_to_model_class(manager_name, manager_type, is_classvar=True)
 
         if incomplete_manager_defs:
@@ -416,7 +474,7 @@ class AddManagers(ModelClassInitializer):
                 fallback_manager_info = self.get_or_create_manager_with_any_fallback()
                 if fallback_manager_info is not None:
                     assert self.model_classdef.info.self_type is not None
-                    manager_type = helpers.fill_manager(fallback_manager_info, self.model_classdef.info.self_type)
+                    manager_type = helpers.fill_instance(fallback_manager_info, [self.model_classdef.info.self_type])
                     self.add_new_var_to_model_class(manager_name, manager_type, is_classvar=True)
 
                 # Find expression for e.g. `objects = SomeManager()`
@@ -480,14 +538,14 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
     @override
     def run_with_model_cls(self, model_cls: type[Model]) -> None:
         if "_default_manager" in self.model_classdef.info.names:
-            return None
+            return
 
         default_manager_cls = model_cls._meta.default_manager.__class__
         default_manager_fullname = helpers.get_class_fullname(default_manager_cls)
 
         try:
             default_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(default_manager_fullname)
-        except helpers.IncompleteDefnException as exc:
+        except helpers.IncompleteDefnException:
             # Check if default manager could be a generated manager
             base_manager_fullname = helpers.get_class_fullname(default_manager_cls.__bases__[0])
             generated_manager_info = self.get_generated_manager_info(default_manager_fullname, base_manager_fullname)
@@ -495,11 +553,13 @@ class AddDefaultManagerAttribute(ModelClassInitializer):
                 # Manager doesn't appear to be generated. Unless we're on the final round,
                 # see if another round could help figuring out the default manager type
                 if not self.api.final_iteration:
-                    raise exc
-                return None
+                    raise
+                return
             default_manager_info = generated_manager_info
 
-        default_manager = helpers.fill_manager(default_manager_info, helpers.model_instance(self.model_classdef.info))
+        default_manager = helpers.fill_instance(
+            default_manager_info, [helpers.model_instance(self.model_classdef.info)]
+        )
         self.add_new_var_to_model_class("_default_manager", default_manager, is_classvar=True)
 
 
@@ -558,7 +618,7 @@ class AddReverseLookups(ModelClassInitializer):
             # ManyToOneRel
             self.add_new_var_to_model_class(
                 attname,
-                Instance(self.reverse_many_to_one_descriptor, [helpers.model_instance(to_model_info)]),
+                helpers.fill_instance(self.reverse_many_to_one_descriptor, [helpers.model_instance(to_model_info)]),
                 is_classvar=True,
             )
 
@@ -600,8 +660,15 @@ class AddReverseLookups(ModelClassInitializer):
             return
 
         # Create a reverse manager subclassed from the default manager of the related
-        # model and 'RelatedManager'
-        related_manager = Instance(related_manager_info, [helpers.model_instance(to_model_info)])
+        # model and 'RelatedManager', sharing the default manager's queryset so both bases agree on `_QS_co`
+        base_manager_info = self.lookup_typeinfo_or_incomplete_defn_error(fullnames.BASE_MANAGER_CLASS_FULLNAME)
+        default_manager_queryset = map_instance_to_supertype(default_manager_type, base_manager_info).args[1]
+        if has_placeholder(default_manager_queryset):
+            # The default manager's bases still hold a forward reference, e.g. `Manager["MyModel"]`.
+            raise helpers.IncompleteDefnException()
+        related_manager = Instance(
+            related_manager_info, [helpers.model_instance(to_model_info), default_manager_queryset]
+        )
         # The reverse manager is based on the related model's manager, so it makes most sense to add the new
         # related manager in that module
         new_related_manager_info = helpers.add_new_class_for_module(
@@ -637,34 +704,41 @@ class AddExtraFieldMethods(ModelClassInitializer):
         # get_FOO_display for choices
         for field in self.django_context.get_model_fields(model_cls):
             if field.choices:
-                info = self.lookup_typeinfo_or_incomplete_defn_error("builtins.str")
-                return_type = Instance(info, [])
-                common.add_method(self.ctx, name=f"get_{field.attname}_display", args=[], return_type=return_type)
+                add_method_to_class(
+                    self.api,
+                    self.model_classdef,
+                    name=f"get_{field.attname}_display",
+                    args=[],
+                    return_type=self.api.named_type("builtins.str"),
+                )
 
         # get_next_by, get_previous_by for Date, DateTime
         for field in self.django_context.get_model_fields(model_cls):
             if isinstance(field, DateField | DateTimeField) and not field.null:
                 return_type = helpers.model_instance(self.model_classdef.info)
-                common.add_method(
-                    self.ctx,
+                kwargs_type = self.api.named_type("builtins.object")
+                add_method_to_class(
+                    self.api,
+                    self.model_classdef,
                     name=f"get_next_by_{field.attname}",
                     args=[
                         Argument(
-                            Var("kwargs", AnyType(TypeOfAny.implementation_artifact)),
-                            AnyType(TypeOfAny.implementation_artifact),
+                            Var("kwargs", kwargs_type),
+                            kwargs_type,
                             initializer=None,
                             kind=ARG_STAR2,
                         )
                     ],
                     return_type=return_type,
                 )
-                common.add_method(
-                    self.ctx,
+                add_method_to_class(
+                    self.api,
+                    self.model_classdef,
                     name=f"get_previous_by_{field.attname}",
                     args=[
                         Argument(
-                            Var("kwargs", AnyType(TypeOfAny.implementation_artifact)),
-                            AnyType(TypeOfAny.implementation_artifact),
+                            Var("kwargs", kwargs_type),
+                            kwargs_type,
                             initializer=None,
                             kind=ARG_STAR2,
                         )
@@ -830,13 +904,11 @@ class ProcessManyToManyFields(ModelClassInitializer):
         Get a primary key instance of provided model's type info. If primary key can't be resolved,
         return a default declaration.
         """
-        contains_from_pk_info = model.get_containing_type_info("pk")
-        if contains_from_pk_info is not None:
-            pk = contains_from_pk_info.names["pk"].node
-            if isinstance(pk, Var):
-                pk_type = get_proper_type(pk.type)
-                if isinstance(pk_type, Instance):
-                    return pk_type
+        pk_sym = model.get("pk")
+        if pk_sym is not None and isinstance(pk_sym.node, Var):
+            pk_type = get_proper_type(pk_sym.node.type)
+            if isinstance(pk_type, Instance):
+                return pk_type
         return self.default_pk_instance
 
     def create_through_table_class(
@@ -905,7 +977,7 @@ class ProcessManyToManyFields(ModelClassInitializer):
                 helpers.add_new_sym_for_info(
                     through_model,
                     name=name,
-                    sym_type=Instance(self.manager_info, [Instance(through_model, [])]),
+                    sym_type=helpers.fill_instance(self.manager_info, [Instance(through_model, [])]),
                     is_classvar=True,
                 )
 
@@ -995,19 +1067,32 @@ class ProcessManyToManyFields(ModelClassInitializer):
 class MetaclassAdjustments(ModelClassInitializer):
     @classmethod
     def adjust_model_class(cls, ctx: ClassDefContext, plugin_config: DjangoPluginConfig) -> None:
-        """Report `objects` and `DoesNotExist` accessed where Django doesn't add them
-
-        Django adds `objects` to concrete models only, and `DoesNotExist` and friends to `Model` subclasses only.
-
-        ```python
-        def count(model: type[models.Model]) -> None:
-            model.objects.count()  # error: "type[Model]" has no attribute "objects"  [attr-defined]
-        ```
-
-        Set `strict_model_abstract_attrs = false` to allow it, at your own risk: `count(models.Model)` fails at runtime.
         """
-        # The stubs annotate these metaclass contributions on `Model` for type checkers other than mypy,
-        # the plugin removes them here and adds them back to concrete models only.
+        For the sake of type checkers other than mypy, some attributes that are
+        dynamically added by Django's model metaclass has been annotated on
+        `django.db.models.base.Model`. We remove those attributes and will handle them
+        through the plugin.
+
+        Configurable with `strict_model_abstract_attrs = false` to skip removing any objects from models.
+
+        Basically, this code::
+
+            from django.db import models
+
+            def get_model_count(model_type: type[models.Model]) -> int:
+                return model_type.objects.count()
+
+        - Will raise an error
+          `"type[models.Model]" has no attribute "objects"  [attr-defined]`
+          when `strict_model_abstract_attrs = true` (default)
+        - Return without any type errors
+          when `strict_model_abstract_attrs = false`
+
+        But, beware that the code above can fail in runtime, as mypy correctly shows.
+        Example: `get_model_count(models.Model)`
+
+        Turn this setting off at your own risk.
+        """
         # Mypy does not properly support narrowing in `__getattr__` based on `Literal["objects"]`
         # so the current `ModelBase.__getattr__` swallows every unknown attributes errors.
         # `objects` is already inserted by the plugin, so the fallback is not necessary for mypy. We can drop it
@@ -1025,11 +1110,13 @@ class MetaclassAdjustments(ModelClassInitializer):
                 helpers.get_semanal_api(ctx), fullnames.MANAGER_CLASS_FULLNAME
             )
             if manager is not None:
-                helpers.add_new_sym_for_info(
-                    ctx.cls.info,
-                    name="objects",
-                    sym_type=Instance(manager, [helpers.model_instance(ctx.cls.info)]),
-                )
+                try:
+                    objects = helpers.fill_instance(manager, [helpers.model_instance(ctx.cls.info)])
+                except helpers.IncompleteDefnException:
+                    if not ctx.api.final_iteration:
+                        ctx.api.defer()
+                    return
+                helpers.add_new_sym_for_info(ctx.cls.info, name="objects", sym_type=objects)
             return
 
         for attr_name in ["DoesNotExist", "NotUpdated", "MultipleObjectsReturned"]:
@@ -1094,22 +1181,10 @@ class MetaclassAdjustments(ModelClassInitializer):
 
 
 def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> None:
-    """Add the attributes Django generates on model classes
-
-    Such as `id` and `pk`, `<fk>_id`, managers, reverse relations, `get_<field>_display()` and `DoesNotExist`.
-
-    ```python
-    class Book(models.Model):
-        publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
-
-    reveal_type(Book().publisher_id)  # int
-    reveal_type(Publisher().book_set)  # RelatedManager[Book]
-    ```
-    """
     # A generic model whose type variable is bounded by a not yet analysed class (e.g. a forward
     # reference) still has a `PlaceholderType` bound. Types built from it, such as the manager's
     # `Self`, would keep that placeholder and fail to serialize, so wait for a later iteration.
-    if not ctx.api.final_iteration and any(has_placeholder(type_var) for type_var in ctx.cls.info.defn.type_vars):
+    if not ctx.api.final_iteration and helpers.has_placeholder_type_vars(ctx.cls.info):
         ctx.api.defer()
         return
 
@@ -1134,33 +1209,38 @@ def process_model_class(ctx: ClassDefContext, django_context: DjangoContext) -> 
                 ctx.api.defer()
 
 
-def set_auth_user_model_boolean_fields(ctx: AttributeContext, django_context: DjangoContext) -> MypyType:
-    """Infer `is_staff`, `is_active` and `is_superuser` of user models as `bool`
+# The transient wrappers mypy puts around TypedDict items. They are not proper types, so
+# `get_proper_type` raises on them, and mypy's own TypedDict analyser is what consumes them.
+TYPED_DICT_ITEM_TYPES = (ReadOnlyType, RequiredType)
 
-    ```python
-    reveal_type(User().is_staff)  # bool
-    ```
+
+def _analyze_and_unwrap(ctx: AnalyzeTypeContext, type_expr: MypyType) -> ProperType | ReadOnlyType | RequiredType:
     """
-    boolinfo = helpers.lookup_class_typeinfo(helpers.get_typechecker_api(ctx), bool)
-    assert boolinfo is not None
-    return Instance(boolinfo, [])
+    Analyses a type argument, unwrapping it to a `ProperType` where that is safe.
+
+    TypedDict item modifiers are left to mypy's own TypedDict analyser, so they are returned
+    untouched instead of being passed to `get_proper_type`, which raises on them.
+    """
+    analyzed_type = ctx.api.analyze_type(type_expr)
+    if isinstance(analyzed_type, TYPED_DICT_ITEM_TYPES):
+        return analyzed_type
+    return get_proper_type(analyzed_type)
 
 
 def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
-    """Resolve `WithAnnotations[Model, TypedDict]` to the annotated model type
-
-    Use it to type instances returned by `annotate()`.
-
-    ```python
-    def f(book: WithAnnotations[Book, Pages]) -> None:
-        reveal_type(book.n_pages)  # int, from the `Pages` TypedDict
-    ```
+    """
+    Replaces the 'WithAnnotations' type with a type that can represent an annotated
+    model.
     """
     is_with_annotations = fullname == fullnames.WITH_ANNOTATIONS_FULLNAME
     args = ctx.type.args
     if not args:
         return AnyType(TypeOfAny.from_omitted_generics) if is_with_annotations else ctx.type
-    type_arg = get_proper_type(ctx.api.analyze_type(args[0]))
+    type_arg = _analyze_and_unwrap(ctx, args[0])
+    if not isinstance(type_arg, ProperType):
+        # TypedDict item modifiers are not model types; they belong to mypy's TypedDict
+        # analyser and are returned as they came in.
+        return type_arg
     if not isinstance(type_arg, Instance) or not helpers.is_model_type(type_arg.type):
         if isinstance(type_arg, TypeVarType):
             # When the first arg is a TypeVar bounded by a Model (e.g. WithAnnotations[_Model, BarDict]),
@@ -1176,7 +1256,12 @@ def handle_annotated_type(ctx: AnalyzeTypeContext, fullname: str) -> MypyType:
 
     fields_dict = None
     if len(args) > 1:
-        second_arg_type = get_proper_type(ctx.api.analyze_type(args[1]))
+        # `args[1]` is the annotations argument. mypy accepts a TypedDict item modifier
+        # there, where it means nothing, so it is dropped instead of asserted away: a
+        # strict assertion would turn that accepted code into an internal error.
+        second_arg_type = _analyze_and_unwrap(ctx, args[1])
+        if not isinstance(second_arg_type, ProperType):
+            return type_arg
         if isinstance(second_arg_type, TypedDictType) and is_with_annotations:
             fields_dict = second_arg_type
         elif isinstance(second_arg_type, Instance) and second_arg_type.type.fullname == ANNOTATIONS_FULLNAME:
