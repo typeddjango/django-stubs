@@ -184,6 +184,11 @@ class DjangoModel(NamedTuple):
     def info(self) -> TypeInfo:
         return self.typ.type
 
+    @property
+    def annotations(self) -> Mapping[str, MypyType]:
+        """Attributes added by `.annotate()`, `Prefetch(to_attr=...)` or `WithAnnotations`"""
+        return self.typ.extra_attrs.attrs if self.typ.extra_attrs else {}
+
     @classmethod
     def from_model_type(cls, model_type: Instance, django_context: DjangoContext) -> Self | None:
         model_info = model_type.type
@@ -230,6 +235,15 @@ def get_model_info_from_qs_ctx(
     """
     if not (isinstance(ctx.type, Instance) and (model_type := extract_model_type_from_queryset(ctx.type))):
         return None
+
+    # In `QuerySet[Article, WithAnnotations[Article, TD]]` only the row knows the annotations, use it as the model
+    row = get_proper_type(ctx.type.args[1]) if len(ctx.type.args) > 1 else None
+    if (
+        isinstance(row, Instance)
+        and is_annotated_model(row.type)
+        and row.type.bases[0].type.fullname == model_type.type.fullname
+    ):
+        model_type = row
 
     return DjangoModel.from_model_type(model_type, django_context)
 

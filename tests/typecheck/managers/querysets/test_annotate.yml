@@ -836,6 +836,13 @@
     reveal_type(vl_named_bare.name)  # N: Revealed type is "str"
     reveal_type(vl_named_bare.extra_id)  # N: Revealed type is "int | None"
 
+    # Annotations declared on the row only are resolved too
+    def get_row_only_qs() -> QuerySet[MyModel, AnnotatedModel]:
+        raise NotImplementedError
+
+    get_row_only_qs().filter(extra_id=1)
+    reveal_type(get_row_only_qs().values_list("extra_id").get())  # N: Revealed type is "tuple[int | None]"
+
   installed_apps:
     - myapp
   files:
