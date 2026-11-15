@@ -83,6 +83,12 @@ We rely on different `django` and `mypy` versions:
 What "partial" support means, and why we don't pin to the exact Django/mypy version, is explained in
 https://github.com/typeddjango/django-stubs/discussions/2101#discussioncomment-9276632.
 
+## Sponsors
+
+[![Sponsors](https://opencollective.com/typeddjangoorg/tiers/sponsors.svg?width=890)](https://opencollective.com/typeddjangoorg)
+
+[![Backers](https://opencollective.com/typeddjangoorg/tiers/backers.svg?width=890&avatarHeight=35)](https://opencollective.com/typeddjangoorg)
+
 ## Features
 
 ### Type checking of Model Meta attributes
