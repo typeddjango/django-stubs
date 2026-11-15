@@ -325,6 +325,8 @@
         reveal_type(qs1) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], TypedDict({'text': str, 'foo': Any})]"
         qs2 = Blog.objects.values_list('text').annotate(foo=F('id'))
         reveal_type(qs2) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], tuple[Any, ...]]"
+        # Unresolved aliases still add columns
+        reveal_type(Blog.objects.values_list('text').annotate(**{'foo': F('id')})) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog, tuple[Any, ...]]"
         qs3 = Blog.objects.values_list('text', named=True).annotate(foo=F('id'))
         reveal_type(qs3) # N: Revealed type is "django.db.models.query.QuerySet[myapp.models.Blog@AnnotatedWith[TypedDict({'foo': Any})], tuple[str, Any, fallback=main.Row3]]"
         qs3_chained = Blog.objects.values_list('text', named=True).annotate(foo=F('id')).annotate(bar=F('num_posts'))
