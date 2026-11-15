@@ -15,6 +15,14 @@ This package contains [type stubs](https://www.python.org/dev/peps/pep-0561/) an
 
 ## Installation
 
+### ty, pyrefly, pyright
+
+```bash
+pip insatll django-stubs
+```
+
+### MyPy
+
 ```bash
 pip install 'django-stubs[compatible-mypy]'
 ```
