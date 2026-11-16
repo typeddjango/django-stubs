@@ -208,6 +208,7 @@
         from django.db.models import Prefetch, QuerySet, Value, IntegerField
         from myapp.models import Article, Tag
         from typing import TYPE_CHECKING, TypedDict
+        from typing_extensions import reveal_type
         from django_stubs_ext import WithAnnotations
 
         class ExtraAnnotation(TypedDict):
@@ -224,8 +225,9 @@
             return qs.annotate(extra_id=Value(None, output_field=IntegerField()))
 
         qs = annotate_extra(Article.objects.all())
-        qs.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="extra_id"))  # E: Attribute "extra_id" already defined on "myapp.models.Article"  [no-redef]
-        qs.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="prefetched_tags"))
+        qs.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="extra_id"))  # E: Attribute "extra_id" already defined on "myapp.models.Article@AnnotatedWith[TypedDict(main.ExtraAnnotation, {'extra_id': int | None})]"  [no-redef]
+        prefetched = qs.prefetch_related(Prefetch("tags", Tag.objects.all(), to_attr="prefetched_tags")).get()
+        reveal_type(prefetched.extra_id)  # N: Revealed type is "int | None"
 
     files:
         -   path: myapp/__init__.py

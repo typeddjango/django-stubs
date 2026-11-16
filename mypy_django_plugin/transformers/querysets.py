@@ -441,48 +441,32 @@ def _extend_values_row(api: TypeChecker, qs_type: Instance, names: Collection[st
 
 
 def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
-    django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
-    if django_model is None:
-        # When the queryset's model is a TypeVar (e.g. inside a generic queryset method body),
-        # use the TypeVar's upper bound to build a temporary annotated type. This allows
-        # `self.annotate(...)` to return `QS[Model@AnnotatedWith[...]]` which is compatible
-        # with return types declared as `QS[WithAnnotations[_Model, ...]]`.
-        upper_bound = _extract_model_type_var_upper_bound(ctx)
-        if upper_bound is not None:
-            default_return_type = get_proper_type(ctx.default_return_type)
-            if isinstance(default_return_type, Instance):
-                api = helpers.get_typechecker_api(ctx)
-                expression_types = gather_expression_types(ctx)
-                if expression_types:
-                    fields_dict = helpers.make_typeddict(api, expression_types)
-                    qs_type = _annotate_queryset_model(api, default_return_type, upper_bound, fields_dict)
-                    return _extend_values_row(api, qs_type, expression_types)
-        return AnyType(TypeOfAny.from_omitted_generics)
-
     default_return_type = get_proper_type(ctx.default_return_type)
     if not isinstance(default_return_type, Instance):
         return ctx.default_return_type
 
+    expression_types = gather_expression_types(ctx)
+    django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
+    if django_model is not None:
+        model = django_model.typ
+        expression_types = {
+            attr_name: typ
+            for attr_name, typ in expression_types.items()
+            if check_valid_attr_value(ctx, django_context, django_model, attr_name)
+        }
+    else:
+        # Inside a generic queryset method the model is a TypeVar: annotate its upper bound,
+        # so that `self.annotate(...)` matches a declared `QS[WithAnnotations[_Model, ...]]`.
+        upper_bound = _extract_model_type_var_upper_bound(ctx)
+        if upper_bound is None or not expression_types:
+            return AnyType(TypeOfAny.from_omitted_generics)
+        model = upper_bound
+
     api = helpers.get_typechecker_api(ctx)
-
-    expression_types = {
-        attr_name: typ
-        for attr_name, typ in gather_expression_types(ctx).items()
-        if check_valid_attr_value(ctx, django_context, django_model, attr_name)
-    }
-
-    existing_row_extra_attrs: dict[str, MypyType] = {}
-    if len(default_return_type.args) > 1:
-        original_row_type = get_proper_type(default_return_type.args[1])
-        if isinstance(original_row_type, Instance) and original_row_type.extra_attrs:
-            existing_row_extra_attrs = dict(original_row_type.extra_attrs.attrs)
-
-    all_fields = {**existing_row_extra_attrs, **expression_types}
-
     qs_type = default_return_type
-    if all_fields:
-        fields_dict = helpers.make_typeddict(api, all_fields)
-        qs_type = _annotate_queryset_model(api, qs_type, django_model.typ, fields_dict)
+    if expression_types:
+        fields_dict = helpers.make_typeddict(api, expression_types)
+        qs_type = _annotate_queryset_model(api, qs_type, model, fields_dict)
     return _extend_values_row(api, qs_type, expression_types)
 
 
@@ -732,29 +716,6 @@ def _is_distinct_on_field(qs_type: Instance, field_name: str) -> bool:
     return _DISTINCT_FIELD_UNKNOWN_ATTR in attrs or f"{_DISTINCT_FIELD_ATTR_PREFIX}{field_name}" in attrs
 
 
-def _get_annotated_fields_from_queryset_type(qs_type: Instance) -> set[str]:
-    """
-    Derive annotated field names from a QuerySet type.
-
-    Sources:
-      - args[0].extra_attrs: from .annotate() calls
-      - args[1].extra_attrs: from WithAnnotations[Model, TypedDict]
-    """
-    fields: set[str] = set()
-
-    if len(qs_type.args) >= 1:
-        model_type = get_proper_type(qs_type.args[0])
-        if isinstance(model_type, Instance) and model_type.extra_attrs:
-            fields.update(model_type.extra_attrs.attrs.keys())
-
-    if len(qs_type.args) >= 2:
-        row_type = get_proper_type(qs_type.args[1])
-        if isinstance(row_type, Instance) and row_type.extra_attrs:
-            fields.update(row_type.extra_attrs.attrs.keys())
-
-    return fields
-
-
 def check_valid_attr_value(
     ctx: MethodContext,
     django_context: DjangoContext,
@@ -772,7 +733,6 @@ def check_valid_attr_value(
         - new_attr_names: A mapping of field names to types currently being added to the model
     """
     deselected_fields: set[str] | None = None
-    annotated_fields: set[str] = set()
     if isinstance(ctx.type, Instance):
         selected_fields = _get_selected_fields_from_queryset_type(ctx.type)
         if selected_fields is not None:
@@ -780,7 +740,6 @@ def check_valid_attr_value(
             deselected_fields = model_field_names - selected_fields
             new_attr_names = new_attr_names or set()
             new_attr_names.update(selected_fields - model_field_names)
-        annotated_fields = _get_annotated_fields_from_queryset_type(ctx.type)
 
     is_conflicting_attr_value = bool(
         # 1. Conflict with another symbol on the model (If not de-selected via a prior .values/.values_list call).
@@ -791,7 +750,7 @@ def check_valid_attr_value(
         # Ex:
         #     User.objects.annotate(foo=...).prefetch_related(Prefetch(...,to_attr="foo"))
         #     User.objects.prefetch_related(Prefetch(...,to_attr="foo")).prefetch_related(Prefetch(...,to_attr="foo"))
-        or attr_name in annotated_fields
+        or attr_name in model.annotations
         # 3. Conflict with another symbol added in the current processing.
         # Ex:
         #     User.objects.prefetch_related(
@@ -1172,12 +1131,11 @@ def validate_order_by(ctx: MethodContext, django_context: DjangoContext) -> Mypy
         return ctx.default_return_type
 
     selected_fields = _get_selected_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else None
-    annotated_fields = _get_annotated_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else set()
 
     for lookup_value in _extract_field_names_from_varargs(ctx):
         parts = lookup_value.removeprefix("-").split(LOOKUP_SEP)
 
-        if parts[0] in annotated_fields:
+        if parts[0] in django_model.annotations:
             # Skip validation for annotated fields
             continue
         if selected_fields is not None and parts[0] in selected_fields:
@@ -1222,14 +1180,13 @@ def validate_distinct(ctx: MethodContext, django_context: DjangoContext) -> Mypy
         return ctx.default_return_type
 
     selected_fields = _get_selected_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else None
-    annotated_fields = _get_annotated_fields_from_queryset_type(ctx.type) if isinstance(ctx.type, Instance) else set()
 
     raw_arg_types = ctx.arg_types[0] if ctx.arg_types and ctx.arg_types[0] else []
     raw_arg_count = len(raw_arg_types)
     field_lookups = _extract_field_names_from_varargs(ctx)
     for lookup_value in field_lookups:
         parts = lookup_value.split(LOOKUP_SEP)
-        if parts[0] in annotated_fields:
+        if parts[0] in django_model.annotations:
             # Skip validation for annotated fields
             continue
         if selected_fields is not None and parts[0] in selected_fields:
