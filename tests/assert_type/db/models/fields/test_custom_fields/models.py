@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, assert_type, overload
 from django.db import models
 from django.db.models import fields
 from django.db.models.expressions import F
-from typing_extensions import TypeVar, Unpack
+from typing_extensions import TypeVar, Unpack, deprecated
 
 if TYPE_CHECKING:
     from django.db.models.fields import FieldInitKwargs
@@ -238,6 +238,18 @@ def custom_fields_with_defaulted_type_vars() -> None:
 class MyIntegerField(models.IntegerField[_ST_Int_contra, _GT_Int_co]):
     @overload
     def __init__(
+        self,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    def __init__(
         self: MyIntegerField[float | int | str | None, int | None],
         verbose_name: str | None = None,
         name: str | None = None,
@@ -254,7 +266,20 @@ class MyIntegerField(models.IntegerField[_ST_Int_contra, _GT_Int_co]):
         verbose_name: str | None = None,
         name: str | None = None,
         *,
-        null: bool = False,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: Any = ...,
@@ -264,13 +289,19 @@ class MyIntegerField(models.IntegerField[_ST_Int_contra, _GT_Int_co]):
         super().__init__(*args, **kwargs)
 
 
+class MyIntegerSubField(MyIntegerField): ...
+
+
 class OverloadedInit(models.Model):
     custom_int = MyIntegerField(null=False)
     custom_int_nullable = MyIntegerField(null=True)
 
 
-def custom_model_field_override_init_via_overloads() -> None:
+def custom_model_field_override_init_via_overloads(flag: bool) -> None:
     # a bad kwarg is rejected through the Unpack'd TypedDict, on every checker
     MyIntegerField(nul=True)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[no-matching-overload]
+    MyIntegerField(null=flag)  # type: ignore[deprecated]  # pyright: ignore[reportDeprecated]  # pyrefly: ignore[deprecated]  # ty: ignore[deprecated]
+    # a subclass without type parameters stays off the deprecated overload
+    MyIntegerSubField(null=True)
     assert_type(OverloadedInit().custom_int, int)
     assert_type(OverloadedInit().custom_int_nullable, int | None)

@@ -706,59 +706,107 @@ The `null=...` flag is resolved at the call site by the fields' constructor over
 - `IntegerField()` and `IntegerField(null=False)` are an `IntegerField[float | int | str, int]`.
 - `IntegerField(null=True)` is an `IntegerField[float | int | str | None, int | None]`.
 
-With the mypy plugin, a custom field subclass needs nothing more:
-`class MyIntegerField(models.IntegerField): ...` resolves like its parent, `null=True` included.
+When defining a custom field subclass, you have to declare the type parameters' defaults yourself.
+For ex a custom integer field repeats the ones of `IntegerField`:
 
-For the other type checkers, the subclass has to declare the type parameters' defaults.
-The constructor overloads are only needed for pyright and for mypy without the plugin,
-which don't solve a subclass's type parameters from the inherited overloads;
-pyrefly and ty resolve `MyIntegerField(null=True)` without them.
+```python
+from typing_extensions import TypeVar, assert_type
+from django.db import models
+
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=float | int | str)
+_GT_co = TypeVar("_GT_co", covariant=True, default=int)
+
+
+class MyIntegerField(models.IntegerField[_ST_contra, _GT_co]):
+    pass
+
+
+class User(models.Model):
+    custom_int = MyIntegerField()
+    custom_int_nullable = MyIntegerField(null=True)
+
+
+assert_type(User().custom_int, int)
+assert_type(User().custom_int_nullable, int | None)
+```
+
+> [!IMPORTANT]
+> The constructor overloads inherited from `IntegerField` are not enough in two cases, where you have to redefine them yourself as shown below:
+>
+> - **With pyright, or mypy without the plugin**: they don't solve a subclass's type parameters from inherited overloads yet, so `MyIntegerField(null=True)` stays non-nullable.
+>   See [pyright#11989](https://github.com/microsoft/pyright/issues/11989) and [mypy#22395](https://github.com/python/mypy/issues/22395).
+>   A [typing spec proposal](https://discuss.python.org/t/proposal-specialize-generic-subclass-from-inherited-init-s-self-annotation/109979) was opened to settle and hopefully make this workaround unnecessary.
+> - **When the field changes the types of its parent**, for ex with `default=int` on `_ST_contra` to restrict the setter to `int`: the inherited `null=True` overload resolves to the parent's types, so the nullable field would accept `float` and `str` again.
 
 ```python
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, overload
-from typing_extensions import TypeVar, Unpack, assert_type
+from typing_extensions import TypeVar, Unpack, assert_type, deprecated
 from django.db import models
 
 if TYPE_CHECKING:
     # A type-check-only `TypedDict` of the keyword arguments shared by every `Field`
     from django.db.models.fields import FieldInitKwargs
 
-# PEP 696 defaults: what a bare `MyIntegerField()` resolves to, on every type checker
 _ST_contra = TypeVar("_ST_contra", contravariant=True, default=float | int | str)
 _GT_co = TypeVar("_GT_co", covariant=True, default=int)
 
 
 class MyIntegerField(models.IntegerField[_ST_contra, _GT_co]):
-    # The overloads below are only needed for pyright and for mypy without the plugin, see above
+    # `MyIntegerField()` or `MyIntegerField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
-        # Self-annotation: what `MyIntegerField(null=True)` resolves to
+        self,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `MyIntegerField(null=True)`: the `self` annotation gives the nullable type.
+    @overload
+    def __init__(
         self: MyIntegerField[float | int | str | None, int | None],
         verbose_name: str | None = None,
         name: str | None = None,
         *,
         null: Literal[True],
-        # These vary per field, so they are not part of `FieldInitKwargs`
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(MyIntegerField): ...`: bound type arguments can't match the overload above.
     @overload
-    def __init__(  # Fallback, keeps the defaults
+    def __init__(
         self,
         verbose_name: str | None = None,
         name: str | None = None,
         *,
-        null: bool = False,
+        null: Literal[True],
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
-    # `@overload` needs an implementation outside stub files, this one just forwards to the parent
+    # `MyIntegerField(null=flag)` with `flag: bool`: the type can't be inferred. Stays last, as `bool` also matches `True`.
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
@@ -770,10 +818,9 @@ class User(models.Model):
 
 assert_type(User().custom_int, int)
 assert_type(User().custom_int_nullable, int | None)
-User().custom_int = "12"  # OK (because Django IntegerField allows str and will try to coerce it)
 ```
 
-If your field adds its own constructor arguments, declare them explicitly next to `null` in both overloads.
+If your field adds its own constructor arguments, declare them explicitly next to `null` in each overload.
 
 </details>
 
