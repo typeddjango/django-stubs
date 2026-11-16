@@ -102,7 +102,7 @@
         User.objects.filter(age__in=None)  # E: Incompatible type for lookup 'age__in': (got "None", expected "Iterable[str | int]")  [misc]
         User.objects.filter(age__in="abc")  # Doesn't error because `Iterable[str]` is valid so `str` is valid.
         User.objects.filter(age__in=(User(),))  # E: Incompatible type for lookup 'age__in': (got "tuple[User]", expected "Iterable[str | int]")  [misc]
-        User.objects.filter(age__in=[User()])  # Doesn't error because mypy sees the provided type as `list[Any]`.
+        User.objects.filter(age__in=[User()])  # E: Incompatible type for lookup 'age__in': (got "list[User]", expected "Iterable[str | int]")  [misc]
         users: list[User] = [User()]
         User.objects.filter(age__in=users)  # E: Incompatible type for lookup 'age__in': (got "list[User]", expected "Iterable[str | int]")  [misc]
     installed_apps:

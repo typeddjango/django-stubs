@@ -20,8 +20,8 @@
 
         reveal_type(apps.get_model("myapp.Article"))  # N: Revealed type is "type[myapp.models.Article[Any]]"
         reveal_type(Article.objects.prefetch_related("author").get().author)  # N: Revealed type is "myapp.models.Author[Any]"
-        Article(author=[])  # E: Incompatible type for "author" of "Article" (got "list[Any]", expected "Author[Any] | Combinable | None")  [misc]
-        Article.objects.filter(author=[])  # E: Incompatible type for lookup 'author': (got "list[Any]", expected "Author[Any] | int | None")  [misc]
+        Article(author=[])  # E: Incompatible type for "author" of "Article" (got "list[Never]", expected "Author[Any] | Combinable | None")  [misc]
+        Article.objects.filter(author=[])  # E: Incompatible type for lookup 'author': (got "list[Never]", expected "Author[Any] | int | None")  [misc]
     installed_apps:
         - myapp
     files:

@@ -1,5 +1,3 @@
-from typing import Any
-
 from .backends.base.base import BaseDatabaseWrapper
 from .utils import DEFAULT_DB_ALIAS as DEFAULT_DB_ALIAS  # Not exported in __all__
 from .utils import DJANGO_VERSION_PICKLE_KEY as DJANGO_VERSION_PICKLE_KEY
@@ -19,8 +17,8 @@ router: ConnectionRouter
 # Actually ConnectionProxy, but quacks exactly like BaseDatabaseWrapper, it's not worth distinguishing the two.
 connection: BaseDatabaseWrapper
 
-def close_old_connections(**kwargs: Any) -> None: ...
-def reset_queries(**kwargs: Any) -> None: ...
+def close_old_connections(**kwargs: object) -> None: ...
+def reset_queries(**kwargs: object) -> None: ...
 
 __all__ = [
     "DEFAULT_DB_ALIAS",

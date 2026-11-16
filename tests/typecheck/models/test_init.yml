@@ -37,7 +37,7 @@
         from myapp.models import MyUser
         user = MyUser(name='hello', age=[])
     out: |
-        main:2: error: Incompatible type for "age" of "MyUser" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
+        main:2: error: Incompatible type for "age" of "MyUser" (got "list[Never]", expected "float | int | str | Combinable")  [misc]
     installed_apps:
         - myapp
     files:
@@ -107,7 +107,7 @@
 -   case: typechecking_of_pk
     main: |
         from myapp.models import MyUser1
-        user = MyUser1(pk=[])  # E: Incompatible type for "pk" of "MyUser1" (got "list[Any]", expected "float | int | str | Combinable | None")  [misc]
+        user = MyUser1(pk=[])  # E: Incompatible type for "pk" of "MyUser1" (got "list[Never]", expected "float | int | str | Combinable | None")  [misc]
     installed_apps:
         - myapp
     files:
@@ -127,7 +127,7 @@
 
         from myapp.models import Publisher, PublisherDatetime, Book
         Book(publisher_id=1, publisher_dt_id=now)
-        Book(publisher_id=[], publisher_dt_id=now)  # E: Incompatible type for "publisher_id" of "Book" (got "list[Any]", expected "float | int | str | Combinable | None")  [misc]
+        Book(publisher_id=[], publisher_dt_id=now)  # E: Incompatible type for "publisher_id" of "Book" (got "list[Never]", expected "float | int | str | Combinable | None")  [misc]
         Book(publisher_id=1, publisher_dt_id=1)  # E: Incompatible type for "publisher_dt_id" of "Book" (got "int", expected "str | datetime | date | Combinable | None")  [misc]
     installed_apps:
         - myapp
@@ -164,7 +164,7 @@
         from myapp.models import MyModel, MyModel2
         MyModel(1)
         MyModel2(1, 12)
-        MyModel2(1, [])  # E: Incompatible type for "name" of "MyModel2" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
+        MyModel2(1, [])  # E: Incompatible type for "name" of "MyModel2" (got "list[Never]", expected "float | int | str | Combinable")  [misc]
     installed_apps:
         - myapp
     files:

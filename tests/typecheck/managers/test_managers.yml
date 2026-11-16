@@ -519,7 +519,7 @@
         myapp/models:51: note: Revealed type is "django.db.models.fields.related_descriptors.RelatedManager[myapp.models.Booking, django.db.models.query.QuerySet[myapp.models.Booking, myapp.models.Booking]]"
         myapp/models:54: note: Revealed type is "def () -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
         myapp/models:55: note: Revealed type is "Any"
-        myapp/models:56: note: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:56: note: Revealed type is "def (*args: object, **kwargs: object) -> myapp.models.UnknownQuerySet[myapp.models.Booking, myapp.models.Booking]"
         myapp/models:57: note: Revealed type is "Any"
         myapp/models:58: note: Revealed type is "myapp.models.Booking | None"
         myapp/models:59: note: Revealed type is "myapp.models.Booking"
@@ -528,7 +528,7 @@
         myapp/models:65: note: Revealed type is "def () -> django.db.models.query.QuerySet[myapp.models.Booking, myapp.models.Booking]"
         myapp/models:66: error: "RelatedManager[Booking, QuerySet[Booking, Booking]]" has no attribute "custom"  [attr-defined]
         myapp/models:66: note: Revealed type is "Any"
-        myapp/models:67: note: Revealed type is "def (*args: Any, **kwargs: Any) -> django.db.models.query.QuerySet[myapp.models.Booking, myapp.models.Booking]"
+        myapp/models:67: note: Revealed type is "def (*args: object, **kwargs: object) -> django.db.models.query.QuerySet[myapp.models.Booking, myapp.models.Booking]"
         myapp/models:68: error: "QuerySet[Booking, Booking]" has no attribute "custom"  [attr-defined]
         myapp/models:68: note: Revealed type is "Any"
         myapp/models:69: note: Revealed type is "myapp.models.Booking | None"

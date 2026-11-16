@@ -508,7 +508,7 @@
 
         reveal_type(Book2().publisher_id)  # N: Revealed type is "int"
         Book2(publisher_id=1)
-        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "float | int | str | Combinable | None")  [misc]
+        Book2(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Never]", expected "float | int | str | Combinable | None")  [misc]
         Book2.objects.create(publisher_id=1)
         Book2.objects.create(publisher_id=[])  # E: Incompatible type for "publisher_id" of "Book2" (got "list[Any]", expected "float | int | str | Combinable")  [misc]
     installed_apps:
@@ -770,9 +770,9 @@
         reveal_type(user.article_set) # N: Revealed type is "myapp.models.Article_RelatedManager"
         reveal_type(user.book_set.add)  # N: Revealed type is "def (*objs: myapp.models.Book | int, bulk: bool =)"
         reveal_type(user.article_set.add)  # N: Revealed type is "def (*objs: myapp.models.Article | int, bulk: bool =)"
-        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Book, myapp.models.Book]"
+        reveal_type(user.book_set.filter)  # N: Revealed type is "def (*args: object, **kwargs: object) -> myapp.models.LibraryEntityQuerySet[myapp.models.Book, myapp.models.Book]"
         reveal_type(user.book_set.get())  # N: Revealed type is "myapp.models.Book"
-        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.LibraryEntityQuerySet[myapp.models.Article, myapp.models.Article]"
+        reveal_type(user.article_set.filter)  # N: Revealed type is "def (*args: object, **kwargs: object) -> myapp.models.LibraryEntityQuerySet[myapp.models.Article, myapp.models.Article]"
         reveal_type(user.article_set.get())  # N: Revealed type is "myapp.models.Article"
         reveal_type(user.book_set.queryset_method())  # N: Revealed type is "int"
         reveal_type(user.article_set.queryset_method())  # N: Revealed type is "int"
