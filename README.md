@@ -780,7 +780,7 @@ class MyIntegerField(models.IntegerField[_ST_contra, _GT_co]):
         db_default: Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
-    # `Sub(null=True)` for `class Sub(MyIntegerField): ...`: bound type arguments can't match the overload above.
+    # `Sub(null=True)` for `class Sub(MyIntegerField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -793,7 +793,7 @@ class MyIntegerField(models.IntegerField[_ST_contra, _GT_co]):
         db_default: Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
-    # `MyIntegerField(null=flag)` with `flag: bool`: the type can't be inferred. Stays last, as `bool` also matches `True`.
+    # `MyIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(

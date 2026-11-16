@@ -113,7 +113,7 @@ _GT_Point_co = TypeVar("_GT_Point_co", covariant=True, default=Point)
 
 class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
     _pyi_lookup_exact_type: Point
-    # Same four `__init__` overloads as the core fields, see `django.db.models.fields.IntegerField`.
+    # `PointField()` or `PointField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -133,6 +133,7 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PointField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: PointField[Point | None, Point | None],
@@ -152,6 +153,7 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(PointField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -171,6 +173,7 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PointField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -200,6 +203,7 @@ _GT_LineString_co = TypeVar("_GT_LineString_co", covariant=True, default=LineStr
 
 class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
     _pyi_lookup_exact_type: LineString
+    # `LineStringField()` or `LineStringField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -219,6 +223,7 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `LineStringField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: LineStringField[LineString | None, LineString | None],
@@ -238,6 +243,7 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(LineStringField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -257,6 +263,7 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `LineStringField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -286,6 +293,7 @@ _GT_Polygon_co = TypeVar("_GT_Polygon_co", covariant=True, default=Polygon)
 
 class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
     _pyi_lookup_exact_type: Polygon
+    # `PolygonField()` or `PolygonField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -305,6 +313,7 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PolygonField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: PolygonField[Polygon | None, Polygon | None],
@@ -324,6 +333,7 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(PolygonField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -343,6 +353,7 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PolygonField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -372,6 +383,7 @@ _GT_MultiPoint_co = TypeVar("_GT_MultiPoint_co", covariant=True, default=MultiPo
 
 class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
     _pyi_lookup_exact_type: MultiPoint
+    # `MultiPointField()` or `MultiPointField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -391,6 +403,7 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `MultiPointField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: MultiPointField[MultiPoint | None, MultiPoint | None],
@@ -410,6 +423,7 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(MultiPointField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -429,6 +443,7 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `MultiPointField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -458,6 +473,7 @@ _GT_MultiLineString_co = TypeVar("_GT_MultiLineString_co", covariant=True, defau
 
 class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLineString_co]):
     _pyi_lookup_exact_type: MultiLineString
+    # `MultiLineStringField()` or `MultiLineStringField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -477,6 +493,7 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `MultiLineStringField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: MultiLineStringField[MultiLineString | None, MultiLineString | None],
@@ -496,6 +513,7 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(MultiLineStringField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -515,6 +533,7 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `MultiLineStringField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -544,6 +563,7 @@ _GT_MultiPolygon_co = TypeVar("_GT_MultiPolygon_co", covariant=True, default=Mul
 
 class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_co]):
     _pyi_lookup_exact_type: MultiPolygon
+    # `MultiPolygonField()` or `MultiPolygonField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -563,6 +583,7 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `MultiPolygonField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: MultiPolygonField[MultiPolygon | None, MultiPolygon | None],
@@ -582,6 +603,7 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(MultiPolygonField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -601,6 +623,7 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `MultiPolygonField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -630,6 +653,7 @@ _GT_GeometryCollection_co = TypeVar("_GT_GeometryCollection_co", covariant=True,
 
 class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_GeometryCollection_co]):
     _pyi_lookup_exact_type: GeometryCollection
+    # `GeometryCollectionField()` or `GeometryCollectionField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -649,6 +673,7 @@ class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_G
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `GeometryCollectionField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: GeometryCollectionField[GeometryCollection | None, GeometryCollection | None],
@@ -668,6 +693,7 @@ class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_G
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(GeometryCollectionField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -687,6 +713,7 @@ class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_G
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `GeometryCollectionField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(

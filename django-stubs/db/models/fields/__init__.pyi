@@ -287,12 +287,7 @@ _GT_Int_co = TypeVar("_GT_Int_co", covariant=True, default=int)
 
 class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
     _pyi_lookup_exact_type: str | int
-    # The concrete fields all declare the same four `__init__` overloads, keyed on `null`:
-    # 1. `Literal[False]`, the default, keeps the class defaults.
-    # 2. `Literal[True]` annotates `self` with the nullable specialisation.
-    # 3. `Literal[True]` without a self-annotation, for a subclass that binds the type arguments so 2. can't match,
-    #    as in `class HTMLField(TextField): ...`. It keeps `HTMLField(null=True)` off the deprecated overload.
-    # 4. A deprecated plain `bool`, as the field type can't be inferred from a non-literal `null`.
+    # `IntegerField()` or `IntegerField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -305,6 +300,7 @@ class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `IntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: IntegerField[float | int | str | None, int | None],
@@ -317,6 +313,7 @@ class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(IntegerField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -329,6 +326,7 @@ class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `IntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -352,6 +350,7 @@ class PositiveIntegerRelDbTypeMixin:
 # TODO: drop the repeated overloads once mypy and pyright support it,
 # see https://github.com/python/mypy/issues/22395 and https://github.com/microsoft/pyright/issues/11989.
 class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
+    # `SmallIntegerField()` or `SmallIntegerField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -364,6 +363,7 @@ class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `SmallIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: SmallIntegerField[float | int | str | None, int | None],
@@ -376,6 +376,7 @@ class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(SmallIntegerField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -388,6 +389,7 @@ class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `SmallIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -404,6 +406,7 @@ class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
 
 class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
     MAX_BIGINT: ClassVar[int]
+    # `BigIntegerField()` or `BigIntegerField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -416,6 +419,7 @@ class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `BigIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: BigIntegerField[float | int | str | None, int | None],
@@ -428,6 +432,7 @@ class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(BigIntegerField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -440,6 +445,7 @@ class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `BigIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -456,6 +462,7 @@ class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
 
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_contra, _GT_Int_co]):
     integer_field_class: type[IntegerField[Any, Any]]
+    # `PositiveIntegerField()` or `PositiveIntegerField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -468,6 +475,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_c
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PositiveIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: PositiveIntegerField[float | int | str | None, int | None],
@@ -480,6 +488,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_c
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(PositiveIntegerField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -492,6 +501,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_c
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PositiveIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -508,6 +518,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_c
 
 class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST_Int_contra, _GT_Int_co]):
     integer_field_class: type[SmallIntegerField[Any, Any]]
+    # `PositiveSmallIntegerField()` or `PositiveSmallIntegerField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -520,6 +531,7 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PositiveSmallIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: PositiveSmallIntegerField[float | int | str | None, int | None],
@@ -532,6 +544,7 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(PositiveSmallIntegerField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -544,6 +557,7 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PositiveSmallIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -560,6 +574,7 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField
 
 class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST_Int_contra, _GT_Int_co]):
     integer_field_class: type[BigIntegerField[Any, Any]]
+    # `PositiveBigIntegerField()` or `PositiveBigIntegerField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -572,6 +587,7 @@ class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PositiveBigIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: PositiveBigIntegerField[float | int | str | None, int | None],
@@ -584,6 +600,7 @@ class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(PositiveBigIntegerField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -596,6 +613,7 @@ class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `PositiveBigIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -615,6 +633,7 @@ _GT_Float_co = TypeVar("_GT_Float_co", covariant=True, default=float)
 
 class FloatField(Field[_ST_Float_contra, _GT_Float_co]):
     _pyi_lookup_exact_type: float
+    # `FloatField()` or `FloatField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -627,6 +646,7 @@ class FloatField(Field[_ST_Float_contra, _GT_Float_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `FloatField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: FloatField[float | int | str | None, float | None],
@@ -639,6 +659,7 @@ class FloatField(Field[_ST_Float_contra, _GT_Float_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(FloatField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -651,6 +672,7 @@ class FloatField(Field[_ST_Float_contra, _GT_Float_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `FloatField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -672,6 +694,7 @@ class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
     _pyi_lookup_exact_type: str | int | decimal.Decimal
     max_digits: int
     decimal_places: int
+    # `DecimalField()` or `DecimalField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -685,6 +708,7 @@ class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `DecimalField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: DecimalField[str | float | decimal.Decimal | None, decimal.Decimal | None],
@@ -698,6 +722,7 @@ class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(DecimalField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -711,6 +736,7 @@ class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `DecimalField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -734,6 +760,7 @@ _GT_Char_co = TypeVar("_GT_Char_co", covariant=True, default=str)
 class CharField(Field[_ST_Char_contra, _GT_Char_co]):
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
+    # `CharField()` or `CharField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -747,6 +774,7 @@ class CharField(Field[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `CharField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: CharField[str | int | None, str | None],
@@ -760,6 +788,7 @@ class CharField(Field[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(CharField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -773,6 +802,7 @@ class CharField(Field[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `CharField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -789,6 +819,7 @@ class CharField(Field[_ST_Char_contra, _GT_Char_co]):
     ) -> None: ...
 
 class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
+    # `CommaSeparatedIntegerField()` or `CommaSeparatedIntegerField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -802,6 +833,7 @@ class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `CommaSeparatedIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: CommaSeparatedIntegerField[str | int | None, str | None],
@@ -815,6 +847,7 @@ class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(CommaSeparatedIntegerField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -828,6 +861,7 @@ class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `CommaSeparatedIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -844,6 +878,7 @@ class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
     ) -> None: ...
 
 class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
+    # `SlugField()` or `SlugField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -858,6 +893,7 @@ class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `SlugField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: SlugField[str | int | None, str | None],
@@ -872,6 +908,7 @@ class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(SlugField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -886,6 +923,7 @@ class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `SlugField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -905,6 +943,7 @@ class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
 _ST_Email_contra = TypeVar("_ST_Email_contra", contravariant=True, default=str)
 
 class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
+    # `EmailField()` or `EmailField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -918,6 +957,7 @@ class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `EmailField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: EmailField[str | None, str | None],
@@ -931,6 +971,7 @@ class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(EmailField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -944,6 +985,7 @@ class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `EmailField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -960,6 +1002,7 @@ class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
     ) -> None: ...
 
 class URLField(CharField[_ST_Char_contra, _GT_Char_co]):
+    # `URLField()` or `URLField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -973,6 +1016,7 @@ class URLField(CharField[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `URLField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: URLField[str | int | None, str | None],
@@ -986,6 +1030,7 @@ class URLField(CharField[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(URLField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -999,6 +1044,7 @@ class URLField(CharField[_ST_Char_contra, _GT_Char_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `URLField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1020,6 +1066,7 @@ _GT_Text_co = TypeVar("_GT_Text_co", covariant=True, default=str)
 class TextField(Field[_ST_Text_contra, _GT_Text_co]):
     # objects are converted to string before comparison
     _pyi_lookup_exact_type: Any
+    # `TextField()` or `TextField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1033,6 +1080,7 @@ class TextField(Field[_ST_Text_contra, _GT_Text_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `TextField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: TextField[str | None, str | None],
@@ -1046,6 +1094,7 @@ class TextField(Field[_ST_Text_contra, _GT_Text_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(TextField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1059,6 +1108,7 @@ class TextField(Field[_ST_Text_contra, _GT_Text_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `TextField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1079,6 +1129,7 @@ _GT_Bool_co = TypeVar("_GT_Bool_co", covariant=True, default=bool)
 
 class BooleanField(Field[_ST_Bool_contra, _GT_Bool_co]):
     _pyi_lookup_exact_type: bool
+    # `BooleanField()` or `BooleanField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1091,6 +1142,7 @@ class BooleanField(Field[_ST_Bool_contra, _GT_Bool_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `BooleanField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: BooleanField[bool | None, bool | None],
@@ -1103,6 +1155,7 @@ class BooleanField(Field[_ST_Bool_contra, _GT_Bool_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(BooleanField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1115,6 +1168,7 @@ class BooleanField(Field[_ST_Bool_contra, _GT_Bool_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `BooleanField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1139,6 +1193,7 @@ _ST_IP_contra = TypeVar("_ST_IP_contra", contravariant=True, default=str)
 _GT_IP_co = TypeVar("_GT_IP_co", covariant=True, default=str)
 
 class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
+    # `IPAddressField()` or `IPAddressField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1151,6 +1206,7 @@ class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `IPAddressField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: IPAddressField[str | None, str | None],
@@ -1163,6 +1219,7 @@ class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(IPAddressField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1175,6 +1232,7 @@ class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `IPAddressField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1195,6 +1253,7 @@ class GenericIPAddressField(Field[_ST_GenIP_contra, _GT_IP_co]):
     default_error_messages: ClassVar[_ErrorMessagesDict]
     unpack_ipv4: bool
     protocol: str
+    # `GenericIPAddressField()` or `GenericIPAddressField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1208,6 +1267,7 @@ class GenericIPAddressField(Field[_ST_GenIP_contra, _GT_IP_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `GenericIPAddressField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: GenericIPAddressField[str | int | Callable[..., Any] | None, str | None],
@@ -1221,6 +1281,7 @@ class GenericIPAddressField(Field[_ST_GenIP_contra, _GT_IP_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(GenericIPAddressField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1234,6 +1295,7 @@ class GenericIPAddressField(Field[_ST_GenIP_contra, _GT_IP_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `GenericIPAddressField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1259,6 +1321,7 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date_contra, _GT_Date_co]):
     _pyi_lookup_exact_type: str | date
     auto_now: bool
     auto_now_add: bool
+    # `DateField()` or `DateField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1273,6 +1336,7 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date_contra, _GT_Date_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `DateField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: DateField[str | date | None, date | None],
@@ -1287,6 +1351,7 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date_contra, _GT_Date_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(DateField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1301,6 +1366,7 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date_contra, _GT_Date_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `DateField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1325,6 +1391,7 @@ _GT_Time_co = TypeVar("_GT_Time_co", covariant=True, default=time)
 class TimeField(DateTimeCheckMixin, Field[_ST_Time_contra, _GT_Time_co]):
     auto_now: bool
     auto_now_add: bool
+    # `TimeField()` or `TimeField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1338,6 +1405,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST_Time_contra, _GT_Time_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `TimeField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: TimeField[str | time | real_datetime | None, time | None],
@@ -1351,6 +1419,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST_Time_contra, _GT_Time_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(TimeField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1364,6 +1433,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST_Time_contra, _GT_Time_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `TimeField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1384,6 +1454,7 @@ _GT_DateTime_co = TypeVar("_GT_DateTime_co", covariant=True, default=real_dateti
 
 class DateTimeField(DateField[_ST_DateTime_contra, _GT_DateTime_co]):
     _pyi_lookup_exact_type: str | real_datetime
+    # `DateTimeField()` or `DateTimeField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1398,6 +1469,7 @@ class DateTimeField(DateField[_ST_DateTime_contra, _GT_DateTime_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `DateTimeField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: DateTimeField[str | real_datetime | date | None, real_datetime | None],
@@ -1412,6 +1484,7 @@ class DateTimeField(DateField[_ST_DateTime_contra, _GT_DateTime_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(DateTimeField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1426,6 +1499,7 @@ class DateTimeField(DateField[_ST_DateTime_contra, _GT_DateTime_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `DateTimeField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1447,6 +1521,7 @@ _GT_UUID_co = TypeVar("_GT_UUID_co", covariant=True, default=uuid.UUID)
 
 class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
     _pyi_lookup_exact_type: uuid.UUID | str
+    # `UUIDField()` or `UUIDField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1459,6 +1534,7 @@ class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `UUIDField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: UUIDField[str | uuid.UUID | None, uuid.UUID | None],
@@ -1471,6 +1547,7 @@ class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(UUIDField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1483,6 +1560,7 @@ class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `UUIDField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1524,6 +1602,7 @@ _ST_Binary_contra = TypeVar("_ST_Binary_contra", contravariant=True, default=byt
 _GT_Binary_co = TypeVar("_GT_Binary_co", covariant=True, default=bytes | memoryview)
 
 class BinaryField(Field[_ST_Binary_contra, _GT_Binary_co]):
+    # `BinaryField()` or `BinaryField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1536,6 +1615,7 @@ class BinaryField(Field[_ST_Binary_contra, _GT_Binary_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `BinaryField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: BinaryField[bytes | bytearray | memoryview | None, bytes | memoryview | None],
@@ -1548,6 +1628,7 @@ class BinaryField(Field[_ST_Binary_contra, _GT_Binary_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(BinaryField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1560,6 +1641,7 @@ class BinaryField(Field[_ST_Binary_contra, _GT_Binary_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `BinaryField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
@@ -1579,6 +1661,7 @@ _ST_Duration_contra = TypeVar("_ST_Duration_contra", contravariant=True, default
 _GT_Duration_co = TypeVar("_GT_Duration_co", covariant=True, default=timedelta)
 
 class DurationField(Field[_ST_Duration_contra, _GT_Duration_co]):
+    # `DurationField()` or `DurationField(null=False)`: keeps the type var defaults.
     @overload
     def __init__(
         self,
@@ -1591,6 +1674,7 @@ class DurationField(Field[_ST_Duration_contra, _GT_Duration_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `DurationField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
         self: DurationField[str | timedelta | None, timedelta | None],
@@ -1603,6 +1687,7 @@ class DurationField(Field[_ST_Duration_contra, _GT_Duration_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(null=True)` for `class Sub(DurationField): ...`: its bound types can't match the overload above.
     @overload
     def __init__(
         self,
@@ -1615,6 +1700,7 @@ class DurationField(Field[_ST_Duration_contra, _GT_Duration_co]):
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `DurationField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(

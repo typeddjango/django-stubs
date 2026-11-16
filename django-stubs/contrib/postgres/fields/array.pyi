@@ -27,6 +27,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_
     size: int | None
     default_validators: list[_ValidatorCallable]
     from_db_value: Any
+    # `ArrayField(CharField())` or `ArrayField(CharField(), null=False)`: the element types come from `base_field`.
     @overload
     def __init__(
         self: ArrayField[Sequence[_ElemST], list[_ElemGT]],
@@ -41,6 +42,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `ArrayField(CharField(), null=True)`: the same element types, in the nullable containers.
     @overload
     def __init__(
         self: ArrayField[Sequence[_ElemST] | None, list[_ElemGT] | None],
@@ -55,6 +57,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `ArrayField(CharField(), null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
