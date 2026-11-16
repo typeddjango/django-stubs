@@ -16,11 +16,11 @@ T_Choices = TypeVar("T_Choices", bound=IntegerChoices)
 
 
 def get_choices_using_property(choices: type[T_Choices]) -> list[tuple[int, str]]:
-    return choices.choices  # pyright: ignore[reportReturnType]  # ty: ignore[invalid-return-type]
+    return choices.choices  # pyright: ignore[reportReturnType]  # ty: ignore[invalid-explicit-return]
 
 
 def get_labels_using_property(choices: type[T_Choices]) -> list[str]:
-    return choices.labels  # pyright: ignore[reportReturnType]  # ty: ignore[invalid-return-type]
+    return choices.labels  # pyright: ignore[reportReturnType]  # ty: ignore[invalid-explicit-return]
 
 
 def get_values_using_property(choices: type[T_Choices]) -> list[int]:
@@ -28,7 +28,7 @@ def get_values_using_property(choices: type[T_Choices]) -> list[int]:
 
 
 def get_labels_using_comprehension(choices: type[T_Choices]) -> list[str]:
-    return [choice.label for choice in choices]  # pyright: ignore[reportReturnType]  # ty: ignore[invalid-return-type]
+    return [choice.label for choice in choices]  # pyright: ignore[reportReturnType]  # ty: ignore[invalid-explicit-return]
 
 
 def get_values_using_comprehension(choices: type[T_Choices]) -> list[int]:
