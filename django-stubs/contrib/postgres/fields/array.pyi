@@ -57,12 +57,42 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
+    # `Sub(CharField())` for `class Sub(ArrayField[set[Any], set[Any]]): ...`: its bound types match neither above.
+    @overload
+    def __init__(
+        self,
+        base_field: Field[Any, Any],
+        size: int | None = None,
+        *,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `Sub(CharField(), null=True)` for the same subclass, kept off the deprecated overload.
+    @overload
+    def __init__(
+        self,
+        base_field: Field[Any, Any],
+        size: int | None = None,
+        *,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     # `ArrayField(CharField(), null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
     @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
     def __init__(
-        self: ArrayField[Sequence[_ElemST], list[_ElemGT]],
-        base_field: Field[_ElemST, _ElemGT],
+        self,
+        base_field: Field[Any, Any],
         size: int | None = None,
         *,
         verbose_name: _StrOrPromise | None = None,

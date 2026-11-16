@@ -61,5 +61,5 @@ def redeclared_field_choices() -> None:
     models.ForeignKey("auth.User", models.CASCADE, choices=mapping())
     models.OneToOneField("auth.User", models.CASCADE, choices=mapping)
     models.ManyToManyField("auth.User", choices=Kind)  # ty: ignore[invalid-argument-type]
-    ArrayField(models.CharField(), choices=Kind)  # ty: ignore[invalid-argument-type]
+    ArrayField(models.CharField(), choices=Kind)  # ty: ignore[no-matching-overload]
     PointField(choices=grouped_pairs)
