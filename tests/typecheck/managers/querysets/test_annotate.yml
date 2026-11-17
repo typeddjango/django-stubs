@@ -407,7 +407,7 @@
     qs.filter(xyz__in=None)
     qs.filter(xyz__in="abc")
     qs.filter(xyz__in=(Blog(),))
-    qs.filter(xyz__in=[Blog()])  # Doesn't error because mypy sees the provided type as `list[Any]`.
+    qs.filter(xyz__in=[Blog()])  # E: Incompatible type for lookup 'xyz__in': (got "list[Blog]", expected "Iterable[int]")  [misc]
     blogs: list[Blog] = [Blog()]
     qs.filter(xyz__in=blogs)  # But this does error as `blogs` is explicitly `list[Blog]`.
 

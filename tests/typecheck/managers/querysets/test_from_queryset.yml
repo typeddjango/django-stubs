@@ -648,8 +648,8 @@
         reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
         reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.custom)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        reveal_type(MyModel.objects.all().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        reveal_type(MyModel.objects.custom().filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.all().filter)  # N: Revealed type is "def (*args: object, **kwargs: object) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.custom().filter)  # N: Revealed type is "def (*args: object, **kwargs: object) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects2)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
         reveal_type(MyModel._default_manager)  # N: Revealed type is "myapp.models.MyManagerFromMyQuerySet"
     installed_apps:
@@ -704,16 +704,16 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects.alias)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.alias)  # N: Revealed type is "def (*args: object, **kwargs: object) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        reveal_type(MyModel.objects.complex_filter)  # N: Revealed type is "def (filter_obj: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: object, **kwargs: object) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.complex_filter)  # N: Revealed type is "def (filter_obj: object) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.defer)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel], def (*fields: str) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel])"
         reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any]) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.distinct)  # N: Revealed type is "def (*field_names: str) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.exclude)  # N: Revealed type is "def (*args: object, **kwargs: object) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.extra)  # N: Revealed type is "def (select: dict[str, Any] | None =, where: typing.Sequence[str] | None =, params: typing.Sequence[Any] | None =, tables: typing.Sequence[str] | None =, order_by: typing.Sequence[str | django.db.models.expressions.Combinable] | None =, select_params: typing.Sequence[Any] | None =) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.filter)  # N: Revealed type is "def (*args: object, **kwargs: object) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.intersection)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any]) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.none)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.only)  # N: Revealed type is "def (*fields: str) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
