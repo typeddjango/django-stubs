@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, assert_type
+from typing import TYPE_CHECKING, Any, Generic, assert_type
 
 from django.db import models
-from typing_extensions import override
+from typing_extensions import TypeVar, override
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -47,3 +47,24 @@ def test_wrong_queryset(m: MyModel, qs: QuerySet[OtherModel]) -> None:
 def test_meta_model(m: MyModel) -> None:
     assert_type(MyModel._meta.model, type[MyModel])
     assert_type(m._meta.model, type[MyModel])
+
+
+def test_get_pk_val(m: MyModel) -> None:
+    assert_type(m._get_pk_val(), Any)
+    assert_type(m._get_pk_val(m._meta), Any)
+
+
+def test_is_pk_set(m: MyModel) -> None:
+    assert_type(m._is_pk_set(), bool)
+    assert_type(m._is_pk_set(m._meta), bool)
+
+
+_T = TypeVar("_T", bound=models.Model)
+
+
+class GenericPkChecker(Generic[_T]):
+    def check(self, m: _T) -> None:
+        assert_type(m._is_pk_set(m._meta), bool)
+
+
+assert_type(GenericPkChecker[MyModel]().check(MyModel()), None)
