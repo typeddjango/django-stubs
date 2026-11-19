@@ -181,3 +181,70 @@
 
                 class Article(models.Model):
                     name = models.CharField(max_length=128)
+
+-   case: modelform_meta_model_binds_model_type
+    main: |
+        from typing_extensions import reveal_type
+        from django import forms
+        from myapp.models import Article, Category
+
+        class ArticleForm(forms.ModelForm):
+            class Meta:
+                model = Article
+                fields = '__all__'
+
+        form = ArticleForm()
+        reveal_type(form.instance)  # N: Revealed type is "myapp.models.Article"
+        reveal_type(form.save())  # N: Revealed type is "myapp.models.Article"
+        ArticleForm(instance=Category())  # E: Argument "instance" to "ArticleForm" has incompatible type "Category"; expected "Article | None"  [arg-type]
+
+        class ArticleSubForm(ArticleForm):
+            class Meta(ArticleForm.Meta):
+                exclude = ('id',)
+
+        reveal_type(ArticleSubForm().save())  # N: Revealed type is "myapp.models.Article"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Article(models.Model):
+                    pass
+                class Category(models.Model):
+                    pass
+
+-   case: modelform_meta_model_leaves_explicit_or_missing_model_alone
+    main: |
+        from typing import Any
+        from typing_extensions import reveal_type
+        from django import forms
+        from myapp.models import Article
+
+        class ExplicitAnyForm(forms.ModelForm[Any]):
+            class Meta:
+                model = Article
+                fields = '__all__'
+
+        class NoModelForm(forms.ModelForm):
+            class Meta:
+                fields = '__all__'
+
+        class NoMetaForm(forms.ModelForm):
+            pass
+
+        reveal_type(ExplicitAnyForm().save())  # N: Revealed type is "Any"
+        reveal_type(NoModelForm().save())  # N: Revealed type is "Any"
+        reveal_type(NoMetaForm().save())  # N: Revealed type is "Any"
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Article(models.Model):
+                    pass

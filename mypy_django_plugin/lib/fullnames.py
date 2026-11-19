@@ -41,6 +41,7 @@ ANNOTATED_TYPES_FULLNAMES: Final = {
 
 
 BASEFORM_CLASS_FULLNAME: Final = "django.forms.forms.BaseForm"
+MODEL_FORM_CLASS_FULLNAME: Final = "django.forms.models.ModelForm"
 
 FORM_MIXIN_CLASS_FULLNAME: Final = "django.views.generic.edit.FormMixin"
 
