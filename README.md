@@ -699,54 +699,275 @@ class Article(models.Model):
 
 
 Django `models.Field` (and subclasses) are generic types with two parameters:
-- `_ST`: type that can be used when setting a value
-- `_GT`: type that will be returned when getting a value
+- `_ST_contra`: type that can be used when setting a value
+- `_GT_co`: type that will be returned when getting a value
 
-When you create a subclass, you have two options depending on how strict you want
-the type to be for consumers of your custom field.
+The `null=...` flag is resolved at the call site by the fields' constructor overloads. For ex:
+- `IntegerField()` and `IntegerField(null=False)` are an `IntegerField[float | int | str, int]`.
+- `IntegerField(null=True)` is an `IntegerField[float | int | str | None, int | None]`.
 
-1. Generic subclass:
+When defining a custom field subclass, you have to declare the type parameters' defaults yourself.
+For ex a custom integer field repeats the ones of `IntegerField`:
 
 ```python
-from typing import TypeVar, reveal_type
+from typing_extensions import TypeVar, assert_type
 from django.db import models
 
-_ST = TypeVar("_ST", contravariant=True)
-_GT = TypeVar("_GT", covariant=True)
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=float | int | str)
+_GT_co = TypeVar("_GT_co", covariant=True, default=int)
 
 
-class MyIntegerField(models.IntegerField[_ST, _GT]): ...
+class MyIntegerField(models.IntegerField[_ST_contra, _GT_co]):
+    pass
 
 
 class User(models.Model):
-    my_field = MyIntegerField()
+    custom_int = MyIntegerField()
+    custom_int_nullable = MyIntegerField(null=True)
 
 
-reveal_type(User().my_field)  # N: Revealed type is "int"
-User().my_field = "12"  # OK (because Django IntegerField allows str and will try to coerce it)
+assert_type(User().custom_int, int)
+assert_type(User().custom_int_nullable, int | None)
 ```
 
-2. Non-generic subclass (more strict):
+> [!IMPORTANT]
+> The constructor overloads inherited from `IntegerField` are not enough in two cases, where you have to redefine them yourself as shown below:
+>
+> - **With pyright, or mypy without the plugin**: they don't solve a subclass's type parameters from inherited overloads yet, so `MyIntegerField(null=True)` stays non-nullable.
+>   See [pyright#11989](https://github.com/microsoft/pyright/issues/11989) and [mypy#22395](https://github.com/python/mypy/issues/22395).
+>   A [typing spec proposal](https://discuss.python.org/t/proposal-specialize-generic-subclass-from-inherited-init-s-self-annotation/109979) was opened to settle and hopefully make this workaround unnecessary.
+> - **When the field changes the types of its parent**, for ex with `default=int` on `_ST_contra` to restrict the setter to `int`: the inherited `null=True` overload resolves to the parent's types, so the nullable field would accept `float` and `str` again.
 
 ```python
-from typing import reveal_type
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Literal, overload
+from typing_extensions import TypeVar, Unpack, assert_type, deprecated
 from django.db import models
 
+if TYPE_CHECKING:
+    # A type-check-only `TypedDict` of the keyword arguments shared by every `Field`
+    from django.db.models.fields import FieldInitKwargs
 
-# This is a non-generic subclass being very explicit
-# that it expects only int when setting values.
-class MyStrictIntegerField(models.IntegerField[int, int]): ...
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=float | int | str)
+_GT_co = TypeVar("_GT_co", covariant=True, default=int)
+
+
+class MyIntegerField(models.IntegerField[_ST_contra, _GT_co]):
+    # `MyIntegerField()` or `MyIntegerField(null=False)`: keeps the type var defaults.
+    @overload
+    def __init__(
+        self,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `MyIntegerField(null=True)`: the `self` annotation gives the nullable type.
+    @overload
+    def __init__(
+        self: MyIntegerField[float | int | str | None, int | None],
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `Sub(null=True)` for `class Sub(MyIntegerField): ...`: its bound types can't match the overload above.
+    @overload
+    def __init__(
+        self,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `MyIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        *,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
 
 
 class User(models.Model):
-    my_field = MyStrictIntegerField()
+    custom_int = MyIntegerField()
+    custom_int_nullable = MyIntegerField(null=True)
 
 
-reveal_type(User().my_field)  # N: Revealed type is "int"
-User().my_field = "12"  # E: Incompatible types in assignment (expression has type "str", variable has type "int")
+assert_type(User().custom_int, int)
+assert_type(User().custom_int_nullable, int | None)
 ```
 
-See mypy section on [generic classes subclasses](https://mypy.readthedocs.io/en/stable/generics.html#defining-subclasses-of-generic-classes).
+If your field adds its own constructor arguments, declare them explicitly next to `null` in each overload.
+
+</details>
+
+<details>
+<summary>
+
+### How to type a custom `ArrayField`?
+
+</summary>
+
+`ArrayField` reads its element types from `base_field`. For ex:
+- `ArrayField(models.IntegerField())` is an `ArrayField[Sequence[float | int | str], list[int]]`.
+- `ArrayField(models.IntegerField(), null=True)` is an `ArrayField[Sequence[float | int | str] | None, list[int] | None]`.
+
+A subclass that changes the container binds the type parameters, and no longer reads the element types:
+
+```python
+from typing import Any
+from typing_extensions import assert_type
+from django.contrib.postgres.fields import ArrayField
+from django.db import models
+
+
+class SetArrayField(ArrayField[set[Any], set[Any]]):
+    pass
+
+
+class Post(models.Model):
+    tag_ids = SetArrayField(models.IntegerField())
+
+
+assert_type(Post().tag_ids, set[Any])
+```
+
+A subclass that keeps the list container follows the [custom field section](#how-to-type-a-custom-modelsfield), with `Sequence[Any]` and `list[Any]` as the type parameters' defaults.
+
+> [!IMPORTANT]
+> With pyright or mypy, even with the plugin, such a subclass reads as `list[Any]`, also when `null=True`.
+> Redefine the constructor overloads of `ArrayField`, as shown below.
+
+```python
+from __future__ import annotations
+
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any, Literal, overload
+from typing_extensions import TypeVar, Unpack, assert_type, deprecated
+from django.contrib.postgres.fields import ArrayField
+from django.db import models
+
+if TYPE_CHECKING:
+    from django.db.models.fields import FieldInitKwargs
+
+_ST_contra = TypeVar("_ST_contra", contravariant=True, default=Sequence[Any])
+_GT_co = TypeVar("_GT_co", covariant=True, default=list[Any])
+_ElemST = TypeVar("_ElemST")
+_ElemGT = TypeVar("_ElemGT")
+
+
+class MyArrayField(ArrayField[_ST_contra, _GT_co]):
+    # `MyArrayField(models.IntegerField())`: the element types come from `base_field`.
+    @overload
+    def __init__(
+        self: MyArrayField[Sequence[_ElemST], list[_ElemGT]],
+        base_field: models.Field[_ElemST, _ElemGT],
+        size: int | None = None,
+        *,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `MyArrayField(models.IntegerField(), null=True)`: the same element types, in the nullable containers.
+    @overload
+    def __init__(
+        self: MyArrayField[Sequence[_ElemST] | None, list[_ElemGT] | None],
+        base_field: models.Field[_ElemST, _ElemGT],
+        size: int | None = None,
+        *,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `Sub(models.IntegerField())` for `class Sub(MyArrayField[set[Any], set[Any]]): ...`: neither above matches.
+    @overload
+    def __init__(
+        self,
+        base_field: models.Field[Any, Any],
+        size: int | None = None,
+        *,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `Sub(models.IntegerField(), null=True)` for the same subclass, kept off the deprecated overload.
+    @overload
+    def __init__(
+        self,
+        base_field: models.Field[Any, Any],
+        size: int | None = None,
+        *,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `MyArrayField(models.IntegerField(), null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        base_field: models.Field[Any, Any],
+        size: int | None = None,
+        *,
+        verbose_name: str | None = None,
+        name: str | None = None,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
+
+class Post(models.Model):
+    scores = MyArrayField(models.IntegerField())
+    scores_nullable = MyArrayField(models.IntegerField(), null=True)
+
+
+assert_type(Post().scores, list[int])
+assert_type(Post().scores_nullable, list[int] | None)
+```
 
 </details>
 

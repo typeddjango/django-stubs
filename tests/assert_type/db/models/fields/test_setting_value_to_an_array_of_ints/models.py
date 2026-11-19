@@ -20,6 +20,6 @@ def setting_value_to_an_array_of_ints() -> None:
     array_val3: list[NotAValid] = [NotAValid()]
     MyModel(array=array_val3)  # type: ignore[misc]
     non_init = MyModel()
-    non_init.array = array_val  # pyrefly: ignore[bad-assignment]
+    non_init.array = array_val
     non_init.array = array_val2
-    non_init.array = array_val3  # type: ignore[assignment]
+    non_init.array = array_val3  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]

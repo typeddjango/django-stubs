@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Literal, overload
 
 from _typeshed import Unused
 from django.contrib.postgres.utils import CheckPostgresInstalledMixin
@@ -13,31 +13,91 @@ from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Transform
 from django.db.models.sql.compiler import _AsSqlType
 from django.utils.functional import _StrOrPromise
-from typing_extensions import TypeVar, Unpack, override
+from typing_extensions import TypeVar, Unpack, deprecated, override
 
-# __set__ value type
-_ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
-# __get__ return type
-_GT_co = TypeVar("_GT_co", covariant=True, default=Any)
+_ST_Array_contra = TypeVar("_ST_Array_contra", contravariant=True, default=Sequence[Any])
+_GT_Array_co = TypeVar("_GT_Array_co", covariant=True, default=list[Any])
+_ElemST = TypeVar("_ElemST")
+_ElemGT = TypeVar("_ElemGT")
 
-class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_contra, _GT_co]):
-    _pyi_private_set_type: Sequence[Any]
-    _pyi_private_get_type: list[Any]
-
+class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field[_ST_Array_contra, _GT_Array_co]):
     empty_strings_allowed: bool
     default_error_messages: ClassVar[_ErrorMessagesDict]
-    base_field: Field
+    base_field: Field[Any, Any]
     size: int | None
     default_validators: list[_ValidatorCallable]
     from_db_value: Any
+    # `ArrayField(CharField())` or `ArrayField(CharField(), null=False)`: the element types come from `base_field`.
+    @overload
     def __init__(
-        self,
-        base_field: Field,
+        self: ArrayField[Sequence[_ElemST], list[_ElemGT]],
+        base_field: Field[_ElemST, _ElemGT],
         size: int | None = None,
         *,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `ArrayField(CharField(), null=True)`: the same element types, in the nullable containers.
+    @overload
+    def __init__(
+        self: ArrayField[Sequence[_ElemST] | None, list[_ElemGT] | None],
+        base_field: Field[_ElemST, _ElemGT],
+        size: int | None = None,
+        *,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `Sub(CharField())` for `class Sub(ArrayField[set[Any], set[Any]]): ...`: its bound types match neither above.
+    @overload
+    def __init__(
+        self,
+        base_field: Field[Any, Any],
+        size: int | None = None,
+        *,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `Sub(CharField(), null=True)` for the same subclass, kept off the deprecated overload.
+    @overload
+    def __init__(
+        self,
+        base_field: Field[Any, Any],
+        size: int | None = None,
+        *,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `ArrayField(CharField(), null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        base_field: Field[Any, Any],
+        size: int | None = None,
+        *,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,

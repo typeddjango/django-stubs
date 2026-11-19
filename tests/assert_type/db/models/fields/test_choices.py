@@ -51,7 +51,7 @@ def field_choices() -> None:
     models.CharField(choices=grouped_pairs)
     models.CharField(choices=grouped_mapping)
     models.CharField(choices=choices_class)
-    models.CharField(choices="ab")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+    models.CharField(choices="ab")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]
 
 
 # Fields redeclaring `choices` accept the same input.
@@ -61,5 +61,5 @@ def redeclared_field_choices() -> None:
     models.ForeignKey("auth.User", models.CASCADE, choices=mapping())
     models.OneToOneField("auth.User", models.CASCADE, choices=mapping)
     models.ManyToManyField("auth.User", choices=Kind)  # ty: ignore[invalid-argument-type]
-    ArrayField(models.CharField(), choices=Kind)  # ty: ignore[invalid-argument-type]
+    ArrayField(models.CharField(), choices=Kind)  # ty: ignore[no-matching-overload]
     PointField(choices=grouped_pairs)
