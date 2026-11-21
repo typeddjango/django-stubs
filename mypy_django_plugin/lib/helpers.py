@@ -525,16 +525,6 @@ def convert_any_to_type(typ: MypyType, referred_to_type: MypyType) -> MypyType:
         for item in proper_type.items:
             converted_items.append(convert_any_to_type(item, referred_to_type))
         return UnionType.make_union(converted_items, line=typ.line, column=typ.column)
-    if isinstance(proper_type, Instance):
-        args = []
-        for default_arg in proper_type.args:
-            default_arg = get_proper_type(default_arg)
-            if isinstance(default_arg, AnyType):
-                args.append(referred_to_type)
-            else:
-                args.append(default_arg)
-        return proper_type.copy_modified(args=args)
-
     if isinstance(proper_type, AnyType):
         return referred_to_type
 
