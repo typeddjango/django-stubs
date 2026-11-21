@@ -31,7 +31,7 @@ from django.db.models.sql.where import WhereNode
 from django.forms.widgets import Widget
 from django.utils.choices import _ChoicesInput
 from django.utils.functional import _StrOrPromise, cached_property
-from typing_extensions import TypeVar, Unpack, override
+from typing_extensions import TypeVar, Unpack, deprecated, override
 
 RECURSIVE_RELATIONSHIP_CONSTANT: Literal["self"]
 
@@ -42,6 +42,7 @@ def lazy_related_operation(
 
 _ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
 _GT_co = TypeVar("_GT_co", covariant=True, default=_ST_contra)
+_To = TypeVar("_To", bound=Model)
 
 class RelatedField(FieldCacheMixin, Field[_ST_contra, _GT_co]):
     one_to_many: bool
@@ -161,6 +162,52 @@ class ForeignKey(ForeignObject[_ST_contra, _GT_co]):
     remote_field: ManyToOneRel
     rel_class: type[ManyToOneRel]
     column: str  # type: ignore[assignment]
+    # `ForeignKey(Model, ...)` or `ForeignKey(Model, ..., null=False)`: the `self` annotation gives the related model.
+    @overload
+    def __init__(
+        self: ForeignKey[_To, _To],
+        to: type[_To],
+        on_delete: Callable[..., None],
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        to_field: str | None = None,
+        db_constraint: bool = True,
+        *,
+        swappable: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `ForeignKey(Model, ..., null=True)`: the `self` annotation gives the nullable related model.
+    @overload
+    def __init__(
+        self: ForeignKey[_To | None, _To | None],
+        to: type[_To],
+        on_delete: Callable[..., None],
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        to_field: str | None = None,
+        db_constraint: bool = True,
+        *,
+        swappable: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `ForeignKey("app.Model", ...)`: a lazy reference can't be resolved, keeps the type var defaults.
+    @overload
     def __init__(
         self,
         to: type[Model] | str,
@@ -175,7 +222,52 @@ class ForeignKey(ForeignObject[_ST_contra, _GT_co]):
         swappable: bool = True,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `ForeignKey("app.Model", ..., null=True)`: same, the `Any` default already accepts `None`.
+    @overload
+    def __init__(
+        self,
+        to: type[Model] | str,
+        on_delete: Callable[..., None],
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        to_field: str | None = None,
+        db_constraint: bool = True,
+        *,
+        swappable: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `ForeignKey(..., null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        to: type[Model] | str,
+        on_delete: Callable[..., None],
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        to_field: str | None = None,
+        db_constraint: bool = True,
+        *,
+        swappable: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -215,6 +307,52 @@ class ForeignKey(ForeignObject[_ST_contra, _GT_co]):
 class OneToOneField(ForeignKey[_ST_contra, _GT_co]):
     remote_field: OneToOneRel
     rel_class: type[OneToOneRel]
+    # `OneToOneField(Model, ...)` or `OneToOneField(Model, ..., null=False)`: the `self` annotation gives the related model.
+    @overload
+    def __init__(
+        self: OneToOneField[_To, _To],
+        to: type[_To],
+        on_delete: Callable[..., None],
+        to_field: str | None = None,
+        *,
+        swappable: bool = True,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        db_constraint: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `OneToOneField(Model, ..., null=True)`: the `self` annotation gives the nullable related model.
+    @overload
+    def __init__(
+        self: OneToOneField[_To | None, _To | None],
+        to: type[_To],
+        on_delete: Callable[..., None],
+        to_field: str | None = None,
+        *,
+        swappable: bool = True,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        db_constraint: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `OneToOneField("app.Model", ...)`: a lazy reference can't be resolved, keeps the type var defaults.
+    @overload
     def __init__(
         self,
         to: type[Model] | str,
@@ -229,7 +367,52 @@ class OneToOneField(ForeignKey[_ST_contra, _GT_co]):
         db_constraint: bool = True,
         verbose_name: _StrOrPromise | None = None,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `OneToOneField("app.Model", ..., null=True)`: same, the `Any` default already accepts `None`.
+    @overload
+    def __init__(
+        self,
+        to: type[Model] | str,
+        on_delete: Callable[..., None],
+        to_field: str | None = None,
+        *,
+        swappable: bool = True,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        db_constraint: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `OneToOneField(..., null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        to: type[Model] | str,
+        on_delete: Callable[..., None],
+        to_field: str | None = None,
+        *,
+        swappable: bool = True,
+        related_name: str | None = None,
+        related_query_name: str | None = None,
+        limit_choices_to: _AllLimitChoicesTo | None = None,
+        parent_link: bool = False,
+        db_constraint: bool = True,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -254,7 +437,6 @@ class OneToOneField(ForeignKey[_ST_contra, _GT_co]):
     related_accessor_class: type[ReverseOneToOneDescriptor[Any, Any]]  # type: ignore[assignment]
 
 _Through = TypeVar("_Through", bound=Model, default=Any)
-_To = TypeVar("_To", bound=Model)
 
 class ManyToManyField(RelatedField, Generic[_To, _Through]):
     has_null_arg: bool
