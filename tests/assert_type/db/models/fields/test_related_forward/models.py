@@ -43,6 +43,8 @@ def class_reference_with_null_true_is_optional() -> None:
 
 
 def lazy_reference_is_only_resolved_by_django_aware_checkers() -> None:
+    # TODO: missing Django support in pyright and ty, a lazy reference reads `Any` there.
+    # See https://github.com/typeddjango/django-stubs/issues/579 and https://github.com/astral-sh/ty/issues/1018.
     assert_type(Book().sequel, Book | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(Profile().best_book, Book)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
 
