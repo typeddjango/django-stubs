@@ -385,15 +385,15 @@ def _resolve_expression_type(expr_type: MypyType) -> MypyType:
 
 
 def gather_expression_types(ctx: MethodContext) -> TypedDictType:
-    api = helpers.get_typechecker_api(ctx)
-    default_aliases: dict[str, MypyType] = {
-        alias: get_proper_type(arg_type)
-        for slot in zip(ctx.arg_kinds, ctx.arg_types, ctx.args, strict=False)
-        for kind, arg_type, arg in zip(*slot, strict=False)
-        if kind == ARG_POS and (alias := _aggregate_default_alias(arg, arg_type)) is not None
-    }
-
-    return helpers.map_typeddict(api, _resolve_expression_type, helpers.gather_keyword_arguments(ctx), default_aliases)
+    kwargs = helpers.gather_keyword_arguments(ctx)
+    types = {name: _resolve_expression_type(typ) for name, typ in kwargs.items.items()}
+    required_keys = set(kwargs.required_keys)
+    for slot in zip(ctx.arg_kinds, ctx.arg_types, ctx.args, strict=False):
+        for kind, arg_type, arg in zip(*slot, strict=False):
+            if kind == ARG_POS and (alias := _aggregate_default_alias(arg, arg_type)) is not None:
+                types[alias] = _resolve_expression_type(arg_type)
+                required_keys.add(alias)
+    return helpers.make_typeddict(helpers.get_typechecker_api(ctx), types, required_keys=required_keys)
 
 
 def _extract_model_type_var_upper_bound(ctx: MethodContext) -> Instance | None:
@@ -429,7 +429,7 @@ def _extend_values_row(api: TypeChecker, qs_type: Instance, names: Collection[st
     row = get_proper_type(qs_type.args[1])
     any_fields: dict[str, MypyType] = {name: AnyType(TypeOfAny.from_omitted_generics) for name in names}
     if isinstance(row, TypedDictType):
-        row = helpers.merge_typeddict(api, row, any_fields)
+        row = helpers.merge_typeddict(api, row, helpers.make_typeddict(api, any_fields))
     elif isinstance(row, TupleType):
         if row.partial_fallback.type.has_base("typing.NamedTuple"):
             row = helpers.extend_oneoff_named_tuple(api, "Row", row, any_fields)
@@ -449,10 +449,13 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is not None:
         model = django_model.typ
-        expression_types = helpers.filter_typeddict(
-            api,
-            lambda attr_name, _: check_valid_attr_value(ctx, django_context, django_model, attr_name),
-            expression_types,
+        valid_types = {
+            attr_name: typ
+            for attr_name, typ in expression_types.items.items()
+            if check_valid_attr_value(ctx, django_context, django_model, attr_name)
+        }
+        expression_types = helpers.make_typeddict(
+            api, valid_types, required_keys=expression_types.required_keys & valid_types.keys()
         )
     else:
         # Inside a generic queryset method the model is a TypeVar: annotate its upper bound,
@@ -562,7 +565,9 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
             column_types[field_lookup] = field_lookup_type
 
     # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
-    row_type = helpers.merge_typeddict(ctx.api, column_types, gather_expression_types(ctx))
+    row_type = helpers.merge_typeddict(
+        ctx.api, helpers.make_typeddict(ctx.api, column_types), gather_expression_types(ctx)
+    )
     return _queryset_subclass_with_row(ctx, row_type) or default_return_type.copy_modified(
         args=[django_model.typ, row_type]
     )

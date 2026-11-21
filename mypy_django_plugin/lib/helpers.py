@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from functools import reduce
-from operator import or_
 from typing import TYPE_CHECKING, NamedTuple, Self, TypedDict, cast
 
 from mypy import checker
@@ -66,7 +64,7 @@ from mypy.typevars import fill_typevars, fill_typevars_with_any
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Collection, Iterable, Iterator, Mapping, Sequence
+    from collections.abc import Collection, Iterable, Iterator, Mapping, Sequence
 
     from django.db.models.base import Model
 
@@ -600,64 +598,26 @@ def make_typeddict(
     fields: dict[str, MypyType],
     *,
     required_keys: Collection[str] | None = None,
-    readonly_keys: Collection[str] | None = None,
 ) -> TypedDictType:
     """Create a TypedDictType from a python dict of field names and types."""
     return TypedDictType(
         items=fields,
         required_keys=set(fields.keys() if required_keys is None else required_keys),
-        readonly_keys=set(readonly_keys or ()),
-        fallback=_get_fallback_typeddict(api),
-    )
-
-
-def filter_typeddict(
-    api: SemanticAnalyzer | CheckerPluginInterface,
-    func: Callable[[str, MypyType], bool],
-    *values: TypedDictType | dict[str, MypyType],
-) -> TypedDictType:
-    """
-    Applies a filter function to one or more TypeDictTypes, merging them if more than one is provided, and returns a
-    TypedDictType with only the entries for which the function returns `True`.
-    """
-    value = merge_typeddict(api, *values)
-    filtered = {k: v for k, v in value.items.items() if func(k, v)}
-    return make_typeddict(
-        api,
-        filtered,
-        required_keys=value.required_keys & filtered.keys(),
-        readonly_keys=value.readonly_keys & filtered.keys(),
-    )
-
-
-def map_typeddict(
-    api: SemanticAnalyzer | CheckerPluginInterface,
-    func: Callable[[MypyType], MypyType],
-    *values: TypedDictType | dict[str, MypyType],
-) -> TypedDictType:
-    """
-    Applies a mapping function to one or more TypedDictTypes, merging them if more than one is provided, and returns a
-    TypedDictType with new values as returned by the mapping function.
-    """
-    value = merge_typeddict(api, *values)
-    return TypedDictType(
-        items={k: func(v) for k, v in value.items.items()},
-        required_keys=value.required_keys,
-        readonly_keys=value.readonly_keys,
+        readonly_keys=set(),
         fallback=_get_fallback_typeddict(api),
     )
 
 
 def merge_typeddict(
-    api: SemanticAnalyzer | CheckerPluginInterface, *values: TypedDictType | dict[str, MypyType]
+    api: SemanticAnalyzer | CheckerPluginInterface,
+    left: TypedDictType,
+    right: TypedDictType,
 ) -> TypedDictType:
-    """Merge TypedDictType types into one with anonymous fallback."""
-    normalized = [v if isinstance(v, TypedDictType) else make_typeddict(api, v) for v in values]
-
+    """Merge two TypedDictType type into one with anonymous fallback."""
     return TypedDictType(
-        items=reduce(or_, (v.items for v in normalized)),
-        required_keys=reduce(or_, (v.required_keys for v in normalized)),
-        readonly_keys=reduce(or_, (v.readonly_keys for v in normalized)),
+        items={**left.items, **right.items},
+        required_keys={*left.required_keys, *right.required_keys},
+        readonly_keys={*left.readonly_keys, *right.readonly_keys},
         fallback=_get_fallback_typeddict(api),
     )
 
