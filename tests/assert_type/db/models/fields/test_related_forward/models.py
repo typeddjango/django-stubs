@@ -54,3 +54,14 @@ def non_literal_null_is_deprecated(flag: bool) -> None:
 
 def single_type_arg_is_also_the_get_type(fk: models.ForeignKey[Author], book: Book) -> None:
     assert_type(fk.__get__(book, Book), Author)
+
+
+class Annotated(models.Model):
+    # pyrefly and ty accept the mismatch, ty on purpose: https://github.com/astral-sh/ty/issues/4977
+    author: models.ForeignKey[Author] = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
+    profile: models.OneToOneField[Author] = models.OneToOneField(Author, on_delete=models.SET_NULL, null=True)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
+    editor: models.ForeignKey[Author | None] = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)
+
+
+def annotation_matching_the_call_is_kept() -> None:
+    assert_type(Annotated().editor, Author | None)
