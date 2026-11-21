@@ -65,6 +65,17 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
     if len(default_related_field_type.args) != 2:
         return default_related_field_type
 
+    to_type = get_proper_type(helpers.get_call_argument_type_by_name(ctx, "to"))
+    is_explicitly_subscripted = isinstance(ctx.context, CallExpr) and isinstance(ctx.context.callee, IndexExpr)
+    if to_type is not None and not isinstance(to_type, Instance) and not is_explicitly_subscripted:
+        # The stub overloads solve a class reference (`ForeignKey(Model)`) to that model for both set and get.
+        # Reset it to the `Any` placeholder of a lazy reference, so both go through the fill-in below,
+        # where a proxy also accepts its concrete model and a generic model gets `Any` type vars.
+        placeholder: MypyType = AnyType(TypeOfAny.implementation_artifact)
+        if helpers.get_bool_call_argument_by_name(ctx, "null", default=False):
+            placeholder = make_optional_type(placeholder)
+        default_related_field_type = default_related_field_type.copy_modified(args=[placeholder, placeholder])
+
     typechecker_api = helpers.get_typechecker_api(ctx)
 
     # self reference with abstract=True on the model where ForeignKey is defined
