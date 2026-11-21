@@ -310,7 +310,7 @@ class NewSemanalDjangoPlugin(Plugin):
 
         # Base class is a Form class definition
         if info.has_base(fullnames.BASEFORM_CLASS_FULLNAME):
-            return forms.make_meta_nested_class_inherit_from_any
+            return forms.transform_form_class
 
         # Base class is a QuerySet class definition
         if info.has_base(fullnames.QUERYSET_CLASS_FULLNAME):
