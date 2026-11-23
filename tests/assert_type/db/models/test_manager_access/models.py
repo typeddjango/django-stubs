@@ -56,7 +56,8 @@ class CategoryHolder(QuerySetHolder[Category]):
 
 
 class UnparametrizedHolder(QuerySetHolder):  # pyright: ignore[reportMissingTypeArgument]
-    queryset = Category.objects
+    # pyrefly drops the inherited annotation and sees a read-only descriptor: https://github.com/pyrefly-org/pyrefly/issues/5725
+    queryset = Category.objects  # pyrefly: ignore[bad-override]
 
 
 class PermissionAware(Protocol):
