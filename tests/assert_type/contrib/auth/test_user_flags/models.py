@@ -14,7 +14,7 @@ class MyUser(AbstractUser):
 
 
 class NullableActiveUser(AbstractUser):
-    is_active = models.BooleanField(null=True)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
+    is_active = models.BooleanField(null=True)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]  # pyrefly: ignore[bad-override]
 
 
 class PropertyStaffUser(AbstractUser):
@@ -25,8 +25,8 @@ class PropertyStaffUser(AbstractUser):
 
 
 def overridden_flags_keep_their_declared_type() -> None:
-    # pyright rejects the override above, pyrefly and ty accept it silently,
-    # ty on purpose: https://github.com/astral-sh/ty/issues/4977.
+    # pyright and pyrefly reject the override above, ty accepts it silently
+    # on purpose: https://github.com/astral-sh/ty/issues/4977.
     # All three keep `AbstractUser`'s non-null field type
     assert_type(NullableActiveUser().is_active, bool | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]
     assert_type(PropertyStaffUser().is_staff, Literal[True])
