@@ -72,3 +72,12 @@ def nullable_geometry_fields_read_optional() -> None:
     assert_type(geo.null_raster, GDALRaster | None)
     geo.null_point = None
     geo.point = None  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
+
+
+def spatial_fields_accept_serialized_input() -> None:
+    geo = Geo()
+    geo.point = "POINT (0 0)"
+    geo.null_point = memoryview(b"")
+    geo.point = b""  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
+    geo.raster = "/rasters/elevation.tif"
+    geo.null_raster = {"srid": 4326, "width": 1, "height": 1}

@@ -64,7 +64,8 @@ class BaseSpatialField(Field[_ST_contra, _GT_co]):
     @override
     def get_prep_value(self, value: Any) -> Any: ...
 
-_ST_Geometry_contra = TypeVar("_ST_Geometry_contra", contravariant=True, default=GEOSGeometry)
+# `SpatialProxy.__set__` also takes WKT, HEX or GeoJSON strings and WKB memoryviews, but rejects `bytes`
+_ST_Geometry_contra = TypeVar("_ST_Geometry_contra", contravariant=True, default=GEOSGeometry | str | memoryview)
 _GT_Geometry_co = TypeVar("_GT_Geometry_co", covariant=True, default=GEOSGeometry)
 
 class GeometryField(BaseSpatialField[_ST_Geometry_contra, _GT_Geometry_co]):
@@ -92,7 +93,7 @@ class GeometryField(BaseSpatialField[_ST_Geometry_contra, _GT_Geometry_co]):
     # `GeometryField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
-        self: GeometryField[GEOSGeometry | None, GEOSGeometry | None],
+        self: GeometryField[GEOSGeometry | str | memoryview | None, GEOSGeometry | None],
         verbose_name: _StrOrPromise | None = None,
         dim: int = 2,
         geography: bool = False,
@@ -175,7 +176,7 @@ class GeometryField(BaseSpatialField[_ST_Geometry_contra, _GT_Geometry_co]):
         **kwargs: Any,
     ) -> forms.GeometryField | None: ...
 
-_ST_Point_contra = TypeVar("_ST_Point_contra", contravariant=True, default=Point)
+_ST_Point_contra = TypeVar("_ST_Point_contra", contravariant=True, default=Point | str | memoryview)
 _GT_Point_co = TypeVar("_GT_Point_co", covariant=True, default=Point)
 
 class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
@@ -203,7 +204,7 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
     # `PointField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
-        self: PointField[Point | None, Point | None],
+        self: PointField[Point | str | memoryview | None, Point | None],
         verbose_name: _StrOrPromise | None = None,
         dim: int = 2,
         geography: bool = False,
@@ -265,7 +266,7 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
     geom_class: type[Point]
     form_class: type[forms.PointField]
 
-_ST_LineString_contra = TypeVar("_ST_LineString_contra", contravariant=True, default=LineString)
+_ST_LineString_contra = TypeVar("_ST_LineString_contra", contravariant=True, default=LineString | str | memoryview)
 _GT_LineString_co = TypeVar("_GT_LineString_co", covariant=True, default=LineString)
 
 class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
@@ -293,7 +294,7 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
     # `LineStringField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
-        self: LineStringField[LineString | None, LineString | None],
+        self: LineStringField[LineString | str | memoryview | None, LineString | None],
         verbose_name: _StrOrPromise | None = None,
         dim: int = 2,
         geography: bool = False,
@@ -355,7 +356,7 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
     geom_class: type[LineString]
     form_class: type[forms.LineStringField]
 
-_ST_Polygon_contra = TypeVar("_ST_Polygon_contra", contravariant=True, default=Polygon)
+_ST_Polygon_contra = TypeVar("_ST_Polygon_contra", contravariant=True, default=Polygon | str | memoryview)
 _GT_Polygon_co = TypeVar("_GT_Polygon_co", covariant=True, default=Polygon)
 
 class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
@@ -383,7 +384,7 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
     # `PolygonField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
-        self: PolygonField[Polygon | None, Polygon | None],
+        self: PolygonField[Polygon | str | memoryview | None, Polygon | None],
         verbose_name: _StrOrPromise | None = None,
         dim: int = 2,
         geography: bool = False,
@@ -445,7 +446,7 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
     geom_class: type[Polygon]
     form_class: type[forms.PolygonField]
 
-_ST_MultiPoint_contra = TypeVar("_ST_MultiPoint_contra", contravariant=True, default=MultiPoint)
+_ST_MultiPoint_contra = TypeVar("_ST_MultiPoint_contra", contravariant=True, default=MultiPoint | str | memoryview)
 _GT_MultiPoint_co = TypeVar("_GT_MultiPoint_co", covariant=True, default=MultiPoint)
 
 class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
@@ -473,7 +474,7 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
     # `MultiPointField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
-        self: MultiPointField[MultiPoint | None, MultiPoint | None],
+        self: MultiPointField[MultiPoint | str | memoryview | None, MultiPoint | None],
         verbose_name: _StrOrPromise | None = None,
         dim: int = 2,
         geography: bool = False,
@@ -535,7 +536,9 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
     geom_class: type[MultiPoint]
     form_class: type[forms.MultiPointField]
 
-_ST_MultiLineString_contra = TypeVar("_ST_MultiLineString_contra", contravariant=True, default=MultiLineString)
+_ST_MultiLineString_contra = TypeVar(
+    "_ST_MultiLineString_contra", contravariant=True, default=MultiLineString | str | memoryview
+)
 _GT_MultiLineString_co = TypeVar("_GT_MultiLineString_co", covariant=True, default=MultiLineString)
 
 class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLineString_co]):
@@ -563,7 +566,7 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
     # `MultiLineStringField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
-        self: MultiLineStringField[MultiLineString | None, MultiLineString | None],
+        self: MultiLineStringField[MultiLineString | str | memoryview | None, MultiLineString | None],
         verbose_name: _StrOrPromise | None = None,
         dim: int = 2,
         geography: bool = False,
@@ -625,7 +628,9 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
     geom_class: type[MultiLineString]
     form_class: type[forms.MultiLineStringField]
 
-_ST_MultiPolygon_contra = TypeVar("_ST_MultiPolygon_contra", contravariant=True, default=MultiPolygon)
+_ST_MultiPolygon_contra = TypeVar(
+    "_ST_MultiPolygon_contra", contravariant=True, default=MultiPolygon | str | memoryview
+)
 _GT_MultiPolygon_co = TypeVar("_GT_MultiPolygon_co", covariant=True, default=MultiPolygon)
 
 class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_co]):
@@ -653,7 +658,7 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
     # `MultiPolygonField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
-        self: MultiPolygonField[MultiPolygon | None, MultiPolygon | None],
+        self: MultiPolygonField[MultiPolygon | str | memoryview | None, MultiPolygon | None],
         verbose_name: _StrOrPromise | None = None,
         dim: int = 2,
         geography: bool = False,
@@ -715,7 +720,9 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
     geom_class: type[MultiPolygon]
     form_class: type[forms.MultiPolygonField]
 
-_ST_GeometryCollection_contra = TypeVar("_ST_GeometryCollection_contra", contravariant=True, default=GeometryCollection)
+_ST_GeometryCollection_contra = TypeVar(
+    "_ST_GeometryCollection_contra", contravariant=True, default=GeometryCollection | str | memoryview
+)
 _GT_GeometryCollection_co = TypeVar("_GT_GeometryCollection_co", covariant=True, default=GeometryCollection)
 
 class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_GeometryCollection_co]):
@@ -743,7 +750,7 @@ class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_G
     # `GeometryCollectionField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
-        self: GeometryCollectionField[GeometryCollection | None, GeometryCollection | None],
+        self: GeometryCollectionField[GeometryCollection | str | memoryview | None, GeometryCollection | None],
         verbose_name: _StrOrPromise | None = None,
         dim: int = 2,
         geography: bool = False,
@@ -809,7 +816,8 @@ class ExtentField(Field[Any, Any]):
     @override
     def get_internal_type(self) -> str: ...
 
-_ST_Raster_contra = TypeVar("_ST_Raster_contra", contravariant=True, default=GDALRaster)
+# `SpatialProxy.__set__` also takes a file path, a JSON string or a dict, all fed to `GDALRaster`
+_ST_Raster_contra = TypeVar("_ST_Raster_contra", contravariant=True, default=GDALRaster | str | dict[str, Any])
 _GT_Raster_co = TypeVar("_GT_Raster_co", covariant=True, default=GDALRaster)
 
 class RasterField(BaseSpatialField[_ST_Raster_contra, _GT_Raster_co]):
@@ -831,7 +839,7 @@ class RasterField(BaseSpatialField[_ST_Raster_contra, _GT_Raster_co]):
     # `RasterField(null=True)`: the `self` annotation gives the nullable type.
     @overload
     def __init__(
-        self: RasterField[GDALRaster | None, GDALRaster | None],
+        self: RasterField[GDALRaster | str | dict[str, Any] | None, GDALRaster | None],
         verbose_name: _StrOrPromise | None = None,
         srid: int = 4326,
         spatial_index: bool = True,
