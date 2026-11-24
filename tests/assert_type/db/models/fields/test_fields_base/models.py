@@ -273,9 +273,8 @@ def every_builtin_field_reads_null_true_as_optional() -> None:
     assert_type(instance.path, str)
     assert_type(instance.null_path, str | None)
 
-    # JSONField has no `null` overloads, only the plugin folds `None` in
     assert_type(instance.payload, Any)
-    assert_type(instance.null_payload, Any | None)  # pyright: ignore[reportAssertTypeFailure]  # ty: ignore[type-assertion-failure]  # pyrefly: ignore[assert-type]
+    assert_type(instance.null_payload, Any | None)
     assert_type(instance.payload_with_db_default, Any)
 
 
