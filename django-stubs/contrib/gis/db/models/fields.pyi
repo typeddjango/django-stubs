@@ -2,6 +2,7 @@ from collections.abc import Iterable
 from typing import Any, Literal, NamedTuple, overload
 
 from django.contrib.gis import forms
+from django.contrib.gis.gdal.raster.source import GDALRaster
 from django.contrib.gis.geos import (
     GeometryCollection,
     GEOSGeometry,
@@ -63,8 +64,13 @@ class BaseSpatialField(Field[_ST_contra, _GT_co]):
     @override
     def get_prep_value(self, value: Any) -> Any: ...
 
-class GeometryField(BaseSpatialField[_ST_contra, _GT_co]):
+_ST_Geometry_contra = TypeVar("_ST_Geometry_contra", contravariant=True, default=GEOSGeometry)
+_GT_Geometry_co = TypeVar("_GT_Geometry_co", covariant=True, default=GEOSGeometry)
+
+class GeometryField(BaseSpatialField[_ST_Geometry_contra, _GT_Geometry_co]):
     dim: int
+    # `GeometryField()` or `GeometryField(null=False)`: keeps the type var defaults.
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -77,7 +83,68 @@ class GeometryField(BaseSpatialField[_ST_contra, _GT_co]):
         srid: int = 4326,
         spatial_index: bool = True,
         name: str | None = None,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `GeometryField(null=True)`: the `self` annotation gives the nullable type.
+    @overload
+    def __init__(
+        self: GeometryField[GEOSGeometry | None, GEOSGeometry | None],
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `Sub(null=True)` for `class Sub(GeometryField): ...`: its bound types can't match the overload above.
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `GeometryField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        dim: int = 2,
+        geography: bool = False,
+        *,
+        extent: tuple[float, float, float, float] = ...,
+        tolerance: float = 0.05,
+        max_geom_collections: int | None = ...,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        name: str | None = None,
+        null: bool,
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
@@ -742,7 +809,71 @@ class ExtentField(Field[Any, Any]):
     @override
     def get_internal_type(self) -> str: ...
 
-class RasterField(BaseSpatialField[_ST_contra, _GT_co]):
+_ST_Raster_contra = TypeVar("_ST_Raster_contra", contravariant=True, default=GDALRaster)
+_GT_Raster_co = TypeVar("_GT_Raster_co", covariant=True, default=GDALRaster)
+
+class RasterField(BaseSpatialField[_ST_Raster_contra, _GT_Raster_co]):
+    # `RasterField()` or `RasterField(null=False)`: keeps the type var defaults.
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        *,
+        name: str | None = None,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `RasterField(null=True)`: the `self` annotation gives the nullable type.
+    @overload
+    def __init__(
+        self: RasterField[GDALRaster | None, GDALRaster | None],
+        verbose_name: _StrOrPromise | None = None,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        *,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `Sub(null=True)` for `class Sub(RasterField): ...`: its bound types can't match the overload above.
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        *,
+        name: str | None = None,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `RasterField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        srid: int = 4326,
+        spatial_index: bool = True,
+        *,
+        name: str | None = None,
+        null: bool,
+        primary_key: bool = False,
+        max_length: int | None = None,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
     @override
     def db_type(self, connection: Any) -> Any: ...
     def from_db_value(self, value: Any, expression: Any, connection: Any) -> Any: ...
