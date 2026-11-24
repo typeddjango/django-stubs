@@ -12,7 +12,6 @@ from django.db.models.sql.compiler import SQLCompiler, _AsSqlType
 from django.utils.functional import _StrOrPromise
 from typing_extensions import TypeVar, Unpack, deprecated, override
 
-# `Mapping` so a `dict[str, str]` is accepted, `dict` is invariant in its values.
 _ST_HStore_contra = TypeVar("_ST_HStore_contra", contravariant=True, default=Mapping[str, str | None])
 _GT_HStore_co = TypeVar("_GT_HStore_co", covariant=True, default=dict[str, str | None])
 

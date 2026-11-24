@@ -64,7 +64,6 @@ class BaseSpatialField(Field[_ST_contra, _GT_co]):
     @override
     def get_prep_value(self, value: Any) -> Any: ...
 
-# `SpatialProxy.__set__` also takes WKT, HEX or GeoJSON strings and WKB memoryviews, but rejects `bytes`
 _ST_Geometry_contra = TypeVar("_ST_Geometry_contra", contravariant=True, default=GEOSGeometry | str | memoryview)
 _GT_Geometry_co = TypeVar("_GT_Geometry_co", covariant=True, default=GEOSGeometry)
 
@@ -816,7 +815,6 @@ class ExtentField(Field[Any, Any]):
     @override
     def get_internal_type(self) -> str: ...
 
-# `SpatialProxy.__set__` also takes a file path, a JSON string or a dict, all fed to `GDALRaster`
 _ST_Raster_contra = TypeVar("_ST_Raster_contra", contravariant=True, default=GDALRaster | str | dict[str, Any])
 _GT_Raster_co = TypeVar("_GT_Raster_co", covariant=True, default=GDALRaster)
 
