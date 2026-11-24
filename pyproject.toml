@@ -55,7 +55,7 @@ tests = [
   "psycopg[binary]==3.3.9",
   "psycopg2-binary==2.9.13",
   "jinja2==3.1.6",
-  "pyyaml==6.0.3",
+  "pyyaml==6.0.4",
   # typing:
   "django-stubs[compatible-mypy,oracle,redis]",
   "types-psycopg2==2.9.21.20261030",
