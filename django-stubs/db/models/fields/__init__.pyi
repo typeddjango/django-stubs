@@ -51,13 +51,16 @@ _ErrorMessagesDict: TypeAlias = dict[str, _StrOrPromise]
 
 _ST_contra = TypeVar("_ST_contra", contravariant=True, default=Any)
 _GT_co = TypeVar("_GT_co", covariant=True, default=Any)
+_VT = TypeVar("_VT", default=Any)
 
 # Keyword arguments shared by every Field constructor, factored out so subclass constructors stay short.
 # `primary_key`, `max_length` and `db_default` vary per field, so each constructor spells them out.
 # Custom fields can reuse it; it only exists in the stubs.
 # `closed=True` (PEP 728) makes ty reject unknown keys passed through `**kwargs`.
+# Parametrized with the getter type minus `None`, as `Field.run_validators()` skips empty values.
+# A field's own `_GT` type var would get solved from the validators, so constructors pass a concrete type.
 @type_check_only
-class FieldInitKwargs(TypedDict, total=False, closed=True):
+class FieldInitKwargs(TypedDict, Generic[_VT], total=False, closed=True):
     unique: bool
     blank: bool
     db_index: bool
@@ -72,7 +75,7 @@ class FieldInitKwargs(TypedDict, total=False, closed=True):
     db_column: str | None
     db_tablespace: str | None
     auto_created: bool
-    validators: Iterable[_ValidatorCallable]
+    validators: Iterable[_ValidatorCallable[_VT]]
     error_messages: _ErrorMessagesMapping | None
     db_comment: str | None
 
@@ -298,7 +301,7 @@ class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `IntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -311,7 +314,7 @@ class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(IntegerField): ...`: its bound types can't match the overload above.
     @overload
@@ -324,7 +327,7 @@ class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `IntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -338,7 +341,7 @@ class IntegerField(Field[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
 
 class PositiveIntegerRelDbTypeMixin:
@@ -361,7 +364,7 @@ class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `SmallIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -374,7 +377,7 @@ class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(SmallIntegerField): ...`: its bound types can't match the overload above.
     @overload
@@ -387,7 +390,7 @@ class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `SmallIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -401,7 +404,7 @@ class SmallIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
 
 class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
@@ -417,7 +420,7 @@ class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `BigIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -430,7 +433,7 @@ class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(BigIntegerField): ...`: its bound types can't match the overload above.
     @overload
@@ -443,7 +446,7 @@ class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `BigIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -457,7 +460,7 @@ class BigIntegerField(IntegerField[_ST_Int_contra, _GT_Int_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
 
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_contra, _GT_Int_co]):
@@ -473,7 +476,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_c
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `PositiveIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -486,7 +489,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_c
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(PositiveIntegerField): ...`: its bound types can't match the overload above.
     @overload
@@ -499,7 +502,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_c
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `PositiveIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -513,7 +516,7 @@ class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField[_ST_Int_c
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
 
 class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField[_ST_Int_contra, _GT_Int_co]):
@@ -529,7 +532,7 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `PositiveSmallIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -542,7 +545,7 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(PositiveSmallIntegerField): ...`: its bound types can't match the overload above.
     @overload
@@ -555,7 +558,7 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `PositiveSmallIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -569,7 +572,7 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, SmallIntegerField
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
 
 class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST_Int_contra, _GT_Int_co]):
@@ -585,7 +588,7 @@ class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `PositiveBigIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -598,7 +601,7 @@ class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(PositiveBigIntegerField): ...`: its bound types can't match the overload above.
     @overload
@@ -611,7 +614,7 @@ class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
     # `PositiveBigIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -625,7 +628,7 @@ class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, BigIntegerField[_ST
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[int]],
     ) -> None: ...
 
 _ST_Float_contra = TypeVar("_ST_Float_contra", contravariant=True, default=float | int | str)
@@ -644,7 +647,7 @@ class FloatField(Field[_ST_Float_contra, _GT_Float_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[float]],
     ) -> None: ...
     # `FloatField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -657,7 +660,7 @@ class FloatField(Field[_ST_Float_contra, _GT_Float_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[float]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(FloatField): ...`: its bound types can't match the overload above.
     @overload
@@ -670,7 +673,7 @@ class FloatField(Field[_ST_Float_contra, _GT_Float_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[float]],
     ) -> None: ...
     # `FloatField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -684,7 +687,7 @@ class FloatField(Field[_ST_Float_contra, _GT_Float_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[float]],
     ) -> None: ...
 
 _ST_Decimal_contra = TypeVar("_ST_Decimal_contra", contravariant=True, default=str | float | decimal.Decimal)
@@ -706,7 +709,7 @@ class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
         null: Literal[False] = False,
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[decimal.Decimal]],
     ) -> None: ...
     # `DecimalField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -720,7 +723,7 @@ class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
         null: Literal[True],
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[decimal.Decimal]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(DecimalField): ...`: its bound types can't match the overload above.
     @overload
@@ -734,7 +737,7 @@ class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
         null: Literal[True],
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[decimal.Decimal]],
     ) -> None: ...
     # `DecimalField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -749,7 +752,7 @@ class DecimalField(Field[_ST_Decimal_contra, _GT_Decimal_co]):
         null: bool,
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[decimal.Decimal]],
     ) -> None: ...
     @cached_property
     def context(self) -> decimal.Context: ...
@@ -772,7 +775,7 @@ class CharField(Field[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CharField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -786,7 +789,7 @@ class CharField(Field[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(CharField): ...`: its bound types can't match the overload above.
     @overload
@@ -800,7 +803,7 @@ class CharField(Field[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CharField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -815,7 +818,7 @@ class CharField(Field[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
@@ -831,7 +834,7 @@ class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CommaSeparatedIntegerField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -845,7 +848,7 @@ class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(CommaSeparatedIntegerField): ...`: its bound types can't match the overload above.
     @overload
@@ -859,7 +862,7 @@ class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CommaSeparatedIntegerField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -874,7 +877,7 @@ class CommaSeparatedIntegerField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
@@ -891,7 +894,7 @@ class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = 50,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `SlugField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -906,7 +909,7 @@ class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = 50,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(SlugField): ...`: its bound types can't match the overload above.
     @overload
@@ -921,7 +924,7 @@ class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = 50,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `SlugField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -937,7 +940,7 @@ class SlugField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = 50,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 _ST_Email_contra = TypeVar("_ST_Email_contra", contravariant=True, default=str)
@@ -955,7 +958,7 @@ class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `EmailField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -969,7 +972,7 @@ class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(EmailField): ...`: its bound types can't match the overload above.
     @overload
@@ -983,7 +986,7 @@ class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `EmailField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -998,7 +1001,7 @@ class EmailField(CharField[_ST_Email_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 class URLField(CharField[_ST_Char_contra, _GT_Char_co]):
@@ -1014,7 +1017,7 @@ class URLField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = 200,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `URLField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1028,7 +1031,7 @@ class URLField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = 200,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(URLField): ...`: its bound types can't match the overload above.
     @overload
@@ -1042,7 +1045,7 @@ class URLField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = 200,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `URLField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1057,7 +1060,7 @@ class URLField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = 200,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 _ST_Text_contra = TypeVar("_ST_Text_contra", contravariant=True, default=str)
@@ -1078,7 +1081,7 @@ class TextField(Field[_ST_Text_contra, _GT_Text_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `TextField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1092,7 +1095,7 @@ class TextField(Field[_ST_Text_contra, _GT_Text_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(TextField): ...`: its bound types can't match the overload above.
     @overload
@@ -1106,7 +1109,7 @@ class TextField(Field[_ST_Text_contra, _GT_Text_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `TextField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1121,7 +1124,7 @@ class TextField(Field[_ST_Text_contra, _GT_Text_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 _ST_Bool_contra = TypeVar("_ST_Bool_contra", contravariant=True, default=bool)
@@ -1140,7 +1143,7 @@ class BooleanField(Field[_ST_Bool_contra, _GT_Bool_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[bool]],
     ) -> None: ...
     # `BooleanField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1153,7 +1156,7 @@ class BooleanField(Field[_ST_Bool_contra, _GT_Bool_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[bool]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(BooleanField): ...`: its bound types can't match the overload above.
     @overload
@@ -1166,7 +1169,7 @@ class BooleanField(Field[_ST_Bool_contra, _GT_Bool_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[bool]],
     ) -> None: ...
     # `BooleanField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1180,7 +1183,7 @@ class BooleanField(Field[_ST_Bool_contra, _GT_Bool_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[bool]],
     ) -> None: ...
 
 _ST_NBool_contra = TypeVar("_ST_NBool_contra", contravariant=True, default=bool | None)
@@ -1204,7 +1207,7 @@ class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `IPAddressField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1217,7 +1220,7 @@ class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(IPAddressField): ...`: its bound types can't match the overload above.
     @overload
@@ -1230,7 +1233,7 @@ class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `IPAddressField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1244,7 +1247,7 @@ class IPAddressField(Field[_ST_IP_contra, _GT_IP_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 _ST_GenIP_contra = TypeVar("_ST_GenIP_contra", contravariant=True, default=str | int | Callable[..., Any])
@@ -1265,7 +1268,7 @@ class GenericIPAddressField(Field[_ST_GenIP_contra, _GT_IP_co]):
         null: Literal[False] = False,
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `GenericIPAddressField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1279,7 +1282,7 @@ class GenericIPAddressField(Field[_ST_GenIP_contra, _GT_IP_co]):
         null: Literal[True],
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(GenericIPAddressField): ...`: its bound types can't match the overload above.
     @overload
@@ -1293,7 +1296,7 @@ class GenericIPAddressField(Field[_ST_GenIP_contra, _GT_IP_co]):
         null: Literal[True],
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `GenericIPAddressField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1308,7 +1311,7 @@ class GenericIPAddressField(Field[_ST_GenIP_contra, _GT_IP_co]):
         null: bool,
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 class DateTimeCheckMixin:
@@ -1334,7 +1337,7 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date_contra, _GT_Date_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[date]],
     ) -> None: ...
     # `DateField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1349,7 +1352,7 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date_contra, _GT_Date_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[date]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(DateField): ...`: its bound types can't match the overload above.
     @overload
@@ -1364,7 +1367,7 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date_contra, _GT_Date_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[date]],
     ) -> None: ...
     # `DateField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1380,7 +1383,7 @@ class DateField(DateTimeCheckMixin, Field[_ST_Date_contra, _GT_Date_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[date]],
     ) -> None: ...
     @override
     def contribute_to_class(self, cls: type[Model], name: str, **kwargs: Any) -> None: ...  # type: ignore[override]
@@ -1403,7 +1406,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST_Time_contra, _GT_Time_co]):
         null: Literal[False] = False,
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[time]],
     ) -> None: ...
     # `TimeField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1417,7 +1420,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST_Time_contra, _GT_Time_co]):
         null: Literal[True],
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[time]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(TimeField): ...`: its bound types can't match the overload above.
     @overload
@@ -1431,7 +1434,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST_Time_contra, _GT_Time_co]):
         null: Literal[True],
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[time]],
     ) -> None: ...
     # `TimeField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1446,7 +1449,7 @@ class TimeField(DateTimeCheckMixin, Field[_ST_Time_contra, _GT_Time_co]):
         null: bool,
         primary_key: bool = False,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[time]],
     ) -> None: ...
 
 _ST_DateTime_contra = TypeVar("_ST_DateTime_contra", contravariant=True, default=str | real_datetime | date)
@@ -1467,7 +1470,7 @@ class DateTimeField(DateField[_ST_DateTime_contra, _GT_DateTime_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[real_datetime]],
     ) -> None: ...
     # `DateTimeField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1482,7 +1485,7 @@ class DateTimeField(DateField[_ST_DateTime_contra, _GT_DateTime_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[real_datetime]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(DateTimeField): ...`: its bound types can't match the overload above.
     @overload
@@ -1497,7 +1500,7 @@ class DateTimeField(DateField[_ST_DateTime_contra, _GT_DateTime_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[real_datetime]],
     ) -> None: ...
     # `DateTimeField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1513,7 +1516,7 @@ class DateTimeField(DateField[_ST_DateTime_contra, _GT_DateTime_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[real_datetime]],
     ) -> None: ...
 
 _ST_UUID_contra = TypeVar("_ST_UUID_contra", contravariant=True, default=str | uuid.UUID)
@@ -1532,7 +1535,7 @@ class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[uuid.UUID]],
     ) -> None: ...
     # `UUIDField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1545,7 +1548,7 @@ class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[uuid.UUID]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(UUIDField): ...`: its bound types can't match the overload above.
     @overload
@@ -1558,7 +1561,7 @@ class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[uuid.UUID]],
     ) -> None: ...
     # `UUIDField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1572,7 +1575,7 @@ class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[uuid.UUID]],
     ) -> None: ...
 
 class FilePathField(Field[_ST_contra, _GT_co]):
@@ -1613,7 +1616,7 @@ class BinaryField(Field[_ST_Binary_contra, _GT_Binary_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[bytes | memoryview]],
     ) -> None: ...
     # `BinaryField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1626,7 +1629,7 @@ class BinaryField(Field[_ST_Binary_contra, _GT_Binary_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[bytes | memoryview]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(BinaryField): ...`: its bound types can't match the overload above.
     @overload
@@ -1639,7 +1642,7 @@ class BinaryField(Field[_ST_Binary_contra, _GT_Binary_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[bytes | memoryview]],
     ) -> None: ...
     # `BinaryField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1653,7 +1656,7 @@ class BinaryField(Field[_ST_Binary_contra, _GT_Binary_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[bytes | memoryview]],
     ) -> None: ...
     def get_placeholder_sql(self, value: Any, compiler: SQLCompiler, connection: BaseDatabaseWrapper) -> _AsSqlType: ...
 
@@ -1672,7 +1675,7 @@ class DurationField(Field[_ST_Duration_contra, _GT_Duration_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[timedelta]],
     ) -> None: ...
     # `DurationField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -1685,7 +1688,7 @@ class DurationField(Field[_ST_Duration_contra, _GT_Duration_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[timedelta]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(DurationField): ...`: its bound types can't match the overload above.
     @overload
@@ -1698,7 +1701,7 @@ class DurationField(Field[_ST_Duration_contra, _GT_Duration_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[timedelta]],
     ) -> None: ...
     # `DurationField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -1712,7 +1715,7 @@ class DurationField(Field[_ST_Duration_contra, _GT_Duration_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[timedelta]],
     ) -> None: ...
 
 class AutoFieldMixin:

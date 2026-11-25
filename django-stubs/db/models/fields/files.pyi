@@ -71,7 +71,7 @@ class FileField(Field[_ST_contra, _GT_File_co]):
         null: bool = False,
         max_length: int | None = 100,
         db_default: type[NOT_PROVIDED] | Expression | str = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[FieldFile]],
     ) -> None: ...
     # class access
     @overload
@@ -121,7 +121,7 @@ class ImageField(FileField[_ST_contra, _GT_ImageFile_co]):
         null: bool = False,
         max_length: int | None = 100,
         db_default: type[NOT_PROVIDED] | Expression | str = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[ImageFieldFile]],
     ) -> None: ...
     # class access
     @overload
