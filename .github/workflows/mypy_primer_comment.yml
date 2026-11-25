@@ -61,7 +61,7 @@ jobs:
             return prNumber
 
       - name: Hide old comments
-        uses: int128/hide-comment-action@430b7e736ceb7372703a3022d1a5a26f07328207  # v1.78.0
+        uses: int128/hide-comment-action@a06f2c83c4bf21f9b9f8b87b3bb88cb769aa5e74  # v1.79.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ steps.get-pr-number.outputs.result }}
