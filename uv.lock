@@ -428,7 +428,7 @@ dev = [
     { name = "pyyaml", specifier = "==6.0.4" },
     { name = "ty", specifier = "==0.0.107" },
     { name = "types-psycopg2" },
-    { name = "types-psycopg2", specifier = "==2.9.21.20261030" },
+    { name = "types-psycopg2", specifier = "==2.9.21.20261122" },
 ]
 pyrefly = [
     { name = "psycopg2-binary" },
@@ -449,7 +449,7 @@ tests = [
     { name = "pytest-shard", specifier = "==0.1.2" },
     { name = "pytest-xdist", specifier = "==3.8.0" },
     { name = "pyyaml", specifier = "==6.0.4" },
-    { name = "types-psycopg2", specifier = "==2.9.21.20261030" },
+    { name = "types-psycopg2", specifier = "==2.9.21.20261122" },
 ]
 ty = [
     { name = "psycopg2-binary" },
@@ -1619,11 +1619,11 @@ wheels = [
 
 [[package]]
 name = "types-psycopg2"
-version = "2.9.21.20261030"
+version = "2.9.21.20261122"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/99/9d/3d22bd79e5777d6bb11042d5853cfe41617e40aebea5272b048aef070872/types_psycopg2-2.9.21.20261030.tar.gz", hash = "sha256:7850716d731d6bf45c53f2d26179e2bcf7273d1d3acfd56b0201adc1dec4ba20", size = 27973, upload-time = "2026-10-30T07:50:27.642Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/06/98/c4d772d148d8c048ec7ac5baecccadb74b80971f6e03b32101c9ba2e9e5f/types_psycopg2-2.9.21.20261122.tar.gz", hash = "sha256:4c045b8b0add828c75f00d7d602a5375ccd433521582af1a78bb153795e7d80c", size = 28016, upload-time = "2026-11-22T08:57:54.855Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8f/23/eb7f937f9f9346097a31d243b74cc3d23e4d8cc777916cef4a89bfafa6b5/types_psycopg2-2.9.21.20261030-py3-none-any.whl", hash = "sha256:e51ed54722bc7bc3cfb635a8623d9915d1816ed789c926c40b5f61d5f417a4ab", size = 25041, upload-time = "2026-10-30T07:50:26.781Z" },
+    { url = "https://files.pythonhosted.org/packages/96/68/688d4b554aac5f59630f56c773acb27f3f48ccf4450556d275e500e0c1c4/types_psycopg2-2.9.21.20261122-py3-none-any.whl", hash = "sha256:2f8288d554d59c3091c4a5b781a087e52663866e4aadf3ab5aa7e4a7eb8bc5e8", size = 25080, upload-time = "2026-11-22T08:57:54.129Z" },
 ]
 
 [[package]]
