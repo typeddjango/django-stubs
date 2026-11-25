@@ -457,7 +457,7 @@
     from django.db import models
     from myapp.models import Blog
 
-    qs = Blog.objects.annotate(distance=0)
+    qs = Blog.objects.annotate(distance=models.Value(0))
     reveal_type(qs)
     reveal_type(qs.filter(distance=10))
     reveal_type(qs.filter(distance__lt=10))
