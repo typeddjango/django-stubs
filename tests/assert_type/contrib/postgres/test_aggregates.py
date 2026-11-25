@@ -20,7 +20,7 @@ ArrayAgg("title", distinct=True, filter=Q(active=True), order_by="-title", defau
 ArrayAgg("title", filter=Exists(queryset))
 ArrayAgg("title", filter=GreaterThan(F("id"), 0))
 ArrayAgg("title", filter=ExpressionWrapper(Exists(queryset), output_field=BooleanField()))
-ArrayAgg("title", order_by=123)  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
-ArrayAgg("title", order_by=[123])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
-ArrayAgg("title", filter=F("a"))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
-ArrayAgg("title", filter="active")  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[bad-argument-type]  # ty: ignore[invalid-argument-type]
+ArrayAgg("title", order_by=123)  # type: ignore[call-overload]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]
+ArrayAgg("title", order_by=[123])  # type: ignore[list-item]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]
+ArrayAgg("title", filter=F("a"))  # type: ignore[call-overload]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]
+ArrayAgg("title", filter="active")  # type: ignore[call-overload]  # pyright: ignore[reportArgumentType]  # pyrefly: ignore[no-matching-overload]  # ty: ignore[invalid-argument-type]
