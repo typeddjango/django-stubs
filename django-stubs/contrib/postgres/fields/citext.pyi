@@ -29,7 +29,7 @@ class CICharField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CICharField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -43,7 +43,7 @@ class CICharField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(CICharField): ...`: its bound types can't match the overload above.
     @overload
@@ -57,7 +57,7 @@ class CICharField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CICharField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -72,7 +72,7 @@ class CICharField(CharField[_ST_Char_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 class CIEmailField(EmailField[_ST_Email_contra, _GT_Char_co]):
@@ -88,7 +88,7 @@ class CIEmailField(EmailField[_ST_Email_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CIEmailField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -102,7 +102,7 @@ class CIEmailField(EmailField[_ST_Email_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(CIEmailField): ...`: its bound types can't match the overload above.
     @overload
@@ -116,7 +116,7 @@ class CIEmailField(EmailField[_ST_Email_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CIEmailField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -131,7 +131,7 @@ class CIEmailField(EmailField[_ST_Email_contra, _GT_Char_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 class CITextField(TextField[_ST_Text_contra, _GT_Text_co]):
@@ -147,7 +147,7 @@ class CITextField(TextField[_ST_Text_contra, _GT_Text_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CITextField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -161,7 +161,7 @@ class CITextField(TextField[_ST_Text_contra, _GT_Text_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(CITextField): ...`: its bound types can't match the overload above.
     @overload
@@ -175,7 +175,7 @@ class CITextField(TextField[_ST_Text_contra, _GT_Text_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
     # `CITextField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -190,7 +190,7 @@ class CITextField(TextField[_ST_Text_contra, _GT_Text_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[str]],
     ) -> None: ...
 
 __all__ = ["CICharField", "CIEmailField", "CITextField"]

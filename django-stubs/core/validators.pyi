@@ -6,13 +6,15 @@ from typing import Any, TypeAlias
 from django.core.files.base import File
 from django.utils.deconstruct import _Deconstructible
 from django.utils.functional import _StrOrPromise
-from typing_extensions import override
+from typing_extensions import TypeVar, override
 
 EMPTY_VALUES: Any
 
 _Regex: TypeAlias = str | Pattern[str]
 
-_ValidatorCallable: TypeAlias = Callable[[Any], None]  # ruff: ignore[unused-private-type-alias]
+_VT_contra = TypeVar("_VT_contra", contravariant=True, default=Any)
+
+_ValidatorCallable: TypeAlias = Callable[[_VT_contra], None]  # ruff: ignore[unused-private-type-alias]
 
 class RegexValidator(_Deconstructible):
     regex: _Regex  # Pattern[str] on instance, but may be str on class definition

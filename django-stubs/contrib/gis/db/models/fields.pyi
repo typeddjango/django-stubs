@@ -131,7 +131,7 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[Point]],
     ) -> None: ...
     # `PointField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -151,7 +151,7 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[Point]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(PointField): ...`: its bound types can't match the overload above.
     @overload
@@ -171,7 +171,7 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[Point]],
     ) -> None: ...
     # `PointField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -192,7 +192,7 @@ class PointField(GeometryField[_ST_Point_contra, _GT_Point_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[Point]],
     ) -> None: ...
 
     geom_class: type[Point]
@@ -221,7 +221,7 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[LineString]],
     ) -> None: ...
     # `LineStringField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -241,7 +241,7 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[LineString]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(LineStringField): ...`: its bound types can't match the overload above.
     @overload
@@ -261,7 +261,7 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[LineString]],
     ) -> None: ...
     # `LineStringField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -282,7 +282,7 @@ class LineStringField(GeometryField[_ST_LineString_contra, _GT_LineString_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[LineString]],
     ) -> None: ...
 
     geom_class: type[LineString]
@@ -311,7 +311,7 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[Polygon]],
     ) -> None: ...
     # `PolygonField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -331,7 +331,7 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[Polygon]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(PolygonField): ...`: its bound types can't match the overload above.
     @overload
@@ -351,7 +351,7 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[Polygon]],
     ) -> None: ...
     # `PolygonField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -372,7 +372,7 @@ class PolygonField(GeometryField[_ST_Polygon_contra, _GT_Polygon_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[Polygon]],
     ) -> None: ...
 
     geom_class: type[Polygon]
@@ -401,7 +401,7 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiPoint]],
     ) -> None: ...
     # `MultiPointField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -421,7 +421,7 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiPoint]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(MultiPointField): ...`: its bound types can't match the overload above.
     @overload
@@ -441,7 +441,7 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiPoint]],
     ) -> None: ...
     # `MultiPointField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -462,7 +462,7 @@ class MultiPointField(GeometryField[_ST_MultiPoint_contra, _GT_MultiPoint_co]):
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiPoint]],
     ) -> None: ...
 
     geom_class: type[MultiPoint]
@@ -491,7 +491,7 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiLineString]],
     ) -> None: ...
     # `MultiLineStringField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -511,7 +511,7 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiLineString]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(MultiLineStringField): ...`: its bound types can't match the overload above.
     @overload
@@ -531,7 +531,7 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiLineString]],
     ) -> None: ...
     # `MultiLineStringField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -552,7 +552,7 @@ class MultiLineStringField(GeometryField[_ST_MultiLineString_contra, _GT_MultiLi
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiLineString]],
     ) -> None: ...
 
     geom_class: type[MultiLineString]
@@ -581,7 +581,7 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiPolygon]],
     ) -> None: ...
     # `MultiPolygonField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -601,7 +601,7 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiPolygon]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(MultiPolygonField): ...`: its bound types can't match the overload above.
     @overload
@@ -621,7 +621,7 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiPolygon]],
     ) -> None: ...
     # `MultiPolygonField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -642,7 +642,7 @@ class MultiPolygonField(GeometryField[_ST_MultiPolygon_contra, _GT_MultiPolygon_
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[MultiPolygon]],
     ) -> None: ...
 
     geom_class: type[MultiPolygon]
@@ -671,7 +671,7 @@ class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_G
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[GeometryCollection]],
     ) -> None: ...
     # `GeometryCollectionField(null=True)`: the `self` annotation gives the nullable type.
     @overload
@@ -691,7 +691,7 @@ class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_G
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[GeometryCollection]],
     ) -> None: ...
     # `Sub(null=True)` for `class Sub(GeometryCollectionField): ...`: its bound types can't match the overload above.
     @overload
@@ -711,7 +711,7 @@ class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_G
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[GeometryCollection]],
     ) -> None: ...
     # `GeometryCollectionField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
     @overload
@@ -732,7 +732,7 @@ class GeometryCollectionField(GeometryField[_ST_GeometryCollection_contra, _GT_G
         primary_key: bool = False,
         max_length: int | None = None,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
-        **kwargs: Unpack[FieldInitKwargs],
+        **kwargs: Unpack[FieldInitKwargs[GeometryCollection]],
     ) -> None: ...
 
     geom_class: type[GeometryCollection]
