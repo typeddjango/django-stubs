@@ -9,6 +9,7 @@ from mypy.nodes import AssignmentStmt, CallExpr, IndexExpr, NameExpr, TypeInfo
 from mypy.semanal import SemanticAnalyzer
 from mypy.semanal_shared import has_placeholder
 from mypy.typeanal import make_optional_type
+from mypy.typeops import make_simplified_union
 from mypy.types import AnyType, Instance, NoneType, ProperType, TypeOfAny, UninhabitedType, get_proper_type
 from mypy.types import Type as MypyType
 
@@ -104,9 +105,14 @@ def fill_descriptor_types_for_related_field(ctx: FunctionContext, django_context
         related_model_to_set_type = helpers.model_instance(related_model_to_set_info)
 
     # replace Any with referred_to_type
-    return helpers.reparametrize_field_type(
+    field_type = helpers.reparametrize_field_type(
         default_related_field_type, set_type=related_model_to_set_type, get_type=related_model_type
     )
+    if related_model_to_set is related_model:
+        return field_type
+    # The stubs solve `ForeignKey(Proxy)` to the proxy, but Django also accepts its concrete model.
+    set_type = make_simplified_union([field_type.args[0], related_model_to_set_type])
+    return field_type.copy_modified(args=[set_type, *field_type.args[1:]])
 
 
 class FieldDescriptorTypes(NamedTuple):
