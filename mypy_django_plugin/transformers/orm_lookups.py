@@ -42,7 +42,7 @@ def typecheck_queryset_filter(ctx: MethodContext, django_context: DjangoContext)
         if isinstance(provided_type, Instance) and helpers.has_any_of_bases(
             provided_type.type, (fullnames.MANAGER_CLASS_FULLNAME, fullnames.QUERYSET_CLASS_FULLNAME)
         ):
-            return ctx.default_return_type
+            continue
 
         helpers.check_types_compatible(
             ctx,
