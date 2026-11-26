@@ -3,8 +3,10 @@ from __future__ import annotations
 from typing import assert_type
 
 from django.contrib.gis.db.models import fields
+from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.geos import (
     GeometryCollection,
+    GEOSGeometry,
     LineString,
     MultiLineString,
     MultiPoint,
@@ -16,6 +18,8 @@ from django.db import models
 
 
 class Geo(models.Model):
+    geometry = fields.GeometryField()
+    raster = fields.RasterField()
     point = fields.PointField()
     line_string = fields.LineStringField()
     polygon = fields.PolygonField()
@@ -30,10 +34,15 @@ class Geo(models.Model):
     null_multi_line_string = fields.MultiLineStringField(null=True)
     null_multi_polygon = fields.MultiPolygonField(null=True)
     null_geometry_collection = fields.GeometryCollectionField(null=True)
+    null_geometry = fields.GeometryField(null=True)
+    null_raster = fields.RasterField(null=True)
 
 
 def fields_getter_and_setter() -> None:
     geo = Geo()
+    assert_type(geo.geometry, GEOSGeometry)
+    geo.geometry = Point()
+    assert_type(geo.raster, GDALRaster)
     assert_type(geo.point, Point)
     geo.point = Point()
     assert_type(geo.line_string, LineString)
@@ -59,5 +68,16 @@ def nullable_geometry_fields_read_optional() -> None:
     assert_type(geo.null_multi_line_string, MultiLineString | None)
     assert_type(geo.null_multi_polygon, MultiPolygon | None)
     assert_type(geo.null_geometry_collection, GeometryCollection | None)
+    assert_type(geo.null_geometry, GEOSGeometry | None)
+    assert_type(geo.null_raster, GDALRaster | None)
     geo.null_point = None
     geo.point = None  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
+
+
+def spatial_fields_accept_serialized_input() -> None:
+    geo = Geo()
+    geo.point = "POINT (0 0)"
+    geo.null_point = memoryview(b"")
+    geo.point = b""  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]  # ty: ignore[invalid-assignment]  # pyrefly: ignore[bad-argument-type]
+    geo.raster = "/rasters/elevation.tif"
+    geo.null_raster = {"srid": 4326, "width": 1, "height": 1}

@@ -317,5 +317,6 @@ django.db.models.fields.PositiveIntegerField.__init__
 django.db.models.fields.PositiveSmallIntegerField.__init__
 django.db.models.fields.SlugField.__init__
 django.db.models.fields.SmallIntegerField.__init__
+django.contrib.postgres.fields.hstore.HStoreField.__init__
 # runtime has a *args passthrough the stub deliberately narrows away
 django.db.models.fields.GenericIPAddressField.__init__

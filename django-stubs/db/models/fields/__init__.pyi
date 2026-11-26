@@ -1575,12 +1575,17 @@ class UUIDField(Field[_ST_UUID_contra, _GT_UUID_co]):
         **kwargs: Unpack[FieldInitKwargs],
     ) -> None: ...
 
-class FilePathField(Field[_ST_contra, _GT_co]):
+_ST_FilePath_contra = TypeVar("_ST_FilePath_contra", contravariant=True, default=str)
+_GT_FilePath_co = TypeVar("_GT_FilePath_co", covariant=True, default=str)
+
+class FilePathField(Field[_ST_FilePath_contra, _GT_FilePath_co]):
     path: str | Callable[..., str]
     match: str | None
     recursive: bool
     allow_files: bool
     allow_folders: bool
+    # `FilePathField()` or `FilePathField(null=False)`: keeps the type var defaults.
+    @overload
     def __init__(
         self,
         verbose_name: _StrOrPromise | None = None,
@@ -1591,7 +1596,62 @@ class FilePathField(Field[_ST_contra, _GT_co]):
         allow_files: bool = True,
         allow_folders: bool = False,
         *,
-        null: bool = False,
+        null: Literal[False] = False,
+        primary_key: bool = False,
+        max_length: int = 100,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `FilePathField(null=True)`: the `self` annotation gives the nullable type.
+    @overload
+    def __init__(
+        self: FilePathField[str | None, str | None],
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        path: str | Callable[..., str] = "",
+        match: str | None = None,
+        recursive: bool = False,
+        allow_files: bool = True,
+        allow_folders: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int = 100,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `Sub(null=True)` for `class Sub(FilePathField): ...`: its bound types can't match the overload above.
+    @overload
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        path: str | Callable[..., str] = "",
+        match: str | None = None,
+        recursive: bool = False,
+        allow_files: bool = True,
+        allow_folders: bool = False,
+        *,
+        null: Literal[True],
+        primary_key: bool = False,
+        max_length: int = 100,
+        db_default: type[NOT_PROVIDED] | Expression | Any = ...,
+        **kwargs: Unpack[FieldInitKwargs],
+    ) -> None: ...
+    # `FilePathField(null=flag)` with `flag: bool`. Stays last, as `bool` also matches `True`.
+    @overload
+    @deprecated("`null` must be a literal `True` or `False` for the field type to be inferred")
+    def __init__(
+        self,
+        verbose_name: _StrOrPromise | None = None,
+        name: str | None = None,
+        path: str | Callable[..., str] = "",
+        match: str | None = None,
+        recursive: bool = False,
+        allow_files: bool = True,
+        allow_folders: bool = False,
+        *,
+        null: bool,
         primary_key: bool = False,
         max_length: int = 100,
         db_default: type[NOT_PROVIDED] | Expression | Any = ...,
