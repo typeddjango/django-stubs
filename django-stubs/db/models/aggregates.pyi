@@ -19,7 +19,7 @@ class Aggregate(Func[_OutputField]):
     allow_distinct: bool
     allow_order_by: bool
     empty_result_set_value: int | None
-    # An aggregate over no rows is NULL, so without a `default` the value can be `None`.
+    # `Aggregate("price", output_field=IntegerField())`: an aggregate over no rows is NULL, so the value can be `None`.
     @overload
     def __init__(
         self: Aggregate[Field[_ST, _GT | None]],
@@ -31,7 +31,7 @@ class Aggregate(Func[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
-    # A `default` wraps the aggregate in `Coalesce`, so the value keeps the output field's type.
+    # `Aggregate("price", output_field=IntegerField(), default=0)`: `Coalesce` keeps the field's type.
     @overload
     def __init__(
         self: Aggregate[Field[_ST, _GT]],
@@ -43,6 +43,7 @@ class Aggregate(Func[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `Aggregate("price")`: without `output_field`, the output field stays `Field`.
     @overload
     def __init__(
         self,
@@ -60,12 +61,8 @@ class Aggregate(Func[_OutputField]):
         self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any
     ) -> _AsSqlType: ...
 
-# mypy and pyright don't solve a subclass's type parameters from an inherited self-annotated overload,
-# so subclasses that take `Aggregate.__init__` repeat its overloads to type `output_field` and `default`.
-# pyrefly and ty get it right from the inherited overloads alone.
-# TODO: drop the repeated overloads once mypy and pyright support it,
-# see https://github.com/python/mypy/issues/22395 and https://github.com/microsoft/pyright/issues/11989.
 class AnyValue(Aggregate[_OutputField]):
+    # `AnyValue("price", output_field=IntegerField())`: an aggregate over no rows is NULL, so the value can be `None`.
     @overload
     def __init__(
         self: AnyValue[Field[_ST, _GT | None]],
@@ -77,6 +74,7 @@ class AnyValue(Aggregate[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `AnyValue("price", output_field=IntegerField(), default=0)`: `Coalesce` keeps the field's type.
     @overload
     def __init__(
         self: AnyValue[Field[_ST, _GT]],
@@ -88,6 +86,7 @@ class AnyValue(Aggregate[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `AnyValue("price")`: without `output_field`, the output field stays `Field`.
     @overload
     def __init__(
         self,
@@ -104,6 +103,7 @@ class AnyValue(Aggregate[_OutputField]):
     ) -> _AsSqlType: ...
 
 class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate[_OutputField]):
+    # `Avg("price", output_field=IntegerField())`: an aggregate over no rows is NULL, so the value can be `None`.
     @overload
     def __init__(
         self: Avg[Field[_ST, _GT | None]],
@@ -115,6 +115,7 @@ class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate[_OutputField
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `Avg("price", output_field=IntegerField(), default=0)`: `Coalesce` keeps the field's type.
     @overload
     def __init__(
         self: Avg[Field[_ST, _GT]],
@@ -126,6 +127,7 @@ class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate[_OutputField
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `Avg("price")`: without `output_field`, the output field stays `Field`.
     @overload
     def __init__(
         self,
@@ -157,6 +159,7 @@ class Count(Aggregate):
     ) -> None: ...
 
 class Max(Aggregate[_OutputField]):
+    # `Max("price", output_field=IntegerField())`: an aggregate over no rows is NULL, so the value can be `None`.
     @overload
     def __init__(
         self: Max[Field[_ST, _GT | None]],
@@ -168,6 +171,7 @@ class Max(Aggregate[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `Max("price", output_field=IntegerField(), default=0)`: `Coalesce` keeps the field's type.
     @overload
     def __init__(
         self: Max[Field[_ST, _GT]],
@@ -179,6 +183,7 @@ class Max(Aggregate[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `Max("price")`: without `output_field`, the output field stays `Field`.
     @overload
     def __init__(
         self,
@@ -191,6 +196,7 @@ class Max(Aggregate[_OutputField]):
     ) -> None: ...
 
 class Min(Aggregate[_OutputField]):
+    # `Min("price", output_field=IntegerField())`: an aggregate over no rows is NULL, so the value can be `None`.
     @overload
     def __init__(
         self: Min[Field[_ST, _GT | None]],
@@ -202,6 +208,7 @@ class Min(Aggregate[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `Min("price", output_field=IntegerField(), default=0)`: `Coalesce` keeps the field's type.
     @overload
     def __init__(
         self: Min[Field[_ST, _GT]],
@@ -213,6 +220,7 @@ class Min(Aggregate[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `Min("price")`: without `output_field`, the output field stays `Field`.
     @overload
     def __init__(
         self,
@@ -253,6 +261,7 @@ class StringAgg(Aggregate):
     def as_sqlite(self, compiler: SQLCompiler, connection: BaseDatabaseWrapper, **extra_context: Any) -> _AsSqlType: ...
 
 class Sum(FixDurationInputMixin, Aggregate[_OutputField]):
+    # `Sum("price", output_field=IntegerField())`: an aggregate over no rows is NULL, so the value can be `None`.
     @overload
     def __init__(
         self: Sum[Field[_ST, _GT | None]],
@@ -264,6 +273,7 @@ class Sum(FixDurationInputMixin, Aggregate[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `Sum("price", output_field=IntegerField(), default=0)`: `Coalesce` keeps the field's type.
     @overload
     def __init__(
         self: Sum[Field[_ST, _GT]],
@@ -275,6 +285,7 @@ class Sum(FixDurationInputMixin, Aggregate[_OutputField]):
         order_by: _OrderByFieldName | Sequence[_OrderByFieldName] | None = None,
         **extra: Any,
     ) -> None: ...
+    # `Sum("price")`: without `output_field`, the output field stays `Field`.
     @overload
     def __init__(
         self,
