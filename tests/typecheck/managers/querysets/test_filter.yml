@@ -467,3 +467,28 @@
                 class Event(models.Model):
                     start_date = models.DateField()
                     created_at = models.DateTimeField()
+
+
+-   case: queryset_valued_lookup_does_not_stop_the_other_checks
+    main: |
+        from myapp.models import Author, Book
+        authors = Author.objects.all()
+        Book.objects.filter(author__in=authors, pages=1)
+        Book.objects.filter(author__in=authors, pages=[1])  # E: Incompatible type for lookup 'pages': (got "list[Any]", expected "str | int")  [misc]
+        Book.objects.exclude(author__in=Author.objects, pages=[1])  # E: Incompatible type for lookup 'pages': (got "list[Any]", expected "str | int")  [misc]
+        Book.objects.filter(author__in=authors, nope=1)  # E: Cannot resolve keyword 'nope' into field. Choices are: author, author_id, id, pages  [misc]
+        Book.objects.get_or_create(author__in=authors, defaults={"pages": [1]})  # E: Incompatible type for "pages" of "Book" (got "list[int]", expected "float | int | str | Combinable")  [misc]
+    installed_apps:
+        - myapp
+    files:
+        -   path: myapp/__init__.py
+        -   path: myapp/models.py
+            content: |
+                from django.db import models
+
+                class Author(models.Model):
+                    pass
+
+                class Book(models.Model):
+                    pages = models.IntegerField()
+                    author = models.ForeignKey(Author, on_delete=models.CASCADE)
