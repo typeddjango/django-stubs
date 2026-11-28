@@ -704,9 +704,9 @@
     main: |
         from typing_extensions import reveal_type
         from myapp.models import MyModel
-        reveal_type(MyModel.objects.alias)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.alias)  # N: Revealed type is "def (*args: django.db.models.query._Resolvable, **kwargs: django.db.models.query._Resolvable) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.all)  # N: Revealed type is "def () -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
-        reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: Any, **kwargs: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
+        reveal_type(MyModel.objects.annotate)  # N: Revealed type is "def (*args: django.db.models.query._Resolvable, **kwargs: django.db.models.query._Resolvable) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.complex_filter)  # N: Revealed type is "def (filter_obj: Any) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"
         reveal_type(MyModel.objects.defer)  # N: Revealed type is "Overload(def (None) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel], def (*fields: str) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel])"
         reveal_type(MyModel.objects.difference)  # N: Revealed type is "def (*other_qs: django.db.models.query.QuerySet[django.db.models.base.Model, Any]) -> myapp.models.MyQuerySet[myapp.models.MyModel, myapp.models.MyModel]"

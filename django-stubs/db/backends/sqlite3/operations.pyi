@@ -10,7 +10,7 @@ from django.db.models.expressions import Expression
 from django.db.models.fields import DateField, DateTimeField, TimeField
 from typing_extensions import override
 
-UNSUPPORTED_DATETIME_AGGREGATES: tuple[type[Aggregate], ...]
+UNSUPPORTED_DATETIME_AGGREGATES: tuple[type[Aggregate[Any]], ...]
 DATETIME_FIELDS: tuple[type[DateField[Any, Any] | DateTimeField[Any, Any] | TimeField[Any, Any]], ...]
 
 class DatabaseOperations(BaseDatabaseOperations):
