@@ -45,9 +45,9 @@ _MT_co = TypeVar("_MT_co", bound=models.Model, covariant=True)
 
 
 class QuerySetHolder(Generic[_MT_co]):
-    """Plain classes hold managers too, this mirrors DRF's `GenericAPIView.queryset`."""
+    """This mirrors DRF's `GenericAPIView.queryset`."""
 
-    queryset: models.Manager[_MT_co] | models.QuerySet[_MT_co] | None = None
+    queryset: models.QuerySet[_MT_co] | None = None
 
 
 class CategoryHolder(QuerySetHolder[Category]):
@@ -56,8 +56,7 @@ class CategoryHolder(QuerySetHolder[Category]):
 
 
 class UnparametrizedHolder(QuerySetHolder):  # pyright: ignore[reportMissingTypeArgument]
-    # pyrefly drops the inherited annotation and sees a read-only descriptor: https://github.com/pyrefly-org/pyrefly/issues/5725
-    queryset = Category.objects  # pyrefly: ignore[bad-override]
+    queryset = Category.objects.all()
 
 
 class PermissionAware(Protocol):
@@ -107,7 +106,7 @@ def self_referential_manager_access_on_instance_is_banned() -> None:
 
 
 def manager_on_plain_class_is_allowed() -> None:
-    assert_type(CategoryHolder().queryset, models.Manager[Category] | models.QuerySet[Category] | None)
+    assert_type(CategoryHolder().queryset, models.QuerySet[Category] | None)
     UnparametrizedHolder().queryset  # pyright: ignore[reportUnknownMemberType]
 
 
