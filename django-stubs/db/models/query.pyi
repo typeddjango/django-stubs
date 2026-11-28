@@ -35,6 +35,9 @@ _OrderByFieldName: TypeAlias = str | Combinable
 # Django rejects `annotate()` values without `resolve_expression()`.
 @type_check_only
 class _Resolvable(Protocol):
+    # `*args: Any, **kwargs: Any` means "any signature" per the typing spec,
+    # `object` would instead require implementers to accept arbitrary arguments.
+    # See https://typing.python.org/en/latest/spec/callables.html#meaning-of-in-callable
     def resolve_expression(self, *args: Any, **kwargs: Any) -> object: ...
 
 MAX_GET_RESULTS: int
