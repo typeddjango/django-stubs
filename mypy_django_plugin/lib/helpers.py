@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import TYPE_CHECKING, NamedTuple, Self, TypedDict, cast
 
 from mypy import checker
@@ -63,7 +64,7 @@ from mypy.typevars import fill_typevars, fill_typevars_with_any
 from mypy_django_plugin.lib import fullnames
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Mapping, Sequence
+    from collections.abc import Collection, Iterable, Iterator, Mapping, Sequence
 
     from django.db.models.base import Model
 
@@ -365,6 +366,44 @@ def iter_bases(info: TypeInfo) -> Iterator[Instance]:
         yield from iter_bases(base.type)
 
 
+def gather_keyword_arguments(ctx: FunctionContext | MethodContext) -> TypedDictType:
+    """
+    Gather the types of the provided keyword arguments into a `TypedDictType`. Regular named arguments and unpacked
+    `Required` `TypedDict` entries are collected normally, but unpacked `NotRequired` `TypedDict` entries are collected
+    into a union of the types for any overlapping keyword names.
+    """
+    api = get_typechecker_api(ctx)
+    kwargs: dict[str, MypyType] = {}
+    named = (ArgKind.ARG_NAMED, ArgKind.ARG_NAMED_OPT)
+    typed_dicts = set()
+    merged_optional: dict[str, list[MypyType]] = defaultdict(list)
+
+    for slot in zip(ctx.arg_kinds, ctx.arg_types, ctx.arg_names, strict=False):
+        for kind, arg_type, name in zip(*slot, strict=False):
+            arg_type = get_proper_type(arg_type)
+            if kind in named:
+                assert name is not None
+                kwargs[name] = arg_type
+            elif kind == ArgKind.ARG_STAR2 and isinstance(arg_type, TypedDictType) and arg_type not in typed_dicts:
+                typed_dicts.add(arg_type)
+                for name, item_type in arg_type.items.items():
+                    item_type = get_proper_type(item_type)
+                    if name in arg_type.required_keys:
+                        # Mypy should be checking that TypedDicts do not overlap, so leave any error reporting to it
+                        if name not in kwargs:
+                            kwargs[name] = item_type
+                    else:
+                        merged_optional[name].append(item_type)
+
+    optional_keys = merged_optional.keys() - kwargs.keys()
+    return make_typeddict(
+        api,
+        # add a union with all optional TypedDict items
+        kwargs | {k: UnionType.make_union(merged_optional[k]) for k in optional_keys},
+        required_keys=kwargs.keys(),
+    )
+
+
 def get_private_descriptor_type(type_info: TypeInfo, private_field_name: str, is_nullable: bool) -> MypyType:
     """Return declared type of type_info's private_field_name (used for private Field attributes)"""
     sym = type_info.get(private_field_name)
@@ -547,11 +586,13 @@ def _get_fallback_typeddict(api: SemanticAnalyzer | CheckerPluginInterface) -> I
 def make_typeddict(
     api: SemanticAnalyzer | CheckerPluginInterface,
     fields: dict[str, MypyType],
+    *,
+    required_keys: Collection[str] | None = None,
 ) -> TypedDictType:
-    """Create a TypedDict from a python dict of field names and types."""
+    """Create a TypedDictType from a python dict of field names and types."""
     return TypedDictType(
         items=fields,
-        required_keys=set(fields.keys()),
+        required_keys=set(fields.keys() if required_keys is None else required_keys),
         readonly_keys=set(),
         fallback=_get_fallback_typeddict(api),
     )

@@ -41,6 +41,7 @@ from mypy.types import (
     TypedDictType,
     TypeOfAny,
     TypeVarType,
+    UnionType,
     get_proper_type,
 )
 from mypy.types import Type as MypyType
@@ -256,26 +257,11 @@ def _aggregate_default_alias(expr: Expression, expr_type: MypyType) -> str | Non
             return None
         source = arg
     # TODO: consider switching to `helpers.resolve_string_attribute_value` once
-    # `gather_kwargs` threads `django_context` through — that would also handle
+    # `gather_expression_types` threads `django_context` through — that would also handle
     # `Count(NAME_CONST)` and `Count(settings.X)`.
     if not isinstance(source, StrExpr):
         return None
     return f"{source.value}__{proper.type.name.lower()}"
-
-
-def gather_kwargs(ctx: MethodContext) -> dict[str, MypyType] | None:
-    kwargs: dict[str, MypyType] = {}
-    named = (ARG_NAMED, ARG_NAMED_OPT)
-    for slot in zip(ctx.arg_kinds, ctx.arg_types, ctx.arg_names, ctx.args, strict=False):
-        for kind, arg_type, name, arg in zip(*slot, strict=False):
-            if kind in named:
-                assert name is not None
-                kwargs[name] = arg_type
-            elif kind == ARG_POS:
-                alias = _aggregate_default_alias(arg, arg_type)
-                if alias is not None:
-                    kwargs[alias] = arg_type
-    return kwargs
 
 
 def reparameterize_func_output_field(ctx: FunctionContext) -> MypyType:
@@ -352,49 +338,62 @@ def _resolve_output_field_type(expr_type: MypyType) -> MypyType | None:
     return None
 
 
-def gather_expression_types(ctx: MethodContext) -> dict[str, MypyType]:
-    kwargs = gather_kwargs(ctx)
-    if not kwargs:
-        return {}
+def _resolve_expression_type(expr_type: MypyType) -> MypyType:
+    """Try to resolve the output_field type for each expression. For expressions
+    with a static ClassVar output_field (e.g. Count → IntegerField → int),
+    we can infer the concrete Python type. Otherwise, fall back to Any.
 
-    # Try to resolve the output_field type for each expression. For expressions
-    # with a static ClassVar output_field (e.g. Count → IntegerField → int),
-    # we can infer the concrete Python type. Otherwise, fall back to Any.
-    #
-    # NOTE: It's important that we use 'special_form' for 'Any' as otherwise we can
-    # get stuck with mypy interpreting an overload ambiguity towards the
-    # overloaded 'Field.__get__' method when its 'model' argument gets matched. This
-    # is because the model argument gets matched with a model subclass that is
-    # parametrized with a type that contains the 'Any' below and then mypy runs in
-    # to a (false?) ambiguity, due to 'Any', and can't decide what overload/return
-    # type to select
-    #
-    # Example:
-    #   class MyModel(models.Model):
-    #       field = models.CharField()
-    #
-    #   # Our plugin auto generates the following subclass
-    #   class MyModel_WithAnnotations(MyModel, django_stubs_ext.Annotations[_Annotations]):
-    #       ...
-    #   # Assume
-    #   x = MyModel.objects.annotate(foo=F("id")).get()
-    #   reveal_type(x)  # MyModel_WithAnnotations[TypedDict({"foo": Any})]
-    #   # Then, on an attribute access of 'field' like
-    #   reveal_type(x.field)
-    #
-    # Now 'CharField.__get__', which is overloaded, is passed 'x' as the 'model'
-    # argument and mypy consider it ambiguous to decide which overload method to
-    # select due to the 'Any' in 'TypedDict({"foo": Any})'. But if we specify the
-    # 'Any' as 'TypeOfAny.special_form' mypy doesn't consider the model instance to
-    # contain 'Any' and the ambiguity goes away.
-    result: dict[str, MypyType] = {}
-    for name, expr_type in kwargs.items():
-        resolved = _resolve_output_field_type(expr_type)
-        if resolved is not None and not isinstance(get_proper_type(resolved), AnyType):
-            result[name] = resolved
-        else:
-            result[name] = AnyType(TypeOfAny.special_form)
-    return result
+    NOTE: It's important that we use 'special_form' for 'Any' as otherwise we can
+    get stuck with mypy interpreting an overload ambiguity towards the
+    overloaded 'Field.__get__' method when its 'model' argument gets matched. This
+    is because the model argument gets matched with a model subclass that is
+    parametrized with a type that contains the 'Any' below and then mypy runs in
+    to a (false?) ambiguity, due to 'Any', and can't decide what overload/return
+    type to select
+
+    Example:
+      class MyModel(models.Model):
+          field = models.CharField()
+
+      # Our plugin auto generates the following subclass
+      class MyModel_WithAnnotations(MyModel, django_stubs_ext.Annotations[_Annotations]):
+          ...
+      # Assume
+      x = MyModel.objects.annotate(foo=F("id")).get()
+      reveal_type(x)  # MyModel_WithAnnotations[TypedDict({"foo": Any})]
+      # Then, on an attribute access of 'field' like
+      reveal_type(x.field)
+
+    Now 'CharField.__get__', which is overloaded, is passed 'x' as the 'model'
+    argument and mypy consider it ambiguous to decide which overload method to
+    select due to the 'Any' in 'TypedDict({"foo": Any})'. But if we specify the
+    'Any' as 'TypeOfAny.special_form' mypy doesn't consider the model instance to
+    contain 'Any' and the ambiguity goes away.
+    """
+    expr_type = get_proper_type(expr_type)
+    resolved = (
+        UnionType.make_union([value for item in expr_type.items if (value := _resolve_output_field_type(item))])
+        if isinstance(expr_type, UnionType)
+        else _resolve_output_field_type(expr_type)
+    )
+
+    return (
+        AnyType(TypeOfAny.special_form)
+        if resolved is None or isinstance(get_proper_type(resolved), AnyType)
+        else resolved
+    )
+
+
+def gather_expression_types(ctx: MethodContext) -> TypedDictType:
+    kwargs = helpers.gather_keyword_arguments(ctx)
+    types = {name: _resolve_expression_type(typ) for name, typ in kwargs.items.items()}
+    required_keys = set(kwargs.required_keys)
+    for slot in zip(ctx.arg_kinds, ctx.arg_types, ctx.args, strict=False):
+        for kind, arg_type, arg in zip(*slot, strict=False):
+            if kind == ARG_POS and (alias := _aggregate_default_alias(arg, arg_type)) is not None:
+                types[alias] = _resolve_expression_type(arg_type)
+                required_keys.add(alias)
+    return helpers.make_typeddict(helpers.get_typechecker_api(ctx), types, required_keys=required_keys)
 
 
 def _extract_model_type_var_upper_bound(ctx: MethodContext) -> Instance | None:
@@ -445,29 +444,31 @@ def extract_proper_type_queryset_annotate(ctx: MethodContext, django_context: Dj
     if not isinstance(default_return_type, Instance):
         return ctx.default_return_type
 
+    api = helpers.get_typechecker_api(ctx)
     expression_types = gather_expression_types(ctx)
     django_model = helpers.get_model_info_from_qs_ctx(ctx, django_context)
     if django_model is not None:
         model = django_model.typ
-        expression_types = {
+        valid_types = {
             attr_name: typ
-            for attr_name, typ in expression_types.items()
+            for attr_name, typ in expression_types.items.items()
             if check_valid_attr_value(ctx, django_context, django_model, attr_name)
         }
+        expression_types = helpers.make_typeddict(
+            api, valid_types, required_keys=expression_types.required_keys & valid_types.keys()
+        )
     else:
         # Inside a generic queryset method the model is a TypeVar: annotate its upper bound,
         # so that `self.annotate(...)` matches a declared `QS[WithAnnotations[_Model, ...]]`.
         upper_bound = _extract_model_type_var_upper_bound(ctx)
-        if upper_bound is None or not expression_types:
+        if upper_bound is None or not expression_types.items:
             return AnyType(TypeOfAny.from_omitted_generics)
         model = upper_bound
 
-    api = helpers.get_typechecker_api(ctx)
     qs_type = default_return_type
-    if expression_types:
-        fields_dict = helpers.make_typeddict(api, expression_types)
-        qs_type = _annotate_queryset_model(api, qs_type, model, fields_dict)
-    return _extend_values_row(api, qs_type, expression_types)
+    if expression_types.items:
+        qs_type = _annotate_queryset_model(api, qs_type, model, expression_types)
+    return _extend_values_row(api, qs_type, expression_types.items)
 
 
 def merge_annotations_from_custom_method(ctx: MethodContext, django_context: DjangoContext) -> MypyType:
@@ -564,8 +565,9 @@ def extract_proper_type_queryset_values(ctx: MethodContext, django_context: Djan
             column_types[field_lookup] = field_lookup_type
 
     # Collect `**expressions` types -- `.values(lower_name=Lower("name"), foo=F("name"))`
-    column_types.update(gather_expression_types(ctx))
-    row_type = helpers.make_typeddict(ctx.api, column_types)
+    row_type = helpers.merge_typeddict(
+        ctx.api, helpers.make_typeddict(ctx.api, column_types), gather_expression_types(ctx)
+    )
     return _queryset_subclass_with_row(ctx, row_type) or default_return_type.copy_modified(
         args=[django_model.typ, row_type]
     )
